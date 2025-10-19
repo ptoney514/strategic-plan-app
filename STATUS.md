@@ -117,7 +117,9 @@ UI Component → React Query Hook → Supabase Client → Database (with RLS)
 
 ## Production Status
 
-**Deployment:** https://strategic-plan-vite-n9ax04zdn-pernells-projects.vercel.app
+**Repository:** https://github.com/ptoney514/strategic-plan-app
+
+**Deployment:** Auto-deploys from `main` branch via Vercel GitHub integration
 
 **Database:** Production Supabase (scpluslhcastrobigkfb)
 
@@ -129,10 +131,11 @@ UI Component → React Query Hook → Supabase Client → Database (with RLS)
 
 **Test User:** pernell+westsideadmin@gmail.com (Westside admin access)
 
+**Deployment Process:**
+- Push to `main` → Vercel builds and deploys automatically
+- Push to feature branch → Vercel creates preview deployment
+- No manual commands needed
+
 ## Blockers
 
 None currently! 🎉
-
----
-
-*This is the active development project. For workspace overview, see [../WORKSPACE_STATUS.md](../WORKSPACE_STATUS.md)*

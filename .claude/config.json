@@ -1,0 +1,12 @@
+{
+  "context_files": ["CLAUDE.md", "WORKSPACE_STATUS.md", "strategic-plan-vite/STATUS.md"],
+  "sub_agents_enabled": true,
+  "auto_test_on_change": false,
+  "preferred_model": "claude-sonnet-4-20250514",
+  "agent_triggers": {
+    "code-reviewer": ["review", "check code", "code quality", "review this"],
+    "test-generator": ["generate tests", "write tests", "add tests", "test coverage"],
+    "pr-prep": ["ready for PR", "pre-PR", "PR checklist", "prepare PR"],
+    "debug-assistant": ["debug", "error", "not working", "investigate", "bug", "issue"]
+  }
+}

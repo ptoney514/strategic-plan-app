@@ -1,0 +1,79 @@
+import { ReactNode, useEffect, useState } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+
+interface ClientAdminGuardProps {
+  children: ReactNode;
+}
+
+/**
+ * ClientAdminGuard - Protects client admin routes
+ * Only allows access to users with admin rights for the specific district
+ *
+ * Usage:
+ * <ClientAdminGuard>
+ *   <ClientAdminLayout />
+ * </ClientAdminGuard>
+ */
+export function ClientAdminGuard({ children }: ClientAdminGuardProps) {
+  const { slug } = useParams<{ slug: string }>();
+  const { isAuthenticated, loading: authLoading, hasDistrictAccess } = useAuth();
+  const [hasAccess, setHasAccess] = useState<boolean | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    async function checkAccess() {
+      if (!slug) {
+        setHasAccess(false);
+        setChecking(false);
+        return;
+      }
+
+      if (authLoading) {
+        return; // Wait for auth to finish loading
+      }
+
+      if (!isAuthenticated) {
+        setHasAccess(false);
+        setChecking(false);
+        return;
+      }
+
+      try {
+        const access = await hasDistrictAccess(slug);
+        setHasAccess(access);
+      } catch (error) {
+        console.error('[ClientAdminGuard] Error checking access:', error);
+        setHasAccess(false);
+      } finally {
+        setChecking(false);
+      }
+    }
+
+    checkAccess();
+  }, [slug, isAuthenticated, authLoading, hasDistrictAccess]);
+
+  // Show loading state while checking auth
+  if (authLoading || checking) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Verifying access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect to login if not authenticated
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: `/${slug}/admin` }} replace />;
+  }
+
+  // Redirect to public view if no admin access
+  if (hasAccess === false) {
+    return <Navigate to={`/${slug}`} replace />;
+  }
+
+  return <>{children}</>;
+}

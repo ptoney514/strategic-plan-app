@@ -1,0 +1,31 @@
+<svg width="200" height="120" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="200" height="120" fill="#ffffff"/>
+
+  <!-- Title -->
+  <text x="100" y="20" font-family="system-ui, -apple-system, sans-serif" font-size="12" font-weight="600" fill="#374151" text-anchor="middle">Likert Scale (1-5)</text>
+
+  <!-- Scale labels -->
+  <text x="20" y="45" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280" text-anchor="start">2023</text>
+  <text x="20" y="65" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280" text-anchor="start">2024</text>
+  <text x="20" y="85" font-family="system-ui, -apple-system, sans-serif" font-size="9" fill="#6B7280" text-anchor="start">2025</text>
+
+  <!-- Bar backgrounds -->
+  <rect x="60" y="38" width="120" height="10" rx="2" fill="#E5E7EB"/>
+  <rect x="60" y="58" width="120" height="10" rx="2" fill="#E5E7EB"/>
+  <rect x="60" y="78" width="120" height="10" rx="2" fill="#E5E7EB"/>
+
+  <!-- Filled bars (representing values 3.2, 3.8, 4.1 out of 5) -->
+  <rect x="60" y="38" width="77" height="10" rx="2" fill="#3B82F6"/>
+  <rect x="60" y="58" width="91" height="10" rx="2" fill="#3B82F6"/>
+  <rect x="60" y="78" width="98" height="10" rx="2" fill="#10B981"/>
+
+  <!-- Values -->
+  <text x="140" y="46" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#1F2937">3.2</text>
+  <text x="154" y="66" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#1F2937">3.8</text>
+  <text x="161" y="86" font-family="system-ui, -apple-system, sans-serif" font-size="9" font-weight="600" fill="#059669">4.1</text>
+
+  <!-- Target line -->
+  <line x1="156" y1="35" x2="156" y2="90" stroke="#EF4444" stroke-width="2" stroke-dasharray="3,3"/>
+  <text x="156" y="100" font-family="system-ui, -apple-system, sans-serif" font-size="8" fill="#EF4444" text-anchor="middle">Target: 4.0</text>
+</svg>

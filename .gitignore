@@ -1,0 +1,67 @@
+# Workspace-level .gitignore for strategic-plan-workspace
+
+# Dependencies
+**/node_modules/
+# Allow package-lock.json for CI/CD consistency
+# **/package-lock.json
+
+# Environment variables
+**/.env
+**/.env.local
+**/.env.production
+**/.env.*.local
+
+# Build outputs
+**/dist/
+**/build/
+**/.next/
+**/out/
+
+# Testing
+**/coverage/
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# Temporary files
+**/tmp/
+**/temp/
+**/.temp/
+**/.cache/
+
+# Supabase
+**/supabase/.temp/
+**/supabase/.branches/
+
+# System Files
+Thumbs.db
+Desktop.ini
+
+# Workspace specific
+*.code-workspace
+
+# Claude Code - Auto-generated files (don't commit)
+.claude/context.md
+
+# Keep documentation
+!**/*.md
+!CLAUDE.md
+!WORKSPACE_STATUS.md
+!DEVELOPMENT_WORKFLOW.md
+!PROJECT_TEMPLATE.md
+!TECHNICAL_STANDARDS.md
+!TESTING_STRATEGY.md
+.vercel

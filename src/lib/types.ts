@@ -108,7 +108,6 @@ export interface Metric {
   metric_calculation_type?: 'numeric' | 'ratio' | 'qualitative' | 'percentage' | 'count' | 'rollup';
   qualitative_mapping?: Record<string, number>;
 
-  collection_frequency?: string;
   data_source_details?: string;
   last_collected?: string;
   risk_threshold_critical?: number;

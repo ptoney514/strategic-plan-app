@@ -278,7 +278,12 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 1. Verify build succeeded
 2. Test login flow
 3. Check admin route protection
-4. After migrations: **Reload Supabase schema cache!**
+4. After database migrations: **Reload Supabase schema cache!**
+   - Go to Supabase Dashboard
+   - Navigate to: Project → Settings → API
+   - Click "Reload Schema" button
+   - **CRITICAL**: Skipping this step will cause API errors if schema changed
+   - Verify changes appear in auto-generated API documentation
 
 ## Quick Reference
 

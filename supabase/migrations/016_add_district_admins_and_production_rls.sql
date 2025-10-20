@@ -29,13 +29,19 @@ COMMENT ON COLUMN public.spb_district_admins.district_id IS 'District the user c
 COMMENT ON COLUMN public.spb_district_admins.district_slug IS 'Denormalized district slug for faster lookups';
 
 -- ============================================================================
--- PART 2: Drop Development RLS Policies
+-- PART 2: Drop All Existing RLS Policies to Start Fresh
 -- ============================================================================
 
--- Drop overly permissive development policies
-DROP POLICY IF EXISTS "Enable all access for development" ON public.spb_districts;
-DROP POLICY IF EXISTS "Enable all access for development" ON public.spb_goals;
-DROP POLICY IF EXISTS "Enable all access for development" ON public.spb_metrics;
+-- Drop all existing policies to avoid conflicts
+DO $$
+DECLARE
+  r RECORD;
+BEGIN
+  FOR r IN (SELECT policyname FROM pg_policies WHERE tablename IN ('spb_districts', 'spb_goals', 'spb_metrics', 'spb_district_admins'))
+  LOOP
+    EXECUTE 'DROP POLICY IF EXISTS "' || r.policyname || '" ON public.' || (SELECT tablename FROM pg_policies WHERE policyname = r.policyname LIMIT 1);
+  END LOOP;
+END $$;
 
 -- ============================================================================
 -- PART 3: Create Production RLS Policies

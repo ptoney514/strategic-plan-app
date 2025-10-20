@@ -61,11 +61,20 @@ CREATE INDEX IF NOT EXISTS idx_metric_time_series_status ON public.spb_metric_ti
 -- Enable RLS
 ALTER TABLE public.spb_metric_time_series ENABLE ROW LEVEL SECURITY;
 
--- Create permissive policy for development
-CREATE POLICY "Enable all access for development" 
-ON public.spb_metric_time_series FOR ALL 
-USING (true) 
-WITH CHECK (true);
+-- Create permissive policy for development (if not exists)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies
+    WHERE tablename = 'spb_metric_time_series'
+      AND policyname = 'Enable all access for development'
+  ) THEN
+    CREATE POLICY "Enable all access for development"
+    ON public.spb_metric_time_series FOR ALL
+    USING (true)
+    WITH CHECK (true);
+  END IF;
+END $$;
 
 -- Grant permissions
 GRANT ALL ON public.spb_metric_time_series TO anon, authenticated;

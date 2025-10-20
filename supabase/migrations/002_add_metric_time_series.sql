@@ -32,9 +32,28 @@ ADD COLUMN IF NOT EXISTS last_actual_period VARCHAR(20),
 ADD COLUMN IF NOT EXISTS risk_threshold_critical DECIMAL(10,2),
 ADD COLUMN IF NOT EXISTS risk_threshold_warning DECIMAL(10,2);
 
+-- Add district_id column if table exists but column doesn't
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'spb_metric_time_series') THEN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'spb_metric_time_series' AND column_name = 'district_id') THEN
+      ALTER TABLE public.spb_metric_time_series
+      ADD COLUMN district_id UUID REFERENCES public.spb_districts(id) ON DELETE CASCADE;
+    END IF;
+  END IF;
+END $$;
+
 -- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_metric_time_series_metric_id ON public.spb_metric_time_series(metric_id);
-CREATE INDEX IF NOT EXISTS idx_metric_time_series_district_id ON public.spb_metric_time_series(district_id);
+-- Only create district_id index if column exists
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_name = 'spb_metric_time_series' AND column_name = 'district_id') THEN
+    CREATE INDEX IF NOT EXISTS idx_metric_time_series_district_id ON public.spb_metric_time_series(district_id);
+  END IF;
+END $$;
 CREATE INDEX IF NOT EXISTS idx_metric_time_series_period ON public.spb_metric_time_series(period);
 CREATE INDEX IF NOT EXISTS idx_metric_time_series_period_type ON public.spb_metric_time_series(period_type);
 CREATE INDEX IF NOT EXISTS idx_metric_time_series_status ON public.spb_metric_time_series(status);

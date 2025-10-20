@@ -62,7 +62,10 @@ export function MetricBuilderWizard({
     if (existingMetric && isOpen) {
       console.log('[MetricBuilderWizard] Loading existing metric for editing:', existingMetric);
       console.log('[MetricBuilderWizard] Visualization config:', existingMetric.visualization_config);
-      setSelectedType(existingMetric.visualization_type || 'bar-chart');
+
+      // Try to load the original frontend type from the config, fallback to visualization_type
+      const frontendType = existingMetric.visualization_config?._frontendType || existingMetric.visualization_type || 'bar-chart';
+      setSelectedType(frontendType as VisualizationType);
       setMetricData(existingMetric.visualization_config || getDefaultConfig('bar-chart'));
       setMetricDetails({
         name: existingMetric.metric_name || existingMetric.name || '',
@@ -163,6 +166,24 @@ export function MetricBuilderWizard({
     }
   };
 
+  // Map frontend visualization types to database-allowed types
+  const mapVisualizationType = (frontendType: VisualizationType): string => {
+    const mapping: Record<VisualizationType, string> = {
+      'percentage': 'progress',
+      'number': 'number',
+      'ratio': 'number',
+      'bar-chart': 'bar',
+      'line-chart': 'line',
+      'donut-chart': 'donut',
+      'gauge': 'gauge',
+      'survey': 'auto',
+      'status': 'progress',
+      'likert-scale': 'bar',
+      'narrative': 'blog'
+    };
+    return mapping[frontendType] || 'auto';
+  };
+
   const handleSave = async () => {
     // Prevent duplicate saves
     if (isSaving) {
@@ -186,9 +207,13 @@ export function MetricBuilderWizard({
         goal_id: goalId,
         name: metricDetails.name,
         description: metricDetails.description,
-        visualization_type: selectedType,
-        visualization_config: metricData, // This JSONB field stores all the chart data including dataPoints
-        chart_type: selectedType,
+        visualization_type: mapVisualizationType(selectedType), // Map to DB-allowed values
+        visualization_config: {
+          ...metricData,
+          // Store the original frontend type for proper loading when editing
+          _frontendType: selectedType
+        }, // This JSONB field stores all the chart data including dataPoints
+        chart_type: mapVisualizationType(selectedType), // Map to DB-allowed values
         current_value: isNumericMetric ? (metricData.currentValue || null) : null,
         target_value: isNumericMetric ? (metricData.targetValue || null) : null,
         unit: metricData.unit || metricData.yAxisLabel || '',

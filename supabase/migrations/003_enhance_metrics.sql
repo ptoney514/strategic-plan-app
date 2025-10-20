@@ -112,8 +112,11 @@ SET
   collection_frequency = 'quarterly'
 WHERE name ILIKE '%special education%';
 
+-- Drop existing view if structure is incompatible, then recreate
+DROP VIEW IF EXISTS public.metrics_with_status;
+
 -- Create a view for easier metric status calculation
-CREATE OR REPLACE VIEW public.metrics_with_status AS
+CREATE VIEW public.metrics_with_status AS
 SELECT 
   m.*,
   CASE 

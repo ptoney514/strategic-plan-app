@@ -830,6 +830,142 @@ After cleanup:
 
 ---
 
+## Real-World Case Study: Production Hotfix
+
+### Scenario: Strategic Plan Builder (Oct 2025)
+
+**Problem**: Metric builder failing to save in production with schema errors
+
+**Discovery Process**:
+1. **Initial Error**: `Could not find the 'frequency' column in schema cache`
+2. **Ran validation**: `./scripts/validate-migrations.sh`
+3. **Found**: 6 naming errors, 2 gaps, 9 misplaced files
+4. **Checked production**: Only migration 001 applied (missing 002-016!)
+
+**Root Causes**:
+- Production database never had migrations 002-016 applied
+- Code expected columns from later migrations
+- Incorrect constraints in production
+- Existing data had invalid values
+
+**Resolution Steps**:
+
+**Step 1: Migration Cleanup (Local)**
+```bash
+# Created directories
+mkdir -p supabase/seeds supabase/archive
+
+# Archived non-migration files
+mv supabase/migrations/*.backup supabase/archive/
+mv supabase/migrations/*.skip supabase/archive/
+
+# Moved seed data
+mv supabase/migrations/quick_westside.sql supabase/seeds/01_westside_district.sql
+# ... (5 more seed files)
+
+# Renumbered to fill gaps
+mv 004_enhance_metrics.sql 003_enhance_metrics.sql
+# ... (filled all gaps to get 001-016 sequential)
+
+# Validated
+./scripts/validate-migrations.sh  # ✅ All checks passed
+```
+
+**Step 2: Applied to Production**
+```bash
+# Linked to production
+supabase link --project-ref scpluslhcastrobigkfb
+
+# Checked current state
+supabase migration list --linked  # Showed only 001 in remote
+
+# Pushed migrations (fixed issues as they appeared)
+supabase db push --linked
+
+# Fixed migration issues:
+# - 002: Added safe district_id column handling
+# - 003: Drop view before recreating
+# - 010: Disabled auto-calculation
+# - 016: Drop existing policies first
+```
+
+**Step 3: Constraint Normalization**
+```sql
+-- Temporary migration to fix production data
+-- 1. Drop incorrect constraint
+ALTER TABLE spb_metrics DROP CONSTRAINT spb_metrics_visualization_type_check;
+
+-- 2. Update all existing metrics
+UPDATE spb_metrics
+SET visualization_type = CASE
+  WHEN visualization_type = 'percentage' THEN 'progress'
+  WHEN visualization_type LIKE '%chart%' THEN 'bar'
+  ELSE 'auto'
+END;
+
+-- 3. Add correct constraint
+ALTER TABLE spb_metrics
+ADD CONSTRAINT spb_metrics_visualization_type_check
+CHECK (visualization_type IN ('auto', 'line', 'bar', 'gauge', 'donut',
+  'timeline', 'blog', 'number', 'progress'));
+
+-- 4. Reload schema
+NOTIFY pgrst, 'reload schema';
+```
+
+**Results**:
+- ✅ All 16 migrations in production
+- ✅ Metric builder working perfectly
+- ✅ Schema synchronized local ↔ production
+- ✅ Validation tools prevent future issues
+
+**Time Investment**:
+- Problem identification: 15 minutes
+- Migration cleanup: 45 minutes
+- Production application: 60 minutes
+- Constraint fixes: 30 minutes
+- Documentation: 30 minutes
+**Total**: ~3 hours
+
+**Value Created**:
+- ✅ Production issue resolved
+- ✅ Universal cleanup guide (reusable)
+- ✅ Automated validation tooling
+- ✅ Clean migration base for future
+- ✅ Prepared for Supabase branching
+
+### Key Takeaways
+
+**What We Learned**:
+1. **Always check production state first** - Don't assume migrations are applied
+2. **Validate locally before pushing** - Use validation scripts
+3. **Production data can have invalid values** - Normalize before adding constraints
+4. **Schema cache must be reloaded** - Use `NOTIFY pgrst, 'reload schema'`
+5. **Clean migrations save hours** - Worth the upfront investment
+
+**Commands That Saved Us**:
+```bash
+# Check production migration status
+supabase migration list --linked
+
+# Validate migrations before deploying
+./scripts/validate-migrations.sh
+
+# Apply migrations to production
+supabase db push --linked
+
+# Reload schema cache (in SQL Editor)
+NOTIFY pgrst, 'reload schema';
+```
+
+**Prevention Going Forward**:
+- Run `./scripts/validate-migrations.sh` before every deployment
+- Check `supabase migration list --linked` before assuming schema state
+- Use `supabase db push --dry-run` to preview changes
+- Keep STATUS.md updated with production migration status
+
+---
+
 **Last Updated**: 2025-10-20
-**Version**: 1.0
+**Version**: 1.1 (Added case study from production hotfix)
 **License**: MIT (copy to any project)

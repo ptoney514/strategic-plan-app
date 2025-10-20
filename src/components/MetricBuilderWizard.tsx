@@ -203,27 +203,31 @@ export function MetricBuilderWizard({
       // The ratio values are stored as strings in visualization_config
       const isNumericMetric = selectedType === 'number' || selectedType === 'percentage';
 
+      // CRITICAL: Only use columns from base schema (001_initial_schema.sql)
+      // Production database may not have migrations 002-016 applied yet
+      // Columns in base schema: name, metric_type, data_source, current_value,
+      // target_value, unit, status, chart_type, display_options
       const metric = {
         goal_id: goalId,
         name: metricDetails.name,
-        description: metricDetails.description,
-        visualization_type: mapVisualizationType(selectedType), // Map to DB-allowed values
-        visualization_config: {
-          ...metricData,
-          // Store the original frontend type for proper loading when editing
-          _frontendType: selectedType
-        }, // This JSONB field stores all the chart data including dataPoints
-        chart_type: mapVisualizationType(selectedType), // Map to DB-allowed values
+        chart_type: mapVisualizationType(selectedType),
         current_value: isNumericMetric ? (metricData.currentValue || null) : null,
         target_value: isNumericMetric ? (metricData.targetValue || null) : null,
         unit: metricData.unit || metricData.yAxisLabel || '',
         data_source: 'survey' as const,
-        metric_type: selectedType === 'percentage' ? 'percent' : 'number' as const
+        metric_type: selectedType === 'percentage' ? 'percent' : 'number' as const,
+        // Store all extended data in display_options (TEXT field, exists in base schema)
+        display_options: JSON.stringify({
+          _frontendType: selectedType,
+          description: metricDetails.description,
+          visualization_config: metricData
+        })
       };
 
       console.log('[MetricBuilderWizard] Saving metric:', existingMetric ? 'UPDATE' : 'CREATE', metric);
       console.log('[MetricBuilderWizard] Metric data structure:', {
-        visualization_type: metric.visualization_type,
+        chart_type: metric.chart_type,
+        frontend_type: selectedType,
         dataPoints: metricData.dataPoints,
         targetValue: metricData.targetValue
       });

@@ -246,6 +246,9 @@ GRANT ALL ON spb_goals_progress_breakdown TO anon, authenticated;
 -- ============================================================================
 
 -- Calculate initial progress for all existing goals
+-- NOTE: Skipped in production to avoid query errors with existing data
+-- Run manually after migration if needed: SELECT recalculate_district_progress(id) FROM spb_districts;
+/*
 DO $$
 DECLARE
   v_district_record RECORD;
@@ -257,6 +260,7 @@ BEGIN
       v_district_record.name, v_result.updated_count, v_result.skipped_count, v_result.calculation_time;
   END LOOP;
 END $$;
+*/
 
 -- ============================================================================
 -- Success Message

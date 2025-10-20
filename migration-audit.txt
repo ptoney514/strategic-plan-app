@@ -1,0 +1,61 @@
+🔍 Validating Supabase Migrations...
+
+📋 Check 1: Migration file naming...
+❌ Invalid name: quick_westside.sql
+   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)
+❌ Invalid name: run_westside.sql
+   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)
+❌ Invalid name: setup_westside_complete.sql
+   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)
+❌ Invalid name: simple_sample_data.sql
+   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)
+❌ Invalid name: westside_complete_setup.sql
+   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)
+❌ Invalid name: westside_goals_structure.sql
+   Expected format: NNN_description.sql (e.g., 001_initial_schema.sql)
+
+📋 Check 2: Sequential numbering...
+⚠️  Gap detected: expected 3, found 4 (004_enhance_metrics.sql)
+⚠️  Gap detected: expected 10, found 11 (011_add_cover_photos.sql)
+   ⚠️  Found 2 gap(s) in numbering (not critical, but recommended to fix)
+
+📋 Check 3: Idempotency checks...
+⚠️  Potentially non-idempotent CREATE INDEX in: 019_rename_collection_frequency_to_frequency.sql
+   Recommendation: Use 'CREATE INDEX IF NOT EXISTS'
+   ⚠️  Found 1 potentially non-idempotent statement(s)
+
+📋 Check 4: Non-migration files...
+⚠️  Found non-migration file: 00000000000000_current_schema.sql.backup
+   Recommendation: Move to archive/ directory
+⚠️  Found non-migration file: 014_sample_data.sql.skip
+   Recommendation: Move to archive/ directory
+⚠️  Found non-migration file: 015_westside_district_data.sql.skip
+   Recommendation: Move to archive/ directory
+⚠️  Found non-timestamped file: quick_westside.sql
+   Recommendation: Rename with number prefix or move to seeds/
+⚠️  Found non-timestamped file: run_westside.sql
+   Recommendation: Rename with number prefix or move to seeds/
+⚠️  Found non-timestamped file: setup_westside_complete.sql
+   Recommendation: Rename with number prefix or move to seeds/
+⚠️  Found non-timestamped file: simple_sample_data.sql
+   Recommendation: Rename with number prefix or move to seeds/
+⚠️  Found non-timestamped file: westside_complete_setup.sql
+   Recommendation: Rename with number prefix or move to seeds/
+⚠️  Found non-timestamped file: westside_goals_structure.sql
+   Recommendation: Rename with number prefix or move to seeds/
+   ⚠️  Found 9 non-migration file(s)
+
+📋 Check 5: Seed file configuration...
+   ✅ seed.sql exists
+   ✅ seed.sql configured in config.toml
+
+═══════════════════════════════════════
+Summary:
+═══════════════════════════════════════
+❌ Errors: 6
+⚠️  Warnings: 2
+⚠️  Non-idempotent statements: 1
+⚠️  Non-migration files: 9
+
+❌ Found 6 critical error(s).
+   Please fix errors before deploying to production.

@@ -203,25 +203,22 @@ export function MetricBuilderWizard({
       // The ratio values are stored as strings in visualization_config
       const isNumericMetric = selectedType === 'number' || selectedType === 'percentage';
 
-      // CRITICAL: Only use columns from base schema (001_initial_schema.sql)
-      // Production database may not have migrations 002-016 applied yet
-      // Columns in base schema: name, metric_type, data_source, current_value,
-      // target_value, unit, status, chart_type, display_options
+      // Production now has full schema with all columns from migrations 001-016
       const metric = {
         goal_id: goalId,
         name: metricDetails.name,
+        description: metricDetails.description,
+        visualization_type: mapVisualizationType(selectedType), // Maps to DB-allowed values
+        visualization_config: {
+          ...metricData,
+          _frontendType: selectedType // Preserve original type for editing
+        },
         chart_type: mapVisualizationType(selectedType),
         current_value: isNumericMetric ? (metricData.currentValue || null) : null,
         target_value: isNumericMetric ? (metricData.targetValue || null) : null,
         unit: metricData.unit || metricData.yAxisLabel || '',
         data_source: 'survey' as const,
-        metric_type: selectedType === 'percentage' ? 'percent' : 'number' as const,
-        // Store all extended data in display_options (TEXT field, exists in base schema)
-        display_options: JSON.stringify({
-          _frontendType: selectedType,
-          description: metricDetails.description,
-          visualization_config: metricData
-        })
+        metric_type: selectedType === 'percentage' ? 'percent' : 'number' as const
       };
 
       console.log('[MetricBuilderWizard] Saving metric:', existingMetric ? 'UPDATE' : 'CREATE', metric);

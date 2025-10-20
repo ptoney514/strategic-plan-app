@@ -185,7 +185,6 @@ export function MetricBuilderWizard({
       const metric = {
         goal_id: goalId,
         name: metricDetails.name,
-        metric_name: metricDetails.name,
         description: metricDetails.description,
         visualization_type: selectedType,
         visualization_config: metricData, // This JSONB field stores all the chart data including dataPoints
@@ -193,8 +192,6 @@ export function MetricBuilderWizard({
         current_value: isNumericMetric ? (metricData.currentValue || null) : null,
         target_value: isNumericMetric ? (metricData.targetValue || null) : null,
         unit: metricData.unit || metricData.yAxisLabel || '',
-        collection_frequency: 'annually' as const,
-        aggregation_method: 'latest' as const,
         data_source: 'survey' as const,
         metric_type: selectedType === 'percentage' ? 'percent' : 'number' as const
       };

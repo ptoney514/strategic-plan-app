@@ -35,8 +35,11 @@ export function LikertScaleChart({
     );
   }
 
-  // Calculate average score
-  const average = data.reduce((sum, point) => sum + point.value, 0) / data.length;
+  // Calculate average score (exclude data points with value 0 as they represent "no data")
+  const validDataPoints = data.filter(point => point.value > 0);
+  const average = validDataPoints.length > 0
+    ? validDataPoints.reduce((sum, point) => sum + point.value, 0) / validDataPoints.length
+    : 0;
 
   return (
     <div className="space-y-3">

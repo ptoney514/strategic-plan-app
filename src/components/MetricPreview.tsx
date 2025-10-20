@@ -306,8 +306,10 @@ export function MetricPreview({ type, data }: MetricPreviewProps) {
 
       case 'likert-scale':
         const likertData = data.dataPoints || [];
-        const average = likertData.length > 0
-          ? likertData.reduce((sum: number, point: any) => sum + point.value, 0) / likertData.length
+        // Calculate average excluding data points with value 0 (represents "no data")
+        const validLikertPoints = likertData.filter((point: any) => point.value > 0);
+        const average = validLikertPoints.length > 0
+          ? validLikertPoints.reduce((sum: number, point: any) => sum + point.value, 0) / validLikertPoints.length
           : 0;
 
         return (

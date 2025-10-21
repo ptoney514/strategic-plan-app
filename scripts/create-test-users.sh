@@ -56,7 +56,12 @@ BEGIN
     created_at,
     updated_at,
     confirmation_token,
-    recovery_token
+    recovery_token,
+    email_change,
+    email_change_token_new,
+    email_change_token_current,
+    phone_change,
+    phone_change_token
   ) VALUES (
     westside_user_id,
     '00000000-0000-0000-0000-000000000000',
@@ -69,6 +74,11 @@ BEGIN
     '{"role":"district_admin"}',
     NOW(),
     NOW(),
+    '',
+    '',
+    '',
+    '',
+    '',
     '',
     ''
   );
@@ -87,7 +97,12 @@ BEGIN
     created_at,
     updated_at,
     confirmation_token,
-    recovery_token
+    recovery_token,
+    email_change,
+    email_change_token_new,
+    email_change_token_current,
+    phone_change,
+    phone_change_token
   ) VALUES (
     eastside_user_id,
     '00000000-0000-0000-0000-000000000000',
@@ -100,6 +115,11 @@ BEGIN
     '{"role":"district_admin"}',
     NOW(),
     NOW(),
+    '',
+    '',
+    '',
+    '',
+    '',
     '',
     ''
   );

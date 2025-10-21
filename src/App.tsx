@@ -15,6 +15,7 @@ import { DistrictLandingPage } from './pages/client/public/DistrictLandingPage';
 import { DistrictDashboard } from './pages/client/public/DistrictDashboard';
 import { GoalDetail } from './pages/client/public/GoalDetail';
 import { MetricsDashboard } from './pages/client/public/MetricsDashboard';
+import { SchoolsDirectory } from './pages/client/public/SchoolsDirectory';
 
 // Client Admin Pages
 import { AdminDashboard } from './pages/client/admin/AdminDashboard';
@@ -63,7 +64,7 @@ function App() {
         {/* School Routes - /:slug/schools */}
         {/* Schools directory (list of all schools) */}
         <Route path="/:slug/schools" element={<ClientPublicLayout />}>
-          <Route index element={<div>Schools Directory - Coming Soon</div>} />
+          <Route index element={<SchoolsDirectory />} />
         </Route>
 
         {/* Individual school public routes */}

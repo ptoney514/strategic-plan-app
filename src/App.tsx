@@ -31,6 +31,7 @@ import { Login } from './pages/Login';
 // Guards
 import { ClientAdminGuard } from './middleware/ClientAdminGuard';
 import { SystemAdminGuard } from './middleware/SystemAdminGuard';
+import { SchoolAdminGuard } from './middleware/SchoolAdminGuard';
 
 function App() {
   return (
@@ -59,6 +60,28 @@ function App() {
           <Route path="metrics" element={<MetricsDashboard />} />
         </Route>
 
+        {/* School Routes - /:slug/schools */}
+        {/* Schools directory (list of all schools) */}
+        <Route path="/:slug/schools" element={<ClientPublicLayout />}>
+          <Route index element={<div>Schools Directory - Coming Soon</div>} />
+        </Route>
+
+        {/* Individual school public routes */}
+        <Route path="/:slug/schools/:schoolSlug" element={<ClientPublicLayout />}>
+          <Route index element={<div>School Landing Page - Coming Soon</div>} />
+          <Route path="goals" element={<div>School Dashboard - Coming Soon</div>} />
+          <Route path="goals/:goalId" element={<GoalDetail />} />
+        </Route>
+
+        {/* School Admin Routes - /:slug/schools/:schoolSlug/admin */}
+        <Route path="/:slug/schools/:schoolSlug/admin" element={<SchoolAdminGuard><ClientAdminLayout /></SchoolAdminGuard>}>
+          <Route index element={<div>School Admin Dashboard - Coming Soon</div>} />
+          <Route path="goals" element={<AdminGoals />} />
+          <Route path="objectives/new" element={<ObjectiveBuilder />} />
+          <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+
         {/* Client Admin Routes - /:slug/admin */}
         <Route path="/:slug/admin" element={<ClientAdminGuard><ClientAdminLayout /></ClientAdminGuard>}>
           <Route index element={<AdminDashboard />} />
@@ -68,6 +91,7 @@ function App() {
           <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
           <Route path="goals/:goalId/edit" element={<ObjectiveBuilder />} />
           <Route path="import" element={<ImportWizard />} />
+          <Route path="schools" element={<div>Manage Schools - Coming Soon</div>} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="audit" element={<AdminAudit />} />
         </Route>

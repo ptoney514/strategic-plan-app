@@ -71,6 +71,7 @@ function App() {
         {/* Individual school public routes */}
         <Route path="/:slug/schools/:schoolSlug" element={<ClientPublicLayout />}>
           <Route index element={<div>School Landing Page - Coming Soon</div>} />
+          {/* TODO: Implement SchoolDashboard component (similar to DistrictDashboard but filtered by school_id) */}
           <Route path="goals" element={<div>School Dashboard - Coming Soon</div>} />
           <Route path="goals/:goalId" element={<GoalDetail />} />
         </Route>

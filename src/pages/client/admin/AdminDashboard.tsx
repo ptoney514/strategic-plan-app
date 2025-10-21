@@ -6,7 +6,8 @@ import {
   Upload,
   Palette,
   Eye,
-  ArrowRight
+  ArrowRight,
+  Loader2
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
@@ -16,12 +17,17 @@ import { useMetrics } from '../../../hooks/useMetrics';
  * AdminDashboard - Simplified, clean dashboard for district/school admins
  * Focus: Content overview + quick actions (no project management features)
  * This is a REPORTING TOOL, not a project management tool
+ *
+ * Note: This dashboard works for both district admins and school admins.
+ * The layout and actions are the same, just scoped differently.
  */
 export function AdminDashboard() {
   const { slug } = useParams();
-  const { data: district } = useDistrict(slug!);
-  const { data: goals } = useGoals(district?.id || '');
-  const { data: metrics } = useMetrics(district?.id || '');
+  const { data: district, isLoading: districtLoading } = useDistrict(slug!);
+  const { data: goals, isLoading: goalsLoading } = useGoals(district?.id || '');
+  const { data: metrics, isLoading: metricsLoading } = useMetrics(district?.id || '');
+
+  const isLoading = districtLoading || goalsLoading || metricsLoading;
 
   // Simple content counts
   const stats = [
@@ -120,7 +126,14 @@ export function AdminDashboard() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  {isLoading ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
+                      <p className="text-lg text-gray-400">Loading...</p>
+                    </div>
+                  ) : (
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  )}
                 </div>
               </div>
             </div>

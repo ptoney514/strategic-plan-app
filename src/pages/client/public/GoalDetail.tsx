@@ -191,7 +191,7 @@ export function GoalDetail() {
 
                     if (isNumber) {
                       const config = metric.visualization_config as any;
-                      const decimals = config.decimals ?? 0;
+                      const decimals = config.decimals ?? 2;
                       const formattedValue = typeof config.currentValue === 'number'
                         ? config.currentValue.toFixed(decimals)
                         : config.currentValue || '0';

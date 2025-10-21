@@ -666,7 +666,7 @@ export function DistrictDashboard() {
                                   <div className="text-sm font-medium text-neutral-600 mb-2">{primaryMetric.name}</div>
                                   <div className="text-4xl font-bold text-neutral-900 mb-1">
                                     {(() => {
-                                      const decimals = primaryMetric.visualization_config?.decimals ?? 0;
+                                      const decimals = primaryMetric.visualization_config?.decimals ?? 2;
                                       const value = typeof primaryMetric.visualization_config?.currentValue === 'number'
                                         ? primaryMetric.visualization_config.currentValue.toFixed(decimals)
                                         : primaryMetric.visualization_config?.currentValue || '0';
@@ -675,7 +675,7 @@ export function DistrictDashboard() {
                                   </div>
                                   {primaryMetric.visualization_config?.targetValue && (
                                     <div className="text-sm text-neutral-500 mt-2">
-                                      Target: {primaryMetric.visualization_config.targetValue.toFixed(primaryMetric.visualization_config?.decimals ?? 0)}{primaryMetric.visualization_config?.unit || ''}
+                                      Target: {primaryMetric.visualization_config.targetValue.toFixed(primaryMetric.visualization_config?.decimals ?? 2)}{primaryMetric.visualization_config?.unit || ''}
                                     </div>
                                   )}
                                 </div>
@@ -815,7 +815,7 @@ export function DistrictDashboard() {
                                                     </div>
                                                     <div className="text-4xl font-bold text-neutral-900 mb-1">
                                                       {(() => {
-                                                        const decimals = primarySubMetric.visualization_config?.decimals ?? 0;
+                                                        const decimals = primarySubMetric.visualization_config?.decimals ?? 2;
                                                         const value = typeof primarySubMetric.visualization_config?.currentValue === 'number'
                                                           ? primarySubMetric.visualization_config.currentValue.toFixed(decimals)
                                                           : primarySubMetric.visualization_config?.currentValue || '0';
@@ -824,7 +824,7 @@ export function DistrictDashboard() {
                                                     </div>
                                                     {primarySubMetric.visualization_config?.targetValue && (
                                                       <div className="text-sm text-neutral-500 mt-2">
-                                                        Target: {primarySubMetric.visualization_config.targetValue.toFixed(primarySubMetric.visualization_config?.decimals ?? 0)}{primarySubMetric.visualization_config?.unit || ''}
+                                                        Target: {primarySubMetric.visualization_config.targetValue.toFixed(primarySubMetric.visualization_config?.decimals ?? 2)}{primarySubMetric.visualization_config?.unit || ''}
                                                       </div>
                                                     )}
                                                   </div>

@@ -553,9 +553,9 @@ export function DistrictDashboard() {
                     const childProgress = child.overall_progress_override ?? child.overall_progress ?? 0;
                     const isExpanded = expandedGoalId === child.id;
 
-                    // Get real metrics for this goal (only one metric per goal)
+                    // Get real metrics for this goal - prefer metrics with visualization_config
                     const goalMetrics = metrics?.filter(m => m.goal_id === child.id) || [];
-                    const primaryMetric = goalMetrics[0]; // Only one metric per goal now
+                    const primaryMetric = goalMetrics.find(m => m.visualization_config) || goalMetrics[0];
 
                     // Convert metric visualization_config.dataPoints to chart data format
                     const dataPoints = primaryMetric?.visualization_config?.dataPoints ||
@@ -660,6 +660,26 @@ export function DistrictDashboard() {
                                   )}
                                 </div>
                               </div>
+                            ) : (primaryMetric.visualization_type === 'number' && primaryMetric.visualization_config?._frontendType === 'number') ? (
+                              <div className="p-6 bg-white rounded-lg">
+                                <div className="text-center">
+                                  <div className="text-sm font-medium text-neutral-600 mb-2">{primaryMetric.name}</div>
+                                  <div className="text-4xl font-bold text-neutral-900 mb-1">
+                                    {(() => {
+                                      const decimals = primaryMetric.visualization_config?.decimals ?? 0;
+                                      const value = typeof primaryMetric.visualization_config?.currentValue === 'number'
+                                        ? primaryMetric.visualization_config.currentValue.toFixed(decimals)
+                                        : primaryMetric.visualization_config?.currentValue || '0';
+                                      return primaryMetric.visualization_config?.unit ? `${value}${primaryMetric.visualization_config.unit}` : value;
+                                    })()}
+                                  </div>
+                                  {primaryMetric.visualization_config?.targetValue && (
+                                    <div className="text-sm text-neutral-500 mt-2">
+                                      Target: {primaryMetric.visualization_config.targetValue.toFixed(primaryMetric.visualization_config?.decimals ?? 0)}{primaryMetric.visualization_config?.unit || ''}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             ) : (
                               chartData && chartData.length > 0 && (
                                 <AnnualProgressChart
@@ -684,9 +704,9 @@ export function DistrictDashboard() {
                                     const isSubExpanded = expandedSubGoalId === subGoal.id;
                                     const subGoalProgress = subGoal.overall_progress_override ?? subGoal.overall_progress ?? 0;
 
-                                    // Get real metrics for this sub-goal (only one metric per goal)
+                                    // Get real metrics for this sub-goal - prefer metrics with visualization_config
                                     const subGoalMetrics = metrics?.filter(m => m.goal_id === subGoal.id) || [];
-                                    const primarySubMetric = subGoalMetrics[0]; // Only one metric per goal now
+                                    const primarySubMetric = subGoalMetrics.find(m => m.visualization_config) || subGoalMetrics[0];
 
                                     // Debug logging
                                     if (subGoal.goal_number === '1.1.1') {
@@ -769,23 +789,24 @@ export function DistrictDashboard() {
                                                     )}
                                                   </div>
                                                 </div>
-                                              ) : primarySubMetric.visualization_type === 'number' ? (
+                                              ) : (primarySubMetric.visualization_type === 'number' && primarySubMetric.visualization_config?._frontendType === 'number') ? (
                                                 <div className="p-6 bg-white">
                                                   <div className="text-center">
                                                     <div className="text-sm font-medium text-neutral-600 mb-2">
                                                       {primarySubMetric.name}
                                                     </div>
-                                                    <div className="text-5xl font-bold text-neutral-900 mb-1">
-                                                      {primarySubMetric.visualization_config?.currentValue || 0}
+                                                    <div className="text-4xl font-bold text-neutral-900 mb-1">
+                                                      {(() => {
+                                                        const decimals = primarySubMetric.visualization_config?.decimals ?? 0;
+                                                        const value = typeof primarySubMetric.visualization_config?.currentValue === 'number'
+                                                          ? primarySubMetric.visualization_config.currentValue.toFixed(decimals)
+                                                          : primarySubMetric.visualization_config?.currentValue || '0';
+                                                        return primarySubMetric.visualization_config?.unit ? `${value}${primarySubMetric.visualization_config.unit}` : value;
+                                                      })()}
                                                     </div>
-                                                    {primarySubMetric.visualization_config?.label && (
-                                                      <div className="text-base text-neutral-600 mt-2">
-                                                        {primarySubMetric.visualization_config.label}
-                                                      </div>
-                                                    )}
                                                     {primarySubMetric.visualization_config?.targetValue && (
                                                       <div className="text-sm text-neutral-500 mt-2">
-                                                        Target: {primarySubMetric.visualization_config.targetValue}
+                                                        Target: {primarySubMetric.visualization_config.targetValue.toFixed(primarySubMetric.visualization_config?.decimals ?? 0)}{primarySubMetric.visualization_config?.unit || ''}
                                                       </div>
                                                     )}
                                                   </div>
@@ -805,7 +826,7 @@ export function DistrictDashboard() {
                                                 </div>
                                               ) : (metricChartData && metricChartData.length > 0) ? (
                                                 <div className="p-5 bg-neutral-50">
-                                                  {primarySubMetric.visualization_type === 'likert-scale' ? (
+                                                  {(primarySubMetric.visualization_type === 'bar' && primarySubMetric.visualization_config?.scaleMin) ? (
                                                     <LikertScaleChart
                                                       data={metricChartData}
                                                       title={primarySubMetric.name || "Survey Results"}

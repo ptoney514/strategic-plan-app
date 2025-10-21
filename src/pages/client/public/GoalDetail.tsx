@@ -6,6 +6,7 @@ import { ChevronLeft, Target, TrendingUp, BarChart2, Edit2 } from 'lucide-react'
 import { MetricsChart } from '../../../components/MetricsChart';
 import { GoalEditWizard } from '../../../components/GoalEditWizard';
 import { LikertScaleChart } from '../../../components/LikertScaleChart';
+import { NarrativeDisplay } from '../../../components/NarrativeDisplay';
 import { calculateGoalProgress, getGoalStatus } from '../../../lib/types';
 
 export function GoalDetail() {
@@ -220,6 +221,29 @@ export function GoalDetail() {
                               </p>
                             )}
                           </div>
+                        </div>
+                      );
+                    }
+
+                    // Check if this is a Narrative/Rich Text metric
+                    const isNarrative = metric.visualization_type === 'blog' &&
+                                       metric.visualization_config &&
+                                       (metric.visualization_config as any)._frontendType === 'narrative';
+
+                    if (isNarrative) {
+                      const config = metric.visualization_config as any;
+
+                      return (
+                        <div key={metric.id} className="border border-border rounded-lg p-4">
+                          <h3 className="font-medium text-card-foreground mb-4">
+                            {metric.name}
+                          </h3>
+                          {metric.description && (
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {metric.description}
+                            </p>
+                          )}
+                          <NarrativeDisplay config={config} />
                         </div>
                       );
                     }

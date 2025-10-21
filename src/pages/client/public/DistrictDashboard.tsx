@@ -680,6 +680,10 @@ export function DistrictDashboard() {
                                   )}
                                 </div>
                               </div>
+                            ) : (primaryMetric.visualization_type === 'blog' && primaryMetric.visualization_config?._frontendType === 'narrative') ? (
+                              <div className="p-6 bg-white rounded-lg">
+                                <NarrativeDisplay config={primaryMetric.visualization_config} />
+                              </div>
                             ) : (
                               chartData && chartData.length > 0 && (
                                 <AnnualProgressChart
@@ -771,8 +775,8 @@ export function DistrictDashboard() {
 
                                           return (
                                             <div className="border-t border-neutral-300">
-                                              {primarySubMetric.visualization_type === 'narrative' ? (
-                                                <div className="p-5 bg-neutral-50">
+                                              {(primarySubMetric.visualization_type === 'blog' && primarySubMetric.visualization_config?._frontendType === 'narrative') ? (
+                                                <div className="p-6 bg-white">
                                                   <NarrativeDisplay config={primarySubMetric.visualization_config} />
                                                 </div>
                                               ) : (primarySubMetric.visualization_type === 'number' && primarySubMetric.visualization_config?._frontendType === 'ratio') ? (

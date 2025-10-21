@@ -187,12 +187,10 @@ CREATE POLICY "System admins can manage school admins"
 CREATE POLICY "District admins can manage school admins in their district"
   ON public.spb_school_admins FOR ALL
   USING (
-    school_id IN (
-      SELECT id FROM public.spb_schools
-      WHERE district_id IN (
-        SELECT district_id FROM public.spb_district_admins
-        WHERE user_id = auth.uid()
-      )
+    -- Use denormalized district_slug to avoid circular dependency with spb_schools
+    district_slug IN (
+      SELECT district_slug FROM public.spb_district_admins
+      WHERE user_id = auth.uid()
     )
   );
 

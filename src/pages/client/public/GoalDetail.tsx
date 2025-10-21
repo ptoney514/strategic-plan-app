@@ -6,6 +6,7 @@ import { ChevronLeft, Target, TrendingUp, BarChart2, Edit2 } from 'lucide-react'
 import { MetricsChart } from '../../../components/MetricsChart';
 import { GoalEditWizard } from '../../../components/GoalEditWizard';
 import { LikertScaleChart } from '../../../components/LikertScaleChart';
+import { NarrativeDisplay } from '../../../components/NarrativeDisplay';
 import { calculateGoalProgress, getGoalStatus } from '../../../lib/types';
 
 export function GoalDetail() {
@@ -242,15 +243,7 @@ export function GoalDetail() {
                               {metric.description}
                             </p>
                           )}
-                          <div className="prose prose-sm max-w-none">
-                            {config.showTitle && config.title && (
-                              <h4 className="text-lg font-semibold mb-2">{config.title}</h4>
-                            )}
-                            <div
-                              dangerouslySetInnerHTML={{ __html: config.content || '<p>No content available</p>' }}
-                              style={{ lineHeight: '1.7' }}
-                            />
-                          </div>
+                          <NarrativeDisplay config={config} />
                         </div>
                       );
                     }

@@ -183,6 +183,47 @@ export function GoalDetail() {
                       );
                     }
 
+                    // Check if this is a Number/KPI metric
+                    const isNumber = metric.visualization_type === 'number' &&
+                                    metric.visualization_config &&
+                                    (metric.visualization_config as any)._frontendType === 'number';
+
+                    if (isNumber) {
+                      const config = metric.visualization_config as any;
+                      const decimals = config.decimals ?? 0;
+                      const formattedValue = typeof config.currentValue === 'number'
+                        ? config.currentValue.toFixed(decimals)
+                        : config.currentValue || '0';
+                      const valueWithUnit = config.unit
+                        ? `${formattedValue}${config.unit}`
+                        : formattedValue;
+                      const fullDisplay = config.label
+                        ? `${config.label} - ${valueWithUnit}`
+                        : valueWithUnit;
+
+                      return (
+                        <div key={metric.id} className="border border-border rounded-lg p-4">
+                          <h3 className="font-medium text-card-foreground mb-4">
+                            {metric.name}
+                          </h3>
+                          {metric.description && (
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {metric.description}
+                            </p>
+                          )}
+                          <div className="bg-white border border-border rounded-lg p-6">
+                            <p className="text-sm text-neutral-600 mb-2">Current Value</p>
+                            <p className="text-4xl font-bold text-neutral-900">{fullDisplay}</p>
+                            {config.targetValue && (
+                              <p className="text-sm text-neutral-500 mt-2">
+                                Target: {config.targetValue.toFixed(decimals)}{config.unit || ''}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+
                     // Default metric rendering (progress bar)
                     return (
                       <div key={metric.id} className="border-l-4 border-primary pl-4">

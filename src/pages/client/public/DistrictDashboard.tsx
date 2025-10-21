@@ -749,6 +749,20 @@ export function DistrictDashboard() {
                                                 <p className="text-xs text-neutral-600 mt-1">{subGoal.description}</p>
                                               )}
                                             </div>
+                                            {subGoal.indicator_text && (
+                                              <div className="flex-shrink-0">
+                                                <span
+                                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
+                                                  style={{
+                                                    backgroundColor: subGoal.indicator_color || '#10b981',
+                                                    color: '#ffffff'
+                                                  }}
+                                                >
+                                                  <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
+                                                  {subGoal.indicator_text}
+                                                </span>
+                                              </div>
+                                            )}
                                           </div>
 
                                           {/* Performance Indicator for Sub-goal - Only show if enabled, no click action */}

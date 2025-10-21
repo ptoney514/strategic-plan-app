@@ -25,6 +25,7 @@ import { AdminAudit } from './pages/client/admin/AdminAudit';
 import { AdminSettings } from './pages/client/admin/AdminSettings';
 import { ObjectiveBuilder } from './pages/client/admin/ObjectiveBuilder';
 import { ImportWizard } from './pages/client/admin/ImportWizard';
+import { AdminSchools } from './pages/client/admin/AdminSchools';
 
 // Auth Pages
 import { Login } from './pages/Login';
@@ -92,7 +93,7 @@ function App() {
           <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
           <Route path="goals/:goalId/edit" element={<ObjectiveBuilder />} />
           <Route path="import" element={<ImportWizard />} />
-          <Route path="schools" element={<div>Manage Schools - Coming Soon</div>} />
+          <Route path="schools" element={<AdminSchools />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="audit" element={<AdminAudit />} />
         </Route>

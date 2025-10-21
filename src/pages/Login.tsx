@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 
 interface LocationState {
@@ -37,9 +38,25 @@ export function Login() {
     }
 
     try {
-      await login(email, password);
+      const response = await login(email, password);
+      const user = response.data.user;
 
-      // Redirect to the page they tried to access, or home
+      // Check if user has a specific district assigned
+      if (user) {
+        const { data: districtAdmin } = await supabase
+          .from('spb_district_admins')
+          .select('district_slug')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // If district admin, redirect to their district admin page
+        if (districtAdmin?.district_slug) {
+          navigate(`/${districtAdmin.district_slug}/admin`, { replace: true });
+          return;
+        }
+      }
+
+      // Otherwise use the page they tried to access, or home
       const from = (location.state as LocationState)?.from || '/';
       navigate(from, { replace: true });
     } catch (err) {

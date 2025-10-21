@@ -633,7 +633,7 @@ export function DistrictDashboard() {
                           <div className="border-t border-neutral-200 p-5 bg-neutral-50">
                             {primaryMetric.visualization_type === 'narrative' ? (
                               <NarrativeDisplay config={primaryMetric.visualization_config} />
-                            ) : primaryMetric.visualization_type === 'likert-scale' ? (
+                            ) : (primaryMetric.visualization_type === 'bar' && primaryMetric.visualization_config?.scaleMin) ? (
                               chartData && chartData.length > 0 && (
                                 <LikertScaleChart
                                   data={chartData}
@@ -646,6 +646,20 @@ export function DistrictDashboard() {
                                   showAverage={true}
                                 />
                               )
+                            ) : (primaryMetric.visualization_type === 'number' && primaryMetric.visualization_config?._frontendType === 'ratio') ? (
+                              <div className="p-6 bg-white rounded-lg">
+                                <div className="text-center">
+                                  <div className="text-sm font-medium text-neutral-600 mb-2">{primaryMetric.name}</div>
+                                  <div className="text-3xl font-bold text-neutral-900">
+                                    {primaryMetric.visualization_config?.label || ''}{primaryMetric.visualization_config?.ratioValue || '1.0:1'}
+                                  </div>
+                                  {primaryMetric.visualization_config?.showTarget && primaryMetric.visualization_config?.targetValue && (
+                                    <div className="text-sm text-neutral-500 mt-2">
+                                      Target: {primaryMetric.visualization_config.label}{primaryMetric.visualization_config.targetValue}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             ) : (
                               chartData && chartData.length > 0 && (
                                 <AnnualProgressChart
@@ -740,6 +754,20 @@ export function DistrictDashboard() {
                                               {primarySubMetric.visualization_type === 'narrative' ? (
                                                 <div className="p-5 bg-neutral-50">
                                                   <NarrativeDisplay config={primarySubMetric.visualization_config} />
+                                                </div>
+                                              ) : (primarySubMetric.visualization_type === 'number' && primarySubMetric.visualization_config?._frontendType === 'ratio') ? (
+                                                <div className="p-6 bg-white">
+                                                  <div className="text-center">
+                                                    <div className="text-sm font-medium text-neutral-600 mb-2">{primarySubMetric.name}</div>
+                                                    <div className="text-xl font-bold text-neutral-900 leading-relaxed">
+                                                      {primarySubMetric.visualization_config?.label || ''}{primarySubMetric.visualization_config?.ratioValue || '1.0:1'}
+                                                    </div>
+                                                    {primarySubMetric.visualization_config?.showTarget && primarySubMetric.visualization_config?.targetValue && (
+                                                      <div className="text-sm text-neutral-500 mt-3">
+                                                        Target: {primarySubMetric.visualization_config.label}{primarySubMetric.visualization_config.targetValue}
+                                                      </div>
+                                                    )}
+                                                  </div>
                                                 </div>
                                               ) : primarySubMetric.visualization_type === 'number' ? (
                                                 <div className="p-6 bg-white">

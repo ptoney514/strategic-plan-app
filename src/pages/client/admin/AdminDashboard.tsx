@@ -73,43 +73,39 @@ export function AdminDashboard() {
     }
   };
 
-  // Top KPI Cards with enhanced design
+  // Top KPI Cards - Clean Webflow-style design (no gradients)
   const kpiCards = [
     {
       title: 'Overall Progress',
       value: `${overallProgress}%`,
       subtitle: overallProgress >= 75 ? 'Excellent progress' : overallProgress >= 50 ? 'On track' : 'Needs attention',
       icon: TrendingUp,
-      iconBg: 'bg-gradient-to-br from-blue-500 to-blue-600',
-      trend: '+12% from last quarter',
-      color: 'blue'
+      iconBg: 'bg-blue-50',
+      iconColor: 'text-blue-600'
     },
     {
       title: 'Goals On Track',
       value: statusSummary['on-target'] || 0,
       subtitle: `${goals?.length || 0} total objectives`,
       icon: CheckCircle,
-      iconBg: 'bg-gradient-to-br from-green-500 to-green-600',
-      trend: '2 completed this week',
-      color: 'green'
+      iconBg: 'bg-green-50',
+      iconColor: 'text-green-600'
     },
     {
       title: 'Data Completeness',
       value: `${dataCompleteness}%`,
       subtitle: `${metrics?.filter(m => m.current_value).length || 0}/${metrics?.length || 0} metrics updated`,
       icon: Activity,
-      iconBg: 'bg-gradient-to-br from-purple-500 to-purple-600',
-      trend: dataCompleteness >= 80 ? 'Healthy' : 'Needs updates',
-      color: 'purple'
+      iconBg: 'bg-purple-50',
+      iconColor: 'text-purple-600'
     },
     {
       title: 'Updates Due',
       value: metricsNeedingUpdates,
       subtitle: 'Metrics need review',
       icon: Clock,
-      iconBg: 'bg-gradient-to-br from-orange-500 to-orange-600',
-      trend: metricsNeedingUpdates === 0 ? 'All up to date' : 'Action required',
-      color: 'orange'
+      iconBg: 'bg-orange-50',
+      iconColor: 'text-orange-600'
     }
   ];
 
@@ -119,7 +115,7 @@ export function AdminDashboard() {
       description: 'Build a new objective visually',
       icon: Target,
       link: `/${slug}/admin/objectives/new`,
-      gradient: 'from-blue-500 to-indigo-600',
+      iconBg: 'bg-blue-50',
       iconColor: 'text-blue-600'
     },
     {
@@ -127,7 +123,7 @@ export function AdminDashboard() {
       description: 'Upload strategic plan data',
       icon: Upload,
       link: `/${slug}/admin/import`,
-      gradient: 'from-teal-500 to-cyan-600',
+      iconBg: 'bg-teal-50',
       iconColor: 'text-teal-600'
     },
     {
@@ -135,7 +131,7 @@ export function AdminDashboard() {
       description: 'Quarterly status review',
       icon: Target,
       link: `/${slug}/admin/goals`,
-      gradient: 'from-purple-500 to-pink-600',
+      iconBg: 'bg-purple-50',
       iconColor: 'text-purple-600'
     },
     {
@@ -143,7 +139,7 @@ export function AdminDashboard() {
       description: `${metricsNeedingUpdates} metrics need updating`,
       icon: BarChart3,
       link: `/${slug}/admin/metrics`,
-      gradient: 'from-green-500 to-teal-600',
+      iconBg: 'bg-green-50',
       iconColor: 'text-green-600'
     },
     {
@@ -151,7 +147,7 @@ export function AdminDashboard() {
       description: 'Recent changes',
       icon: FileText,
       link: `/${slug}/admin/audit`,
-      gradient: 'from-orange-500 to-red-600',
+      iconBg: 'bg-gray-50',
       iconColor: 'text-orange-600'
     }
   ];
@@ -207,21 +203,21 @@ export function AdminDashboard() {
                   <Link
                     key={action.title}
                     to={action.link}
-                    className="group p-3 sm:p-4 rounded-lg border border-border hover:border-primary/50 hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50/50"
+                    className="group p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all bg-white"
                   >
-                    <div className="flex items-start space-x-3 sm:space-x-4">
-                      <div className={`p-2 rounded-lg bg-gradient-to-br ${action.gradient} shadow-sm flex-shrink-0`}>
-                        <Icon className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${action.iconBg} flex-shrink-0`}>
+                        <Icon className={`h-5 w-5 ${action.iconColor}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm sm:text-base font-semibold text-foreground group-hover:text-primary transition-colors">
+                        <h3 className="text-sm font-semibold text-gray-900">
                           {action.title}
                         </h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 line-clamp-1 sm:line-clamp-none">
+                        <p className="text-xs text-gray-500 mt-1">
                           {action.description}
                         </p>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                      <ArrowRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
                     </div>
                   </Link>
                 );
@@ -231,17 +227,17 @@ export function AdminDashboard() {
               <button
                 onClick={handleRecalculateProgress}
                 disabled={isRecalculating || !district}
-                className="group p-4 rounded-lg border border-border hover:border-indigo-500/50 hover:shadow-md transition-all duration-200 bg-gradient-to-br from-white to-gray-50/50 disabled:opacity-50 disabled:cursor-not-allowed text-left"
+                className="group p-4 rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-sm transition-all bg-white disabled:opacity-50 disabled:cursor-not-allowed text-left"
               >
-                <div className="flex items-start space-x-4">
-                  <div className="p-2 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 shadow-sm">
-                    <RefreshCw className={`h-5 w-5 text-white ${isRecalculating ? 'animate-spin' : ''}`} />
+                <div className="flex items-start gap-3">
+                  <div className="p-2 rounded-lg bg-indigo-50 flex-shrink-0">
+                    <RefreshCw className={`h-5 w-5 text-indigo-600 ${isRecalculating ? 'animate-spin' : ''}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                    <h3 className="text-sm font-semibold text-gray-900">
                       {isRecalculating ? 'Recalculating...' : 'Recalculate Progress'}
                     </h3>
-                    <p className="text-sm text-muted-foreground mt-0.5">
+                    <p className="text-xs text-gray-500 mt-1">
                       Update all goal progress values
                     </p>
                   </div>
@@ -388,46 +384,52 @@ export function AdminDashboard() {
             )}
           </div>
 
-          {/* System Health */}
-          <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl p-4 sm:p-6 text-white">
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 flex items-center space-x-2">
-              <Activity className="h-4 w-4 sm:h-5 sm:w-5" />
+          {/* System Health - Clean design without gradient */}
+          <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+            <h3 className="text-base sm:text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+              <div className="p-2 rounded-lg bg-indigo-50">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 text-indigo-600" />
+              </div>
               <span>System Health</span>
             </h3>
 
-            <div className="space-y-3 sm:space-y-4">
+            <div className="space-y-4">
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs sm:text-sm opacity-90">Data Quality</span>
-                  <span className="text-xs sm:text-sm font-bold">{dataCompleteness}%</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Data Quality</span>
+                  <span className="text-xs sm:text-sm font-semibold text-gray-900">{dataCompleteness}%</span>
                 </div>
-                <div className="w-full bg-white/20 rounded-full h-2">
+                <div className="w-full bg-gray-100 rounded-full h-2">
                   <div
-                    className="bg-white h-2 rounded-full transition-all duration-500"
+                    className="bg-indigo-500 h-2 rounded-full transition-all duration-500"
                     style={{ width: `${dataCompleteness}%` }}
                   />
                 </div>
               </div>
 
-              <div className="pt-3 sm:pt-4 border-t border-white/20">
+              <div className="pt-4 border-t border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs sm:text-sm opacity-90">Manual Overrides</p>
-                    <p className="text-xl sm:text-2xl font-bold">
+                    <p className="text-xs sm:text-sm text-gray-600">Manual Overrides</p>
+                    <p className="text-xl sm:text-2xl font-bold text-gray-900">
                       {goals?.filter(g => g.status_source === 'manual').length || 0}
                     </p>
                   </div>
-                  <Users className="h-6 w-6 sm:h-8 sm:w-8 opacity-50" />
+                  <div className="p-2 rounded-lg bg-gray-50">
+                    <Users className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                  </div>
                 </div>
               </div>
 
-              <div className="pt-3 sm:pt-4 border-t border-white/20">
+              <div className="pt-4 border-t border-gray-100">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-xs sm:text-sm opacity-90">Last Sync</p>
-                    <p className="text-base sm:text-lg font-bold">Just now</p>
+                    <p className="text-xs sm:text-sm text-gray-600">Last Sync</p>
+                    <p className="text-base sm:text-lg font-bold text-gray-900">Just now</p>
                   </div>
-                  <Calendar className="h-6 w-6 sm:h-8 sm:w-8 opacity-50" />
+                  <div className="p-2 rounded-lg bg-gray-50">
+                    <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-gray-400" />
+                  </div>
                 </div>
               </div>
             </div>

@@ -19,9 +19,47 @@ export interface DistrictWithSummary extends District {
   lastActivity?: string;
 }
 
-export interface Goal {
+export interface School {
   id: string;
   district_id: string;
+  name: string;
+  slug: string;
+  logo_url?: string;
+  primary_color?: string;
+  secondary_color?: string;
+  description?: string;
+  address?: string;
+  phone?: string;
+  principal_name?: string;
+  principal_email?: string;
+  is_public: boolean;
+  student_count?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SchoolWithSummary extends School {
+  goalCount?: number;
+  strategyCount?: number;
+  subGoalCount?: number;
+  metricCount?: number;
+  lastActivity?: string;
+}
+
+export interface SchoolAdmin {
+  id: string;
+  user_id: string;
+  school_id: string;
+  school_slug: string;
+  district_slug: string;
+  created_at: string;
+  created_by?: string;
+}
+
+export interface Goal {
+  id: string;
+  district_id: string | null;  // Nullable: goal belongs to either district OR school
+  school_id?: string | null;    // Optional: goal belongs to either district OR school
   parent_id: string | null;
   goal_number: string;
   title: string;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { supabase } from '../lib/supabase';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 
 interface LocationState {
@@ -37,9 +38,25 @@ export function Login() {
     }
 
     try {
-      await login(email, password);
+      const response = await login(email, password);
+      const user = response.data.user;
 
-      // Redirect to the page they tried to access, or home
+      // Check if user has a specific district assigned
+      if (user) {
+        const { data: districtAdmin } = await supabase
+          .from('spb_district_admins')
+          .select('district_slug')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        // If district admin, redirect to their district admin page
+        if (districtAdmin?.district_slug) {
+          navigate(`/${districtAdmin.district_slug}/admin`, { replace: true });
+          return;
+        }
+      }
+
+      // Otherwise use the page they tried to access, or home
       const from = (location.state as LocationState)?.from || '/';
       navigate(from, { replace: true });
     } catch (err) {
@@ -51,9 +68,9 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 flex-col justify-between relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      {/* Left side - Branding - HIDDEN FOR NOW */}
+      <div className="hidden bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 flex-col justify-between relative overflow-hidden">
         {/* Background pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
@@ -86,9 +103,9 @@ export function Login() {
         </div>
       </div>
 
-      {/* Right side - Login Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-background">
-        <div className="w-full max-w-md">
+      {/* Login Form - Centered */}
+      <div className="w-full max-w-md p-8">
+        <div className="w-full">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
               <Lock className="w-8 h-8 text-primary" />
@@ -214,12 +231,34 @@ export function Login() {
             </p>
           </div>
 
-          {/* Development Helper */}
+          {/* Test Credentials - Development Only */}
           {import.meta.env.DEV && (
-            <div className="mt-8 p-4 bg-muted/50 rounded-lg border border-border">
-              <p className="text-xs font-medium text-foreground mb-2">Development Mode</p>
-              <p className="text-xs text-muted-foreground">
-                Create a test user with: <code className="bg-background px-1 py-0.5 rounded">supabase auth signup</code>
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs font-semibold text-blue-900 mb-2">Test Credentials</p>
+              <p className="text-xs text-blue-700 mb-3">
+                <a
+                  href="http://127.0.0.1:54323"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-blue-900 font-medium"
+                >
+                  Open Supabase Studio →
+                </a>
+              </p>
+              <div className="space-y-2 text-xs">
+                <div className="bg-white p-2.5 rounded border border-blue-100">
+                  <p className="font-medium text-blue-900 mb-1">Westside Admin</p>
+                  <p className="text-blue-700 font-mono text-[11px]">admin@westside66.org</p>
+                  <p className="text-blue-600 font-mono text-[11px] mt-0.5">Password: Westside123!</p>
+                </div>
+                <div className="bg-white p-2.5 rounded border border-blue-100">
+                  <p className="font-medium text-blue-900 mb-1">Eastside Admin</p>
+                  <p className="text-blue-700 font-mono text-[11px]">admin@eastside.edu</p>
+                  <p className="text-blue-600 font-mono text-[11px] mt-0.5">Password: Eastside123!</p>
+                </div>
+              </div>
+              <p className="text-xs text-blue-600 mt-3 leading-relaxed">
+                Run <code className="bg-blue-100 px-1 rounded">./scripts/create-test-users.sh</code> to create these test users
               </p>
             </div>
           )}

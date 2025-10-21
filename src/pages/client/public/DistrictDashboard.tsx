@@ -637,7 +637,7 @@ export function DistrictDashboard() {
                               chartData && chartData.length > 0 && (
                                 <LikertScaleChart
                                   data={chartData}
-                                  title={primaryMetric.metric_name || "Survey Results"}
+                                  title={primaryMetric.name || "Survey Results"}
                                   description={primaryMetric.description}
                                   scaleMin={primaryMetric.visualization_config?.scaleMin || 1}
                                   scaleMax={primaryMetric.visualization_config?.scaleMax || 5}
@@ -650,7 +650,7 @@ export function DistrictDashboard() {
                               chartData && chartData.length > 0 && (
                                 <AnnualProgressChart
                                   data={chartData}
-                                  title={primaryMetric?.metric_name || "Annual Progress"}
+                                  title={primaryMetric?.name || "Annual Progress"}
                                   description={primaryMetric?.description || "Year-over-year progress tracking"}
                                   unit={primaryMetric?.unit || ""}
                                 />
@@ -745,7 +745,7 @@ export function DistrictDashboard() {
                                                 <div className="p-6 bg-white">
                                                   <div className="text-center">
                                                     <div className="text-sm font-medium text-neutral-600 mb-2">
-                                                      {primarySubMetric.metric_name}
+                                                      {primarySubMetric.name}
                                                     </div>
                                                     <div className="text-5xl font-bold text-neutral-900 mb-1">
                                                       {primarySubMetric.visualization_config?.currentValue || 0}
@@ -780,7 +780,7 @@ export function DistrictDashboard() {
                                                   {primarySubMetric.visualization_type === 'likert-scale' ? (
                                                     <LikertScaleChart
                                                       data={metricChartData}
-                                                      title={primarySubMetric.metric_name || "Survey Results"}
+                                                      title={primarySubMetric.name || "Survey Results"}
                                                       description={primarySubMetric.description}
                                                       scaleMin={primarySubMetric.visualization_config?.scaleMin || 1}
                                                       scaleMax={primarySubMetric.visualization_config?.scaleMax || 5}
@@ -791,7 +791,7 @@ export function DistrictDashboard() {
                                                   ) : (
                                                     <AnnualProgressChart
                                                       data={metricChartData}
-                                                      title={primarySubMetric.metric_name || "Annual Progress"}
+                                                      title={primarySubMetric.name || "Annual Progress"}
                                                       description={primarySubMetric.description || "Year-over-year progress tracking"}
                                                       unit={primarySubMetric.unit || ""}
                                                     />

@@ -22,7 +22,7 @@ export function MetricsChart({ metrics, variant = 'line' }: MetricsChartProps) {
       period: point.date,
       value: point.value,
       target: point.target,
-      [metric.metric_name]: point.value
+      [metric.name]: point.value
     }));
   } else {
     // Fallback to synthetic data for backward compatibility
@@ -34,8 +34,8 @@ export function MetricsChart({ metrics, variant = 'line' }: MetricsChartProps) {
         const currentValue = metric.current_value || 0;
         const monthIndex = months.indexOf(month);
         const progress = monthIndex / (months.length - 1);
-        monthData[metric.metric_name] = Math.round(baseValue + (currentValue - baseValue) * progress);
-        monthData[`${metric.metric_name}_target`] = metric.target_value;
+        monthData[metric.name] = Math.round(baseValue + (currentValue - baseValue) * progress);
+        monthData[`${metric.name}_target`] = metric.target_value;
       });
       return monthData;
     });
@@ -103,7 +103,7 @@ export function MetricsChart({ metrics, variant = 'line' }: MetricsChartProps) {
             <DataComponent
               key={metric.id}
               type={variant === 'bar' ? undefined : 'monotone'}
-              dataKey={metric.metric_name}
+              dataKey={metric.name}
               stroke={colors[index % colors.length]}
               fill={colors[index % colors.length]}
               fillOpacity={variant === 'area' ? 0.3 : 1}

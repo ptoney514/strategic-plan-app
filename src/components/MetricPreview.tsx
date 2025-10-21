@@ -17,7 +17,8 @@ import {
   Legend,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  LabelList
 } from 'recharts';
 
 interface MetricPreviewProps {
@@ -306,8 +307,10 @@ export function MetricPreview({ type, data }: MetricPreviewProps) {
 
       case 'likert-scale':
         const likertData = data.dataPoints || [];
-        const average = likertData.length > 0
-          ? likertData.reduce((sum: number, point: any) => sum + point.value, 0) / likertData.length
+        // Calculate average excluding data points with value 0 (represents "no data")
+        const validLikertPoints = likertData.filter((point: any) => point.value > 0);
+        const average = validLikertPoints.length > 0
+          ? validLikertPoints.reduce((sum: number, point: any) => sum + point.value, 0) / validLikertPoints.length
           : 0;
 
         return (
@@ -331,7 +334,18 @@ export function MetricPreview({ type, data }: MetricPreviewProps) {
                   <XAxis dataKey="label" />
                   <YAxis domain={[data.scaleMin || 1, data.scaleMax || 5]} />
                   <Tooltip />
-                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                    <LabelList
+                      dataKey="value"
+                      position="top"
+                      formatter={(value: number) => value > 0 ? value.toFixed(2) : ''}
+                      style={{
+                        fill: '#111827',
+                        fontSize: '14px',
+                        fontWeight: 600
+                      }}
+                    />
+                  </Bar>
                   {data.showTarget && data.targetValue && (
                     <Line
                       type="monotone"

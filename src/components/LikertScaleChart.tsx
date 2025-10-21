@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LabelList } from 'recharts';
 
 interface LikertScaleData {
   year: string;
@@ -35,8 +35,11 @@ export function LikertScaleChart({
     );
   }
 
-  // Calculate average score
-  const average = data.reduce((sum, point) => sum + point.value, 0) / data.length;
+  // Calculate average score (exclude data points with value 0 as they represent "no data")
+  const validDataPoints = data.filter(point => point.value > 0);
+  const average = validDataPoints.length > 0
+    ? validDataPoints.reduce((sum, point) => sum + point.value, 0) / validDataPoints.length
+    : 0;
 
   return (
     <div className="space-y-3">
@@ -113,7 +116,18 @@ export function LikertScaleChart({
               fill="#3b82f6"
               radius={[8, 8, 0, 0]}
               maxBarSize={60}
-            />
+            >
+              <LabelList
+                dataKey="value"
+                position="top"
+                formatter={(value: number) => value > 0 ? value.toFixed(2) : ''}
+                style={{
+                  fill: '#111827',
+                  fontSize: '14px',
+                  fontWeight: 600
+                }}
+              />
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

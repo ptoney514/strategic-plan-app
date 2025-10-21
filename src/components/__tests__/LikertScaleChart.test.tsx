@@ -80,4 +80,25 @@ describe('LikertScaleChart', () => {
     // Chart should render without errors
     expect(screen.getByText('Average Score')).toBeInTheDocument();
   });
+
+  it('should exclude zero values from average calculation', () => {
+    const dataWithZeros = [
+      { year: '2022', value: 0 },
+      { year: '2023', value: 3.7 },
+      { year: '2024', value: 3.7 }
+    ];
+    render(<LikertScaleChart data={dataWithZeros} showAverage={true} />);
+    // Average should be (3.7 + 3.7) / 2 = 3.70, not (0 + 3.7 + 3.7) / 3 = 2.47
+    expect(screen.getByText('3.70')).toBeInTheDocument();
+  });
+
+  it('should show 0 average when all values are 0', () => {
+    const allZeros = [
+      { year: '2022', value: 0 },
+      { year: '2023', value: 0 },
+      { year: '2024', value: 0 }
+    ];
+    render(<LikertScaleChart data={allZeros} showAverage={true} />);
+    expect(screen.getByText('0.00')).toBeInTheDocument();
+  });
 });

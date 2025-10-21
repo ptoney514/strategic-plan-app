@@ -63,7 +63,7 @@ BEGIN
     'authenticated',
     'authenticated',
     'admin@westside66.org',
-    crypt('password123', gen_salt('bf')),
+    crypt('Westside123!', gen_salt('bf')),
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"role":"district_admin"}',
@@ -94,7 +94,7 @@ BEGIN
     'authenticated',
     'authenticated',
     'admin@eastside.edu',
-    crypt('password123', gen_salt('bf')),
+    crypt('Eastside123!', gen_salt('bf')),
     NOW(),
     '{"provider":"email","providers":["email"]}',
     '{"role":"district_admin"}',
@@ -154,8 +154,8 @@ BEGIN
   );
 
   RAISE NOTICE 'Test users created successfully!';
-  RAISE NOTICE 'Westside Admin: admin@westside66.org / password123';
-  RAISE NOTICE 'Eastside Admin: admin@eastside.edu / password123';
+  RAISE NOTICE 'Westside Admin: admin@westside66.org / Westside123!';
+  RAISE NOTICE 'Eastside Admin: admin@eastside.edu / Eastside123!';
 END $$;
 
 -- Verify users were created
@@ -179,11 +179,11 @@ if [ $? -eq 0 ]; then
   echo -e "${YELLOW}📋 Test Credentials:${NC}"
   echo -e "  ${GREEN}Westside Admin:${NC}"
   echo -e "    Email:    ${BLUE}admin@westside66.org${NC}"
-  echo -e "    Password: ${BLUE}password123${NC}"
+  echo -e "    Password: ${BLUE}Westside123!${NC}"
   echo ""
   echo -e "  ${GREEN}Eastside Admin:${NC}"
   echo -e "    Email:    ${BLUE}admin@eastside.edu${NC}"
-  echo -e "    Password: ${BLUE}password123${NC}"
+  echo -e "    Password: ${BLUE}Eastside123!${NC}"
   echo ""
   echo -e "${BLUE}🔗 Login at: http://localhost:5173/login${NC}"
 else

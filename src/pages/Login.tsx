@@ -232,15 +232,16 @@ export function Login() {
                 <div className="bg-white p-2.5 rounded border border-blue-100">
                   <p className="font-medium text-blue-900 mb-1">Westside Admin</p>
                   <p className="text-blue-700 font-mono text-[11px]">admin@westside66.org</p>
+                  <p className="text-blue-600 font-mono text-[11px] mt-0.5">Password: Westside123!</p>
                 </div>
                 <div className="bg-white p-2.5 rounded border border-blue-100">
                   <p className="font-medium text-blue-900 mb-1">Eastside Admin</p>
                   <p className="text-blue-700 font-mono text-[11px]">admin@eastside.edu</p>
+                  <p className="text-blue-600 font-mono text-[11px] mt-0.5">Password: Eastside123!</p>
                 </div>
               </div>
               <p className="text-xs text-blue-600 mt-3 leading-relaxed">
-                Create users in Supabase Studio → Authentication → Add User,
-                then assign district access in spb_district_admins table
+                Run <code className="bg-blue-100 px-1 rounded">./scripts/create-test-users.sh</code> to create these test users
               </p>
             </div>
           )}

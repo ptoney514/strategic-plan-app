@@ -5,6 +5,7 @@ import { useMetrics } from '../../../hooks/useMetrics';
 import { ChevronLeft, Target, TrendingUp, BarChart2, Edit2 } from 'lucide-react';
 import { MetricsChart } from '../../../components/MetricsChart';
 import { GoalEditWizard } from '../../../components/GoalEditWizard';
+import { LikertScaleChart } from '../../../components/LikertScaleChart';
 import { calculateGoalProgress, getGoalStatus } from '../../../lib/types';
 
 export function GoalDetail() {
@@ -98,12 +99,48 @@ export function GoalDetail() {
               {!metrics || metrics.length === 0 ? (
                 <p className="text-muted-foreground">No metrics defined for this goal</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {metrics.map((metric) => {
-                    const progress = metric.target_value 
+                    const progress = metric.target_value
                       ? Math.round((metric.current_value || 0) / metric.target_value * 100)
                       : 0;
-                    
+
+                    // Check if this is a Likert scale metric
+                    const isLikertScale = metric.visualization_type === 'bar' &&
+                                        metric.visualization_config &&
+                                        (metric.visualization_config as any).scaleMin;
+
+                    if (isLikertScale) {
+                      const config = metric.visualization_config as any;
+                      const dataPoints = config.dataPoints || [];
+                      const likertData = dataPoints.map((dp: any) => ({
+                        year: dp.label,
+                        value: dp.value || 0
+                      }));
+
+                      return (
+                        <div key={metric.id} className="border border-border rounded-lg p-4">
+                          <h3 className="font-medium text-card-foreground mb-4">
+                            {metric.metric_name}
+                          </h3>
+                          {metric.description && (
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {metric.description}
+                            </p>
+                          )}
+                          <LikertScaleChart
+                            data={likertData}
+                            scaleMin={config.scaleMin || 1}
+                            scaleMax={config.scaleMax || 5}
+                            scaleLabel={config.scaleLabel || '(5 high)'}
+                            targetValue={config.targetValue}
+                            showAverage={config.showAverage !== false}
+                          />
+                        </div>
+                      );
+                    }
+
+                    // Default metric rendering (progress bar)
                     return (
                       <div key={metric.id} className="border-l-4 border-primary pl-4">
                         <h3 className="font-medium text-card-foreground">
@@ -136,7 +173,7 @@ export function GoalDetail() {
                         </div>
                         <div className="mt-2">
                           <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
-                            <div 
+                            <div
                               className="h-full bg-primary transition-all duration-300 ease-out"
                               style={{ width: `${Math.min(progress, 100)}%` }}
                             />

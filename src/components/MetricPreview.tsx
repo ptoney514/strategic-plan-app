@@ -17,7 +17,8 @@ import {
   Legend,
   ResponsiveContainer,
   Area,
-  AreaChart
+  AreaChart,
+  LabelList
 } from 'recharts';
 
 interface MetricPreviewProps {
@@ -333,7 +334,18 @@ export function MetricPreview({ type, data }: MetricPreviewProps) {
                   <XAxis dataKey="label" />
                   <YAxis domain={[data.scaleMin || 1, data.scaleMax || 5]} />
                   <Tooltip />
-                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="value" fill="#3b82f6" radius={[4, 4, 0, 0]}>
+                    <LabelList
+                      dataKey="value"
+                      position="top"
+                      formatter={(value: number) => value > 0 ? value.toFixed(2) : ''}
+                      style={{
+                        fill: '#111827',
+                        fontSize: '14px',
+                        fontWeight: 600
+                      }}
+                    />
+                  </Bar>
                   {data.showTarget && data.targetValue && (
                     <Line
                       type="monotone"

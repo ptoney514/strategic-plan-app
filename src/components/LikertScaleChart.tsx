@@ -1,4 +1,4 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, LabelList } from 'recharts';
 
 interface LikertScaleData {
   year: string;
@@ -116,7 +116,18 @@ export function LikertScaleChart({
               fill="#3b82f6"
               radius={[8, 8, 0, 0]}
               maxBarSize={60}
-            />
+            >
+              <LabelList
+                dataKey="value"
+                position="top"
+                formatter={(value: number) => value > 0 ? value.toFixed(2) : ''}
+                style={{
+                  fill: '#111827',
+                  fontSize: '14px',
+                  fontWeight: 600
+                }}
+              />
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>

@@ -313,6 +313,7 @@ CREATE POLICY "District admins can delete school goals in their district"
 -- Grant read-only access to anon for schools
 GRANT SELECT ON public.spb_schools TO anon;
 GRANT SELECT ON public.spb_school_admins TO anon;
+GRANT SELECT ON public.spb_district_admins TO anon;  -- Needed for RLS policy evaluation
 
 -- Authenticated users need read/write (controlled by RLS)
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.spb_schools TO authenticated;

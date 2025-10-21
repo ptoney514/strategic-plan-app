@@ -79,16 +79,25 @@ export function GoalDetail() {
       <main className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            {/* Metrics Chart */}
-            {metrics && metrics.length > 0 && (
-              <div className="bg-card rounded-lg border border-border p-6">
-                <h2 className="text-xl font-semibold text-card-foreground mb-4">
-                  <BarChart2 className="inline h-5 w-5 mr-2" />
-                  Metrics Performance
-                </h2>
-                <MetricsChart metrics={metrics} variant="line" />
-              </div>
-            )}
+            {/* Metrics Chart - exclude Likert metrics as they have their own visualization */}
+            {(() => {
+              const chartMetrics = metrics?.filter(m => {
+                const isLikert = m.visualization_type === 'bar' &&
+                                m.visualization_config &&
+                                (m.visualization_config as any).scaleMin;
+                return !isLikert;
+              }) || [];
+
+              return chartMetrics.length > 0 && (
+                <div className="bg-card rounded-lg border border-border p-6">
+                  <h2 className="text-xl font-semibold text-card-foreground mb-4">
+                    <BarChart2 className="inline h-5 w-5 mr-2" />
+                    Metrics Performance
+                  </h2>
+                  <MetricsChart metrics={chartMetrics} variant="line" />
+                </div>
+              );
+            })()}
 
             {/* Metrics Details */}
             <div className="bg-card rounded-lg border border-border p-6">

@@ -121,7 +121,7 @@ export function GoalDetail() {
                       return (
                         <div key={metric.id} className="border border-border rounded-lg p-4">
                           <h3 className="font-medium text-card-foreground mb-4">
-                            {metric.metric_name}
+                            {metric.name}
                           </h3>
                           {metric.description && (
                             <p className="text-sm text-muted-foreground mb-4">
@@ -144,7 +144,7 @@ export function GoalDetail() {
                     return (
                       <div key={metric.id} className="border-l-4 border-primary pl-4">
                         <h3 className="font-medium text-card-foreground">
-                          {metric.metric_name}
+                          {metric.name}
                         </h3>
                         {metric.description && (
                           <p className="text-sm text-muted-foreground mt-1">

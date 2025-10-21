@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useParams, useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -11,9 +11,12 @@ import {
   User,
   ChevronDown,
   Menu,
-  X
+  X,
+  LogOut,
+  Settings
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
+import { useAuth } from '../hooks/useAuth';
 
 /**
  * ClientAdminLayout - Redesigned admin layout with left sidebar (Webflow-style)
@@ -23,11 +26,36 @@ export function ClientAdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: district, isLoading } = useDistrict(slug!);
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement>(null);
 
   // Determine if we're in school admin context
   const isSchoolAdmin = !!schoolSlug;
   const basePath = isSchoolAdmin ? `/${slug}/schools/${schoolSlug}/admin` : `/${slug}/admin`;
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+        setIsUserMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -207,15 +235,45 @@ export function ClientAdminLayout() {
               </div>
             </div>
 
-            {/* Right: User Menu */}
+            {/* Right: User Menu with Dropdown */}
             <div className="flex items-center gap-3">
-              <button className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-colors">
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-gray-600" />
-                </div>
-                <span className="text-sm font-medium text-gray-700 hidden sm:inline">Admin</span>
-                <ChevronDown className="h-3 w-3 text-gray-400 hidden sm:inline" />
-              </button>
+              <div className="relative" ref={userMenuRef}>
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-colors"
+                >
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <User className="h-4 w-4 text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">Admin</span>
+                  <ChevronDown className={`h-3 w-3 text-gray-400 hidden sm:inline transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {/* Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    {/* User Info */}
+                    <div className="px-4 py-2 border-b border-gray-100">
+                      <p className="text-xs text-gray-500">Signed in as</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">{user?.email || 'admin@example.com'}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        {isSchoolAdmin ? 'School Admin' : 'District Admin'}
+                      </p>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="py-1">
+                      <button
+                        onClick={handleLogout}
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <LogOut className="h-4 w-4" />
+                        <span>Sign out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>

@@ -149,6 +149,40 @@ export function GoalDetail() {
                       );
                     }
 
+                    // Check if this is a Ratio metric
+                    const isRatio = metric.visualization_type === 'number' &&
+                                   metric.visualization_config &&
+                                   (metric.visualization_config as any)._frontendType === 'ratio';
+
+                    if (isRatio) {
+                      const config = metric.visualization_config as any;
+                      const fullDisplay = config.label
+                        ? `${config.label}${config.ratioValue || '1.0:1'}`
+                        : config.ratioValue || '1.0:1';
+
+                      return (
+                        <div key={metric.id} className="border border-border rounded-lg p-4">
+                          <h3 className="font-medium text-card-foreground mb-4">
+                            {metric.name}
+                          </h3>
+                          {metric.description && (
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {metric.description}
+                            </p>
+                          )}
+                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                            <p className="text-sm text-neutral-600 mb-2">Ratio</p>
+                            <p className="text-3xl font-bold text-neutral-900">{fullDisplay}</p>
+                            {config.showTarget && config.targetValue && (
+                              <p className="text-sm text-neutral-500 mt-2">
+                                Target: {config.label}{config.targetValue}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    }
+
                     // Default metric rendering (progress bar)
                     return (
                       <div key={metric.id} className="border-l-4 border-primary pl-4">

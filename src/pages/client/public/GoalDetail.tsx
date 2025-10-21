@@ -224,6 +224,37 @@ export function GoalDetail() {
                       );
                     }
 
+                    // Check if this is a Narrative/Rich Text metric
+                    const isNarrative = metric.visualization_type === 'blog' &&
+                                       metric.visualization_config &&
+                                       (metric.visualization_config as any)._frontendType === 'narrative';
+
+                    if (isNarrative) {
+                      const config = metric.visualization_config as any;
+
+                      return (
+                        <div key={metric.id} className="border border-border rounded-lg p-4">
+                          <h3 className="font-medium text-card-foreground mb-4">
+                            {metric.name}
+                          </h3>
+                          {metric.description && (
+                            <p className="text-sm text-muted-foreground mb-4">
+                              {metric.description}
+                            </p>
+                          )}
+                          <div className="prose prose-sm max-w-none">
+                            {config.showTitle && config.title && (
+                              <h4 className="text-lg font-semibold mb-2">{config.title}</h4>
+                            )}
+                            <div
+                              dangerouslySetInnerHTML={{ __html: config.content || '<p>No content available</p>' }}
+                              style={{ lineHeight: '1.7' }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    }
+
                     // Default metric rendering (progress bar)
                     return (
                       <div key={metric.id} className="border-l-4 border-primary pl-4">

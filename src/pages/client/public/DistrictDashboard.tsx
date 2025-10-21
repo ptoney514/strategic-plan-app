@@ -680,6 +680,18 @@ export function DistrictDashboard() {
                                   )}
                                 </div>
                               </div>
+                            ) : (primaryMetric.visualization_type === 'blog' && primaryMetric.visualization_config?._frontendType === 'narrative') ? (
+                              <div className="p-6 bg-white rounded-lg">
+                                <div className="prose prose-sm max-w-none">
+                                  {primaryMetric.visualization_config?.showTitle && primaryMetric.visualization_config?.title && (
+                                    <h4 className="text-lg font-semibold mb-2">{primaryMetric.visualization_config.title}</h4>
+                                  )}
+                                  <div
+                                    dangerouslySetInnerHTML={{ __html: primaryMetric.visualization_config?.content || '<p>No content available</p>' }}
+                                    style={{ lineHeight: '1.7' }}
+                                  />
+                                </div>
+                              </div>
                             ) : (
                               chartData && chartData.length > 0 && (
                                 <AnnualProgressChart
@@ -771,9 +783,17 @@ export function DistrictDashboard() {
 
                                           return (
                                             <div className="border-t border-neutral-300">
-                                              {primarySubMetric.visualization_type === 'narrative' ? (
-                                                <div className="p-5 bg-neutral-50">
-                                                  <NarrativeDisplay config={primarySubMetric.visualization_config} />
+                                              {(primarySubMetric.visualization_type === 'blog' && primarySubMetric.visualization_config?._frontendType === 'narrative') ? (
+                                                <div className="p-6 bg-white">
+                                                  <div className="prose prose-sm max-w-none">
+                                                    {primarySubMetric.visualization_config?.showTitle && primarySubMetric.visualization_config?.title && (
+                                                      <h4 className="text-lg font-semibold mb-2">{primarySubMetric.visualization_config.title}</h4>
+                                                    )}
+                                                    <div
+                                                      dangerouslySetInnerHTML={{ __html: primarySubMetric.visualization_config?.content || '<p>No content available</p>' }}
+                                                      style={{ lineHeight: '1.7' }}
+                                                    />
+                                                  </div>
                                                 </div>
                                               ) : (primarySubMetric.visualization_type === 'number' && primarySubMetric.visualization_config?._frontendType === 'ratio') ? (
                                                 <div className="p-6 bg-white">

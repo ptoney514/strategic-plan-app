@@ -95,6 +95,22 @@ export function HeroSection({
                     transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
                     className="flex-1 relative"
                   >
+                    {/* "START HERE" Badge */}
+                    <motion.div
+                      className="absolute -top-2 -right-2 z-10 px-2.5 py-1 text-xs font-bold text-white rounded-full shadow-lg"
+                      style={{ backgroundColor: primaryColor }}
+                      animate={{
+                        y: [0, -2, 0],
+                      }}
+                      transition={{
+                        duration: 1.5,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    >
+                      START HERE
+                    </motion.div>
+
                     {/* Animated pulse ring effect */}
                     <motion.div
                       className="absolute inset-0 rounded-lg"

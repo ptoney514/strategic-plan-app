@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Outlet, Link, useParams } from 'react-router-dom';
-import { Home, Target, GraduationCap, Menu, X } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
+import { HomepageHeader } from '../components/homepage/HomepageHeader';
 
 /**
  * ClientPublicLayout - Layout for public client pages (/:slug)
@@ -10,7 +10,6 @@ import { useDistrict } from '../hooks/useDistricts';
 export function ClientPublicLayout() {
   const { slug } = useParams<{ slug: string }>();
   const { data: district, isLoading } = useDistrict(slug!);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (isLoading) {
     return (
@@ -38,72 +37,14 @@ export function ClientPublicLayout() {
 
   return (
     <div className="min-h-screen bg-neutral-50">
-      {/* Public Header - Clean Design */}
-      <header className="sticky top-0 z-30 bg-white border-b border-neutral-200">
-        <div className="px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Left: Logo & District Name */}
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-sky-400 to-sky-500 flex items-center justify-center">
-                <GraduationCap className="h-5 w-5 text-white" />
-              </div>
-              <div className="leading-tight">
-                <div className="text-lg font-semibold text-neutral-900">{district.name}</div>
-                <div className="text-sm text-neutral-500">Strategic Plan</div>
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
-              <Link
-                to={`/${slug}`}
-                className="inline-flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
-              >
-                <Home className="h-4 w-4" />
-                Home
-              </Link>
-              <Link
-                to={`/${slug}/goals`}
-                className="inline-flex items-center gap-2 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
-              >
-                <Target className="h-4 w-4" />
-                Goals
-              </Link>
-            </nav>
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-neutral-900 hover:bg-neutral-100 rounded-lg transition"
-              aria-label="Toggle menu"
-            >
-              {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-
-          {/* Mobile Navigation */}
-          {isMobileMenuOpen && (
-            <nav className="md:hidden pb-4 pt-2 border-t border-neutral-200 space-y-2">
-              <Link
-                to={`/${slug}`}
-                className="flex items-center gap-2 px-3 py-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Home className="h-4 w-4" />
-                Home
-              </Link>
-              <Link
-                to={`/${slug}/goals`}
-                className="flex items-center gap-2 px-3 py-2 text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <Target className="h-4 w-4" />
-                Goals
-              </Link>
-            </nav>
-          )}
-        </div>
-      </header>
+      {/* Use the same header as the landing page */}
+      <HomepageHeader
+        districtName={district.name}
+        districtSlug={slug!}
+        primaryColor={district.primary_color || '#C03537'}
+        tagline={district.tagline || 'Community. Innovation. Excellence.'}
+        logoUrl={district.logo_url}
+      />
 
       {/* Main Content */}
       <main>

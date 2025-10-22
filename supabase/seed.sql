@@ -12,9 +12,9 @@ BEGIN;
 -- STEP 1: Create Districts
 -- ============================================================================
 
-INSERT INTO public.spb_districts (id, name, slug, logo_url, primary_color, secondary_color, admin_email, is_public, created_at, updated_at) VALUES
-  ('a0000000-0000-0000-0000-000000000001', 'Eastside School District', 'eastside', 'https://images.unsplash.com/photo-1509062522246-3755977927d7', '#1e40af', '#10b981', 'admin@eastside.edu', true, NOW(), NOW()),
-  ('a0000000-0000-0000-0000-000000000002', 'Westside School District', 'westside', 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1', '#0099CC', '#51d01b', 'admin@westside.edu', true, NOW(), NOW());
+INSERT INTO public.spb_districts (id, name, slug, logo_url, primary_color, secondary_color, admin_email, is_public, tagline, created_at, updated_at) VALUES
+  ('a0000000-0000-0000-0000-000000000001', 'Eastside School District', 'eastside', 'https://images.unsplash.com/photo-1509062522246-3755977927d7', '#1e40af', '#10b981', 'admin@eastside.edu', true, NULL, NOW(), NOW()),
+  ('a0000000-0000-0000-0000-000000000002', 'Westside Community Schools', 'westside', 'https://www.westside66.org/cms/lib/NE50000555/Centricity/Template/GlobalAssets/images//logos/Westside District STAR BOX.png', '#C03537', '#000000', 'admin@westside.edu', true, 'Community. Innovation. Excellence.', NOW(), NOW());
 
 -- ============================================================================
 -- STEP 2: Create Stock Photos Library

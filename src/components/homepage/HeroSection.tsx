@@ -93,21 +93,35 @@ export function HeroSection({
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                    className="flex-1"
+                    className="flex-1 relative"
                   >
+                    {/* Animated pulse ring effect */}
+                    <motion.div
+                      className="absolute inset-0 rounded-lg"
+                      style={{ backgroundColor: primaryColor, opacity: 0.15 }}
+                      animate={{
+                        scale: [1, 1.05, 1],
+                        opacity: [0.15, 0.25, 0.15],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut"
+                      }}
+                    />
                     <Link
                       to={link.href}
-                      className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg transition-all duration-300 group text-left w-full"
+                      className="relative flex items-center gap-3 p-4 bg-white border-2 rounded-lg transition-all duration-300 group text-left w-full shadow-md hover:shadow-xl"
                       style={{
-                        borderColor: 'rgb(229 231 235)',
+                        borderColor: primaryColor,
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.borderColor = primaryColor;
-                        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)';
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.borderColor = 'rgb(229 231 235)';
-                        e.currentTarget.style.boxShadow = 'none';
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)';
                       }}
                     >
                       {ButtonContent}

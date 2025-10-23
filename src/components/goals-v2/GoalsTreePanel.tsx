@@ -1,15 +1,27 @@
 import React, { useState } from 'react';
 import { ChevronRight, ChevronDown, Target, BarChart3 } from 'lucide-react';
 import type { Goal } from '../../lib/types';
+import { DraggableGoalsTree } from './DraggableGoalsTree';
 
 interface GoalsTreePanelProps {
   goals: Goal[];
   selectedGoalId: string | null;
   onSelectGoal: (goalId: string) => void;
   searchQuery: string;
+  districtId?: string;
+  enableReordering?: boolean;
+  onRefresh?: () => void;
 }
 
-export function GoalsTreePanel({ goals, selectedGoalId, onSelectGoal, searchQuery }: GoalsTreePanelProps) {
+export function GoalsTreePanel({
+  goals,
+  selectedGoalId,
+  onSelectGoal,
+  searchQuery,
+  districtId,
+  enableReordering = false,
+  onRefresh,
+}: GoalsTreePanelProps) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpand = (goalId: string) => {
@@ -43,10 +55,14 @@ export function GoalsTreePanel({ goals, selectedGoalId, onSelectGoal, searchQuer
   const filteredGoals = filterGoals(goals, searchQuery);
 
   return (
-    <div className="w-96 border-r border-gray-200 bg-white overflow-hidden flex flex-col">
+    <div className="w-1/2 border-r border-gray-200 bg-white overflow-hidden flex flex-col">
       <div className="p-4 border-b border-gray-200">
         <h2 className="font-semibold text-gray-900">Strategic Objectives</h2>
-        <p className="text-xs text-gray-500 mt-1">Click an objective to see its roll-up metrics</p>
+        <p className="text-xs text-gray-500 mt-1">
+          {enableReordering
+            ? 'Drag to reorder. Click to expand and reorder child goals.'
+            : 'Click an objective to see its roll-up metrics'}
+        </p>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -57,6 +73,14 @@ export function GoalsTreePanel({ goals, selectedGoalId, onSelectGoal, searchQuer
               {searchQuery ? 'No objectives found' : 'No objectives created yet'}
             </p>
           </div>
+        ) : enableReordering && districtId ? (
+          <DraggableGoalsTree
+            goals={filteredGoals}
+            selectedGoalId={selectedGoalId}
+            onSelectGoal={onSelectGoal}
+            districtId={districtId}
+            onRefresh={onRefresh}
+          />
         ) : (
           <div>
             {filteredGoals.map(goal => (

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useGoals, useDistrict } from '../../../hooks';
-import { Plus, ChevronLeft, Eye } from 'lucide-react';
+import { Plus, ChevronLeft, Eye, Info, ArrowLeft } from 'lucide-react';
 import { GoalsTreePanel } from '../../../components/goals-v2/GoalsTreePanel';
 import { GoalDetailPanel } from '../../../components/goals-v2/GoalDetailPanel';
 import type { Goal } from '../../../lib/types';
@@ -15,58 +15,30 @@ export default function AdminGoalsV2() {
   const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const isLoading = isLoadingDistrict || isLoadingGoals;
 
-  // Build hierarchical goal structure
-  const buildGoalHierarchy = (goals: Goal[]): Goal[] => {
-    console.log('[AdminGoalsV2] Building hierarchy from goals:', goals);
-    const goalsMap = new Map<string, Goal>();
-    const rootGoals: Goal[] = [];
+  // useGoals already returns hierarchical goals from GoalsService.getByDistrict()
+  // They already have children attached, no need to rebuild hierarchy
+  const hierarchicalGoals = goals || [];
 
-    // First pass: create map of all goals
-    goals.forEach(goal => {
-      goalsMap.set(goal.id, { ...goal, children: [] });
-    });
-
-    // Second pass: build hierarchy
-    goals.forEach(goal => {
-      const goalWithChildren = goalsMap.get(goal.id);
-      if (goalWithChildren) {
-        if (goal.parent_id) {
-          console.log(`[AdminGoalsV2] Goal ${goal.goal_number} has parent_id:`, goal.parent_id);
-          const parent = goalsMap.get(goal.parent_id);
-          if (parent) {
-            parent.children = parent.children || [];
-            parent.children.push(goalWithChildren);
-            console.log(`[AdminGoalsV2] Added ${goal.goal_number} as child of ${parent.goal_number}`);
-          } else {
-            console.warn(`[AdminGoalsV2] Parent not found for goal ${goal.goal_number}, parent_id:`, goal.parent_id);
-          }
-        } else {
-          console.log(`[AdminGoalsV2] Goal ${goal.goal_number} is a root goal (no parent_id)`);
-          rootGoals.push(goalWithChildren);
-        }
+  // Find selected goal by traversing the hierarchy
+  const findGoalById = (goals: Goal[], id: string): Goal | null => {
+    for (const goal of goals) {
+      if (goal.id === id) return goal;
+      if (goal.children) {
+        const found = findGoalById(goal.children, id);
+        if (found) return found;
       }
-    });
-
-    console.log('[AdminGoalsV2] Root goals:', rootGoals);
-    console.log('[AdminGoalsV2] Root goals with children:', rootGoals.map(g => ({
-      number: g.goal_number,
-      children: g.children?.map(c => c.goal_number)
-    })));
-
-    // Sort root goals by order_position
-    return rootGoals.sort((a, b) => a.order_position - b.order_position);
+    }
+    return null;
   };
 
-  const hierarchicalGoals = goals ? buildGoalHierarchy(goals) : [];
-  console.log('[AdminGoalsV2] Hierarchical goals:', hierarchicalGoals);
-  const selectedGoal = goals?.find(g => g.id === selectedGoalId) || null;
+  const selectedGoal = selectedGoalId ? findGoalById(hierarchicalGoals, selectedGoalId) : null;
 
   const handleGoBack = () => {
     navigate(`/${slug}/admin`);
   };
 
-  const handleViewPublic = () => {
-    navigate(`/${slug}/dashboard`);
+  const handleBackToManageGoals = () => {
+    navigate(`/${slug}/admin/goals`);
   };
 
   if (isLoading) {
@@ -95,42 +67,54 @@ export default function AdminGoalsV2() {
               </button>
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">
-                  Strategic Objectives & Goals
+                  Reorder Strategic Objectives
                 </h1>
                 <p className="text-sm text-gray-600 mt-1">
-                  {district?.name || 'District'} - Admin View
+                  Drag and drop to reorder objectives and goals
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-3">
               <button
-                onClick={handleViewPublic}
-                className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-              >
-                <Eye className="w-4 h-4" />
-                View Public
-              </button>
-              <button
-                onClick={() => {/* TODO: Create objective */}}
+                onClick={handleBackToManageGoals}
                 className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" />
-                Create Strategic Objective
+                <ArrowLeft className="w-4 h-4" />
+                Back to Manage Goals
               </button>
             </div>
           </div>
         </div>
       </header>
 
+      {/* Info Banner */}
+      <div className="bg-blue-50 border-b border-blue-200 px-6 py-3">
+        <div className="flex items-center gap-3">
+          <Info className="w-5 h-5 text-blue-600 flex-shrink-0" />
+          <p className="text-sm text-blue-800">
+            Use this page to reorder objectives and goals. To edit content or add measures, go to{' '}
+            <Link
+              to={`/${slug}/admin/goals`}
+              className="font-semibold underline hover:text-blue-900"
+            >
+              Manage Goals
+            </Link>
+          </p>
+        </div>
+      </div>
+
       {/* Split View Content */}
-      <div className="flex h-[calc(100vh-140px)]">
+      <div className="flex h-[calc(100vh-190px)]">
         {/* Left Panel - Goals Tree */}
         <GoalsTreePanel
           goals={hierarchicalGoals}
           selectedGoalId={selectedGoalId}
           onSelectGoal={setSelectedGoalId}
           searchQuery=""
+          districtId={district?.id}
+          enableReordering={true}
+          onRefresh={refetch}
         />
 
         {/* Right Panel - Goal Details */}
@@ -138,6 +122,7 @@ export default function AdminGoalsV2() {
           goal={selectedGoal}
           districtSlug={slug || ''}
           onRefresh={refetch}
+          mode="simple"
         />
       </div>
     </div>

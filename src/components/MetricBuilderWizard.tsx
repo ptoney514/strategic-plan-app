@@ -204,7 +204,7 @@ export function MetricBuilderWizard({
       const isNumericMetric = selectedType === 'number' || selectedType === 'percentage';
 
       // Production now has full schema with all columns from migrations 001-016
-      const metric = {
+      const metric: any = {
         goal_id: goalId,
         name: metricDetails.name,
         description: metricDetails.description,
@@ -220,6 +220,11 @@ export function MetricBuilderWizard({
         data_source: 'survey' as const,
         metric_type: selectedType === 'percentage' ? 'percent' : 'number' as const
       };
+
+      // Include id when editing existing metric
+      if (existingMetric?.id) {
+        metric.id = existingMetric.id;
+      }
 
       console.log('[MetricBuilderWizard] Saving metric:', existingMetric ? 'UPDATE' : 'CREATE', metric);
       console.log('[MetricBuilderWizard] Metric data structure:', {

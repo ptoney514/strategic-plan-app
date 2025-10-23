@@ -1,5 +1,5 @@
 import { supabase } from '../supabase';
-import type { Goal, HierarchicalGoal, Metric } from '../types';
+import type { Goal, HierarchicalGoal } from '../types';
 import { buildGoalHierarchy, getNextGoalNumber } from '../types';
 
 export class GoalsService {
@@ -176,11 +176,113 @@ export class GoalsService {
     );
 
     const results = await Promise.all(updates);
-    
+
     const errors = results.filter(r => r.error);
     if (errors.length > 0) {
       console.error('Error reordering goals:', errors);
       throw new Error('Failed to reorder goals');
     }
+  }
+
+  /**
+   * Renumber goals within a specific parent based on their order_position
+   * This is called after reordering to update goal_number display values
+   *
+   * @param districtId - The district ID
+   * @param parentId - The parent goal ID (null for root goals)
+   */
+  static async renumberGoals(districtId: string, parentId: string | null): Promise<void> {
+    console.log('[GoalsService] Renumbering goals for parent:', parentId);
+
+    // Get all sibling goals under this parent
+    let query = supabase
+      .from('spb_goals')
+      .select('*')
+      .eq('district_id', districtId);
+
+    // Use .is() for null check, .eq() for specific parent_id
+    if (parentId === null) {
+      query = query.is('parent_id', null);
+    } else {
+      query = query.eq('parent_id', parentId);
+    }
+
+    const { data: siblings, error: fetchError } = await query.order('order_position');
+
+    if (fetchError) {
+      console.error('[GoalsService] Error fetching siblings:', fetchError);
+      throw fetchError;
+    }
+
+    if (!siblings || siblings.length === 0) {
+      console.log('[GoalsService] No siblings to renumber');
+      return;
+    }
+
+    // Get parent's goal_number if this is not a root goal
+    let parentNumber = '';
+    if (parentId) {
+      const { data: parent, error: parentError } = await supabase
+        .from('spb_goals')
+        .select('goal_number')
+        .eq('id', parentId)
+        .single();
+
+      if (parentError || !parent) {
+        console.error('[GoalsService] Error fetching parent:', parentError);
+        throw new Error('Parent goal not found');
+      }
+      parentNumber = parent.goal_number;
+    }
+
+    // Renumber each sibling sequentially
+    const updates = siblings.map((goal, index) => {
+      const newNumber = parentNumber
+        ? `${parentNumber}.${index + 1}`
+        : String(index + 1);
+
+      console.log(`[GoalsService] Renumbering ${goal.goal_number} -> ${newNumber}`);
+
+      return supabase
+        .from('spb_goals')
+        .update({ goal_number: newNumber })
+        .eq('id', goal.id);
+    });
+
+    const results = await Promise.all(updates);
+
+    const errors = results.filter(r => r.error);
+    if (errors.length > 0) {
+      console.error('[GoalsService] Error renumbering goals:', errors);
+      throw new Error('Failed to renumber goals');
+    }
+
+    console.log('[GoalsService] Successfully renumbered goals');
+
+    // Recursively renumber all children of the goals we just renumbered
+    for (const goal of siblings) {
+      await this.renumberGoals(districtId, goal.id);
+    }
+  }
+
+  /**
+   * Reorder goals and automatically renumber them
+   *
+   * @param districtId - The district ID
+   * @param parentId - The parent goal ID (null for root goals)
+   * @param reorderedGoals - Array of goal IDs in their new order
+   */
+  static async reorderAndRenumber(
+    districtId: string,
+    parentId: string | null,
+    reorderedGoals: { id: string; order_position: number }[]
+  ): Promise<void> {
+    console.log('[GoalsService] Reordering and renumbering goals');
+
+    // First update order positions
+    await this.reorder(reorderedGoals);
+
+    // Then renumber the goals
+    await this.renumberGoals(districtId, parentId);
   }
 }

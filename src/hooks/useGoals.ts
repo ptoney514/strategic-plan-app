@@ -67,10 +67,29 @@ export function useDeleteGoal() {
 
 export function useReorderGoals() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (goals: { id: string; order_position: number }[]) => 
+    mutationFn: (goals: { id: string; order_position: number }[]) =>
       GoalsService.reorder(goals),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['goals'] });
+    },
+  });
+}
+
+export function useReorderAndRenumberGoals() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      districtId,
+      parentId,
+      reorderedGoals,
+    }: {
+      districtId: string;
+      parentId: string | null;
+      reorderedGoals: { id: string; order_position: number }[];
+    }) => GoalsService.reorderAndRenumber(districtId, parentId, reorderedGoals),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },

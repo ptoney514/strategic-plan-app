@@ -15,7 +15,8 @@ import {
   XCircle,
   Clock,
   Eye,
-  Target
+  Target,
+  GripVertical
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
@@ -235,17 +236,26 @@ export function AdminGoals() {
               Strategic Objectives & Goals
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground mt-1">
-              Manage your strategic objectives and their goals
+              Manage content, add measures, and edit objectives
             </p>
           </div>
-          <button
-            onClick={() => navigate(`/${slug}/admin/objectives/new`)}
-            className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base whitespace-nowrap"
-          >
-            <Plus className="h-4 w-4" />
-            <span className="hidden sm:inline">Create Strategic Objective</span>
-            <span className="sm:hidden">New Objective</span>
-          </button>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <button
+              onClick={() => navigate(`/${slug}/admin/goals-v2`)}
+              className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 border border-gray-300 text-gray-700 bg-white rounded-md hover:bg-gray-50 transition-colors text-sm sm:text-base whitespace-nowrap"
+            >
+              <GripVertical className="h-4 w-4" />
+              <span>Reorder Goals</span>
+            </button>
+            <button
+              onClick={() => navigate(`/${slug}/admin/objectives/new`)}
+              className="flex items-center justify-center space-x-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm sm:text-base whitespace-nowrap"
+            >
+              <Plus className="h-4 w-4" />
+              <span className="hidden sm:inline">Create Strategic Objective</span>
+              <span className="sm:hidden">New Objective</span>
+            </button>
+          </div>
         </div>
 
         {/* Goals Table - Desktop Only */}

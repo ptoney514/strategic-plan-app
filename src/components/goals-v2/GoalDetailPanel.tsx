@@ -10,9 +10,10 @@ interface GoalDetailPanelProps {
   goal: Goal | null;
   districtSlug: string;
   onRefresh: () => void;
+  mode?: 'full' | 'simple'; // 'full' for manage page, 'simple' for reorder page
 }
 
-export function GoalDetailPanel({ goal, districtSlug, onRefresh }: GoalDetailPanelProps) {
+export function GoalDetailPanel({ goal, districtSlug, onRefresh, mode = 'full' }: GoalDetailPanelProps) {
   const updateGoalMutation = useUpdateGoal();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');
@@ -242,42 +243,44 @@ export function GoalDetailPanel({ goal, districtSlug, onRefresh }: GoalDetailPan
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-2 ml-4">
-              {isEditing ? (
-                <>
+            {/* Action Buttons - Only show in full mode */}
+            {mode === 'full' && (
+              <div className="flex items-center gap-2 ml-4">
+                {isEditing ? (
+                  <>
+                    <button
+                      onClick={handleCancel}
+                      disabled={isSaving}
+                      className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    >
+                      <X className="w-4 h-4" />
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSave}
+                      disabled={isSaving}
+                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      {isSaving ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </>
+                ) : (
                   <button
-                    onClick={handleCancel}
-                    disabled={isSaving}
+                    onClick={() => setIsEditing(true)}
                     className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
                   >
-                    <X className="w-4 h-4" />
-                    Cancel
+                    <Edit2 className="w-4 h-4" />
+                    Edit Goal
                   </button>
-                  <button
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
-                  >
-                    <Save className="w-4 h-4" />
-                    {isSaving ? 'Saving...' : 'Save Changes'}
-                  </button>
-                </>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center gap-2"
-                >
-                  <Edit2 className="w-4 h-4" />
-                  Edit Goal
-                </button>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Metrics Section - Only show for Goals (level 1+), not Strategic Objectives (level 0) */}
-        {goal.level > 0 && (
+        {/* Metrics Section - Only show for Goals (level 1+) in full mode */}
+        {goal.level > 0 && mode === 'full' && (
           <div className="border-t border-gray-200 pt-8">
             <div className="flex items-center justify-between mb-6">
               <div>
@@ -296,8 +299,8 @@ export function GoalDetailPanel({ goal, districtSlug, onRefresh }: GoalDetailPan
           </div>
         )}
 
-        {/* Progress Bar Section - Only show for Strategic Objectives (level 0) */}
-        {goal.level === 0 && (
+        {/* Progress Bar Section - Only show progress bar in full mode */}
+        {goal.level === 0 && mode === 'full' && (
           <div className="border-t border-gray-200 pt-8">
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-900">Overall Progress</h2>
@@ -308,7 +311,7 @@ export function GoalDetailPanel({ goal, districtSlug, onRefresh }: GoalDetailPan
 
             {/* Show progress bar if enabled */}
             {goal.show_progress_bar && (
-              <div className="bg-gray-50 rounded-lg p-6">
+              <div className="bg-gray-50 rounded-lg p-6 mb-8">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium text-gray-700">Overall Progress</span>
                   <span className="text-sm font-semibold text-gray-900">
@@ -323,37 +326,41 @@ export function GoalDetailPanel({ goal, districtSlug, onRefresh }: GoalDetailPan
                 </div>
               </div>
             )}
+          </div>
+        )}
 
-            {/* Show child goals */}
-            {goal.children && goal.children.length > 0 && (
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Goals</h3>
-                <div className="space-y-3">
-                  {goal.children.map((child) => (
-                    <div
-                      key={child.id}
-                      className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h4 className="font-medium text-gray-900">
-                            {child.goal_number}. {child.title}
-                          </h4>
-                          {child.description && (
-                            <p className="text-sm text-gray-600 mt-1">{child.description}</p>
-                          )}
-                          <div className="flex items-center gap-3 mt-2">
-                            <span className="text-xs text-gray-500">
-                              {child.metrics?.length || 0} metrics
-                            </span>
-                          </div>
+        {/* Child Goals - Show for any goal with children */}
+        {goal.children && goal.children.length > 0 && (
+          <div className={mode === 'full' ? 'mt-0' : 'border-t border-gray-200 pt-8'}>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {goal.level === 0 ? 'Goals' : 'Sub-Goals'}
+            </h3>
+            <div className="space-y-3">
+              {goal.children.map((child) => (
+                <div
+                  key={child.id}
+                  className="p-4 border border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900">
+                        {child.goal_number}. {child.title}
+                      </h4>
+                      {child.description && (
+                        <p className="text-sm text-gray-600 mt-1">{child.description}</p>
+                      )}
+                      {mode === 'full' && (
+                        <div className="flex items-center gap-3 mt-2">
+                          <span className="text-xs text-gray-500">
+                            {child.metrics?.length || 0} metrics
+                          </span>
                         </div>
-                      </div>
+                      )}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
         )}
         </div>

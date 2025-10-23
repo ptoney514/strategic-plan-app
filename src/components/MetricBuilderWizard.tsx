@@ -204,7 +204,7 @@ export function MetricBuilderWizard({
       const isNumericMetric = selectedType === 'number' || selectedType === 'percentage';
 
       // Production now has full schema with all columns from migrations 001-016
-      const metric: any = {
+      const metric: Partial<Metric> = {
         goal_id: goalId,
         name: metricDetails.name,
         description: metricDetails.description,

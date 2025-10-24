@@ -123,11 +123,9 @@ export function DistrictDashboard() {
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-neutral-900">
             {district.name}
-            <br />
-            <span className="text-red-600">Strategic Plan 2021-2026</span>
           </h1>
-          <p className="mt-6 text-base md:text-lg text-neutral-600 max-w-3xl mx-auto">
-            Community. Innovation. Excellence. - Charting our course for educational excellence through strategic pillars that guide our commitment to student success
+          <p className="mt-2 text-base md:text-lg text-neutral-600">
+            <span className="text-red-600 font-semibold">Strategic Plan 2021-2026</span>
           </p>
         </div>
       </section>
@@ -180,7 +178,7 @@ export function DistrictDashboard() {
                     setSelectedGoal(goal);
                     setShowSlidePanel(true);
                   }}
-                  className="group relative rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-all shadow-sm hover:shadow-md cursor-pointer overflow-hidden"
+                  className="group relative rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-1 cursor-pointer overflow-hidden"
                 >
                   {/* Header Visual - Image or Color */}
                   {(goal.image_url || goal.header_color) && (
@@ -203,7 +201,7 @@ export function DistrictDashboard() {
                   <div className="pointer-events-none absolute -top-6 -right-6 h-28 w-28 rounded-full bg-gradient-to-br from-emerald-400/30 via-sky-400/30 to-indigo-500/30 blur-2xl"></div>
                   <div className="p-5 md:p-6">
                     <div className="flex items-start justify-between">
-                      <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${style.from} ${style.to} text-white flex items-center justify-center shadow-sm`}>
+                      <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${style.from} ${style.to} text-white flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300`}>
                         {index === 0 ? <GraduationCap className="h-5 w-5" /> :
                          index === 1 ? <BarChart3 className="h-5 w-5" /> :
                          <BookOpen className="h-5 w-5" />}
@@ -242,27 +240,27 @@ export function DistrictDashboard() {
                     {goal.show_progress_bar !== false && displayMode !== 'hidden' && (
                       <div className="mt-5">
                         <div className="relative">
-                          <div className="w-full bg-secondary rounded-full h-3 overflow-hidden shadow-inner">
+                          <div className="w-full bg-neutral-100 rounded-full h-2.5 overflow-hidden shadow-inner ring-1 ring-neutral-200/50">
                             <div
-                              className="h-full transition-all duration-700 ease-out relative"
+                              className="h-full transition-all duration-700 ease-out relative rounded-full"
                               style={{
                                 width: `${Math.min(Math.max(progress, 0), 100)}%`,
                                 background: `linear-gradient(90deg, ${progressColor}, ${progressColor}dd)`,
-                                boxShadow: `0 0 8px ${progressColor}40`
+                                boxShadow: `0 0 12px ${progressColor}30`
                               }}
                             >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20" />
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse" />
                             </div>
                           </div>
                         </div>
                         {/* Show label if not color-only mode */}
                         {progressLabel && (
-                          <div className="mt-2 text-right">
+                          <div className="mt-2.5 text-right">
                             <span
-                              className="text-sm font-bold"
+                              className="text-sm font-bold tracking-wide"
                               style={{
                                 color: progressColor,
-                                textShadow: `0 1px 2px ${progressColor}20`
+                                textShadow: `0 1px 3px ${progressColor}20`
                               }}
                             >
                               {progressLabel}
@@ -277,9 +275,9 @@ export function DistrictDashboard() {
                     )}
                   </div>
                   <div className="px-5 md:px-6 pb-5 md:pb-6">
-                    <button className="inline-flex items-center gap-2 text-sm font-medium text-neutral-800 hover:text-neutral-900">
-                      Annual progress click here
-                      <ArrowRight className="h-4 w-4" />
+                    <button className="group/btn inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 rounded-lg border border-neutral-200 hover:border-neutral-300 transition-all duration-200 hover:shadow-sm">
+                      <span>View Annual Progress</span>
+                      <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
                     </button>
                   </div>
                 </article>

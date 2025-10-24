@@ -128,7 +128,7 @@ export function DistrictDashboard() {
       </section>
 
       {/* Objectives Grid */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-12 md:pb-16">
+      <section className="flex-1 max-w-7xl mx-auto px-6 md:px-8 py-8 md:py-12">
         {!objectives || objectives.length === 0 ? (
           <div className="text-center py-12">
             <Target className="h-16 w-16 text-neutral-400 mx-auto mb-4" />
@@ -209,7 +209,7 @@ export function DistrictDashboard() {
 
       {/* Footer */}
       <footer className="mt-auto bg-white border-t border-neutral-200">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-4">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-6 md:py-8">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-neutral-600">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-900 text-white text-xs font-medium">

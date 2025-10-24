@@ -8,7 +8,7 @@ interface GoalsOutlineListProps {
 }
 
 export function GoalsOutlineList({ goals, onGoalClick }: GoalsOutlineListProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   if (!goals || goals.length === 0) {
     return null;

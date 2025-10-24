@@ -13,23 +13,37 @@ import { SlidePanel } from '../../../components/SlidePanel';
 import { PerformanceIndicator } from '../../../components/PerformanceIndicator';
 import { AnnualProgressChart } from '../../../components/AnnualProgressChart';
 import { LikertScaleChart } from '../../../components/LikertScaleChart';
-import { GoalNarrativeDetail } from '../../../components/GoalNarrativeDetail';
 import { GoalsOutlineList } from '../../../components/GoalsOutlineList';
 import { NarrativeDisplay } from '../../../components/NarrativeDisplay';
-import type { Goal, TimeSeriesDataPoint } from '../../../lib/types';
-import {
-  getProgressColor,
-  getProgressQualitativeLabel,
-  getProgressScoreOutOf5
-} from '../../../lib/types';
+import type { Goal } from '../../../lib/types';
 
 export function DistrictDashboard() {
   const { slug } = useParams<{ slug: string }>();
   const { data: district, isLoading: districtLoading } = useDistrict(slug!);
-  const { data: goals, isLoading: goalsLoading } = useGoals(district?.id || '');
-  const { data: metrics, isLoading: metricsLoading } = useMetricsByDistrict(district?.id || '');
+
+  // Always call hooks in the same order - use empty string as fallback
+  // The hooks have 'enabled' flags that will prevent fetching when districtId is invalid
+  const districtId = district?.id ?? '';
+  const { data: goals, isLoading: goalsLoading } = useGoals(districtId);
+  const { data: metrics, isLoading: metricsLoading } = useMetricsByDistrict(districtId);
+
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [showSlidePanel, setShowSlidePanel] = useState(false);
+
+  // Flatten goal hierarchy for display - memoized to avoid recalculation
+  // IMPORTANT: Must be before early returns to follow Rules of Hooks
+  const flattenedGoals = useMemo(() => {
+    if (!selectedGoal?.children) return [];
+
+    const goals: Goal[] = [];
+    selectedGoal.children.forEach((child: Goal) => {
+      goals.push(child);
+      if (child.children && child.children.length > 0) {
+        goals.push(...child.children);
+      }
+    });
+    return goals;
+  }, [selectedGoal]);
 
   // Debug logging (development only)
   useEffect(() => {
@@ -115,20 +129,6 @@ export function DistrictDashboard() {
     return goal.overall_progress_display_mode ||
            (goal.level === 2 ? 'percentage' : 'qualitative');
   };
-
-  // Flatten goal hierarchy for display - memoized to avoid recalculation
-  const flattenedGoals = useMemo(() => {
-    if (!selectedGoal?.children) return [];
-
-    const goals: Goal[] = [];
-    selectedGoal.children.forEach((child: Goal) => {
-      goals.push(child);
-      if (child.children && child.children.length > 0) {
-        goals.push(...child.children);
-      }
-    });
-    return goals;
-  }, [selectedGoal]);
 
   return (
     <div className="min-h-screen flex flex-col antialiased text-neutral-800 bg-neutral-50">

@@ -233,36 +233,19 @@ export function DistrictDashboard() {
           setShowSlidePanel(false);
           setSelectedGoal(null);
         }}
-        title={selectedGoal ? `${selectedGoal.goal_number} - ${selectedGoal.title}` : 'Objective Details'}
+        title={selectedGoal ? `${selectedGoal.goal_number}. ${selectedGoal.title}` : 'Objective Details'}
       >
         {selectedGoal && (
           <div className="h-full flex flex-col">
-            {/* Header Section - Fixed */}
-            <div className="p-6 border-b border-neutral-200 space-y-4">
-              {/* Visual Indicator Badge */}
-              {selectedGoal.indicator_text && (
-                <div className="flex justify-end">
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full text-xs font-medium px-2.5 py-1"
-                    style={{
-                      backgroundColor: selectedGoal.indicator_color || '#10b981',
-                      color: '#ffffff'
-                    }}
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/80"></span>
-                    {selectedGoal.indicator_text}
-                  </span>
-                </div>
-              )}
+            {/* Description - Directly under title, above the line */}
+            <div className="px-6 pt-2 pb-4">
+              <p className="text-neutral-600 text-sm leading-relaxed">
+                {selectedGoal.description || 'Strategic initiatives focused on this objective'}
+              </p>
+            </div>
 
-              {/* Description */}
-              <div>
-                <p className="text-neutral-600 text-sm leading-relaxed">
-                  {selectedGoal.description || 'Strategic initiatives focused on this objective'}
-                </p>
-              </div>
-
-              {/* Goal Overall Progress */}
+            {/* Goal Overall Progress - Below the line */}
+            <div className="px-6 py-4 border-t border-neutral-200">
               {(() => {
                 const progress = selectedGoal.overall_progress_override ?? selectedGoal.overall_progress ?? 0;
                 const progressColor = getProgressColor(progress);

@@ -113,7 +113,7 @@ export function DistrictDashboard() {
   };
 
   return (
-    <div className="min-h-full antialiased text-neutral-800 bg-neutral-50">
+    <div className="min-h-screen flex flex-col antialiased text-neutral-800 bg-neutral-50">
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-white py-12 md:py-16">
@@ -206,6 +206,25 @@ export function DistrictDashboard() {
           </div>
         )}
       </section>
+
+      {/* Footer */}
+      <footer className="mt-auto bg-white border-t border-neutral-200">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-neutral-600">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-900 text-white text-xs font-medium">
+                ©
+              </span>
+              <span>© 2025 {district?.name || 'Westside Community Schools'}</span>
+            </div>
+            <div className="flex items-center gap-6">
+              <Link to="#" className="hover:text-neutral-900 transition-colors">Privacy</Link>
+              <Link to="#" className="hover:text-neutral-900 transition-colors">Terms</Link>
+              <Link to="#" className="hover:text-neutral-900 transition-colors">Contact</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
 
       {/* Slide Panel for Goal Details */}
       <SlidePanel

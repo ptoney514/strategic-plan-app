@@ -223,18 +223,16 @@ export function DistrictDashboard() {
 
                     {/* Status badge at bottom */}
                     <div className="mt-auto pt-6 flex items-center justify-between">
-                      {goal.indicator_text && (
-                        isOffTrack ? (
-                          <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
-                            <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
-                            {goal.indicator_text}
-                          </button>
-                        ) : (
-                          <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
-                            <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
-                            {goal.indicator_text}
-                          </button>
-                        )
+                      {isOffTrack ? (
+                        <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
+                          <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          {goal.indicator_text || 'Off Track'}
+                        </button>
+                      ) : (
+                        <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
+                          <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          {goal.indicator_text || 'On Target'}
+                        </button>
                       )}
                     </div>
                   </div>

@@ -138,7 +138,7 @@ export function DistrictDashboard() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
             {objectives.map((goal, index) => {
               // Determine goal status using helper function
               const status = getGoalStatus(goal.indicator_text);
@@ -234,11 +234,35 @@ export function DistrictDashboard() {
           setSelectedGoal(null);
         }}
         title={selectedGoal ? `${selectedGoal.goal_number}. ${selectedGoal.title}` : 'Objective Details'}
+        topBarColor={selectedGoal && getGoalStatus(selectedGoal.indicator_text) === 'off-track' ? 'warning' : 'success'}
       >
         {selectedGoal && (
           <div className="h-full flex flex-col">
-            {/* Description - Directly under title, no border */}
-            <div className="px-6 pt-2 pb-6">
+            {/* Status Badge and Description */}
+            <div className="px-6 pt-1 pb-6">
+              {/* Status Badge */}
+              {selectedGoal.indicator_text && (
+                <div className="mb-3">
+                  {(() => {
+                    const status = getGoalStatus(selectedGoal.indicator_text);
+                    const isOffTrack = status === 'off-track';
+
+                    return isOffTrack ? (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300">
+                        <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                        {selectedGoal.indicator_text}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300">
+                        <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+                        {selectedGoal.indicator_text}
+                      </span>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* Description */}
               <p className="text-neutral-600 text-sm leading-relaxed">
                 {selectedGoal.description || 'Strategic initiatives focused on this objective'}
               </p>
@@ -278,7 +302,17 @@ export function DistrictDashboard() {
               {/* Goals List */}
               {selectedGoal.children && selectedGoal.children.length > 0 ? (
                 <div className="space-y-4">
-                  {selectedGoal.children.map((child: any, index: number) => {
+                  {(() => {
+                    // Flatten the hierarchy: create array of level 1 goals followed by their children
+                    const flattenedGoals: any[] = [];
+                    selectedGoal.children.forEach((child: any) => {
+                      flattenedGoals.push(child);
+                      if (child.children && child.children.length > 0) {
+                        flattenedGoals.push(...child.children);
+                      }
+                    });
+                    return flattenedGoals;
+                  })().map((child: any, index: number) => {
                     const childProgress = child.overall_progress_override ?? child.overall_progress ?? 0;
                     const isExpanded = expandedGoalId === child.id;
 
@@ -326,7 +360,7 @@ export function DistrictDashboard() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="text-lg font-semibold text-neutral-900 mb-1">{child.title}</h4>
-                              {child.description && !isExpanded && (
+                              {child.description && (
                                 <p className="text-sm text-neutral-600 mb-2">{child.description}</p>
                               )}
                             </div>
@@ -350,9 +384,9 @@ export function DistrictDashboard() {
                           {child.show_progress_bar !== false && (
                             <PerformanceIndicator
                               progress={childProgress}
-                              displayMode={child.overall_progress_display_mode || 'qualitative'}
+                              displayMode={child.overall_progress_display_mode || (child.level === 2 ? 'percentage' : 'qualitative')}
                               customValue={child.overall_progress_custom_value}
-                              showLabels={true}
+                              showLabels={child.level === 1}
                             />
                           )}
                         </div>
@@ -423,186 +457,6 @@ export function DistrictDashboard() {
                                 />
                               )
                             )}
-                          </div>
-                        )}
-
-                        {/* Level 2 Sub-goals (e.g., 1.1.1, 1.1.2) - Always show if they exist */}
-                        {child.children && child.children.length > 0 && (
-                          <div className="border-t border-neutral-200 p-5 bg-neutral-50">
-                            <div className="space-y-4">
-                              {/* Sub-goals section */}
-                              {child.children && child.children.length > 0 && (
-                                <div className="space-y-3 pt-4">
-                                  {child.children.map((subGoal: any) => {
-                                    const isSubExpanded = expandedSubGoalId === subGoal.id;
-                                    const subGoalProgress = subGoal.overall_progress_override ?? subGoal.overall_progress ?? 0;
-
-                                    // Get real metrics for this sub-goal - prefer metrics with visualization_config
-                                    const subGoalMetrics = metrics?.filter(m => m.goal_id === subGoal.id) || [];
-                                    const primarySubMetric = subGoalMetrics.find(m => m.visualization_config) || subGoalMetrics[0];
-
-                                    // Debug logging
-                                    if (subGoal.goal_number === '1.1.1') {
-                                      console.log('[DistrictDashboard] Sub-goal 1.1.1 metrics:', {
-                                        subGoalId: subGoal.id,
-                                        totalMetrics: metrics?.length,
-                                        subGoalMetrics: subGoalMetrics,
-                                        primarySubMetric: primarySubMetric
-                                      });
-                                    }
-
-                                    // Convert metric visualization_config.dataPoints to chart data format
-                                    const subDataPoints = primarySubMetric?.visualization_config?.dataPoints ||
-                                                         primarySubMetric?.data_points;
-
-                                    const subChartData = subDataPoints && Array.isArray(subDataPoints) ?
-                                      subDataPoints.map((dp: any) => ({
-                                        year: dp.period || dp.date || dp.label || '',
-                                        value: Number(dp.value) || 0,
-                                        target: Number(dp.target || primarySubMetric?.target_value) || undefined
-                                      })).filter(d => d.year) // Only include entries with a year/date
-                                      : null;
-
-                                    return (
-                                      <div key={subGoal.id} className="bg-white border border-neutral-300 rounded-lg overflow-hidden">
-                                        <div className="p-4">
-                                          <div className="flex items-start gap-3 mb-3">
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm">
-                                              <span className="text-base font-bold text-white">
-                                                {subGoal.goal_number}
-                                              </span>
-                                            </div>
-                                            <div className="flex-1 min-w-0">
-                                              <h5 className="text-lg font-semibold text-neutral-900">{subGoal.title}</h5>
-                                              {subGoal.description && (
-                                                <p className="text-xs text-neutral-600 mt-1">{subGoal.description}</p>
-                                              )}
-                                            </div>
-                                            {subGoal.indicator_text && (
-                                              <div className="flex-shrink-0">
-                                                <span
-                                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
-                                                  style={{
-                                                    backgroundColor: subGoal.indicator_color || '#10b981',
-                                                    color: '#ffffff'
-                                                  }}
-                                                >
-                                                  <span className="w-1.5 h-1.5 rounded-full bg-white/80" />
-                                                  {subGoal.indicator_text}
-                                                </span>
-                                              </div>
-                                            )}
-                                          </div>
-
-                                          {/* Performance Indicator for Sub-goal - Only show if enabled, no click action */}
-                                          {subGoal.show_progress_bar !== false && (
-                                            <PerformanceIndicator
-                                              progress={subGoalProgress}
-                                              displayMode={subGoal.overall_progress_display_mode || 'percentage'}
-                                              customValue={subGoal.overall_progress_custom_value}
-                                              showLabels={false}
-                                            />
-                                          )}
-                                        </div>
-
-                                        {/* Metric Visualization - Show single metric with proper card styling */}
-                                        {primarySubMetric && (() => {
-                                          // Prepare chart data if needed
-                                          const metricDataPoints = primarySubMetric.visualization_config?.dataPoints || primarySubMetric.data_points;
-                                          const metricChartData = metricDataPoints && Array.isArray(metricDataPoints) ?
-                                            metricDataPoints.map((dp: any) => ({
-                                              year: dp.period || dp.date || dp.label || '',
-                                              value: Number(dp.value) || 0,
-                                              target: Number(dp.target || primarySubMetric.target_value) || undefined
-                                            })).filter(d => d.year) : null;
-
-                                          return (
-                                            <div className="border-t border-neutral-300">
-                                              {(primarySubMetric.visualization_type === 'blog' && primarySubMetric.visualization_config?._frontendType === 'narrative') ? (
-                                                <div className="p-6 bg-white">
-                                                  <NarrativeDisplay config={primarySubMetric.visualization_config} />
-                                                </div>
-                                              ) : (primarySubMetric.visualization_type === 'number' && primarySubMetric.visualization_config?._frontendType === 'ratio') ? (
-                                                <div className="p-6 bg-white">
-                                                  <div className="text-center">
-                                                    <div className="text-sm font-medium text-neutral-600 mb-2">{primarySubMetric.name}</div>
-                                                    <div className="text-xl font-bold text-neutral-900 leading-relaxed">
-                                                      {primarySubMetric.visualization_config?.label || ''}{primarySubMetric.visualization_config?.ratioValue || '1.0:1'}
-                                                    </div>
-                                                    {primarySubMetric.visualization_config?.showTarget && primarySubMetric.visualization_config?.targetValue && (
-                                                      <div className="text-sm text-neutral-500 mt-3">
-                                                        Target: {primarySubMetric.visualization_config.label}{primarySubMetric.visualization_config.targetValue}
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              ) : (primarySubMetric.visualization_type === 'number' && primarySubMetric.visualization_config?._frontendType === 'number') ? (
-                                                <div className="p-6 bg-white">
-                                                  <div className="text-center">
-                                                    <div className="text-sm font-medium text-neutral-600 mb-2">
-                                                      {primarySubMetric.name}
-                                                    </div>
-                                                    <div className="text-4xl font-bold text-neutral-900 mb-1">
-                                                      {(() => {
-                                                        const decimals = primarySubMetric.visualization_config?.decimals ?? 2;
-                                                        const value = typeof primarySubMetric.visualization_config?.currentValue === 'number'
-                                                          ? primarySubMetric.visualization_config.currentValue.toFixed(decimals)
-                                                          : primarySubMetric.visualization_config?.currentValue || '0';
-                                                        return primarySubMetric.visualization_config?.unit ? `${value}${primarySubMetric.visualization_config.unit}` : value;
-                                                      })()}
-                                                    </div>
-                                                    {primarySubMetric.visualization_config?.targetValue && (
-                                                      <div className="text-sm text-neutral-500 mt-2">
-                                                        Target: {primarySubMetric.visualization_config.targetValue.toFixed(primarySubMetric.visualization_config?.decimals ?? 2)}{primarySubMetric.visualization_config?.unit || ''}
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              ) : primarySubMetric.visualization_type === 'ratio' ? (
-                                                <div className="p-6 bg-white">
-                                                  <div className="text-center">
-                                                    <div className="text-xl font-bold text-neutral-900 leading-relaxed">
-                                                      {primarySubMetric.visualization_config?.label || ''}{primarySubMetric.visualization_config?.ratioValue || '1.0:1'}
-                                                    </div>
-                                                    {primarySubMetric.visualization_config?.showTarget && primarySubMetric.visualization_config?.targetValue && (
-                                                      <div className="text-sm text-neutral-500 mt-3">
-                                                        Target: {primarySubMetric.visualization_config.label}{primarySubMetric.visualization_config.targetValue}
-                                                      </div>
-                                                    )}
-                                                  </div>
-                                                </div>
-                                              ) : (metricChartData && metricChartData.length > 0) ? (
-                                                <div className="p-5 bg-neutral-50">
-                                                  {(primarySubMetric.visualization_type === 'bar' && primarySubMetric.visualization_config?.scaleMin) ? (
-                                                    <LikertScaleChart
-                                                      data={metricChartData}
-                                                      title={primarySubMetric.name || "Survey Results"}
-                                                      description={primarySubMetric.description}
-                                                      scaleMin={primarySubMetric.visualization_config?.scaleMin || 1}
-                                                      scaleMax={primarySubMetric.visualization_config?.scaleMax || 5}
-                                                      scaleLabel={primarySubMetric.visualization_config?.scaleLabel || '(5 high)'}
-                                                      targetValue={primarySubMetric.target_value || primarySubMetric.visualization_config?.targetValue}
-                                                      showAverage={true}
-                                                    />
-                                                  ) : (
-                                                    <AnnualProgressChart
-                                                      data={metricChartData}
-                                                      title={primarySubMetric.name || "Annual Progress"}
-                                                      description={primarySubMetric.description || "Year-over-year progress tracking"}
-                                                      unit={primarySubMetric.unit || ""}
-                                                    />
-                                                  )}
-                                                </div>
-                                              ) : null}
-                                            </div>
-                                          );
-                                        })()}
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                              )}
-                            </div>
                           </div>
                         )}
                       </div>

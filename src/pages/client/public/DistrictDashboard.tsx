@@ -12,7 +12,10 @@ import {
   Star,
   Users,
   HandCoins,
-  Megaphone
+  Megaphone,
+  MoreHorizontal,
+  Check,
+  AlertTriangle
 } from 'lucide-react';
 import { SlidePanel } from '../../../components/SlidePanel';
 import { PerformanceIndicator } from '../../../components/PerformanceIndicator';
@@ -141,7 +144,7 @@ export function DistrictDashboard() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {objectives.map((goal, index) => {
               const style = cardStyles[index % cardStyles.length];
               const subGoalsCount = goal.children?.length || 0;
@@ -169,116 +172,71 @@ export function DistrictDashboard() {
                 }
               };
 
-              const progressLabel = renderProgressLabel();
+              // Determine status badge based on indicator
+              const isOnTarget = goal.indicator_text &&
+                (goal.indicator_text.toLowerCase().includes('on target') ||
+                 goal.indicator_text.toLowerCase().includes('good'));
+
+              const isOffTrack = goal.indicator_text &&
+                (goal.indicator_text.toLowerCase().includes('off track') ||
+                 goal.indicator_text.toLowerCase().includes('needs attention') ||
+                 goal.indicator_text.toLowerCase().includes('at risk'));
+
+              // Gradient bar color based on status
+              const gradientClass = isOffTrack
+                ? 'from-amber-500 via-orange-600 to-red-600'
+                : 'from-emerald-400 via-emerald-500 to-teal-500';
 
               return (
                 <article
                   key={goal.id}
+                  className="group relative h-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-zinc-300 cursor-pointer"
                   onClick={() => {
                     setSelectedGoal(goal);
                     setShowSlidePanel(true);
                   }}
-                  className="group relative rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-all duration-300 shadow-sm hover:shadow-lg hover:-translate-y-1 cursor-pointer overflow-hidden"
                 >
-                  {/* Header Visual - Image or Color */}
-                  {(goal.image_url || goal.header_color) && (
-                    <div className="h-32 w-full relative">
-                      {goal.image_url ? (
-                        <img
-                          src={goal.image_url}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      ) : goal.header_color ? (
-                        <div
-                          className="w-full h-full"
-                          style={{ backgroundColor: goal.header_color }}
-                        />
-                      ) : null}
-                    </div>
-                  )}
+                  {/* Top gradient bar */}
+                  <div className={`h-1 w-full bg-gradient-to-r ${gradientClass}`} />
 
-                  <div className="pointer-events-none absolute -top-6 -right-6 h-28 w-28 rounded-full bg-gradient-to-br from-emerald-400/30 via-sky-400/30 to-indigo-500/30 blur-2xl"></div>
-                  <div className="p-5 md:p-6">
+                  <div className="flex h-full flex-col p-6 md:p-7">
+                    {/* Header with title and menu */}
                     <div className="flex items-start justify-between">
-                      <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${style.from} ${style.to} text-white flex items-center justify-center shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300`}>
-                        {index === 0 ? <GraduationCap className="h-5 w-5" /> :
-                         index === 1 ? <BarChart3 className="h-5 w-5" /> :
-                         <BookOpen className="h-5 w-5" />}
+                      <div>
+                        <h2 className="text-xl md:text-2xl tracking-tight font-semibold text-zinc-900">
+                          {goal.goal_number}. {goal.title}
+                        </h2>
+                        <p className="mt-1 text-sm text-zinc-500">
+                          {goal.description || 'Strategic initiatives focused on this objective'}
+                        </p>
                       </div>
+                      <button
+                        className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/70"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Add menu functionality
+                        }}
+                      >
+                        <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
+                      </button>
+                    </div>
+
+                    {/* Status badge at bottom */}
+                    <div className="mt-auto pt-6 flex items-center justify-between">
                       {goal.indicator_text && (
-                        <span
-                          className="inline-flex items-center gap-1.5 rounded-full text-xs font-medium px-2.5 py-1"
-                          style={{
-                            backgroundColor: goal.indicator_color || '#10b981',
-                            color: '#ffffff'
-                          }}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/80"></span>
-                          {goal.indicator_text}
-                        </span>
+                        isOffTrack ? (
+                          <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
+                            <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                            {goal.indicator_text}
+                          </button>
+                        ) : (
+                          <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
+                            <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+                            {goal.indicator_text}
+                          </button>
+                        )
                       )}
                     </div>
-                    <h3 className="mt-4 text-xl md:text-2xl font-semibold tracking-tight text-neutral-900">
-                      {goal.goal_number} - {goal.title}
-                    </h3>
-                    <p className="mt-3 text-neutral-600 text-sm md:text-base line-clamp-3">
-                      {goal.description || 'Strategic initiatives focused on this objective'}
-                    </p>
-
-                    {/* Goal overall progress label - Only show if progress bar is enabled */}
-                    {goal.show_progress_bar !== false && (
-                      <div className="mt-5 flex items-center gap-4 text-sm text-neutral-600">
-                        <div className="inline-flex items-center gap-1.5">
-                          <Target className="h-4 w-4 text-neutral-400" />
-                          <span>Goal overall progress</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Progress Bar - Only show if enabled and not hidden mode */}
-                    {goal.show_progress_bar !== false && displayMode !== 'hidden' && (
-                      <div className="mt-5">
-                        <div className="relative">
-                          <div className="w-full bg-neutral-100 rounded-full h-2.5 overflow-hidden shadow-inner ring-1 ring-neutral-200/50">
-                            <div
-                              className="h-full transition-all duration-700 ease-out relative rounded-full"
-                              style={{
-                                width: `${Math.min(Math.max(progress, 0), 100)}%`,
-                                background: `linear-gradient(90deg, ${progressColor}, ${progressColor}dd)`,
-                                boxShadow: `0 0 12px ${progressColor}30`
-                              }}
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30 animate-pulse" />
-                            </div>
-                          </div>
-                        </div>
-                        {/* Show label if not color-only mode */}
-                        {progressLabel && (
-                          <div className="mt-2.5 text-right">
-                            <span
-                              className="text-sm font-bold tracking-wide"
-                              style={{
-                                color: progressColor,
-                                textShadow: `0 1px 3px ${progressColor}20`
-                              }}
-                            >
-                              {progressLabel}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {/* Spacer to maintain uniform card height when progress bar is hidden */}
-                    {goal.show_progress_bar === false && (
-                      <div className="mt-5 h-[84px]" aria-hidden="true" />
-                    )}
-                  </div>
-                  <div className="px-5 md:px-6 pb-5 md:pb-6">
-                    <button className="group/btn inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-neutral-700 hover:text-neutral-900 bg-neutral-50 hover:bg-neutral-100 rounded-lg border border-neutral-200 hover:border-neutral-300 transition-all duration-200 hover:shadow-sm">
-                      <span>View Annual Progress</span>
-                      <ArrowRight className="h-4 w-4 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
-                    </button>
                   </div>
                 </article>
               );

@@ -18,12 +18,10 @@ import {
   Save,
   X,
   TrendingUp,
-  Upload,
   Edit2
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { OverallProgressBar } from '../../../components/OverallProgressBar';
-import { DEFAULT_OBJECTIVE_IMAGES } from '../../../lib/default-images';
 import { GoalsService } from '../../../lib/services/goals.service';
 import { MetricsService } from '../../../lib/services/metrics.service';
 import type { Goal, Metric } from '../../../lib/types';
@@ -56,7 +54,6 @@ interface BuilderState {
     progressBar: boolean;
     visualBadge: boolean;
   };
-  headerMode: 'color' | 'image';
 }
 
 const AVAILABLE_COMPONENTS: ComponentItem[] = [
@@ -91,7 +88,6 @@ export function ObjectiveBuilder() {
       progressBar: true,
       visualBadge: true,
     },
-    headerMode: 'color',
   });
   const [activeTab, setActiveTab] = useState<'objective' | 'goals'>('objective');
   const [previewMode, setPreviewMode] = useState(false);
@@ -199,7 +195,6 @@ export function ObjectiveBuilder() {
               ...prev,
               objective: goal,
               goals: goalsWithChildren,
-              headerMode: goal.image_url ? 'image' : 'color',
               visibleComponents: {
                 title: !!goal.title,
                 description: !!goal.description,
@@ -324,8 +319,6 @@ export function ObjectiveBuilder() {
 
   const updateMetricMutation = useUpdateMetric();
   const deleteMetricMutation = useDeleteMetric();
-
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const addGoal = () => {
     setEditingGoalIndex(null);
@@ -527,30 +520,6 @@ export function ObjectiveBuilder() {
         }
         return g;
       })
-    }));
-  };
-
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    // Validate file size (2MB max)
-    if (file.size > 2 * 1024 * 1024) {
-      alert('File size must be less than 2MB');
-      return;
-    }
-
-    // Validate file type
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      alert('Please upload a JPEG, PNG, or WebP image');
-      return;
-    }
-
-    // Create local URL (in production, this would upload to Supabase Storage)
-    const localUrl = URL.createObjectURL(file);
-    setBuilderState(prev => ({
-      ...prev,
-      objective: { ...prev.objective, image_url: localUrl, header_color: undefined }
     }));
   };
 
@@ -992,130 +961,6 @@ export function ObjectiveBuilder() {
                     )}
                   </div>
                 )}
-
-                {/* Header Visual - Image or Color */}
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <label className="block text-xs font-medium text-muted-foreground">
-                      CARD HEADER
-                    </label>
-                    <div className="flex border border-border rounded-md overflow-hidden">
-                      <button
-                        onClick={() => setBuilderState(prev => ({ ...prev, headerMode: 'color' }))}
-                        className={`px-3 py-1 text-xs font-medium transition-colors ${
-                          builderState.headerMode === 'color'
-                            ? 'bg-primary text-white'
-                            : 'bg-white text-muted-foreground hover:bg-muted'
-                        }`}
-                      >
-                        Color
-                      </button>
-                      <button
-                        onClick={() => setBuilderState(prev => ({ ...prev, headerMode: 'image' }))}
-                        className={`px-3 py-1 text-xs font-medium transition-colors ${
-                          builderState.headerMode === 'image'
-                            ? 'bg-primary text-white'
-                            : 'bg-white text-muted-foreground hover:bg-muted'
-                        }`}
-                      >
-                        Image
-                      </button>
-                    </div>
-                  </div>
-
-                  {builderState.headerMode === 'color' ? (
-                    <div className="flex items-center space-x-3">
-                      <input
-                        type="color"
-                        value={objective.header_color || '#3b82f6'}
-                        onChange={(e) => setBuilderState(prev => ({
-                          ...prev,
-                          objective: { ...prev.objective, header_color: e.target.value, image_url: undefined }
-                        }))}
-                        className="h-10 w-16 border border-border rounded cursor-pointer"
-                      />
-                      <div
-                        className="flex-1 h-10 rounded-lg border border-border transition-all"
-                        style={{ backgroundColor: objective.header_color || '#3b82f6' }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {objective.image_url ? (
-                        <div className="relative">
-                          <img
-                            src={objective.image_url}
-                            alt="Header"
-                            className="w-full h-32 object-cover rounded-lg border border-border"
-                          />
-                          <button
-                            onClick={() => setBuilderState(prev => ({
-                              ...prev,
-                              objective: { ...prev.objective, image_url: undefined }
-                            }))}
-                            className="absolute top-2 right-2 p-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 shadow-lg"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          {/* Upload Custom Button */}
-                          <button
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full flex items-center justify-center space-x-2 p-3 border-2 border-dashed border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-all"
-                          >
-                            <Upload className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium text-muted-foreground">Upload Custom Image</span>
-                          </button>
-                          <input
-                            ref={fileInputRef}
-                            type="file"
-                            accept="image/jpeg,image/png,image/webp"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                          />
-
-                          {/* Divider */}
-                          <div className="relative">
-                            <div className="absolute inset-0 flex items-center">
-                              <div className="w-full border-t border-border" />
-                            </div>
-                            <div className="relative flex justify-center">
-                              <span className="px-2 bg-white text-xs text-muted-foreground">or choose from library</span>
-                            </div>
-                          </div>
-
-                          {/* Image Library */}
-                          <div className="grid grid-cols-3 gap-2 max-h-64 overflow-y-auto p-1">
-                            {DEFAULT_OBJECTIVE_IMAGES.map((img) => (
-                              <button
-                                key={img.id}
-                                onClick={() => setBuilderState(prev => ({
-                                  ...prev,
-                                  objective: { ...prev.objective, image_url: img.url, header_color: undefined }
-                                }))}
-                                className="group relative aspect-[2/1] rounded-md overflow-hidden border-2 border-border hover:border-primary transition-all"
-                                title={img.name}
-                              >
-                                <img
-                                  src={img.url}
-                                  alt={img.name}
-                                  className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
-                                  <div className="text-white text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity text-center px-1">
-                                    {img.name}
-                                  </div>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </div>
 
                 {/* Properties Grid */}
                 {(objective.owner_name || objective.department || objective.start_date || objective.priority) && (

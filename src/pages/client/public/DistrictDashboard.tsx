@@ -4,15 +4,7 @@ import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
 import {
-  GraduationCap,
   Target,
-  BarChart3,
-  ArrowRight,
-  BookOpen,
-  Star,
-  Users,
-  HandCoins,
-  Megaphone,
   MoreHorizontal,
   Check,
   AlertTriangle
@@ -121,7 +113,7 @@ export function DistrictDashboard() {
   };
 
   return (
-    <div className="min-h-full antialiased text-neutral-800 bg-neutral-50">
+    <div className="min-h-screen flex flex-col antialiased text-neutral-800 bg-neutral-50">
 
       {/* Hero */}
       <section className="relative overflow-hidden bg-white py-12 md:py-16">
@@ -215,118 +207,24 @@ export function DistrictDashboard() {
         )}
       </section>
 
-      {/* Success Story */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-12 md:pb-20">
-        <div className="relative overflow-hidden rounded-3xl ring-1 ring-neutral-200 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-[0_10px_35px_-10px_rgba(79,70,229,0.35)]">
-          <div className="absolute inset-0">
-            <img
-              src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop"
-              alt=""
-              className="absolute right-0 top-0 h-full w-[60%] object-cover opacity-10 hidden sm:block"
-            />
-          </div>
-          <div className="relative p-6 md:p-10">
+      {/* Footer */}
+      <footer className="mt-auto bg-white border-t border-neutral-200">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-neutral-600">
             <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-amber-300" />
-              <span className="text-sm font-medium">Success Story</span>
+              <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-900 text-white text-xs font-medium">
+                ©
+              </span>
+              <span>© 2025 {district?.name || 'Westside Community Schools'}</span>
             </div>
-            <h3 className="mt-3 text-2xl md:text-4xl font-semibold tracking-tight">
-              Emma's Reading Journey
-            </h3>
-            <p className="mt-4 max-w-3xl text-white/90 text-base md:text-lg">
-              "Six months ago, Emma struggled with reading. Thanks to our new reading specialists and personalized support, she's now reading above grade level and loves picking out books at the library!"
-            </p>
-            <div className="mt-6 flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur ring-1 ring-white/30 flex items-center justify-center font-medium">SJ</div>
-              <div>
-                <div className="text-sm font-medium">Sarah Johnson</div>
-                <div className="text-sm text-white/80">Emma's Mom, Grade 2</div>
-              </div>
-            </div>
-            <BookOpen className="absolute right-6 bottom-6 md:right-8 md:bottom-8 h-16 w-16 md:h-24 md:w-24 text-white/25" />
-          </div>
-        </div>
-      </section>
-
-      {/* How You Can Help */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-16 md:pb-24">
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-neutral-900">How You Can Help</h2>
-        <p className="mt-2 text-neutral-600">Join families, educators, and partners to strengthen each objective.</p>
-
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Help card 1 */}
-          <div className="rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-shadow shadow-sm hover:shadow-md overflow-hidden">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?q=80&w=1600&auto=format&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700">
-                <Users className="h-4 w-4 text-emerald-600" />
-                Volunteer &amp; Mentor
-              </div>
-              <p className="mt-2 text-sm text-neutral-600">
-                Support tutoring, after‑school clubs, and wellness programs.
-              </p>
-              <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-800">
-                Get involved
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Help card 2 */}
-          <div className="rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-shadow shadow-sm hover:shadow-md overflow-hidden">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1600&auto=format&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700">
-                <HandCoins className="h-4 w-4 text-indigo-600" />
-                Fund Classroom Needs
-              </div>
-              <p className="mt-2 text-sm text-neutral-600">
-                Provide books, technology, and program resources.
-              </p>
-              <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-800">
-                See priorities
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Help card 3 */}
-          <div className="rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-shadow shadow-sm hover:shadow-md overflow-hidden">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1600&auto=format&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700">
-                <Megaphone className="h-4 w-4 text-rose-600" />
-                Share Your Story
-              </div>
-              <p className="mt-2 text-sm text-neutral-600">
-                Celebrate wins like Emma's—and inspire others to join.
-              </p>
-              <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-800">
-                Submit a story
-                <ArrowRight className="h-4 w-4" />
-              </button>
+            <div className="flex items-center gap-6">
+              <Link to="#" className="hover:text-neutral-900 transition-colors">Privacy</Link>
+              <Link to="#" className="hover:text-neutral-900 transition-colors">Terms</Link>
+              <Link to="#" className="hover:text-neutral-900 transition-colors">Contact</Link>
             </div>
           </div>
         </div>
-      </section>
+      </footer>
 
       {/* Slide Panel for Goal Details */}
       <SlidePanel
@@ -335,110 +233,15 @@ export function DistrictDashboard() {
           setShowSlidePanel(false);
           setSelectedGoal(null);
         }}
-        title={selectedGoal ? `${selectedGoal.goal_number} - ${selectedGoal.title}` : 'Objective Details'}
+        title={selectedGoal ? `${selectedGoal.goal_number}. ${selectedGoal.title}` : 'Objective Details'}
       >
         {selectedGoal && (
           <div className="h-full flex flex-col">
-            {/* Header Section - Fixed */}
-            <div className="p-6 border-b border-neutral-200 space-y-4">
-              {/* Visual Indicator Badge */}
-              {selectedGoal.indicator_text && (
-                <div className="flex justify-end">
-                  <span
-                    className="inline-flex items-center gap-1.5 rounded-full text-xs font-medium px-2.5 py-1"
-                    style={{
-                      backgroundColor: selectedGoal.indicator_color || '#10b981',
-                      color: '#ffffff'
-                    }}
-                  >
-                    <span className="h-1.5 w-1.5 rounded-full bg-white/80"></span>
-                    {selectedGoal.indicator_text}
-                  </span>
-                </div>
-              )}
-
-              {/* Description */}
-              <div>
-                <p className="text-neutral-600 text-sm leading-relaxed">
-                  {selectedGoal.description || 'Strategic initiatives focused on this objective'}
-                </p>
-              </div>
-
-              {/* Goal Overall Progress */}
-              {(() => {
-                const progress = selectedGoal.overall_progress_override ?? selectedGoal.overall_progress ?? 0;
-                const progressColor = getProgressColor(progress);
-                const displayMode = selectedGoal.overall_progress_display_mode || 'percentage';
-
-                // Render progress label based on display mode
-                const renderProgressLabel = () => {
-                  switch (displayMode) {
-                    case 'percentage':
-                      return `${Math.round(progress)}%`;
-                    case 'qualitative':
-                      return getProgressQualitativeLabel(progress);
-                    case 'score':
-                      return `${getProgressScoreOutOf5(progress)}/5.00`;
-                    case 'custom':
-                      return selectedGoal.overall_progress_custom_value || `${Math.round(progress)}%`;
-                    case 'color-only':
-                      return null;
-                    case 'hidden':
-                      return null;
-                    default:
-                      return `${Math.round(progress)}%`;
-                  }
-                };
-
-                const progressLabel = renderProgressLabel();
-
-                // Only show if progress bar is enabled and not hidden mode
-                if (selectedGoal.show_progress_bar === false || displayMode === 'hidden') {
-                  return null;
-                }
-
-                return (
-                  <div className="mt-4">
-                    {/* Progress Label */}
-                    <div className="flex items-center gap-4 text-sm text-neutral-600 mb-2">
-                      <div className="inline-flex items-center gap-1.5">
-                        <Target className="h-4 w-4 text-neutral-400" />
-                        <span>Goal overall progress</span>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="relative">
-                      <div className="w-full bg-secondary rounded-full h-3 overflow-hidden shadow-inner">
-                        <div
-                          className="h-full transition-all duration-700 ease-out relative"
-                          style={{
-                            width: `${Math.min(Math.max(progress, 0), 100)}%`,
-                            background: `linear-gradient(90deg, ${progressColor}, ${progressColor}dd)`,
-                            boxShadow: `0 0 8px ${progressColor}40`
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20" />
-                        </div>
-                      </div>
-                    </div>
-                    {/* Show label if not color-only mode */}
-                    {progressLabel && (
-                      <div className="mt-2 text-right">
-                        <span
-                          className="text-sm font-bold"
-                          style={{
-                            color: progressColor,
-                            textShadow: `0 1px 2px ${progressColor}20`
-                          }}
-                        >
-                          {progressLabel}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
+            {/* Description - Directly under title, no border */}
+            <div className="px-6 pt-2 pb-6">
+              <p className="text-neutral-600 text-sm leading-relaxed">
+                {selectedGoal.description || 'Strategic initiatives focused on this objective'}
+              </p>
             </div>
 
             {/* Scrollable Content */}

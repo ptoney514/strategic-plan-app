@@ -1,5 +1,4 @@
 import { Outlet, Link, useParams } from 'react-router-dom';
-import { GraduationCap } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
 import { HomepageHeader } from '../components/homepage/HomepageHeader';
 
@@ -50,25 +49,6 @@ export function ClientPublicLayout() {
       <main>
         <Outlet />
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-neutral-200/80 bg-white">
-        <div className="max-w-7xl mx-auto px-6 md:px-8 py-8 md:py-10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-lg bg-neutral-900 text-white flex items-center justify-center">
-              <GraduationCap className="h-4 w-4" />
-            </div>
-            <div className="text-sm text-neutral-600">
-              © {new Date().getFullYear()} {district.name}
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-sm text-neutral-600">
-            <a href="#" className="hover:text-neutral-900">Privacy</a>
-            <a href="#" className="hover:text-neutral-900">Terms</a>
-            <a href="#" className="hover:text-neutral-900">Contact</a>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

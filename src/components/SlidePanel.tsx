@@ -6,9 +6,10 @@ interface SlidePanelProps {
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
+  topBarColor?: 'success' | 'warning';
 }
 
-export function SlidePanel({ isOpen, onClose, title, children }: SlidePanelProps) {
+export function SlidePanel({ isOpen, onClose, title, children, topBarColor = 'success' }: SlidePanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   
   // Handle ESC key press
@@ -61,8 +62,15 @@ export function SlidePanel({ isOpen, onClose, title, children }: SlidePanelProps
         aria-modal="true"
         aria-labelledby={title ? "slide-panel-title" : undefined}
       >
+        {/* Top gradient bar */}
+        <div className={`h-1 w-full bg-gradient-to-r ${
+          topBarColor === 'warning'
+            ? 'from-amber-500 via-orange-600 to-red-600'
+            : 'from-emerald-400 via-emerald-500 to-teal-500'
+        }`} />
+
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-border">
+        <div className="flex items-center justify-between px-6 pt-6 pb-2">
           {title && (
             <h2 id="slide-panel-title" className="text-xl font-semibold">
               {title}

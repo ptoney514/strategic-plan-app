@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
@@ -30,8 +30,6 @@ export function DistrictDashboard() {
   const { data: metrics, isLoading: metricsLoading } = useMetricsByDistrict(district?.id || '');
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const [showSlidePanel, setShowSlidePanel] = useState(false);
-  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
-  const [expandedSubGoalId, setExpandedSubGoalId] = useState<string | null>(null);
 
   // Debug logging (development only)
   useEffect(() => {
@@ -111,6 +109,26 @@ export function DistrictDashboard() {
       ? 'off-track'
       : 'on-target';
   };
+
+  // Helper function to determine display mode based on goal level
+  const getDisplayMode = (goal: Goal): 'qualitative' | 'percentage' | 'custom' => {
+    return goal.overall_progress_display_mode ||
+           (goal.level === 2 ? 'percentage' : 'qualitative');
+  };
+
+  // Flatten goal hierarchy for display - memoized to avoid recalculation
+  const flattenedGoals = useMemo(() => {
+    if (!selectedGoal?.children) return [];
+
+    const goals: Goal[] = [];
+    selectedGoal.children.forEach((child: Goal) => {
+      goals.push(child);
+      if (child.children && child.children.length > 0) {
+        goals.push(...child.children);
+      }
+    });
+    return goals;
+  }, [selectedGoal]);
 
   return (
     <div className="min-h-screen flex flex-col antialiased text-neutral-800 bg-neutral-50">
@@ -300,21 +318,10 @@ export function DistrictDashboard() {
               </div>
 
               {/* Goals List */}
-              {selectedGoal.children && selectedGoal.children.length > 0 ? (
+              {flattenedGoals.length > 0 ? (
                 <div className="space-y-4">
-                  {(() => {
-                    // Flatten the hierarchy: create array of level 1 goals followed by their children
-                    const flattenedGoals: any[] = [];
-                    selectedGoal.children.forEach((child: any) => {
-                      flattenedGoals.push(child);
-                      if (child.children && child.children.length > 0) {
-                        flattenedGoals.push(...child.children);
-                      }
-                    });
-                    return flattenedGoals;
-                  })().map((child: any, index: number) => {
+                  {flattenedGoals.map((child: Goal, index: number) => {
                     const childProgress = child.overall_progress_override ?? child.overall_progress ?? 0;
-                    const isExpanded = expandedGoalId === child.id;
 
                     // Get real metrics for this goal - prefer metrics with visualization_config
                     const goalMetrics = metrics?.filter(m => m.goal_id === child.id) || [];
@@ -384,7 +391,7 @@ export function DistrictDashboard() {
                           {child.show_progress_bar !== false && (
                             <PerformanceIndicator
                               progress={childProgress}
-                              displayMode={child.overall_progress_display_mode || (child.level === 2 ? 'percentage' : 'qualitative')}
+                              displayMode={getDisplayMode(child)}
                               customValue={child.overall_progress_custom_value}
                               showLabels={child.level === 1}
                             />

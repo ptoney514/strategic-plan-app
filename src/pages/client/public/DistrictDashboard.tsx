@@ -237,89 +237,11 @@ export function DistrictDashboard() {
       >
         {selectedGoal && (
           <div className="h-full flex flex-col">
-            {/* Description - Directly under title, above the line */}
-            <div className="px-6 pt-2 pb-4">
+            {/* Description - Directly under title, no border */}
+            <div className="px-6 pt-2 pb-6">
               <p className="text-neutral-600 text-sm leading-relaxed">
                 {selectedGoal.description || 'Strategic initiatives focused on this objective'}
               </p>
-            </div>
-
-            {/* Goal Overall Progress - Below the line */}
-            <div className="px-6 py-4 border-t border-neutral-200">
-              {(() => {
-                const progress = selectedGoal.overall_progress_override ?? selectedGoal.overall_progress ?? 0;
-                const progressColor = getProgressColor(progress);
-                const displayMode = selectedGoal.overall_progress_display_mode || 'percentage';
-
-                // Render progress label based on display mode
-                const renderProgressLabel = () => {
-                  switch (displayMode) {
-                    case 'percentage':
-                      return `${Math.round(progress)}%`;
-                    case 'qualitative':
-                      return getProgressQualitativeLabel(progress);
-                    case 'score':
-                      return `${getProgressScoreOutOf5(progress)}/5.00`;
-                    case 'custom':
-                      return selectedGoal.overall_progress_custom_value || `${Math.round(progress)}%`;
-                    case 'color-only':
-                      return null;
-                    case 'hidden':
-                      return null;
-                    default:
-                      return `${Math.round(progress)}%`;
-                  }
-                };
-
-                const progressLabel = renderProgressLabel();
-
-                // Only show if progress bar is enabled and not hidden mode
-                if (selectedGoal.show_progress_bar === false || displayMode === 'hidden') {
-                  return null;
-                }
-
-                return (
-                  <div className="mt-4">
-                    {/* Progress Label */}
-                    <div className="flex items-center gap-4 text-sm text-neutral-600 mb-2">
-                      <div className="inline-flex items-center gap-1.5">
-                        <Target className="h-4 w-4 text-neutral-400" />
-                        <span>Goal overall progress</span>
-                      </div>
-                    </div>
-
-                    {/* Progress Bar */}
-                    <div className="relative">
-                      <div className="w-full bg-secondary rounded-full h-3 overflow-hidden shadow-inner">
-                        <div
-                          className="h-full transition-all duration-700 ease-out relative"
-                          style={{
-                            width: `${Math.min(Math.max(progress, 0), 100)}%`,
-                            background: `linear-gradient(90deg, ${progressColor}, ${progressColor}dd)`,
-                            boxShadow: `0 0 8px ${progressColor}40`
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20" />
-                        </div>
-                      </div>
-                    </div>
-                    {/* Show label if not color-only mode */}
-                    {progressLabel && (
-                      <div className="mt-2 text-right">
-                        <span
-                          className="text-sm font-bold"
-                          style={{
-                            color: progressColor,
-                            textShadow: `0 1px 2px ${progressColor}20`
-                          }}
-                        >
-                          {progressLabel}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                );
-              })()}
             </div>
 
             {/* Scrollable Content */}

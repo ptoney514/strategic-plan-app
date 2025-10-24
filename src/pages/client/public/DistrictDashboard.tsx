@@ -108,15 +108,17 @@ export function DistrictDashboard() {
   // Get top-level objectives (level 0)
   const objectives = goals?.filter(g => g.level === 0) || [];
 
-  // Icon gradients for cards
-  const cardStyles = [
-    { from: 'from-emerald-500', to: 'to-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-200' },
-    { from: 'from-sky-500', to: 'to-indigo-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-fuchsia-500', to: 'to-rose-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-amber-500', to: 'to-orange-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-violet-500', to: 'to-purple-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-cyan-500', to: 'to-blue-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-  ];
+  // Helper function to determine goal status from indicator text
+  const getGoalStatus = (indicatorText?: string): 'off-track' | 'on-target' => {
+    if (!indicatorText) return 'on-target';
+
+    const text = indicatorText.toLowerCase().trim();
+    const offTrackKeywords = ['off track', 'needs attention', 'at risk', 'critical'];
+
+    return offTrackKeywords.some(keyword => text.includes(keyword))
+      ? 'off-track'
+      : 'on-target';
+  };
 
   return (
     <div className="min-h-full antialiased text-neutral-800 bg-neutral-50">
@@ -146,41 +148,9 @@ export function DistrictDashboard() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {objectives.map((goal, index) => {
-              const style = cardStyles[index % cardStyles.length];
-              const subGoalsCount = goal.children?.length || 0;
-              const progress = goal.overall_progress_override ?? goal.overall_progress ?? 0;
-              const progressColor = getProgressColor(progress);
-              const displayMode = goal.overall_progress_display_mode || 'percentage';
-
-              // Render progress label based on display mode
-              const renderProgressLabel = () => {
-                switch (displayMode) {
-                  case 'percentage':
-                    return `${Math.round(progress)}%`;
-                  case 'qualitative':
-                    return getProgressQualitativeLabel(progress);
-                  case 'score':
-                    return `${getProgressScoreOutOf5(progress)}/5.00`;
-                  case 'custom':
-                    return goal.overall_progress_custom_value || `${Math.round(progress)}%`;
-                  case 'color-only':
-                    return null; // No label for color-only mode
-                  case 'hidden':
-                    return null;
-                  default:
-                    return `${Math.round(progress)}%`;
-                }
-              };
-
-              // Determine status badge based on indicator
-              const isOnTarget = goal.indicator_text &&
-                (goal.indicator_text.toLowerCase().includes('on target') ||
-                 goal.indicator_text.toLowerCase().includes('good'));
-
-              const isOffTrack = goal.indicator_text &&
-                (goal.indicator_text.toLowerCase().includes('off track') ||
-                 goal.indicator_text.toLowerCase().includes('needs attention') ||
-                 goal.indicator_text.toLowerCase().includes('at risk'));
+              // Determine goal status using helper function
+              const status = getGoalStatus(goal.indicator_text);
+              const isOffTrack = status === 'off-track';
 
               // Gradient bar color based on status
               const gradientClass = isOffTrack
@@ -214,8 +184,10 @@ export function DistrictDashboard() {
                         className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/70"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // TODO: Add menu functionality
+                          // TODO: Add dropdown menu (View Details, Share Goal, etc.)
+                          // For now, menu button is visual placeholder
                         }}
+                        aria-label="Goal options menu"
                       >
                         <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
                       </button>

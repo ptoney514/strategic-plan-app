@@ -4,15 +4,7 @@ import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
 import {
-  GraduationCap,
   Target,
-  BarChart3,
-  ArrowRight,
-  BookOpen,
-  Star,
-  Users,
-  HandCoins,
-  Megaphone,
   MoreHorizontal,
   Check,
   AlertTriangle
@@ -213,119 +205,6 @@ export function DistrictDashboard() {
             })}
           </div>
         )}
-      </section>
-
-      {/* Success Story */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-12 md:pb-20">
-        <div className="relative overflow-hidden rounded-3xl ring-1 ring-neutral-200 bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-[0_10px_35px_-10px_rgba(79,70,229,0.35)]">
-          <div className="absolute inset-0">
-            <img
-              src="https://images.unsplash.com/photo-1531482615713-2afd69097998?q=80&w=1600&auto=format&fit=crop"
-              alt=""
-              className="absolute right-0 top-0 h-full w-[60%] object-cover opacity-10 hidden sm:block"
-            />
-          </div>
-          <div className="relative p-6 md:p-10">
-            <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-amber-300" />
-              <span className="text-sm font-medium">Success Story</span>
-            </div>
-            <h3 className="mt-3 text-2xl md:text-4xl font-semibold tracking-tight">
-              Emma's Reading Journey
-            </h3>
-            <p className="mt-4 max-w-3xl text-white/90 text-base md:text-lg">
-              "Six months ago, Emma struggled with reading. Thanks to our new reading specialists and personalized support, she's now reading above grade level and loves picking out books at the library!"
-            </p>
-            <div className="mt-6 flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-white/20 backdrop-blur ring-1 ring-white/30 flex items-center justify-center font-medium">SJ</div>
-              <div>
-                <div className="text-sm font-medium">Sarah Johnson</div>
-                <div className="text-sm text-white/80">Emma's Mom, Grade 2</div>
-              </div>
-            </div>
-            <BookOpen className="absolute right-6 bottom-6 md:right-8 md:bottom-8 h-16 w-16 md:h-24 md:w-24 text-white/25" />
-          </div>
-        </div>
-      </section>
-
-      {/* How You Can Help */}
-      <section className="max-w-7xl mx-auto px-6 md:px-8 pb-16 md:pb-24">
-        <h2 className="text-2xl md:text-3xl font-semibold tracking-tight text-neutral-900">How You Can Help</h2>
-        <p className="mt-2 text-neutral-600">Join families, educators, and partners to strengthen each objective.</p>
-
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Help card 1 */}
-          <div className="rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-shadow shadow-sm hover:shadow-md overflow-hidden">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1517520287167-4bbf64a00d66?q=80&w=1600&auto=format&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700">
-                <Users className="h-4 w-4 text-emerald-600" />
-                Volunteer &amp; Mentor
-              </div>
-              <p className="mt-2 text-sm text-neutral-600">
-                Support tutoring, after‑school clubs, and wellness programs.
-              </p>
-              <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-800">
-                Get involved
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Help card 2 */}
-          <div className="rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-shadow shadow-sm hover:shadow-md overflow-hidden">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?q=80&w=1600&auto=format&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700">
-                <HandCoins className="h-4 w-4 text-indigo-600" />
-                Fund Classroom Needs
-              </div>
-              <p className="mt-2 text-sm text-neutral-600">
-                Provide books, technology, and program resources.
-              </p>
-              <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-800">
-                See priorities
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-          {/* Help card 3 */}
-          <div className="rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-shadow shadow-sm hover:shadow-md overflow-hidden">
-            <div className="aspect-[16/9] overflow-hidden">
-              <img
-                src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=1600&auto=format&fit=crop"
-                alt=""
-                className="h-full w-full object-cover"
-              />
-            </div>
-            <div className="p-5">
-              <div className="inline-flex items-center gap-2 text-sm font-medium text-neutral-700">
-                <Megaphone className="h-4 w-4 text-rose-600" />
-                Share Your Story
-              </div>
-              <p className="mt-2 text-sm text-neutral-600">
-                Celebrate wins like Emma's—and inspire others to join.
-              </p>
-              <button className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-neutral-800">
-                Submit a story
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Slide Panel for Goal Details */}

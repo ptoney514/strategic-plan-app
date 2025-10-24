@@ -12,7 +12,10 @@ import {
   Star,
   Users,
   HandCoins,
-  Megaphone
+  Megaphone,
+  MoreHorizontal,
+  Check,
+  AlertTriangle
 } from 'lucide-react';
 import { SlidePanel } from '../../../components/SlidePanel';
 import { PerformanceIndicator } from '../../../components/PerformanceIndicator';
@@ -105,15 +108,17 @@ export function DistrictDashboard() {
   // Get top-level objectives (level 0)
   const objectives = goals?.filter(g => g.level === 0) || [];
 
-  // Icon gradients for cards
-  const cardStyles = [
-    { from: 'from-emerald-500', to: 'to-emerald-600', bg: 'bg-emerald-50', text: 'text-emerald-700', ring: 'ring-emerald-200' },
-    { from: 'from-sky-500', to: 'to-indigo-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-fuchsia-500', to: 'to-rose-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-amber-500', to: 'to-orange-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-violet-500', to: 'to-purple-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-    { from: 'from-cyan-500', to: 'to-blue-600', bg: 'bg-neutral-50', text: 'text-neutral-700', ring: 'ring-neutral-200' },
-  ];
+  // Helper function to determine goal status from indicator text
+  const getGoalStatus = (indicatorText?: string): 'off-track' | 'on-target' => {
+    if (!indicatorText) return 'on-target';
+
+    const text = indicatorText.toLowerCase().trim();
+    const offTrackKeywords = ['off track', 'needs attention', 'at risk', 'critical'];
+
+    return offTrackKeywords.some(keyword => text.includes(keyword))
+      ? 'off-track'
+      : 'on-target';
+  };
 
   return (
     <div className="min-h-full antialiased text-neutral-800 bg-neutral-50">
@@ -123,11 +128,9 @@ export function DistrictDashboard() {
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-neutral-900">
             {district.name}
-            <br />
-            <span className="text-red-600">Strategic Plan 2021-2026</span>
           </h1>
-          <p className="mt-6 text-base md:text-lg text-neutral-600 max-w-3xl mx-auto">
-            Community. Innovation. Excellence. - Charting our course for educational excellence through strategic pillars that guide our commitment to student success
+          <p className="mt-2 text-base md:text-lg text-neutral-600">
+            <span className="text-red-600 font-semibold">Strategic Plan 2021-2026</span>
           </p>
         </div>
       </section>
@@ -143,144 +146,67 @@ export function DistrictDashboard() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {objectives.map((goal, index) => {
-              const style = cardStyles[index % cardStyles.length];
-              const subGoalsCount = goal.children?.length || 0;
-              const progress = goal.overall_progress_override ?? goal.overall_progress ?? 0;
-              const progressColor = getProgressColor(progress);
-              const displayMode = goal.overall_progress_display_mode || 'percentage';
+              // Determine goal status using helper function
+              const status = getGoalStatus(goal.indicator_text);
+              const isOffTrack = status === 'off-track';
 
-              // Render progress label based on display mode
-              const renderProgressLabel = () => {
-                switch (displayMode) {
-                  case 'percentage':
-                    return `${Math.round(progress)}%`;
-                  case 'qualitative':
-                    return getProgressQualitativeLabel(progress);
-                  case 'score':
-                    return `${getProgressScoreOutOf5(progress)}/5.00`;
-                  case 'custom':
-                    return goal.overall_progress_custom_value || `${Math.round(progress)}%`;
-                  case 'color-only':
-                    return null; // No label for color-only mode
-                  case 'hidden':
-                    return null;
-                  default:
-                    return `${Math.round(progress)}%`;
-                }
-              };
-
-              const progressLabel = renderProgressLabel();
+              // Gradient bar color based on status
+              const gradientClass = isOffTrack
+                ? 'from-amber-500 via-orange-600 to-red-600'
+                : 'from-emerald-400 via-emerald-500 to-teal-500';
 
               return (
                 <article
                   key={goal.id}
+                  className="group relative h-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-zinc-300 cursor-pointer"
                   onClick={() => {
                     setSelectedGoal(goal);
                     setShowSlidePanel(true);
                   }}
-                  className="group relative rounded-2xl bg-white ring-1 ring-neutral-200 hover:ring-neutral-300 transition-all shadow-sm hover:shadow-md cursor-pointer overflow-hidden"
                 >
-                  {/* Header Visual - Image or Color */}
-                  {(goal.image_url || goal.header_color) && (
-                    <div className="h-32 w-full relative">
-                      {goal.image_url ? (
-                        <img
-                          src={goal.image_url}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                      ) : goal.header_color ? (
-                        <div
-                          className="w-full h-full"
-                          style={{ backgroundColor: goal.header_color }}
-                        />
-                      ) : null}
-                    </div>
-                  )}
+                  {/* Top gradient bar */}
+                  <div className={`h-1 w-full bg-gradient-to-r ${gradientClass}`} />
 
-                  <div className="pointer-events-none absolute -top-6 -right-6 h-28 w-28 rounded-full bg-gradient-to-br from-emerald-400/30 via-sky-400/30 to-indigo-500/30 blur-2xl"></div>
-                  <div className="p-5 md:p-6">
+                  <div className="flex h-full flex-col p-6 md:p-7">
+                    {/* Header with title and menu */}
                     <div className="flex items-start justify-between">
-                      <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${style.from} ${style.to} text-white flex items-center justify-center shadow-sm`}>
-                        {index === 0 ? <GraduationCap className="h-5 w-5" /> :
-                         index === 1 ? <BarChart3 className="h-5 w-5" /> :
-                         <BookOpen className="h-5 w-5" />}
+                      <div>
+                        <h2 className="text-xl md:text-2xl tracking-tight font-semibold text-zinc-900">
+                          {goal.goal_number}. {goal.title}
+                        </h2>
+                        <p className="mt-1 text-sm text-zinc-500">
+                          {goal.description || 'Strategic initiatives focused on this objective'}
+                        </p>
                       </div>
-                      {goal.indicator_text && (
-                        <span
-                          className="inline-flex items-center gap-1.5 rounded-full text-xs font-medium px-2.5 py-1"
-                          style={{
-                            backgroundColor: goal.indicator_color || '#10b981',
-                            color: '#ffffff'
-                          }}
-                        >
-                          <span className="h-1.5 w-1.5 rounded-full bg-white/80"></span>
-                          {goal.indicator_text}
-                        </span>
+                      <button
+                        className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/70"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Add dropdown menu (View Details, Share Goal, etc.)
+                          // For now, menu button is visual placeholder
+                        }}
+                        aria-label="Goal options menu"
+                      >
+                        <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
+                      </button>
+                    </div>
+
+                    {/* Status badge at bottom */}
+                    <div className="mt-auto pt-6 flex items-center justify-between">
+                      {isOffTrack ? (
+                        <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
+                          <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          {goal.indicator_text || 'Off Track'}
+                        </button>
+                      ) : (
+                        <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
+                          <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+                          {goal.indicator_text || 'On Target'}
+                        </button>
                       )}
                     </div>
-                    <h3 className="mt-4 text-xl md:text-2xl font-semibold tracking-tight text-neutral-900">
-                      {goal.goal_number} - {goal.title}
-                    </h3>
-                    <p className="mt-3 text-neutral-600 text-sm md:text-base line-clamp-3">
-                      {goal.description || 'Strategic initiatives focused on this objective'}
-                    </p>
-
-                    {/* Goal overall progress label - Only show if progress bar is enabled */}
-                    {goal.show_progress_bar !== false && (
-                      <div className="mt-5 flex items-center gap-4 text-sm text-neutral-600">
-                        <div className="inline-flex items-center gap-1.5">
-                          <Target className="h-4 w-4 text-neutral-400" />
-                          <span>Goal overall progress</span>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Progress Bar - Only show if enabled and not hidden mode */}
-                    {goal.show_progress_bar !== false && displayMode !== 'hidden' && (
-                      <div className="mt-5">
-                        <div className="relative">
-                          <div className="w-full bg-secondary rounded-full h-3 overflow-hidden shadow-inner">
-                            <div
-                              className="h-full transition-all duration-700 ease-out relative"
-                              style={{
-                                width: `${Math.min(Math.max(progress, 0), 100)}%`,
-                                background: `linear-gradient(90deg, ${progressColor}, ${progressColor}dd)`,
-                                boxShadow: `0 0 8px ${progressColor}40`
-                              }}
-                            >
-                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-20" />
-                            </div>
-                          </div>
-                        </div>
-                        {/* Show label if not color-only mode */}
-                        {progressLabel && (
-                          <div className="mt-2 text-right">
-                            <span
-                              className="text-sm font-bold"
-                              style={{
-                                color: progressColor,
-                                textShadow: `0 1px 2px ${progressColor}20`
-                              }}
-                            >
-                              {progressLabel}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                    {/* Spacer to maintain uniform card height when progress bar is hidden */}
-                    {goal.show_progress_bar === false && (
-                      <div className="mt-5 h-[84px]" aria-hidden="true" />
-                    )}
-                  </div>
-                  <div className="px-5 md:px-6 pb-5 md:pb-6">
-                    <button className="inline-flex items-center gap-2 text-sm font-medium text-neutral-800 hover:text-neutral-900">
-                      Annual progress click here
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
                   </div>
                 </article>
               );

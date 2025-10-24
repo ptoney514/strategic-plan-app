@@ -181,14 +181,29 @@ export function DistrictDashboard() {
 
                   <div className="flex h-full flex-col p-6 md:p-7">
                     {/* Header with title and menu */}
-                    <div className="flex items-start justify-between">
-                      <div>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
                         <h2 className="text-xl md:text-2xl tracking-tight font-semibold text-zinc-900">
                           {goal.goal_number}. {goal.title}
                         </h2>
                         <p className="mt-1 text-sm text-zinc-500">
                           {goal.description || 'Strategic initiatives focused on this objective'}
                         </p>
+
+                        {/* Status badge below description */}
+                        <div className="mt-3">
+                          {isOffTrack ? (
+                            <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
+                              <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
+                              {goal.indicator_text || 'Off Track'}
+                            </button>
+                          ) : (
+                            <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
+                              <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
+                              {goal.indicator_text || 'On Target'}
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <button
                         className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/70"
@@ -201,21 +216,6 @@ export function DistrictDashboard() {
                       >
                         <MoreHorizontal className="h-4 w-4" strokeWidth={1.5} />
                       </button>
-                    </div>
-
-                    {/* Status badge at bottom */}
-                    <div className="mt-auto pt-6 flex items-center justify-between">
-                      {isOffTrack ? (
-                        <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
-                          <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
-                          {goal.indicator_text || 'Off Track'}
-                        </button>
-                      ) : (
-                        <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
-                          <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
-                          {goal.indicator_text || 'On Target'}
-                        </button>
-                      )}
                     </div>
                   </div>
                 </article>
@@ -256,11 +256,16 @@ export function DistrictDashboard() {
       >
         {selectedGoal && (
           <div className="h-full flex flex-col">
-            {/* Status Badge and Description */}
+            {/* Description and Status Badge */}
             <div className="px-6 pt-1 pb-6">
+              {/* Description */}
+              <p className="text-neutral-600 text-sm leading-relaxed">
+                {selectedGoal.description || 'Strategic initiatives focused on this objective'}
+              </p>
+
               {/* Status Badge */}
               {selectedGoal.indicator_text && (
-                <div className="mb-3">
+                <div className="mt-3">
                   {(() => {
                     const status = getGoalStatus(selectedGoal.indicator_text);
                     const isOffTrack = status === 'off-track';
@@ -279,11 +284,6 @@ export function DistrictDashboard() {
                   })()}
                 </div>
               )}
-
-              {/* Description */}
-              <p className="text-neutral-600 text-sm leading-relaxed">
-                {selectedGoal.description || 'Strategic initiatives focused on this objective'}
-              </p>
             </div>
 
             {/* Scrollable Content */}
@@ -359,20 +359,15 @@ export function DistrictDashboard() {
                     return (
                       <div key={child.id} id={`goal-${child.id}`} className="bg-white border border-neutral-200 rounded-lg overflow-hidden transition-all">
                         <div className="p-5">
-                          <div className="flex items-start gap-3 mb-4">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-sm">
-                              <span className="text-base font-bold text-white">
-                                {child.goal_number}
-                              </span>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="text-lg font-semibold text-neutral-900 mb-1">{child.title}</h4>
-                              {child.description && (
-                                <p className="text-sm text-neutral-600 mb-2">{child.description}</p>
-                              )}
-                            </div>
+                          <div className="mb-4">
+                            <h4 className="text-lg font-semibold text-neutral-900 mb-1">
+                              {child.goal_number}. {child.title}
+                            </h4>
+                            {child.description && (
+                              <p className="text-sm text-neutral-600 mb-2">{child.description}</p>
+                            )}
                             {child.indicator_text && (
-                              <div className="flex-shrink-0">
+                              <div className="mt-3">
                                 <span
                                   className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium"
                                   style={{

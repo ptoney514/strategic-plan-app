@@ -1,0 +1,235 @@
+{
+  "kpi_framework": {
+    "description": "KPI definitions following the Acquisition → Activation → Retention → Revenue framework",
+    "updated": "2025-11-01"
+  },
+  "acquisition": {
+    "description": "How users discover and arrive at your product",
+    "kpis": [
+      {
+        "name": "Traffic Volume",
+        "definition": "Total number of unique visitors to landing page or app store listing",
+        "measurement": "Unique visitors per week/month",
+        "good_target": "10% week-over-week growth",
+        "data_source": "Google Analytics, Mixpanel, or similar",
+        "example_events": ["page_view", "landing_page_view"]
+      },
+      {
+        "name": "Traffic by Channel",
+        "definition": "Breakdown of where users come from (organic, paid, referral, direct)",
+        "measurement": "% of traffic by source",
+        "good_target": "Diversified channels (no single channel >50%)",
+        "data_source": "Google Analytics UTM parameters",
+        "example_events": ["page_view with source/medium properties"]
+      },
+      {
+        "name": "Signup Starts",
+        "definition": "Number of users who begin the signup process",
+        "measurement": "Count of signup_started events",
+        "good_target": "20%+ of landing page visitors",
+        "data_source": "Analytics platform",
+        "example_events": ["signup_started"]
+      }
+    ]
+  },
+  "activation": {
+    "description": "Users experience core value and complete setup",
+    "kpis": [
+      {
+        "name": "Signup Conversion Rate",
+        "definition": "% of signup attempts that complete successfully",
+        "calculation": "(signup_completed / signup_started) × 100",
+        "measurement": "Percentage",
+        "good_target": "60%+ (desktop), 40%+ (mobile)",
+        "data_source": "Analytics funnel",
+        "example_events": ["signup_started", "signup_completed"]
+      },
+      {
+        "name": "Activation Rate",
+        "definition": "% of new users who reach 'aha moment' or complete onboarding",
+        "calculation": "(users_activated / users_signed_up) × 100",
+        "measurement": "Percentage within first session or first 24 hours",
+        "good_target": "30%+ within first session",
+        "data_source": "Custom activation event",
+        "example_events": ["user_activated", "first_release_created", "onboarding_completed"],
+        "notes": "Define 'activation' based on core value prop (e.g., 'created first release' for a release notes product)"
+      },
+      {
+        "name": "Time to Activation",
+        "definition": "Average time from signup to activation event",
+        "measurement": "Minutes or hours",
+        "good_target": "<5 minutes for SaaS, <1 hour for complex products",
+        "data_source": "Time difference between signup_completed and user_activated timestamps",
+        "example_events": ["signup_completed timestamp", "user_activated timestamp"]
+      }
+    ]
+  },
+  "retention": {
+    "description": "Users come back and continue using the product",
+    "kpis": [
+      {
+        "name": "Day 1 Retention (D1)",
+        "definition": "% of users who return the day after signup",
+        "calculation": "(users_active_day_1 / users_signed_up_day_0) × 100",
+        "measurement": "Percentage",
+        "good_target": "40%+ for consumer, 60%+ for B2B SaaS",
+        "data_source": "Cohort analysis",
+        "example_events": ["user_session_started on D1"]
+      },
+      {
+        "name": "Day 7 Retention (D7)",
+        "definition": "% of users who return within 7 days of signup",
+        "calculation": "(users_active_day_7 / users_signed_up_day_0) × 100",
+        "measurement": "Percentage",
+        "good_target": "20%+ for consumer, 40%+ for B2B SaaS",
+        "data_source": "Cohort analysis",
+        "example_events": ["user_session_started on D7"]
+      },
+      {
+        "name": "Day 30 Retention (D30)",
+        "definition": "% of users who return within 30 days of signup",
+        "calculation": "(users_active_day_30 / users_signed_up_day_0) × 100",
+        "measurement": "Percentage",
+        "good_target": "10%+ for consumer, 30%+ for B2B SaaS",
+        "data_source": "Cohort analysis",
+        "example_events": ["user_session_started on D30"]
+      },
+      {
+        "name": "Weekly Active Users (WAU)",
+        "definition": "Number of unique users active in the past 7 days",
+        "measurement": "Count",
+        "good_target": "10%+ week-over-week growth in early stage",
+        "data_source": "Active user count",
+        "example_events": ["Any activity event within 7-day window"]
+      },
+      {
+        "name": "Monthly Active Users (MAU)",
+        "definition": "Number of unique users active in the past 30 days",
+        "measurement": "Count",
+        "good_target": "15%+ month-over-month growth in early stage",
+        "data_source": "Active user count",
+        "example_events": ["Any activity event within 30-day window"]
+      },
+      {
+        "name": "Churn Rate",
+        "definition": "% of users who stop using the product in a given period",
+        "calculation": "(users_churned / total_users_start_of_period) × 100",
+        "measurement": "Monthly percentage",
+        "good_target": "<5% monthly for SaaS",
+        "data_source": "Cohort analysis or subscription data",
+        "example_events": ["subscription_cancelled", "no activity for 30 days"]
+      }
+    ]
+  },
+  "revenue": {
+    "description": "Users pay for the product or generate revenue",
+    "kpis": [
+      {
+        "name": "Conversion to Paid",
+        "definition": "% of free users who become paying customers",
+        "calculation": "(paying_customers / total_users) × 100",
+        "measurement": "Percentage",
+        "good_target": "2-5% for freemium SaaS",
+        "data_source": "Billing system + analytics",
+        "example_events": ["subscription_started", "payment_completed"]
+      },
+      {
+        "name": "Average Revenue Per User (ARPU)",
+        "definition": "Total revenue divided by number of users",
+        "calculation": "total_revenue / total_users",
+        "measurement": "Currency (e.g., $50/month)",
+        "good_target": "Depends on pricing model; track trend",
+        "data_source": "Billing system",
+        "example_events": ["payment_completed with amount property"]
+      },
+      {
+        "name": "Customer Lifetime Value (LTV)",
+        "definition": "Predicted total revenue from a customer over their lifetime",
+        "calculation": "ARPU × (1 / churn_rate)",
+        "measurement": "Currency",
+        "good_target": "LTV should be 3x+ customer acquisition cost (CAC)",
+        "data_source": "Billing system + cohort analysis",
+        "example_events": ["All revenue events over customer lifetime"]
+      },
+      {
+        "name": "Monthly Recurring Revenue (MRR)",
+        "definition": "Predictable revenue from subscriptions each month",
+        "calculation": "Sum of all active subscription values normalized to monthly",
+        "measurement": "Currency per month",
+        "good_target": "20%+ MoM growth in early stage",
+        "data_source": "Billing system (Stripe, Paddle, etc.)",
+        "example_events": ["subscription_created", "subscription_renewed"]
+      },
+      {
+        "name": "Customer Acquisition Cost (CAC)",
+        "definition": "Total cost to acquire one new customer",
+        "calculation": "total_marketing_sales_spend / new_customers_acquired",
+        "measurement": "Currency per customer",
+        "good_target": "CAC should be <1/3 of LTV",
+        "data_source": "Ad platforms + CRM + analytics",
+        "example_events": ["N/A - calculated from spend data"]
+      }
+    ]
+  },
+  "engagement": {
+    "description": "Additional engagement metrics (optional but useful)",
+    "kpis": [
+      {
+        "name": "Session Duration",
+        "definition": "Average time a user spends in the app per session",
+        "measurement": "Minutes",
+        "good_target": "Depends on product; track trend",
+        "data_source": "Analytics platform",
+        "example_events": ["session_started", "session_ended"]
+      },
+      {
+        "name": "Feature Adoption Rate",
+        "definition": "% of users who use a specific feature",
+        "calculation": "(users_who_used_feature / total_active_users) × 100",
+        "measurement": "Percentage",
+        "good_target": "30%+ for core features",
+        "data_source": "Feature usage events",
+        "example_events": ["feature_used with feature_name property"]
+      },
+      {
+        "name": "Stickiness (DAU/MAU)",
+        "definition": "Ratio of daily active users to monthly active users",
+        "calculation": "(DAU / MAU) × 100",
+        "measurement": "Percentage",
+        "good_target": "20%+ (means users return 6+ days/month)",
+        "data_source": "Active user counts",
+        "example_events": ["Activity events aggregated"]
+      }
+    ]
+  },
+  "example_one_metric_that_matters": {
+    "description": "Choose ONE primary metric per cycle based on product stage",
+    "early_stage_0_to_1": {
+      "metric": "Activation Rate",
+      "why": "Need to prove users get value before optimizing growth",
+      "target": "30% of signups activate (complete onboarding + create first release) within first session"
+    },
+    "growth_stage": {
+      "metric": "Weekly Active Users (WAU)",
+      "why": "Activation is proven; now focus on growing user base",
+      "target": "15% week-over-week growth in WAU"
+    },
+    "retention_stage": {
+      "metric": "Day 7 Retention",
+      "why": "User growth is strong; need to keep them coming back",
+      "target": "Improve D7 retention from 20% to 40%"
+    },
+    "monetization_stage": {
+      "metric": "Conversion to Paid",
+      "why": "Retention is solid; time to monetize",
+      "target": "3% of free users convert to paid within 30 days"
+    }
+  },
+  "usage_notes": [
+    "Not all KPIs are relevant at all stages. Focus on 3-5 KPIs per cycle.",
+    "Always have ONE primary metric (OMTM) per cycle or sprint.",
+    "Define your 'activation event' based on core value (e.g., 'created first release', 'sent first message').",
+    "Track anti-metrics (e.g., signup conversion shouldn't tank while optimizing activation).",
+    "Industry benchmarks vary; use these as guidelines, not absolutes."
+  ]
+}

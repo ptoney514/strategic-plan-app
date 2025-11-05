@@ -7,6 +7,8 @@
     "code-reviewer": ["review", "check code", "code quality", "review this"],
     "test-generator": ["generate tests", "write tests", "add tests", "test coverage"],
     "pr-prep": ["ready for PR", "pre-PR", "PR checklist", "prepare PR"],
-    "debug-assistant": ["debug", "error", "not working", "investigate", "bug", "issue"]
+    "debug-assistant": ["debug", "error", "not working", "investigate", "bug", "issue"],
+    "product-growth-lead": ["prd", "product spec", "tech spec", "mvp", "release notes", "wireframes", "user flow", "feature plan", "prioritize", "roadmap", "analytics", "kpi", "launch plan"],
+    "supabase-dev-admin": ["supabase", "database", "rls", "row level security", "migration", "auth", "authentication", "edge function", "storage", "realtime", "postgres", "postgresql", "query optimization", "schema"]
   }
 }

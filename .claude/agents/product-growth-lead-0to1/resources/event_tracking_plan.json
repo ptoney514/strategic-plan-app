@@ -1,0 +1,574 @@
+{
+  "tracking_plan": {
+    "product_name": "Example SaaS Product",
+    "version": "1.0",
+    "updated": "2025-11-01",
+    "description": "Comprehensive event tracking plan following Acquisition → Activation → Retention → Revenue framework",
+    "analytics_platform": "PostHog, Mixpanel, Amplitude, or similar"
+  },
+  "global_properties": {
+    "description": "Properties sent with EVERY event automatically",
+    "properties": [
+      {
+        "name": "user_id",
+        "type": "string (UUID)",
+        "description": "Unique identifier for the user",
+        "example": "550e8400-e29b-41d4-a716-446655440000",
+        "required": true
+      },
+      {
+        "name": "session_id",
+        "type": "string (UUID)",
+        "description": "Unique identifier for the current session",
+        "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+        "required": true
+      },
+      {
+        "name": "platform",
+        "type": "string",
+        "description": "Platform where event occurred",
+        "example": "web | ios | android",
+        "required": true
+      },
+      {
+        "name": "app_version",
+        "type": "string",
+        "description": "Version of the app",
+        "example": "1.2.3",
+        "required": true
+      },
+      {
+        "name": "timestamp",
+        "type": "ISO 8601 datetime",
+        "description": "When the event occurred",
+        "example": "2025-11-01T14:30:00Z",
+        "required": true
+      }
+    ]
+  },
+  "acquisition_events": [
+    {
+      "event_name": "landing_page_viewed",
+      "trigger": "User views the landing page",
+      "properties": {
+        "page_url": {
+          "type": "string",
+          "description": "Full URL of the landing page",
+          "example": "https://example.com/?utm_source=google&utm_medium=cpc"
+        },
+        "utm_source": {
+          "type": "string",
+          "description": "Traffic source (e.g., google, facebook, email)",
+          "example": "google"
+        },
+        "utm_medium": {
+          "type": "string",
+          "description": "Marketing medium (e.g., cpc, email, social)",
+          "example": "cpc"
+        },
+        "utm_campaign": {
+          "type": "string",
+          "description": "Campaign name",
+          "example": "launch_week_2025"
+        },
+        "referrer": {
+          "type": "string",
+          "description": "URL of the referring page",
+          "example": "https://google.com/search?q=release+notes"
+        }
+      },
+      "owner": "Growth",
+      "frequency": "High (every landing page visit)",
+      "priority": "P0"
+    },
+    {
+      "event_name": "signup_started",
+      "trigger": "User clicks 'Sign Up' button or lands on signup page",
+      "properties": {
+        "entry_point": {
+          "type": "string",
+          "description": "Where user clicked to start signup",
+          "example": "navbar | hero_cta | pricing_page"
+        },
+        "variant": {
+          "type": "string",
+          "description": "A/B test variant (if applicable)",
+          "example": "control | variant_a"
+        }
+      },
+      "owner": "Growth",
+      "frequency": "High",
+      "priority": "P0"
+    }
+  ],
+  "activation_events": [
+    {
+      "event_name": "signup_method_selected",
+      "trigger": "User selects an authentication method (email, Apple, Google)",
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "Auth method chosen",
+          "example": "email | apple | google"
+        }
+      },
+      "owner": "Growth",
+      "frequency": "High",
+      "priority": "P0"
+    },
+    {
+      "event_name": "signup_completed",
+      "trigger": "User successfully creates an account",
+      "properties": {
+        "auth_method": {
+          "type": "string",
+          "description": "How user signed up",
+          "example": "email | apple | google"
+        },
+        "time_to_signup": {
+          "type": "number (seconds)",
+          "description": "Time from signup_started to signup_completed",
+          "example": 45
+        },
+        "variant": {
+          "type": "string",
+          "description": "A/B test variant (if applicable)",
+          "example": "control | variant_a"
+        }
+      },
+      "owner": "Growth",
+      "frequency": "High",
+      "priority": "P0"
+    },
+    {
+      "event_name": "signup_failed",
+      "trigger": "Signup attempt fails",
+      "properties": {
+        "auth_method": {
+          "type": "string",
+          "description": "Auth method attempted",
+          "example": "email | apple | google"
+        },
+        "error_type": {
+          "type": "string",
+          "description": "Type of error that occurred",
+          "example": "invalid_email | weak_password | api_error | network_error"
+        },
+        "error_message": {
+          "type": "string",
+          "description": "Error message shown to user",
+          "example": "Email already exists"
+        }
+      },
+      "owner": "Engineering",
+      "frequency": "Low (should be rare)",
+      "priority": "P0"
+    },
+    {
+      "event_name": "onboarding_started",
+      "trigger": "User begins onboarding flow",
+      "properties": {},
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P0"
+    },
+    {
+      "event_name": "onboarding_step_completed",
+      "trigger": "User completes a step in onboarding",
+      "properties": {
+        "step_number": {
+          "type": "number",
+          "description": "Which step was completed (1, 2, 3...)",
+          "example": 1
+        },
+        "step_name": {
+          "type": "string",
+          "description": "Name of the step",
+          "example": "create_project | invite_team | connect_repo"
+        },
+        "time_spent": {
+          "type": "number (seconds)",
+          "description": "Time spent on this step",
+          "example": 30
+        }
+      },
+      "owner": "Product",
+      "frequency": "Medium",
+      "priority": "P1"
+    },
+    {
+      "event_name": "onboarding_completed",
+      "trigger": "User finishes all onboarding steps",
+      "properties": {
+        "total_time": {
+          "type": "number (seconds)",
+          "description": "Total time from start to finish",
+          "example": 120
+        },
+        "steps_skipped": {
+          "type": "number",
+          "description": "How many optional steps were skipped",
+          "example": 0
+        }
+      },
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P0"
+    },
+    {
+      "event_name": "user_activated",
+      "trigger": "User reaches 'aha moment' - completes core action that delivers value",
+      "description": "DEFINE THIS based on your product! Examples: created first release, sent first message, made first sale",
+      "properties": {
+        "activation_action": {
+          "type": "string",
+          "description": "What action triggered activation",
+          "example": "created_first_release | sent_first_email | made_first_sale"
+        },
+        "time_to_activation": {
+          "type": "number (minutes)",
+          "description": "Time from signup to activation",
+          "example": 5
+        }
+      },
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P0 - MOST IMPORTANT METRIC"
+    }
+  ],
+  "retention_events": [
+    {
+      "event_name": "session_started",
+      "trigger": "User opens the app or logs in",
+      "properties": {
+        "session_count": {
+          "type": "number",
+          "description": "Total number of sessions for this user (lifetime)",
+          "example": 10
+        },
+        "days_since_signup": {
+          "type": "number",
+          "description": "Days since user first signed up",
+          "example": 7
+        },
+        "days_since_last_session": {
+          "type": "number",
+          "description": "Days since user's last session",
+          "example": 2
+        }
+      },
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P0"
+    },
+    {
+      "event_name": "session_ended",
+      "trigger": "User closes the app or logs out",
+      "properties": {
+        "session_duration": {
+          "type": "number (seconds)",
+          "description": "Length of this session",
+          "example": 300
+        },
+        "pages_viewed": {
+          "type": "number",
+          "description": "Number of pages/screens viewed",
+          "example": 5
+        },
+        "actions_taken": {
+          "type": "number",
+          "description": "Number of actions performed (clicks, creates, etc.)",
+          "example": 8
+        }
+      },
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P1"
+    },
+    {
+      "event_name": "feature_used",
+      "trigger": "User engages with a specific feature",
+      "properties": {
+        "feature_name": {
+          "type": "string",
+          "description": "Name of the feature used",
+          "example": "release_notes | analytics_dashboard | settings"
+        },
+        "usage_count": {
+          "type": "number",
+          "description": "Lifetime usage count of this feature by user",
+          "example": 5
+        }
+      },
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P1"
+    }
+  ],
+  "revenue_events": [
+    {
+      "event_name": "pricing_page_viewed",
+      "trigger": "User views the pricing page",
+      "properties": {
+        "source": {
+          "type": "string",
+          "description": "Where user came from",
+          "example": "navbar | dashboard_upgrade_prompt | paywall"
+        }
+      },
+      "owner": "Growth",
+      "frequency": "Medium",
+      "priority": "P1"
+    },
+    {
+      "event_name": "checkout_started",
+      "trigger": "User clicks 'Subscribe' or 'Buy Now'",
+      "properties": {
+        "plan_name": {
+          "type": "string",
+          "description": "Plan selected",
+          "example": "pro | enterprise"
+        },
+        "plan_price": {
+          "type": "number",
+          "description": "Monthly price in cents",
+          "example": 2900
+        },
+        "billing_interval": {
+          "type": "string",
+          "description": "Billing frequency",
+          "example": "monthly | yearly"
+        }
+      },
+      "owner": "Growth",
+      "frequency": "Low",
+      "priority": "P0"
+    },
+    {
+      "event_name": "payment_completed",
+      "trigger": "Payment successfully processed",
+      "properties": {
+        "plan_name": {
+          "type": "string",
+          "description": "Plan purchased",
+          "example": "pro"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount paid in cents",
+          "example": 2900
+        },
+        "currency": {
+          "type": "string",
+          "description": "Currency code",
+          "example": "USD"
+        },
+        "billing_interval": {
+          "type": "string",
+          "description": "Billing frequency",
+          "example": "monthly | yearly"
+        },
+        "is_trial": {
+          "type": "boolean",
+          "description": "Whether this is a trial conversion",
+          "example": false
+        }
+      },
+      "owner": "Growth",
+      "frequency": "Low",
+      "priority": "P0"
+    },
+    {
+      "event_name": "payment_failed",
+      "trigger": "Payment attempt fails",
+      "properties": {
+        "plan_name": {
+          "type": "string",
+          "description": "Plan attempted",
+          "example": "pro"
+        },
+        "error_code": {
+          "type": "string",
+          "description": "Payment error code from processor",
+          "example": "card_declined | insufficient_funds"
+        },
+        "retry_count": {
+          "type": "number",
+          "description": "Number of retry attempts",
+          "example": 1
+        }
+      },
+      "owner": "Engineering",
+      "frequency": "Low (should be rare)",
+      "priority": "P0"
+    },
+    {
+      "event_name": "subscription_cancelled",
+      "trigger": "User cancels their subscription",
+      "properties": {
+        "plan_name": {
+          "type": "string",
+          "description": "Plan being cancelled",
+          "example": "pro"
+        },
+        "cancellation_reason": {
+          "type": "string",
+          "description": "Reason selected from dropdown",
+          "example": "too_expensive | missing_features | switching_to_competitor | other"
+        },
+        "cancellation_feedback": {
+          "type": "string",
+          "description": "Free-text feedback (optional)",
+          "example": "Needed integrations with X tool"
+        },
+        "days_subscribed": {
+          "type": "number",
+          "description": "Days from subscription start to cancellation",
+          "example": 30
+        }
+      },
+      "owner": "Growth",
+      "frequency": "Low",
+      "priority": "P0"
+    }
+  ],
+  "product_specific_events": [
+    {
+      "event_name": "release_created",
+      "trigger": "User creates a new release",
+      "properties": {
+        "release_id": {
+          "type": "string (UUID)",
+          "description": "Unique ID of the release",
+          "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+        },
+        "num_changes": {
+          "type": "number",
+          "description": "Number of changes in the release",
+          "example": 5
+        },
+        "is_first_release": {
+          "type": "boolean",
+          "description": "Whether this is the user's first release",
+          "example": true
+        }
+      },
+      "owner": "Product",
+      "frequency": "Medium",
+      "priority": "P0"
+    },
+    {
+      "event_name": "release_published",
+      "trigger": "User publishes a release (makes it public)",
+      "properties": {
+        "release_id": {
+          "type": "string (UUID)",
+          "description": "Unique ID of the release",
+          "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+        },
+        "num_changes": {
+          "type": "number",
+          "description": "Number of changes in the release",
+          "example": 5
+        },
+        "time_to_publish": {
+          "type": "number (minutes)",
+          "description": "Time from create to publish",
+          "example": 10
+        }
+      },
+      "owner": "Product",
+      "frequency": "Medium",
+      "priority": "P0"
+    },
+    {
+      "event_name": "release_viewed",
+      "trigger": "Public release notes page is viewed",
+      "properties": {
+        "release_id": {
+          "type": "string (UUID)",
+          "description": "Unique ID of the release",
+          "example": "7c9e6679-7425-40de-944b-e07fc1f90ae7"
+        },
+        "viewer_type": {
+          "type": "string",
+          "description": "Who viewed it",
+          "example": "creator | team_member | public | logged_out"
+        }
+      },
+      "owner": "Product",
+      "frequency": "High",
+      "priority": "P1"
+    }
+  ],
+  "implementation_notes": {
+    "best_practices": [
+      "Use snake_case for event names and property names",
+      "Always include user_id, session_id, timestamp, platform as global properties",
+      "Track both success AND failure events (e.g., signup_completed vs. signup_failed)",
+      "Include time-based properties (time_to_activation, session_duration) for performance analysis",
+      "Use consistent naming: {noun}_{action} format (e.g., release_created, payment_completed)",
+      "Don't log PII in events unless absolutely necessary and encrypted",
+      "Test events in staging before deploying to production",
+      "Document all events in a central tracking plan (this file!)"
+    ],
+    "analytics_platforms": {
+      "PostHog": "Open-source, self-hosted or cloud, good for startups",
+      "Mixpanel": "Advanced funnels and cohorts, good for SaaS",
+      "Amplitude": "Enterprise-grade analytics, good for growth teams",
+      "Google Analytics 4": "Free, good for web traffic, less product-focused",
+      "Segment": "Customer Data Platform, aggregates events to multiple tools"
+    },
+    "priority_levels": {
+      "P0": "Must have - core KPIs depend on this event",
+      "P1": "Should have - important for understanding user behavior",
+      "P2": "Nice to have - useful but not critical"
+    }
+  },
+  "example_funnel_analysis": {
+    "signup_funnel": [
+      {
+        "step": 1,
+        "event": "landing_page_viewed",
+        "typical_conversion": "100% (baseline)"
+      },
+      {
+        "step": 2,
+        "event": "signup_started",
+        "typical_conversion": "20% of landing page views"
+      },
+      {
+        "step": 3,
+        "event": "signup_method_selected",
+        "typical_conversion": "80% of signup starts"
+      },
+      {
+        "step": 4,
+        "event": "signup_completed",
+        "typical_conversion": "60% of method selections (50% overall from signup_started)"
+      }
+    ],
+    "activation_funnel": [
+      {
+        "step": 1,
+        "event": "signup_completed",
+        "typical_conversion": "100% (baseline)"
+      },
+      {
+        "step": 2,
+        "event": "onboarding_started",
+        "typical_conversion": "90%"
+      },
+      {
+        "step": 3,
+        "event": "onboarding_completed",
+        "typical_conversion": "70%"
+      },
+      {
+        "step": 4,
+        "event": "user_activated",
+        "typical_conversion": "30-40% (the 'aha moment')"
+      }
+    ]
+  }
+}

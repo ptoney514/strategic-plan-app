@@ -1,5 +1,5 @@
 {
-  "context_files": ["CLAUDE.md", "WORKSPACE_STATUS.md", "strategic-plan-vite/STATUS.md"],
+  "context_files": ["CLAUDE.md", "WORKSPACE_STATUS.md", "PLANNING.md"],
   "sub_agents_enabled": true,
   "auto_test_on_change": false,
   "preferred_model": "claude-sonnet-4-20250514",
@@ -8,7 +8,9 @@
     "test-generator": ["generate tests", "write tests", "add tests", "test coverage"],
     "pr-prep": ["ready for PR", "pre-PR", "PR checklist", "prepare PR"],
     "debug-assistant": ["debug", "error", "not working", "investigate", "bug", "issue"],
-    "product-growth-lead": ["prd", "product spec", "tech spec", "mvp", "release notes", "wireframes", "user flow", "feature plan", "prioritize", "roadmap", "analytics", "kpi", "launch plan"],
+    "product-growth-lead": ["prd", "product spec", "tech spec", "mvp", "release notes", "wireframes", "user flow", "feature plan", "analytics", "kpi", "launch plan", "growth"],
+    "product-manager": ["backlog", "prioritize", "rice", "user stories", "acceptance criteria", "stakeholder", "user research", "persona", "discovery", "quarterly roadmap", "product requirements"],
+    "technical-architect": ["architecture", "system design", "scalability", "api design", "microservices", "database design", "cloud architecture", "adr", "migration plan", "performance optimization", "security architecture"],
     "supabase-dev-admin": ["supabase", "database", "rls", "row level security", "migration", "auth", "authentication", "edge function", "storage", "realtime", "postgres", "postgresql", "query optimization", "schema"]
   }
 }

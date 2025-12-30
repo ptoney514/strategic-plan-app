@@ -7,10 +7,13 @@ import {
   Search,
   List,
   LayoutGrid,
-  Filter,
+  EyeOff,
+  Eye,
   HelpCircle,
   MoreHorizontal,
-  X
+  X,
+  Play,
+  CheckCircle2
 } from 'lucide-react';
 import type { HierarchicalGoal } from '../../../lib/types';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -30,8 +33,8 @@ export function AdminDashboard2() {
   const [viewMode, setViewMode] = useState<'compact' | 'list' | 'board'>('compact');
   const [showFilters, setShowFilters] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [quickFilter, setQuickFilter] = useState<'all' | 'mine'>('all');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [showVideoModal, setShowVideoModal] = useState(false);
 
   // Goals are returned as HierarchicalGoal[] with children nested in goal.children
   // Level 0 goals are at the root level of the array
@@ -106,81 +109,98 @@ export function AdminDashboard2() {
           </button>
         </div>
 
-        {/* Title Row */}
-        <div className="flex items-start justify-between mb-5">
-          <h1 className="font-['Playfair_Display',_Georgia,_serif] text-[32px] font-medium text-[#1a1a1a] tracking-tight">
-            All objectives
-          </h1>
-          <a
-            href="#"
-            className="flex items-center gap-1.5 text-[#b85c38] text-sm font-medium hover:opacity-80 transition-opacity"
-          >
-            <svg className="w-[18px] h-[18px]" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            How to create an OKR
-          </a>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3">
-          <Link
-            to={`/${slug}/admin/objectives/new`}
-            className="bg-[#b85c38] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors"
-          >
-            Create a new objective
-          </Link>
-          <button className="w-10 h-10 rounded-lg border border-[#e8e6e1] bg-white text-[#4a4a4a] hover:bg-[#f5f3ef] transition-colors flex items-center justify-center">
-            <MoreHorizontal className="h-[18px] w-[18px]" />
-          </button>
-        </div>
-      </div>
-
-      {/* Filters Section */}
-      <div className="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-7">
-        <div className="flex items-center gap-5 mb-4">
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 text-[#b85c38] text-[13px] font-medium"
-          >
-            <Filter className="h-3.5 w-3.5" />
-            {showFilters ? 'Hide filters' : 'Show filters'}
-          </button>
-          <div className="flex items-center gap-1.5">
-            <span className="text-[13px] text-[#8a8a8a] mr-1">Quick filters:</span>
+        {/* Title Row with Video Link */}
+        <div className="flex items-center justify-between mb-5">
+          <div className="flex items-center gap-4">
+            <h1 className="font-['Playfair_Display',_Georgia,_serif] text-[32px] font-medium text-[#1a1a1a] tracking-tight">
+              All objectives
+            </h1>
             <button
-              onClick={() => setQuickFilter('all')}
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-colors ${
-                quickFilter === 'all'
-                  ? 'bg-[#f5f3ef] text-[#1a1a1a]'
-                  : 'text-[#4a4a4a] hover:bg-[#f5f3ef]'
-              }`}
+              onClick={() => setShowVideoModal(true)}
+              className="flex items-center gap-2 text-[#6b46c1] hover:opacity-80 transition-opacity group"
+              aria-label="Watch how to create an OKR video"
             >
-              District-wide
+              <span className="w-7 h-7 rounded-full bg-[#6b46c1] flex items-center justify-center group-hover:bg-[#553c9a] transition-colors">
+                <Play className="h-3.5 w-3.5 text-white fill-white ml-0.5" />
+              </span>
+              <span className="text-sm font-medium">How to create an OKR</span>
             </button>
-            <button
-              onClick={() => setQuickFilter('mine')}
-              className={`px-3 py-1.5 text-[13px] font-medium rounded-md transition-colors ${
-                quickFilter === 'mine'
-                  ? 'bg-[#f5f3ef] text-[#1a1a1a]'
-                  : 'text-[#4a4a4a] hover:bg-[#f5f3ef]'
-              }`}
+          </div>
+          <div className="flex items-center gap-3">
+            <Link
+              to={`/${slug}/admin/objectives/new`}
+              className="bg-[#b85c38] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors"
             >
-              My objectives
+              Create a new objective
+            </Link>
+            <button className="w-10 h-10 rounded-lg border border-[#e8e6e1] bg-white text-[#4a4a4a] hover:bg-[#f5f3ef] transition-colors flex items-center justify-center">
+              <MoreHorizontal className="h-[18px] w-[18px]" />
             </button>
           </div>
         </div>
+      </div>
+
+      {/* Video Modal */}
+      {showVideoModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowVideoModal(false)}
+          />
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl mx-4 overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e6e1]">
+              <h2 className="text-lg font-semibold text-[#1a1a1a]">How to create an OKR</h2>
+              <button
+                onClick={() => setShowVideoModal(false)}
+                className="w-8 h-8 rounded-full hover:bg-[#f5f3ef] flex items-center justify-center text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors"
+                aria-label="Close video"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {/* Video Container */}
+            <div className="aspect-video bg-[#1a1a1a] flex items-center justify-center">
+              {/* Placeholder for video - replace with actual video embed */}
+              <div className="text-center text-white/60">
+                <div className="w-20 h-20 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+                  <Play className="h-10 w-10 text-white/80 fill-white/80 ml-1" />
+                </div>
+                <p className="text-sm">Video tutorial coming soon</p>
+                <p className="text-xs mt-1 text-white/40">Learn how to create effective OKRs</p>
+              </div>
+            </div>
+            {/* Footer */}
+            <div className="px-6 py-4 bg-[#fafaf8] border-t border-[#e8e6e1]">
+              <div className="flex items-center gap-2 text-sm text-[#6a6a6a]">
+                <CheckCircle2 className="h-4 w-4 text-[#6b8f71]" />
+                <span>Watch this 2-minute guide to get started with OKRs</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Filters Section */}
+      <div className="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-7">
+        <div className={showFilters ? 'mb-4' : ''}>
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 text-[#6b46c1] text-[13px] font-medium hover:opacity-80 transition-opacity"
+          >
+            {showFilters ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
+            {showFilters ? 'Hide filters' : 'Show filters'}
+          </button>
+        </div>
 
         {showFilters && (
-          <div className="grid grid-cols-4 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                Objective Owners
-              </label>
-              <select className="px-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg bg-white text-[#4a4a4a] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238a8a8a%22%20stroke-width%3D%222%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_10px_center] pr-8 focus:outline-none focus:border-[#c9a227]">
-                <option>Search for a person or group</option>
-              </select>
-            </div>
+          <div className="grid grid-cols-3 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
                 Objective Type
@@ -378,8 +398,10 @@ export function AdminDashboard2() {
                     >
                       {isExpanded ? (
                         <Minus className="h-4 w-4" />
-                      ) : (
+                      ) : hasChildGoals ? (
                         <Plus className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
                       )}
                     </button>
 
@@ -480,28 +502,38 @@ export function AdminDashboard2() {
                               {child.children?.map((grandchild: HierarchicalGoal) => (
                                 <div
                                   key={grandchild.id}
-                                  className="bg-white border border-[#e8e6e1] rounded-md px-3 py-2.5 hover:shadow-sm transition-shadow"
+                                  className="bg-[#fafaf8] border border-[#e8e6e1] rounded-lg px-4 py-3 hover:shadow-sm transition-shadow"
                                   data-testid="grandchild-goal-row"
                                 >
-                                  <div className="flex items-center gap-2.5">
-                                    {/* Bullet/Indicator */}
-                                    <div className="w-6 h-6 rounded-md bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
-                                      <span className="text-[10px] font-semibold text-[#6a6a6a]">
+                                  <div className="flex items-center gap-3">
+                                    {/* Chevron - indicates no children (leaf node) */}
+                                    <div className="w-7 h-7 rounded-md border border-[#e8e6e1] flex items-center justify-center text-[#d4d1cb] flex-shrink-0">
+                                      <ChevronRight className="h-3.5 w-3.5" />
+                                    </div>
+
+                                    {/* Number Badge */}
+                                    <div className="w-8 h-8 rounded-full bg-[#e8e6e1] flex items-center justify-center flex-shrink-0">
+                                      <span className="text-[12px] font-semibold text-[#4a4a4a]">
                                         {grandchild.goal_number}
                                       </span>
                                     </div>
 
-                                    {/* Title */}
-                                    <div className="flex-1 min-w-0">
-                                      <h5 className="text-[13px] font-medium text-[#1a1a1a] truncate" data-testid="grandchild-goal-title">
-                                        {grandchild.title}
+                                    {/* Title and Description */}
+                                    <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                                      <h5 className="text-[14px] font-semibold text-[#1a1a1a] leading-snug" data-testid="grandchild-goal-title">
+                                        {grandchild.title?.split(':')[0]?.trim() || grandchild.title}
                                       </h5>
+                                      {(grandchild.description || grandchild.title?.includes(':')) && (
+                                        <p className="text-[12px] text-[#6a6a6a] truncate">
+                                          {grandchild.description || grandchild.title?.split(':').slice(1).join(':').trim()}
+                                        </p>
+                                      )}
                                     </div>
 
-                                    {/* Status */}
-                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded flex-shrink-0">
+                                    {/* Status Badge */}
+                                    <div className="flex items-center gap-1.5 px-2 py-1 border border-[#e8e6e1] rounded flex-shrink-0">
                                       <span className="w-1.5 h-1.5 rounded-full bg-[#6b8f71]"></span>
-                                      <span className="text-[10px] font-medium text-[#6a6a6a] uppercase">
+                                      <span className="text-[11px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
                                         On Target
                                       </span>
                                     </div>

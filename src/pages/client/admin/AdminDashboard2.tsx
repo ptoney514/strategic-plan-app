@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Plus,
+  Minus,
+  ChevronRight,
   Search,
   List,
   LayoutGrid,
@@ -10,6 +12,7 @@ import {
   MoreHorizontal,
   X
 } from 'lucide-react';
+import type { HierarchicalGoal } from '../../../lib/types';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
 
@@ -28,9 +31,46 @@ export function AdminDashboard2() {
   const [showFilters, setShowFilters] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [quickFilter, setQuickFilter] = useState<'all' | 'mine'>('all');
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
-  // Get strategic objectives (level 0 goals)
-  const objectives = goals?.filter(g => g.level === 0) || [];
+  // Goals are returned as HierarchicalGoal[] with children nested in goal.children
+  // Level 0 goals are at the root level of the array
+  const objectives = goals || [];
+
+  // Toggle expand/collapse for a goal
+  const toggleExpand = (goalId: string) => {
+    setExpandedIds(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(goalId)) {
+        newSet.delete(goalId);
+      } else {
+        newSet.add(goalId);
+      }
+      return newSet;
+    });
+  };
+
+  // Recursively collect IDs of goals with children
+  const collectExpandableIds = (goalList: HierarchicalGoal[], ids: Set<string>) => {
+    goalList.forEach(goal => {
+      if (goal.children && goal.children.length > 0) {
+        ids.add(goal.id);
+        collectExpandableIds(goal.children, ids);
+      }
+    });
+  };
+
+  // Expand all objectives and their children
+  const expandAll = () => {
+    const allIds = new Set<string>();
+    collectExpandableIds(objectives, allIds);
+    setExpandedIds(allIds);
+  };
+
+  // Collapse all
+  const collapseAll = () => {
+    setExpandedIds(new Set());
+  };
 
   // Status counts (mock for now)
   const statusCounts = {
@@ -259,9 +299,21 @@ export function AdminDashboard2() {
       <div className="flex items-center justify-between mb-3">
         <div className="text-[13px] text-[#8a8a8a]">
           Showing {objectives.length} of {objectives.length} objectives
-          <button className="text-[#4a6fa5] ml-1.5 hover:underline">Expand all</button>
+          <button
+            onClick={expandAll}
+            className="text-[#4a6fa5] ml-1.5 hover:underline"
+            data-testid="expand-all-btn"
+          >
+            Expand all
+          </button>
           {' | '}
-          <button className="text-[#4a6fa5] hover:underline">Collapse all</button>
+          <button
+            onClick={collapseAll}
+            className="text-[#4a6fa5] hover:underline"
+            data-testid="collapse-all-btn"
+          >
+            Collapse all
+          </button>
         </div>
         <div className="text-[13px] text-[#8a8a8a]">
           Sort by{' '}
@@ -298,45 +350,171 @@ export function AdminDashboard2() {
           </div>
         ) : (
           objectives.map((objective, index) => {
+            const isExpanded = expandedIds.has(objective.id);
+            const hasChildGoals = objective.children && objective.children.length > 0;
+
             return (
               <div
                 key={objective.id}
-                className="bg-white border border-[#e8e6e1] rounded-xl px-5 py-4 hover:shadow-sm transition-shadow animate-fadeInUp"
+                className="animate-fadeInUp"
                 style={{ animationDelay: `${index * 0.05}s` }}
+                data-testid="objective-row"
               >
-                <div className="flex items-center gap-4">
-                  {/* Expand Button */}
-                  <button className="w-8 h-8 rounded-lg border border-[#e8e6e1] flex items-center justify-center text-[#8a8a8a] hover:bg-[#f5f3ef] hover:text-[#4a4a4a] transition-colors flex-shrink-0">
-                    <Plus className="h-4 w-4" />
-                  </button>
+                {/* Main Objective Row */}
+                <div className="bg-white border border-[#e8e6e1] rounded-xl px-5 py-4 hover:shadow-sm transition-shadow">
+                  <div className="flex items-center gap-4">
+                    {/* Expand Button */}
+                    <button
+                      onClick={() => hasChildGoals && toggleExpand(objective.id)}
+                      className={`w-8 h-8 rounded-lg border border-[#e8e6e1] flex items-center justify-center transition-colors flex-shrink-0 ${
+                        hasChildGoals
+                          ? 'text-[#8a8a8a] hover:bg-[#f5f3ef] hover:text-[#4a4a4a] cursor-pointer'
+                          : 'text-[#d4d1cb] cursor-default'
+                      }`}
+                      disabled={!hasChildGoals}
+                      data-testid="expand-btn"
+                      aria-expanded={isExpanded}
+                      aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                    >
+                      {isExpanded ? (
+                        <Minus className="h-4 w-4" />
+                      ) : (
+                        <Plus className="h-4 w-4" />
+                      )}
+                    </button>
 
-                  {/* Number Badge */}
-                  <div className="w-10 h-10 rounded-full bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
-                    <span className="text-[13px] font-semibold text-[#4a4a4a]">
-                      {(index + 1).toFixed(1)}
-                    </span>
-                  </div>
+                    {/* Number Badge */}
+                    <div className="w-10 h-10 rounded-full bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
+                      <span className="text-[13px] font-semibold text-[#4a4a4a]">
+                        {objective.goal_number || (index + 1).toFixed(1)}
+                      </span>
+                    </div>
 
-                  {/* Title and Description */}
-                  <div className="flex-1 min-w-0 flex flex-col">
-                    <h3 className="text-[15px] font-bold text-[#1a1a1a] leading-snug">
-                      {objective.name?.split(':')[0] || objective.name}
-                    </h3>
-                    {(objective.description || objective.name?.includes(':')) && (
-                      <p className="text-[13px] text-[#6a6a6a] mt-0.5 truncate">
-                        {objective.description || objective.name?.split(':').slice(1).join(':').trim()}
-                      </p>
-                    )}
-                  </div>
+                    {/* Title and Description - stacked vertically */}
+                    <div className="flex-1 min-w-0 flex flex-col gap-1">
+                      <h3 className="text-[15px] font-bold text-[#1a1a1a] leading-snug" data-testid="objective-title">
+                        {objective.title?.split(':')[0]?.trim() || objective.title}
+                      </h3>
+                      {(objective.description || objective.title?.includes(':')) && (
+                        <p className="text-[13px] text-[#6a6a6a] leading-relaxed line-clamp-2" data-testid="objective-description">
+                          {objective.description || objective.title?.split(':').slice(1).join(':').trim()}
+                        </p>
+                      )}
+                    </div>
 
-                  {/* Status Badge */}
-                  <div className="flex items-center gap-2 px-3 py-1.5 border border-[#e8e6e1] rounded-md flex-shrink-0">
-                    <span className="w-2 h-2 rounded-full bg-[#6b8f71]"></span>
-                    <span className="text-[12px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
-                      On Target
-                    </span>
+                    {/* Status Badge */}
+                    <div className="flex items-center gap-2 px-3 py-1.5 border border-[#e8e6e1] rounded-md flex-shrink-0">
+                      <span className="w-2 h-2 rounded-full bg-[#6b8f71]"></span>
+                      <span className="text-[12px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
+                        On Target
+                      </span>
+                    </div>
                   </div>
                 </div>
+
+                {/* Children (Level 1 Goals) */}
+                {isExpanded && hasChildGoals && (
+                  <div className="ml-12 mt-2 flex flex-col gap-2" data-testid="children-container">
+                    {objective.children?.map((child: HierarchicalGoal) => {
+                      const isChildExpanded = expandedIds.has(child.id);
+                      const hasGrandchildren = child.children && child.children.length > 0;
+
+                      return (
+                        <div key={child.id} data-testid="child-goal-row">
+                          {/* Level 1 Goal Row */}
+                          <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-lg px-4 py-3 hover:shadow-sm transition-shadow">
+                            <div className="flex items-center gap-3">
+                              {/* Expand Button for Level 1 */}
+                              <button
+                                onClick={() => hasGrandchildren && toggleExpand(child.id)}
+                                className={`w-7 h-7 rounded-md border border-[#e8e6e1] flex items-center justify-center transition-colors flex-shrink-0 ${
+                                  hasGrandchildren
+                                    ? 'text-[#8a8a8a] hover:bg-[#f5f3ef] hover:text-[#4a4a4a] cursor-pointer'
+                                    : 'text-[#d4d1cb] cursor-default'
+                                }`}
+                                disabled={!hasGrandchildren}
+                                data-testid="child-expand-btn"
+                                aria-expanded={isChildExpanded}
+                              >
+                                {isChildExpanded ? (
+                                  <Minus className="h-3.5 w-3.5" />
+                                ) : hasGrandchildren ? (
+                                  <Plus className="h-3.5 w-3.5" />
+                                ) : (
+                                  <ChevronRight className="h-3.5 w-3.5" />
+                                )}
+                              </button>
+
+                              {/* Number Badge */}
+                              <div className="w-8 h-8 rounded-full bg-[#e8e6e1] flex items-center justify-center flex-shrink-0">
+                                <span className="text-[12px] font-semibold text-[#4a4a4a]">
+                                  {child.goal_number}
+                                </span>
+                              </div>
+
+                              {/* Title and Description */}
+                              <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+                                <h4 className="text-[14px] font-semibold text-[#1a1a1a] leading-snug" data-testid="child-goal-title">
+                                  {child.title?.split(':')[0]?.trim() || child.title}
+                                </h4>
+                                {(child.description || child.title?.includes(':')) && (
+                                  <p className="text-[12px] text-[#6a6a6a] truncate" data-testid="child-goal-description">
+                                    {child.description || child.title?.split(':').slice(1).join(':').trim()}
+                                  </p>
+                                )}
+                              </div>
+
+                              {/* Status Badge */}
+                              <div className="flex items-center gap-1.5 px-2 py-1 border border-[#e8e6e1] rounded flex-shrink-0">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#6b8f71]"></span>
+                                <span className="text-[11px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
+                                  On Target
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Grandchildren (Level 2 Sub-goals) */}
+                          {isChildExpanded && hasGrandchildren && (
+                            <div className="ml-10 mt-1.5 flex flex-col gap-1.5" data-testid="grandchildren-container">
+                              {child.children?.map((grandchild: HierarchicalGoal) => (
+                                <div
+                                  key={grandchild.id}
+                                  className="bg-white border border-[#e8e6e1] rounded-md px-3 py-2.5 hover:shadow-sm transition-shadow"
+                                  data-testid="grandchild-goal-row"
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    {/* Bullet/Indicator */}
+                                    <div className="w-6 h-6 rounded-md bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
+                                      <span className="text-[10px] font-semibold text-[#6a6a6a]">
+                                        {grandchild.goal_number}
+                                      </span>
+                                    </div>
+
+                                    {/* Title */}
+                                    <div className="flex-1 min-w-0">
+                                      <h5 className="text-[13px] font-medium text-[#1a1a1a] truncate" data-testid="grandchild-goal-title">
+                                        {grandchild.title}
+                                      </h5>
+                                    </div>
+
+                                    {/* Status */}
+                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded flex-shrink-0">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#6b8f71]"></span>
+                                      <span className="text-[10px] font-medium text-[#6a6a6a] uppercase">
+                                        On Target
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })

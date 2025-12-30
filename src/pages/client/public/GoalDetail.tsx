@@ -2,18 +2,18 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useGoal, useChildGoals } from '../../../hooks/useGoals';
 import { useMetrics } from '../../../hooks/useMetrics';
-import { ChevronLeft, Target, TrendingUp, BarChart2, Edit2 } from 'lucide-react';
+import { ChevronLeft, BarChart2, Edit2 } from 'lucide-react';
 import { MetricsChart } from '../../../components/MetricsChart';
 import { GoalEditWizard } from '../../../components/GoalEditWizard';
 import { LikertScaleChart } from '../../../components/LikertScaleChart';
 import { NarrativeDisplay } from '../../../components/NarrativeDisplay';
-import { calculateGoalProgress, getGoalStatus } from '../../../lib/types';
+// Types used in component logic
 
 export function GoalDetail() {
   const { slug, goalId } = useParams<{ slug: string; goalId: string }>();
   const { data: goal, isLoading: goalLoading, refetch: refetchGoal } = useGoal(goalId!);
   const { data: metrics, isLoading: metricsLoading } = useMetrics(goalId!);
-  const { data: childGoals, isLoading: childrenLoading } = useChildGoals(goalId!);
+  const { isLoading: childrenLoading } = useChildGoals(goalId!);
   const [showEditModal, setShowEditModal] = useState(false);
 
   const isLoading = goalLoading || metricsLoading || childrenLoading;

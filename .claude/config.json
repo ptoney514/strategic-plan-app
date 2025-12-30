@@ -1,5 +1,5 @@
 {
-  "context_files": ["CLAUDE.md", "WORKSPACE_STATUS.md", "PLANNING.md"],
+  "context_files": ["CLAUDE.md", "project_status.md"],
   "sub_agents_enabled": true,
   "auto_test_on_change": false,
   "preferred_model": "claude-sonnet-4-20250514",

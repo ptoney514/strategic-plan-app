@@ -16,7 +16,7 @@ import {
   Settings
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
-import { useAuth } from '../hooks/useAuth';
+import { useAuth } from '../contexts/AuthContext';
 
 /**
  * ClientAdminLayout - Redesigned admin layout with left sidebar (Webflow-style)

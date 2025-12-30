@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { HomepageHeader } from '../../../components/homepage/HomepageHeader';

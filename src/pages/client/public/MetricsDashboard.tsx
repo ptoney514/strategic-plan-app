@@ -1,22 +1,16 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { 
-  ChevronLeft, 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  ChevronLeft,
+  TrendingUp,
+  TrendingDown,
   Minus,
-  Target,
   BarChart3,
   PieChart,
   Activity,
-  Calendar,
   Download,
   RefreshCw,
   AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Clock,
-  Filter,
   Grid3x3,
   List,
   FileText,
@@ -29,7 +23,8 @@ import {
   useMetricsByCategory,
   usePerformanceTrends 
 } from '../../../hooks/useDashboard';
-import { DashboardStats } from '../../../components/DashboardStats';
+// DashboardStats imported for future use
+// import { DashboardStats } from '../../../components/DashboardStats';
 import { MetricsChart } from '../../../components/MetricsChart';
 import { GoalProgressChart } from '../../../components/GoalProgressChart';
 import { MetricOverview } from '../../../components/MetricOverview';
@@ -107,20 +102,8 @@ export function MetricsDashboard() {
     return true;
   });
 
-  // Calculate category distribution for pie chart
-  const categoryDistribution = metricsByCategory?.map(cat => ({
-    name: cat.category,
-    value: cat.metrics.length,
-    progress: cat.averageProgress,
-  })) || [];
-
-  // Status indicators
-  const statusIndicators = {
-    'on-target': { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100' },
-    'off-target': { icon: AlertTriangle, color: 'text-yellow-600', bg: 'bg-yellow-100' },
-    'critical': { icon: XCircle, color: 'text-red-600', bg: 'bg-red-100' },
-    'no-data': { icon: Clock, color: 'text-gray-600', bg: 'bg-gray-100' },
-  };
+  // Category distribution and status indicators available for future use
+  // via metricsByCategory and status constants
 
   return (
     <div className="min-h-screen bg-background">

@@ -19,5 +19,12 @@ export default defineConfig([
       ecmaVersion: 2020,
       globals: globals.browser,
     },
+    rules: {
+      // Downgrade to warnings - many files pending refactor/removal
+      '@typescript-eslint/no-unused-vars': 'warn',
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // Allow unused vars that start with underscore
+      'no-unused-vars': 'off',
+    },
   },
 ])

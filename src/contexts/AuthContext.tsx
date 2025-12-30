@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
 
@@ -9,13 +9,25 @@ interface AuthState {
   loading: boolean;
 }
 
+interface AuthContextValue extends AuthState {
+  hasDistrictAccess: (slug: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<ReturnType<typeof supabase.auth.signInWithPassword>>;
+  logout: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextValue | null>(null);
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
 /**
- * useAuth - Authentication hook with Supabase
+ * AuthProvider - Provides authentication state to the entire app
  *
- * Manages user authentication state and provides auth methods.
- * Automatically syncs with Supabase auth state changes.
+ * Single subscription to Supabase auth changes at the root level.
+ * All components share the same auth state via useAuth hook.
  */
-export function useAuth() {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
     isAuthenticated: false,
@@ -53,8 +65,6 @@ export function useAuth() {
 
   /**
    * Check if user has admin access to a specific district
-   * @param slug - District slug to check access for
-   * @returns Promise<boolean> - True if user has access
    */
   const hasDistrictAccess = async (slug: string): Promise<boolean> => {
     if (!authState.user) return false;
@@ -63,7 +73,6 @@ export function useAuth() {
     if (authState.isSystemAdmin) return true;
 
     try {
-      // Check if user is in spb_district_admins for this district
       const { data, error } = await supabase
         .from('spb_district_admins')
         .select('id')
@@ -72,22 +81,19 @@ export function useAuth() {
         .maybeSingle();
 
       if (error) {
-        console.error('[useAuth] Error checking district access:', error);
+        console.error('[AuthContext] Error checking district access:', error);
         return false;
       }
 
       return !!data;
     } catch (error) {
-      console.error('[useAuth] Exception checking district access:', error);
+      console.error('[AuthContext] Exception checking district access:', error);
       return false;
     }
   };
 
   /**
    * Sign in with email and password
-   * @param email - User email
-   * @param password - User password
-   * @returns Promise with auth response
    */
   const login = async (email: string, password: string) => {
     const response = await supabase.auth.signInWithPassword({
@@ -104,7 +110,6 @@ export function useAuth() {
 
   /**
    * Sign out current user
-   * @returns Promise with void
    */
   const logout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -114,10 +119,31 @@ export function useAuth() {
     }
   };
 
-  return {
+  const value: AuthContextValue = {
     ...authState,
     hasDistrictAccess,
     login,
     logout,
   };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+/**
+ * useAuth - Hook to access authentication state
+ *
+ * Must be used within an AuthProvider.
+ */
+export function useAuth(): AuthContextValue {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+
+  return context;
 }

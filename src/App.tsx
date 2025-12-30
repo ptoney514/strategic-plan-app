@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { SystemAdminLayout } from './layouts/SystemAdminLayout';
 import { ClientPublicLayout } from './layouts/ClientPublicLayout';
 import { ClientAdminLayout } from './layouts/ClientAdminLayout';
+import { ClientAdminEditorialLayout } from './layouts/ClientAdminEditorialLayout';
 
 // System Admin Pages
 import { SystemDashboard } from './pages/admin/SystemDashboard';
@@ -26,6 +27,7 @@ import { AdminSettings } from './pages/client/admin/AdminSettings';
 import { ObjectiveBuilder } from './pages/client/admin/ObjectiveBuilder';
 import { ImportWizard } from './pages/client/admin/ImportWizard';
 import { AdminSchools } from './pages/client/admin/AdminSchools';
+import { AdminDashboard2 } from './pages/client/admin/AdminDashboard2';
 
 // Auth Pages
 import { Login } from './pages/Login';
@@ -97,6 +99,15 @@ function App() {
           <Route path="schools" element={<AdminSchools />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="audit" element={<AdminAudit />} />
+        </Route>
+
+        {/* Client Admin v2 Routes - /:slug/admin2 (Editorial Design) */}
+        <Route path="/:slug/admin2" element={<ClientAdminGuard><ClientAdminEditorialLayout /></ClientAdminGuard>}>
+          <Route index element={<AdminDashboard2 />} />
+          <Route path="objectives" element={<AdminDashboard2 />} />
+          {/* Reuse existing ObjectiveBuilder for creating/editing */}
+          <Route path="objectives/new" element={<ObjectiveBuilder />} />
+          <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
         </Route>
 
         {/* Catch-all redirect to home */}

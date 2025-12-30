@@ -54,8 +54,9 @@ strategic-plan-vite/
 │   └── migrations/          # Database migrations
 ├── .claude/
 │   ├── agents/              # Sub-agents
+│   ├── commands/            # Slash commands (/pre-commit)
 │   └── config.json          # Agent configuration
-└── STATUS.md                # Current project status
+└── project_status.md        # Current project status
 ```
 
 ## Development Commands
@@ -120,6 +121,20 @@ Our testing strategy prioritizes **confidence over coverage**. Write tests that 
 - **Testing Library** for component tests
 - **ResizeObserver** mocked for Recharts
 - Tests mirror `src/` structure in `__tests__/`
+
+## Development Pattern: Tests-as-You-Go (Encouraged)
+
+When building features or fixing bugs, consider:
+1. Writing a test that specifies the behavior
+2. Implementing minimum code to pass
+3. Refactoring while keeping tests green
+
+### What to Test (When Practical)
+- User-facing behavior, not implementation details
+- Edge cases and error states
+- Integration points (API calls, database operations)
+
+Note: Tests encouraged but not strictly required for MVP pace. Focus on critical paths first.
 
 ## Performance Budgets
 
@@ -203,24 +218,9 @@ All features must meet **WCAG 2.1 Level AA** standards.
 - `SystemAdminGuard` - Protects system admin routes
 - Both show loading states and redirect properly
 
-## Current Phase
+## Current Focus
 
-**Phase**: Production Ready with Auth & Security
-
-**Active Focus**: Feature enhancements and user feedback incorporation
-
-**Recently Completed**:
-- ✅ Authentication system (Supabase Auth)
-- ✅ Row Level Security (RLS) policies
-- ✅ Modern login UI
-- ✅ TypeScript strict mode
-- ✅ Claude Code v2.0 setup
-
-**Next Priorities**:
-1. Zod validation for all forms
-2. Excel template download
-3. Bundle size optimization
-4. Code cleanup (lint errors)
+See [project_status.md](project_status.md) for current work and GitHub Issues for task tracking.
 
 ## Development Workflow
 
@@ -288,7 +288,7 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 ## Quick Reference
 
 ### Key Files
-- [STATUS.md](STATUS.md) - Current project status
+- [project_status.md](project_status.md) - Current project status
 - [src/lib/types.ts](src/lib/types.ts) - TypeScript interfaces
 - [src/lib/services/](src/lib/services/) - Business logic
 - [src/hooks/useAuth.ts](src/hooks/useAuth.ts) - Authentication hook
@@ -312,11 +312,10 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 
 ### Always Remember
 - ✅ Follow established patterns
-- ✅ Document significant changes in STATUS.md
+- ✅ Use `/pre-commit` before committing
 - ✅ Test locally before committing
 - ✅ Run pr-prep agent before creating PRs
-- ✅ Update STATUS.md weekly
 
 ---
 
-*For detailed project status, see [STATUS.md](STATUS.md)*
+*For detailed project status, see [project_status.md](project_status.md)*

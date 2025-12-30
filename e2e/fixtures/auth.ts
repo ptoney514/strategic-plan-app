@@ -1,4 +1,4 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, expect, Page } from '@playwright/test';
 import { LoginPage } from '../helpers/login-page';
 
 /**
@@ -10,13 +10,15 @@ import { LoginPage } from '../helpers/login-page';
 
 export const test = base.extend<{
   loginPage: LoginPage;
-  authenticatedPage: any;
+  authenticatedPage: Page;
 }>({
+   
   loginPage: async ({ page }, use) => {
     const loginPage = new LoginPage(page);
     await use(loginPage);
   },
 
+   
   authenticatedPage: async ({ page }, use) => {
     // TODO: Add authentication logic here
     // For now, pass through the page

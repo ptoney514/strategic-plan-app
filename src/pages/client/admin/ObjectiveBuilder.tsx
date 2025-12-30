@@ -5,19 +5,15 @@ import {
   Plus,
   Trash2,
   GripVertical,
-  Image as ImageIcon,
-  FileText,
   BarChart3,
   Users,
   Calendar,
-  DollarSign,
   Flag,
   AlertCircle,
   ChevronRight,
   Eye,
   Save,
   X,
-  TrendingUp,
   Edit2
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -26,7 +22,6 @@ import { GoalsService } from '../../../lib/services/goals.service';
 import { MetricsService } from '../../../lib/services/metrics.service';
 import type { Goal, Metric } from '../../../lib/types';
 import { MetricBuilderWizard } from '../../../components/MetricBuilderWizard';
-import { GoalBuilder } from '../../../components/GoalBuilder';
 import { useUpdateMetric, useDeleteMetric } from '../../../hooks/useMetrics';
 
 interface ComponentItem {
@@ -69,8 +64,6 @@ export function ObjectiveBuilder() {
   // Determine what we're editing: objectiveId for level 0, goalId for level 1+
   const editingId = objectiveId || goalId;
   const isEditMode = !!editingId;
-  const isEditingObjective = !!objectiveId; // true if editing via /objectives/:id/edit route
-
   const [editingLevel, setEditingLevel] = useState<0 | 1 | 2>(0);
   const [builderState, setBuilderState] = useState<BuilderState>({
     objective: {
@@ -89,8 +82,6 @@ export function ObjectiveBuilder() {
       visualBadge: true,
     },
   });
-  const [activeTab, setActiveTab] = useState<'objective' | 'goals'>('objective');
-  const [previewMode, setPreviewMode] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{
@@ -98,8 +89,6 @@ export function ObjectiveBuilder() {
     objectiveDescription?: string;
     goals?: { [key: number]: string };
   }>({});
-
-  const categories = [...new Set(AVAILABLE_COMPONENTS.map(c => c.category))];
 
   // Dynamic labels based on editing level
   const entityLabel = editingLevel === 0 ? 'Strategic Objective' : editingLevel === 1 ? 'Goal' : 'Sub-Goal';

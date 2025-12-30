@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Info, Plus, Trash2, GripVertical } from 'lucide-react';
-import { type VisualizationType, getDefaultConfig } from '../lib/metric-visualizations';
+import { type VisualizationType } from '../lib/metric-visualizations';
 import { NarrativeEditor } from './NarrativeEditor';
 
 interface MetricDataFormProps {

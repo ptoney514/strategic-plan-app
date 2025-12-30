@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 // Layouts
 import { SystemAdminLayout } from './layouts/SystemAdminLayout';
@@ -39,8 +40,9 @@ import { SchoolAdminGuard } from './middleware/SchoolAdminGuard';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <Routes>
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
 
@@ -112,8 +114,9 @@ function App() {
 
         {/* Catch-all redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </BrowserRouter>
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
 

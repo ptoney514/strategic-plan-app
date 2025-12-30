@@ -1,10 +1,13 @@
 import { supabase } from '../supabase';
 import type { Goal, HierarchicalGoal } from '../types';
 import { buildGoalHierarchy, getNextGoalNumber } from '../types';
+import { serviceLoggers } from '../utils/logger';
+
+const log = serviceLoggers.goals;
 
 export class GoalsService {
   static async getByDistrict(districtId: string): Promise<HierarchicalGoal[]> {
-    console.log('[GoalsService] Fetching goals for district:', districtId);
+    log.debug('Fetching goals for district:', districtId);
 
     const { data: goals, error } = await supabase
       .from('spb_goals')
@@ -16,37 +19,15 @@ export class GoalsService {
       .order('goal_number');
 
     if (error) {
-      console.error('[GoalsService] Error fetching goals:', error);
-      console.error('[GoalsService] Error details:', {
-        message: error.message,
-        details: error.details,
-        hint: error.hint,
-        code: error.code
-      });
+      log.error('Error fetching goals:', error);
       throw error;
     }
 
-    console.log('[GoalsService] Raw goals from DB:', goals?.map(g => ({
-      goal_number: g.goal_number,
-      id: g.id,
-      metrics_count: g.metrics?.length || 0,
-      level: g.level
-    })));
+    log.debug('Raw goals from DB:', goals?.length ?? 0, 'goals');
 
     const hierarchy = buildGoalHierarchy(goals || []);
 
-    console.log('[GoalsService] After buildGoalHierarchy:', hierarchy.map(g => ({
-      goal_number: g.goal_number,
-      metrics_count: g.metrics?.length || 0,
-      children: g.children?.map(c => ({
-        goal_number: c.goal_number,
-        metrics_count: c.metrics?.length || 0,
-        children: c.children?.map(gc => ({
-          goal_number: gc.goal_number,
-          metrics_count: gc.metrics?.length || 0
-        }))
-      }))
-    })));
+    log.debug('After buildGoalHierarchy:', hierarchy.length, 'top-level goals');
 
     return hierarchy;
   }

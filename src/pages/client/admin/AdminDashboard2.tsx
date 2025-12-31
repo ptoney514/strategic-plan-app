@@ -128,10 +128,10 @@ export function AdminDashboard2() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              to={`/${slug}/admin/objectives/new`}
+              to={`/${slug}/admin2/objectives/create`}
               className="bg-[#b85c38] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors"
             >
-              Create a new objective
+              Create new strategic objective
             </Link>
             <button className="w-10 h-10 rounded-lg border border-[#e8e6e1] bg-white text-[#4a4a4a] hover:bg-[#f5f3ef] transition-colors flex items-center justify-center">
               <MoreHorizontal className="h-[18px] w-[18px]" />
@@ -414,9 +414,13 @@ export function AdminDashboard2() {
 
                     {/* Title and Description - stacked vertically */}
                     <div className="flex-1 min-w-0 flex flex-col gap-1">
-                      <h3 className="text-[15px] font-bold text-[#1a1a1a] leading-snug" data-testid="objective-title">
+                      <Link
+                        to={`/${slug}/admin2/objectives/${objective.id}/edit`}
+                        className="text-[15px] font-bold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
+                        data-testid="objective-title"
+                      >
                         {objective.title?.split(':')[0]?.trim() || objective.title}
-                      </h3>
+                      </Link>
                       {(objective.description || objective.title?.includes(':')) && (
                         <p className="text-[13px] text-[#6a6a6a] leading-relaxed line-clamp-2" data-testid="objective-description">
                           {objective.description || objective.title?.split(':').slice(1).join(':').trim()}
@@ -426,9 +430,12 @@ export function AdminDashboard2() {
 
                     {/* Status Badge */}
                     <div className="flex items-center gap-2 px-3 py-1.5 border border-[#e8e6e1] rounded-md flex-shrink-0">
-                      <span className="w-2 h-2 rounded-full bg-[#6b8f71]"></span>
+                      <span
+                        className="w-2 h-2 rounded-full"
+                        style={{ backgroundColor: objective.indicator_color || '#6b8f71' }}
+                      ></span>
                       <span className="text-[12px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
-                        On Target
+                        {objective.indicator_text || 'On Target'}
                       </span>
                     </div>
                   </div>
@@ -476,9 +483,13 @@ export function AdminDashboard2() {
 
                               {/* Title and Description */}
                               <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                                <h4 className="text-[14px] font-semibold text-[#1a1a1a] leading-snug" data-testid="child-goal-title">
+                                <Link
+                                  to={`/${slug}/admin2/objectives/${child.id}/edit`}
+                                  className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
+                                  data-testid="child-goal-title"
+                                >
                                   {child.title?.split(':')[0]?.trim() || child.title}
-                                </h4>
+                                </Link>
                                 {(child.description || child.title?.includes(':')) && (
                                   <p className="text-[12px] text-[#6a6a6a] truncate" data-testid="child-goal-description">
                                     {child.description || child.title?.split(':').slice(1).join(':').trim()}
@@ -488,9 +499,12 @@ export function AdminDashboard2() {
 
                               {/* Status Badge */}
                               <div className="flex items-center gap-1.5 px-2 py-1 border border-[#e8e6e1] rounded flex-shrink-0">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#6b8f71]"></span>
+                                <span
+                                  className="w-1.5 h-1.5 rounded-full"
+                                  style={{ backgroundColor: child.indicator_color || '#6b8f71' }}
+                                ></span>
                                 <span className="text-[11px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
-                                  On Target
+                                  {child.indicator_text || 'On Target'}
                                 </span>
                               </div>
                             </div>
@@ -520,9 +534,13 @@ export function AdminDashboard2() {
 
                                     {/* Title and Description */}
                                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
-                                      <h5 className="text-[14px] font-semibold text-[#1a1a1a] leading-snug" data-testid="grandchild-goal-title">
+                                      <Link
+                                        to={`/${slug}/admin2/objectives/${grandchild.id}/edit`}
+                                        className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
+                                        data-testid="grandchild-goal-title"
+                                      >
                                         {grandchild.title?.split(':')[0]?.trim() || grandchild.title}
-                                      </h5>
+                                      </Link>
                                       {(grandchild.description || grandchild.title?.includes(':')) && (
                                         <p className="text-[12px] text-[#6a6a6a] truncate">
                                           {grandchild.description || grandchild.title?.split(':').slice(1).join(':').trim()}
@@ -532,9 +550,12 @@ export function AdminDashboard2() {
 
                                     {/* Status Badge */}
                                     <div className="flex items-center gap-1.5 px-2 py-1 border border-[#e8e6e1] rounded flex-shrink-0">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#6b8f71]"></span>
+                                      <span
+                                        className="w-1.5 h-1.5 rounded-full"
+                                        style={{ backgroundColor: grandchild.indicator_color || '#6b8f71' }}
+                                      ></span>
                                       <span className="text-[11px] font-semibold text-[#4a4a4a] uppercase tracking-wider">
-                                        On Target
+                                        {grandchild.indicator_text || 'On Target'}
                                       </span>
                                     </div>
                                   </div>

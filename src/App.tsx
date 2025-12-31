@@ -29,6 +29,8 @@ import { ObjectiveBuilder } from './pages/client/admin/ObjectiveBuilder';
 import { ImportWizard } from './pages/client/admin/ImportWizard';
 import { AdminSchools } from './pages/client/admin/AdminSchools';
 import { AdminDashboard2 } from './pages/client/admin/AdminDashboard2';
+import { CreateObjective } from './pages/client/admin/CreateObjective';
+import { EditObjective } from './pages/client/admin/EditObjective';
 
 // Auth Pages
 import { Login } from './pages/Login';
@@ -107,9 +109,9 @@ function App() {
         <Route path="/:slug/admin2" element={<ClientAdminGuard><ClientAdminEditorialLayout /></ClientAdminGuard>}>
           <Route index element={<AdminDashboard2 />} />
           <Route path="objectives" element={<AdminDashboard2 />} />
-          {/* Reuse existing ObjectiveBuilder for creating/editing */}
+          <Route path="objectives/create" element={<CreateObjective />} />
           <Route path="objectives/new" element={<ObjectiveBuilder />} />
-          <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
+          <Route path="objectives/:objectiveId/edit" element={<EditObjective />} />
         </Route>
 
         {/* Catch-all redirect to home */}

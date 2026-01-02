@@ -22,6 +22,8 @@ import {
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals, useCreateGoal } from '../../../hooks/useGoals';
 import { GoalEditor, type GoalFormData, type MetricFormData } from '../../../components/admin/GoalEditor';
+import { SlideoverPanel } from '../../../components/ui/SlideoverPanel';
+import { Target } from 'lucide-react';
 
 // Stored goal with all its data
 interface StoredGoal {
@@ -214,9 +216,10 @@ export function CreateObjective() {
           {/* Main Form */}
           <div className="flex-1 flex flex-col gap-6">
             {/* Title Field */}
-            <div className="bg-white border border-[#e8e6e1] rounded-xl p-5">
-              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-                What is your strategic objective? (Title)
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
+              <label className="block text-[15px] font-bold text-[#1a1a1a] mb-3">
+                What is your strategic objective?
+                <span className="ml-2 text-[12px] font-medium text-[#10b981]">(Title)</span>
               </label>
               <input
                 type="text"
@@ -228,9 +231,10 @@ export function CreateObjective() {
             </div>
 
             {/* Description Field */}
-            <div className="bg-white border border-[#e8e6e1] rounded-xl p-5">
-              <label className="block text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide mb-2">
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
+              <label className="block text-[15px] font-bold text-[#1a1a1a] mb-3">
                 Description
+                <span className="ml-2 text-[12px] font-normal text-[#6a6a6a]">(optional)</span>
               </label>
               <textarea
                 value={description}
@@ -248,11 +252,11 @@ export function CreateObjective() {
             <div className="bg-white border border-[#e8e6e1] rounded-xl overflow-hidden">
               <button
                 onClick={() => setGoalsExpanded(!goalsExpanded)}
-                className="w-full px-5 py-4 flex items-center justify-between hover:bg-[#fafaf8] transition-colors"
+                className="w-full px-6 py-5 flex items-center justify-between hover:bg-[#fafaf8] transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Plus className="h-4 w-4 text-[#8a8a8a]" />
-                  <span className="text-[14px] font-semibold text-[#1a1a1a]">Goals</span>
+                  <Plus className="h-5 w-5 text-[#10b981]" />
+                  <span className="text-[15px] font-bold text-[#1a1a1a]">Goals</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[13px] text-[#8a8a8a] bg-[#f5f3ef] px-2 py-0.5 rounded">
@@ -267,7 +271,7 @@ export function CreateObjective() {
               </button>
 
               {goalsExpanded && (
-                <div className="px-5 pb-5 border-t border-[#e8e6e1]">
+                <div className="px-6 pb-6 border-t border-[#e8e6e1]">
                   <div className="flex flex-col gap-3 mt-4">
                     {/* Existing Goals List */}
                     {goals.map((goal, index) => (
@@ -330,81 +334,28 @@ export function CreateObjective() {
                       </div>
                     ))}
 
-                    {/* Inline Goal Editor */}
-                    {showGoalEditor && (
-                      <div className="mt-2">
-                        <GoalEditor
-                          districtId={district?.id || ''}
-                          parentObjectiveTitle={title || 'New Objective'}
-                          existingGoals={existingGoals || []}
-                          existingGoal={
-                            editingGoalIndex !== null
-                              ? {
-                                  id: goals[editingGoalIndex].id,
-                                  district_id: district?.id || '',
-                                  parent_id: null,
-                                  goal_number: '',
-                                  title: goals[editingGoalIndex].data.title,
-                                  description: goals[editingGoalIndex].data.description,
-                                  level: 1,
-                                  order_position: editingGoalIndex,
-                                  created_at: '',
-                                  updated_at: '',
-                                  indicator_text: goals[editingGoalIndex].data.indicator_text,
-                                  indicator_color: goals[editingGoalIndex].data.indicator_color,
-                                  start_date: goals[editingGoalIndex].data.start_date,
-                                  end_date: goals[editingGoalIndex].data.end_date,
-                                  show_progress_bar: goals[editingGoalIndex].data.show_progress_bar,
-                                  is_public: goals[editingGoalIndex].data.is_public,
-                                  metrics: goals[editingGoalIndex].metrics.map((m, i) => ({
-                                    id: m.id || `temp-${i}`,
-                                    goal_id: goals[editingGoalIndex].id,
-                                    district_id: district?.id || '',
-                                    metric_name: m.name,
-                                    name: m.name,
-                                    description: m.description,
-                                    metric_type: m.metric_type,
-                                    current_value: m.current_value ?? undefined,
-                                    target_value: m.target_value ?? undefined,
-                                    unit: m.unit,
-                                    visualization_type: m.visualization_type,
-                                    visualization_config: m.visualization_config,
-                                    frequency: 'quarterly',
-                                    aggregation_method: 'latest',
-                                  })),
-                                }
-                              : undefined
-                          }
-                          onSave={handleSaveGoal}
-                          onCancel={() => {
-                            setShowGoalEditor(false);
-                            setEditingGoalIndex(null);
-                          }}
-                        />
-                      </div>
-                    )}
-
                     {/* Add Goal Button */}
-                    {!showGoalEditor && (
-                      <button
-                        onClick={() => setShowGoalEditor(true)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#e8e6e1] rounded-lg text-[13px] font-medium text-[#8a8a8a] hover:border-[#10b981] hover:text-[#10b981] hover:bg-[#f0fdf4] transition-colors"
-                      >
-                        <Plus className="h-4 w-4" />
-                        Add Goal
-                      </button>
-                    )}
+                    <button
+                      onClick={() => {
+                        setEditingGoalIndex(null);
+                        setShowGoalEditor(true);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#e8e6e1] rounded-lg text-[13px] font-medium text-[#8a8a8a] hover:border-[#10b981] hover:text-[#10b981] hover:bg-[#f0fdf4] transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add Goal
+                    </button>
                   </div>
                 </div>
               )}
             </div>
 
             {/* Visual Badge Section */}
-            <div className="bg-white border border-[#e8e6e1] rounded-xl p-5">
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <Layers className="h-4 w-4 text-[#8a8a8a]" />
-                  <span className="text-[14px] font-semibold text-[#1a1a1a]">Visual Badge</span>
+                  <Layers className="h-5 w-5 text-[#10b981]" />
+                  <span className="text-[15px] font-bold text-[#1a1a1a]">Visual Badge</span>
                 </div>
                 <button
                   onClick={() => setShowVisualBadge(!showVisualBadge)}
@@ -488,13 +439,13 @@ export function CreateObjective() {
             </div>
 
             {/* Progress Bar Section */}
-            <div className="bg-white border border-[#e8e6e1] rounded-xl p-5">
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <TrendingUp className="h-4 w-4 text-[#8a8a8a]" />
+                  <TrendingUp className="h-5 w-5 text-[#10b981]" />
                   <div>
-                    <span className="text-[14px] font-semibold text-[#1a1a1a]">Progress Bar</span>
-                    <p className="text-[11px] text-[#8a8a8a]">Display an overall progress indicator</p>
+                    <span className="text-[15px] font-bold text-[#1a1a1a]">Progress Bar</span>
+                    <p className="text-[12px] text-[#6a6a6a]">Display an overall progress indicator</p>
                   </div>
                 </div>
                 <button
@@ -513,11 +464,11 @@ export function CreateObjective() {
             </div>
 
             {/* Visibility Section */}
-            <div className="bg-white border border-[#e8e6e1] rounded-xl p-5">
-              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-1">
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
+              <label className="block text-[15px] font-bold text-[#1a1a1a] mb-1">
                 Who can see this strategic objective?
               </label>
-              <p className="text-[12px] text-[#6a6a6a] mb-3">
+              <p className="text-[13px] text-[#6a6a6a] mb-4">
                 Public objectives are visible on your district's public dashboard.
               </p>
               <div className="flex gap-2">
@@ -549,8 +500,8 @@ export function CreateObjective() {
             </div>
 
             {/* Date Range Section */}
-            <div className="bg-white border border-[#e8e6e1] rounded-xl p-5">
-              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-3">
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
+              <label className="block text-[15px] font-bold text-[#1a1a1a] mb-4">
                 When does this strategic objective start and end?
               </label>
               <div className="flex gap-3">
@@ -620,6 +571,76 @@ export function CreateObjective() {
           </div>
         </div>
       </div>
+
+      {/* Goal Editor Slideover */}
+      <SlideoverPanel
+        isOpen={showGoalEditor}
+        onClose={() => {
+          setShowGoalEditor(false);
+          setEditingGoalIndex(null);
+        }}
+        title={editingGoalIndex !== null ? 'Edit Goal' : 'Add New Goal'}
+        subtitle={`Under: ${title || 'New Objective'}`}
+        icon={
+          <div className="w-10 h-10 flex items-center justify-center bg-[#d1fae5] rounded-lg">
+            <Target className="h-5 w-5 text-[#10b981]" />
+          </div>
+        }
+        width="xl"
+      >
+        <GoalEditor
+          districtId={district?.id || ''}
+          parentObjectiveTitle={title || 'New Objective'}
+          existingGoals={existingGoals || []}
+          existingGoal={
+            editingGoalIndex !== null
+              ? {
+                  id: goals[editingGoalIndex].id,
+                  district_id: district?.id || '',
+                  parent_id: null,
+                  goal_number: '',
+                  title: goals[editingGoalIndex].data.title,
+                  description: goals[editingGoalIndex].data.description,
+                  level: 1,
+                  order_position: editingGoalIndex,
+                  created_at: '',
+                  updated_at: '',
+                  indicator_text: goals[editingGoalIndex].data.indicator_text,
+                  indicator_color: goals[editingGoalIndex].data.indicator_color,
+                  start_date: goals[editingGoalIndex].data.start_date,
+                  end_date: goals[editingGoalIndex].data.end_date,
+                  show_progress_bar: goals[editingGoalIndex].data.show_progress_bar,
+                  is_public: goals[editingGoalIndex].data.is_public,
+                  metrics: goals[editingGoalIndex].metrics.map((m, i) => ({
+                    id: m.id || `temp-${i}`,
+                    goal_id: goals[editingGoalIndex].id,
+                    district_id: district?.id || '',
+                    metric_name: m.name,
+                    name: m.name,
+                    description: m.description,
+                    metric_type: m.metric_type,
+                    current_value: m.current_value ?? undefined,
+                    target_value: m.target_value ?? undefined,
+                    unit: m.unit,
+                    visualization_type: m.visualization_type,
+                    visualization_config: m.visualization_config,
+                    frequency: 'quarterly',
+                    aggregation_method: 'latest',
+                  })),
+                }
+              : undefined
+          }
+          onSave={async (goalData, metrics) => {
+            await handleSaveGoal(goalData, metrics);
+            setShowGoalEditor(false);
+            setEditingGoalIndex(null);
+          }}
+          onCancel={() => {
+            setShowGoalEditor(false);
+            setEditingGoalIndex(null);
+          }}
+        />
+      </SlideoverPanel>
     </div>
   );
 }

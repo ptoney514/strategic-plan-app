@@ -86,6 +86,7 @@ export interface Goal {
   indicator_color?: string;
   image_url?: string;
   header_color?: string;
+  color?: 'red' | 'blue' | 'amber' | 'green';  // Theme color for objective cards
   show_progress_bar?: boolean;
   children?: Goal[];
   metrics?: Metric[];

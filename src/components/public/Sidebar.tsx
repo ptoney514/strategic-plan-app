@@ -27,6 +27,21 @@ function getStatusTextColor(progress: number | null | undefined): string {
   return 'text-red-600';
 }
 
+// Local logo mapping for districts (can be moved to R2/CDN later)
+const districtLogos: Record<string, string> = {
+  westside: '/assets/districts/westside-logo.png',
+};
+
+// Get logo URL - prefers local file, falls back to database logo_url
+function getLogoUrl(district: District, slug: string): string | null {
+  // Check for local logo first
+  if (slug && districtLogos[slug]) {
+    return districtLogos[slug];
+  }
+  // Fall back to database logo_url
+  return district.logo_url || null;
+}
+
 interface SidebarProps {
   district: District;
   objectives: Goal[];
@@ -258,13 +273,16 @@ function SidebarContent({
       {/* Logo Area */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 h-16 flex items-center">
         <Link to={`/${slug}`} className="flex items-center gap-3" onClick={onItemClick}>
-          {district.logo_url ? (
-            <img src={district.logo_url} alt={district.name} className="w-8 h-8 object-contain" />
-          ) : (
-            <div className="w-8 h-8 rounded bg-district-red flex items-center justify-center text-white font-display font-semibold text-sm">
-              {district.name.charAt(0)}
-            </div>
-          )}
+          {(() => {
+            const logoUrl = getLogoUrl(district, slug || '');
+            return logoUrl ? (
+              <img src={logoUrl} alt={district.name} className="w-8 h-8 object-contain" />
+            ) : (
+              <div className="w-8 h-8 rounded bg-district-red flex items-center justify-center text-white font-display font-semibold text-sm">
+                {district.name.charAt(0)}
+              </div>
+            );
+          })()}
           <div className="flex flex-col">
             <span className="font-display font-semibold text-sm tracking-tight text-gray-900 leading-none truncate max-w-[180px]">
               {district.name.split(' ')[0].toUpperCase()}

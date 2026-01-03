@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, Link, useLocation } from 'react-router-dom';
 import { useGoal, useChildGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
-import { StatusBadge, calculateStatus, GoalCardWithMetrics, MobileGoalCarousel } from '../../../components/public';
+import { StatusBadge, GoalCardWithMetrics, MobileGoalCarousel } from '../../../components/public';
+import type { StatusType } from '../../../components/public/StatusBadge';
 import { FolderOpen } from 'lucide-react';
 import type { District, Goal, Metric } from '../../../lib/types';
 
@@ -120,7 +121,7 @@ export function ObjectiveDetail() {
             <div className="h-1 bg-gray-100 rounded w-24" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[1, 2, 3, 4, 5, 6].map(i => (
             <div key={i} className="h-64 bg-gray-100 rounded-xl" />
           ))}
@@ -142,7 +143,6 @@ export function ObjectiveDetail() {
 
   const color = getColor(objective, objectiveIndex);
   const colors = colorConfig[color];
-  const status = calculateStatus(objective.overall_progress);
 
   // Get child goals (Level 1) and sort by goal_number
   const level1Goals = (childGoals?.filter(g => g.level === 1) || []).sort((a, b) => {
@@ -150,6 +150,17 @@ export function ObjectiveDetail() {
     const bNum = parseFloat(b.goal_number?.replace(/[^\d.]/g, '') || '0');
     return aNum - bNum;
   });
+
+  // Helper to get manual status set by admin (stored in overall_progress_custom_value)
+  const getManualStatus = (goal: Goal): StatusType => {
+    const validStatuses = ['on-target', 'needs-attention', 'off-track', 'not-started', 'on-track', 'complete'];
+    const manualStatus = goal.overall_progress_custom_value?.toLowerCase().replace(/\s+/g, '-');
+    return validStatuses.includes(manualStatus || '')
+      ? (manualStatus as StatusType)
+      : 'not-started';
+  };
+
+  const status = getManualStatus(objective);
 
   // Get Level 2 goals (sub-goals)
   const level2Goals = childGoals?.filter(g => g.level === 2) || [];
@@ -213,7 +224,7 @@ export function ObjectiveDetail() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {level1Goals.map(goal => {
               const subGoals = getSubGoals(goal.id);
 
@@ -251,7 +262,7 @@ export function ObjectiveDetail() {
                                   <h4 className="text-xs font-semibold text-gray-900 line-clamp-2">
                                     {subGoal.title}
                                   </h4>
-                                  <StatusBadge status={calculateStatus(subGoal.overall_progress)} size="sm" />
+                                  <StatusBadge status={getManualStatus(subGoal)} size="sm" />
                                 </div>
                               </div>
                             </div>

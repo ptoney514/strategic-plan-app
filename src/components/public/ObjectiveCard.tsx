@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { ChevronRight, Target, BarChart3 } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
-import { StatusBadge, calculateStatus } from './StatusBadge';
+import { StatusBadge } from './StatusBadge';
 
 interface ObjectiveCardProps {
   objective: Goal;
@@ -56,8 +56,13 @@ export function ObjectiveCard({ objective, childGoals, metrics, index }: Objecti
   // Find hero metric (first metric with is_primary flag, or first metric)
   const heroMetric = objectiveMetrics.find(m => m.is_primary) || objectiveMetrics[0];
 
-  // Calculate status
-  const status = calculateStatus(objective.overall_progress);
+  // Get manual status set by admin (stored in overall_progress_custom_value)
+  // Valid values: 'on-target', 'needs-attention', 'off-track', 'not-started'
+  const validStatuses = ['on-target', 'needs-attention', 'off-track', 'not-started', 'on-track', 'complete'];
+  const manualStatus = objective.overall_progress_custom_value?.toLowerCase().replace(/\s+/g, '-');
+  const status = validStatuses.includes(manualStatus || '')
+    ? (manualStatus as 'on-target' | 'needs-attention' | 'off-track' | 'not-started')
+    : 'not-started';
 
   // Format hero metric value
   const formatMetricValue = (metric: Metric) => {

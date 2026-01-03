@@ -1,5 +1,4 @@
 import type { Goal } from '../../lib/types';
-import { calculateStatus } from './StatusBadge';
 
 interface NarrativeHeroProps {
   objectives: Goal[];
@@ -10,11 +9,14 @@ export function NarrativeHero({
   objectives,
   planTitle = 'Our Strategic Plan',
 }: NarrativeHeroProps) {
-  // Calculate status summary
+  // Valid status values for manual status
+  const onTargetStatuses = ['on-target', 'on-track', 'complete'];
+
+  // Count objectives with "on target" status (manual status set by admin)
   const statusCounts = objectives.reduce(
     (acc, obj) => {
-      const status = calculateStatus(obj.overall_progress);
-      if (status === 'on-target' || status === 'on-track' || status === 'complete') {
+      const manualStatus = obj.overall_progress_custom_value?.toLowerCase().replace(/\s+/g, '-');
+      if (manualStatus && onTargetStatuses.includes(manualStatus)) {
         acc.onTarget++;
       }
       return acc;

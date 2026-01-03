@@ -3,30 +3,6 @@ import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Calendar, X } from 'lucide-react';
 import type { District, Goal } from '../../lib/types';
 
-// Get status dot color based on progress
-function getStatusDotColor(progress: number | null | undefined): string {
-  if (progress === null || progress === undefined) return 'bg-gray-400';
-  if (progress >= 80) return 'bg-green-500';
-  if (progress >= 50) return 'bg-amber-500';
-  return 'bg-red-500';
-}
-
-// Get status label based on progress
-function getStatusLabel(progress: number | null | undefined): string {
-  if (progress === null || progress === undefined) return 'Not Started';
-  if (progress >= 80) return 'On Target';
-  if (progress >= 50) return 'Needs Attention';
-  return 'Off Track';
-}
-
-// Get status text color based on progress
-function getStatusTextColor(progress: number | null | undefined): string {
-  if (progress === null || progress === undefined) return 'text-gray-500';
-  if (progress >= 80) return 'text-green-600';
-  if (progress >= 50) return 'text-amber-600';
-  return 'text-red-600';
-}
-
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
   westside: '/assets/districts/westside-logo.png',
@@ -375,13 +351,6 @@ function SidebarContent({
                               isExpanded ? 'rotate-90' : ''
                             } ${isActive ? `text-${color}-300` : 'text-gray-400'}`}
                           />
-                        </div>
-                        {/* Status indicator */}
-                        <div className="flex items-center gap-1.5 mt-1">
-                          <span className={`w-1.5 h-1.5 rounded-full ${getStatusDotColor(objective.overall_progress)}`} />
-                          <span className={`text-[10px] font-medium ${getStatusTextColor(objective.overall_progress)}`}>
-                            {getStatusLabel(objective.overall_progress)}
-                          </span>
                         </div>
                       </div>
                     </button>

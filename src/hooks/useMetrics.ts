@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { MetricsService } from '../lib/services';
-import type { Metric } from '../lib/types';
+import { MetricsService, MetricTimeSeriesService } from '../lib/services';
+import type { Metric, MetricTimeSeries } from '../lib/types';
 
 export function useMetrics(goalId: string) {
   return useQuery({
@@ -93,12 +93,29 @@ export function useBulkUpdateMetrics() {
 
 export function useReorderMetrics() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: (metrics: { id: string; display_order: number }[]) => 
+    mutationFn: (metrics: { id: string; display_order: number }[]) =>
       MetricsService.reorder(metrics),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['metrics'] });
     },
+  });
+}
+
+// Time series hooks
+export function useMetricTimeSeries(metricId: string) {
+  return useQuery({
+    queryKey: ['metric-time-series', metricId],
+    queryFn: () => MetricTimeSeriesService.getByMetricId(metricId),
+    enabled: !!metricId,
+  });
+}
+
+export function useMetricChartData(metricId: string, limit: number = 12) {
+  return useQuery({
+    queryKey: ['metric-chart-data', metricId, limit],
+    queryFn: () => MetricTimeSeriesService.getChartData(metricId, undefined, limit),
+    enabled: !!metricId,
   });
 }

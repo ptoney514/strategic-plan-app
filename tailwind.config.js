@@ -6,6 +6,10 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Sora', 'system-ui', 'sans-serif'],
+      },
       colors: {
         background: 'var(--color-background)',
         foreground: 'var(--color-foreground)',
@@ -28,6 +32,17 @@ export default {
         border: 'var(--color-border)',
         input: 'var(--color-input)',
         ring: 'var(--color-ring)',
+        // District theme colors for public pages
+        district: {
+          red: '#B91C1C',
+          'red-light': '#FEE2E2',
+          blue: '#2563EB',
+          'blue-light': '#DBEAFE',
+          green: '#059669',
+          'green-light': '#D1FAE5',
+          amber: '#D97706',
+          'amber-light': '#FEF3C7',
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',

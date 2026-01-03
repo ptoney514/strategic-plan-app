@@ -6,6 +6,7 @@ import { SystemAdminLayout } from './layouts/SystemAdminLayout';
 import { ClientPublicLayout } from './layouts/ClientPublicLayout';
 import { ClientAdminLayout } from './layouts/ClientAdminLayout';
 import { ClientAdminEditorialLayout } from './layouts/ClientAdminEditorialLayout';
+import { PublicLayout } from './layouts/PublicLayout';
 
 // System Admin Pages
 import { SystemDashboard } from './pages/admin/SystemDashboard';
@@ -18,6 +19,11 @@ import { DistrictDashboard } from './pages/client/public/DistrictDashboard';
 import { GoalDetail } from './pages/client/public/GoalDetail';
 import { MetricsDashboard } from './pages/client/public/MetricsDashboard';
 import { SchoolsDirectory } from './pages/client/public/SchoolsDirectory';
+
+// New Public Pages (sidebar design)
+import { Dashboard } from './pages/client/public/Dashboard';
+import { GoalDetailNew } from './pages/client/public/GoalDetailNew';
+import { ObjectiveDetail } from './pages/client/public/ObjectiveDetail';
 
 // Client Admin Pages
 import { AdminDashboard } from './pages/client/admin/AdminDashboard';
@@ -57,16 +63,25 @@ function App() {
           <Route path="settings" element={<SystemSettings />} />
         </Route>
 
-        {/* Client Public Routes - /:slug */}
-        {/* Landing page without layout (has its own header/footer) */}
-        <Route path="/:slug" element={<DistrictLandingPage />} />
-
-        {/* Dashboard pages with layout */}
-        <Route path="/:slug" element={<ClientPublicLayout />}>
-          <Route path="goals" element={<DistrictDashboard />} />
-          <Route path="goals/:goalId" element={<GoalDetail />} />
-          <Route path="metrics" element={<MetricsDashboard />} />
+        {/* Client Public Routes - /:slug (New sidebar design) */}
+        <Route path="/:slug" element={<PublicLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="overview" element={<Dashboard />} />
+          <Route path="objective/:goalId" element={<ObjectiveDetail />} />
+          <Route path="goal/:goalId" element={<GoalDetailNew />} />
         </Route>
+
+        {/* Legacy Client Public Routes - /:slug/goals (Old design - kept for compatibility) */}
+        <Route path="/:slug/goals" element={<ClientPublicLayout />}>
+          <Route index element={<DistrictDashboard />} />
+          <Route path=":goalId" element={<GoalDetail />} />
+        </Route>
+        <Route path="/:slug/metrics" element={<ClientPublicLayout />}>
+          <Route index element={<MetricsDashboard />} />
+        </Route>
+
+        {/* Old Landing page route (redirect to new design) */}
+        <Route path="/:slug/landing" element={<DistrictLandingPage />} />
 
         {/* School Routes - /:slug/schools */}
         {/* Schools directory (list of all schools) */}

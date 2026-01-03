@@ -28,11 +28,7 @@ export function Dashboard() {
   return (
     <div>
       {/* Narrative Hero Section */}
-      <NarrativeHero
-        district={district}
-        objectives={objectives}
-        metrics={metrics || []}
-      />
+      <NarrativeHero objectives={objectives} />
 
       {/* Objectives Grid */}
       {metricsLoading ? (

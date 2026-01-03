@@ -34,6 +34,7 @@ import { AdminSettings } from './pages/client/admin/AdminSettings';
 import { ObjectiveBuilder } from './pages/client/admin/ObjectiveBuilder';
 import { ImportWizard } from './pages/client/admin/ImportWizard';
 import { AdminSchools } from './pages/client/admin/AdminSchools';
+import { DataManager } from './pages/client/admin/DataManager';
 import { AdminDashboard2 } from './pages/client/admin/AdminDashboard2';
 import { CreateObjective } from './pages/client/admin/CreateObjective';
 import { EditObjective } from './pages/client/admin/EditObjective';
@@ -115,6 +116,7 @@ function App() {
           <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
           <Route path="goals/:goalId/edit" element={<ObjectiveBuilder />} />
           <Route path="import" element={<ImportWizard />} />
+          <Route path="data-manager" element={<DataManager />} />
           <Route path="schools" element={<AdminSchools />} />
           <Route path="settings" element={<AdminSettings />} />
           <Route path="audit" element={<AdminAudit />} />

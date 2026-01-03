@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Calendar, X } from 'lucide-react';
 import type { District, Goal } from '../../lib/types';
 
@@ -77,19 +77,61 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
   const { slug, goalId } = useParams();
   const location = useLocation();
   const [expandedObjective, setExpandedObjective] = useState<string | null>(null);
+  const [expandedGoals, setExpandedGoals] = useState<Set<string>>(new Set());
 
-  // Determine which objective should be expanded based on current route
-  const currentGoal = goals.find(g => g.id === goalId);
-  const currentObjectiveId = currentGoal?.parent_id || currentGoal?.id;
+  // Helper to get direct children of any goal
+  const getChildGoals = (parentId: string) => {
+    return goals.filter(g => g.parent_id === parentId);
+  };
 
-  // Auto-expand objective when viewing a goal
-  if (currentObjectiveId && expandedObjective !== currentObjectiveId) {
-    // Find if current goal is an objective or child of objective
-    const objective = objectives.find(o => o.id === currentObjectiveId || o.id === currentGoal?.parent_id);
-    if (objective && expandedObjective !== objective.id) {
-      setExpandedObjective(objective.id);
+  // Auto-expand ancestors when viewing a goal (useEffect to prevent infinite re-renders)
+  useEffect(() => {
+    if (!goalId || goals.length === 0) return;
+
+    // Find ancestry of current goal
+    const findAncestry = (id: string): string[] => {
+      const ancestry: string[] = [];
+      let current = goals.find(g => g.id === id);
+      while (current) {
+        ancestry.unshift(current.id);
+        current = goals.find(g => g.id === current?.parent_id);
+      }
+      return ancestry;
+    };
+
+    const ancestry = findAncestry(goalId);
+
+    // Find the Level 0 ancestor (objective)
+    const objectiveId = ancestry.find(id => {
+      const goal = goals.find(g => g.id === id);
+      return goal?.level === 0;
+    });
+
+    // Find Level 1 ancestor (goal)
+    const level1Id = ancestry.find(id => {
+      const goal = goals.find(g => g.id === id);
+      return goal?.level === 1;
+    });
+
+    if (objectiveId) {
+      setExpandedObjective(objectiveId);
     }
-  }
+    if (level1Id) {
+      setExpandedGoals(prev => new Set([...prev, level1Id]));
+    }
+  }, [goalId, goals]);
+
+  const toggleGoalExpanded = (id: string) => {
+    setExpandedGoals(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
 
   const isOverviewActive = location.pathname === `/${slug}` || location.pathname === `/${slug}/overview`;
 
@@ -103,6 +145,9 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
           goals={goals}
           expandedObjective={expandedObjective}
           setExpandedObjective={setExpandedObjective}
+          expandedGoals={expandedGoals}
+          toggleGoalExpanded={toggleGoalExpanded}
+          getChildGoals={getChildGoals}
           isOverviewActive={isOverviewActive}
           currentGoalId={goalId}
           isLoading={isLoading}
@@ -133,6 +178,9 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
           goals={goals}
           expandedObjective={expandedObjective}
           setExpandedObjective={setExpandedObjective}
+          expandedGoals={expandedGoals}
+          toggleGoalExpanded={toggleGoalExpanded}
+          getChildGoals={getChildGoals}
           isOverviewActive={isOverviewActive}
           currentGoalId={goalId}
           onItemClick={onClose}
@@ -152,6 +200,9 @@ interface SidebarContentProps {
   goals: Goal[];
   expandedObjective: string | null;
   setExpandedObjective: (id: string | null) => void;
+  expandedGoals: Set<string>;
+  toggleGoalExpanded: (goalId: string) => void;
+  getChildGoals: (parentId: string) => Goal[];
   isOverviewActive: boolean;
   currentGoalId?: string;
   onItemClick?: () => void;
@@ -161,19 +212,45 @@ interface SidebarContentProps {
 function SidebarContent({
   district,
   objectives,
-  goals,
   expandedObjective,
   setExpandedObjective,
+  expandedGoals,
+  toggleGoalExpanded,
+  getChildGoals,
   isOverviewActive,
   currentGoalId,
   onItemClick,
   isLoading,
 }: SidebarContentProps) {
   const { slug } = useParams();
+  const navigate = useNavigate();
 
-  // Get child goals for an objective
-  const getChildGoals = (objectiveId: string) => {
-    return goals.filter(g => g.parent_id === objectiveId && g.level === 1);
+  // Handle objective click - navigate and expand
+  const handleObjectiveClick = (objectiveId: string, isCurrentlyActive: boolean) => {
+    // If clicking on already active objective, just toggle expand/collapse
+    if (isCurrentlyActive) {
+      setExpandedObjective(expandedObjective === objectiveId ? null : objectiveId);
+    } else {
+      // Navigate to the objective detail page and expand
+      navigate(`/${slug}/objective/${objectiveId}`);
+      setExpandedObjective(objectiveId);
+      // Call onItemClick for mobile to close drawer
+      onItemClick?.();
+    }
+  };
+
+  // Handle Level 1 goal click - navigate and expand
+  const handleGoalClick = (goalId: string, isCurrentlyActive: boolean) => {
+    // If clicking on already active goal, just toggle expand/collapse
+    if (isCurrentlyActive) {
+      toggleGoalExpanded(goalId);
+    } else {
+      // Navigate to the goal detail page and expand
+      navigate(`/${slug}/goal/${goalId}`);
+      toggleGoalExpanded(goalId);
+      // Call onItemClick for mobile to close drawer
+      onItemClick?.();
+    }
   };
 
   return (
@@ -251,7 +328,8 @@ function SidebarContent({
                   <div key={objective.id} className="group">
                     {/* Objective Header */}
                     <button
-                      onClick={() => setExpandedObjective(isExpanded ? null : objective.id)}
+                      onClick={() => handleObjectiveClick(objective.id, isActive)}
+                      data-testid={`objective-${objective.goal_number}`}
                       className={`relative w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
                         isActive ? `${colors.bg} ${colors.text}` : 'text-gray-600 hover:bg-gray-50'
                       }`}
@@ -268,7 +346,10 @@ function SidebarContent({
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <span className={`truncate ${isActive ? colors.text : ''}`}>
+                          <span
+                            className={`truncate ${isActive ? colors.text : ''}`}
+                            title={objective.title}
+                          >
                             {objective.title}
                           </span>
                           <ChevronRight
@@ -287,26 +368,85 @@ function SidebarContent({
                       </div>
                     </button>
 
-                    {/* Child Goals (Expanded) */}
+                    {/* Child Goals - Level 1 (Expanded) */}
                     {isExpanded && childGoals.length > 0 && (
                       <div className="pl-4 pr-1 mt-1 space-y-0.5">
                         <div className="relative">
                           <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200" />
                           {childGoals.map(goal => {
                             const isGoalActive = currentGoalId === goal.id;
+                            const level2Children = getChildGoals(goal.id);
+                            const hasChildren = level2Children.length > 0;
+                            const isGoalExpanded = expandedGoals.has(goal.id);
+
                             return (
-                              <Link
-                                key={goal.id}
-                                to={`/${slug}/goal/${goal.id}`}
-                                onClick={onItemClick}
-                                className={`block pl-6 py-2 text-xs font-medium rounded-md transition-colors ${
-                                  isGoalActive
-                                    ? `${colors.text} ${colors.bg}/50`
-                                    : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                                }`}
-                              >
-                                {goal.goal_number} {goal.title}
-                              </Link>
+                              <div key={goal.id}>
+                                {/* Level 1 goal row */}
+                                {hasChildren ? (
+                                  <button
+                                    onClick={() => handleGoalClick(goal.id, isGoalActive)}
+                                    className={`w-full flex items-center justify-between pl-6 pr-2 py-2 text-xs font-medium rounded-md transition-colors text-left ${
+                                      isGoalActive
+                                        ? `${colors.text} ${colors.bg}/50`
+                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                                    }`}
+                                    title={`${goal.goal_number} ${goal.title}`}
+                                  >
+                                    <span className="truncate">
+                                      {goal.goal_number} {goal.title}
+                                    </span>
+                                    <ChevronRight
+                                      className={`w-3 h-3 flex-shrink-0 ml-1 transition-transform ${
+                                        isGoalExpanded ? 'rotate-90' : ''
+                                      } text-gray-400`}
+                                    />
+                                  </button>
+                                ) : (
+                                  <Link
+                                    to={`/${slug}/goal/${goal.id}`}
+                                    onClick={onItemClick}
+                                    className={`block pl-6 py-2 text-xs font-medium rounded-md transition-colors ${
+                                      isGoalActive
+                                        ? `${colors.text} ${colors.bg}/50`
+                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                                    }`}
+                                    title={`${goal.goal_number} ${goal.title}`}
+                                  >
+                                    <span className="truncate block">
+                                      {goal.goal_number} {goal.title}
+                                    </span>
+                                  </Link>
+                                )}
+
+                                {/* Level 2 initiatives (nested under Level 1) */}
+                                {hasChildren && isGoalExpanded && (
+                                  <div className="pl-4 mt-0.5 space-y-0.5">
+                                    <div className="relative">
+                                      <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-100" />
+                                      {level2Children.map(initiative => {
+                                        const isInitiativeActive = currentGoalId === initiative.id;
+                                        return (
+                                          <Link
+                                            key={initiative.id}
+                                            to={`/${slug}/goal/${initiative.id}`}
+                                            onClick={onItemClick}
+                                            className={`block pl-6 py-1.5 text-[11px] font-medium rounded-md transition-colors ${
+                                              isInitiativeActive
+                                                ? `${colors.text} ${colors.bg}/30`
+                                                : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
+                                            }`}
+                                            title={`${initiative.goal_number} ${initiative.title}`}
+                                          >
+                                            <span className="truncate block">
+                                              {initiative.goal_number} {initiative.title}
+                                            </span>
+                                          </Link>
+                                        );
+                                      })}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             );
                           })}
                         </div>

@@ -6,8 +6,6 @@ interface NarrativeHeroProps {
   objectives: Goal[];
   metrics: Metric[];
   planTitle?: string;
-  planPeriod?: string;
-  planTagline?: string;
 }
 
 export function NarrativeHero({
@@ -15,8 +13,6 @@ export function NarrativeHero({
   objectives,
   metrics,
   planTitle = 'Our Strategic Plan',
-  planPeriod = '2021-2026',
-  planTagline = 'Charting our course for educational excellence through strategic pillars that guide our commitment to student success',
 }: NarrativeHeroProps) {
   // Calculate status summary
   const statusCounts = objectives.reduce(
@@ -51,70 +47,69 @@ export function NarrativeHero({
 
     const date = new Date(mostRecent);
     return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
+      month: 'long',
       year: 'numeric',
     });
   };
 
+  const totalObjectives = objectives.length;
+
   return (
     <div className="mb-12">
-      {/* Title Section */}
-      <div className="mb-8">
-        <h1 className="font-display font-semibold text-3xl lg:text-4xl text-gray-900 tracking-tight mb-3">
-          {district.name}
-        </h1>
-        <div className="flex items-center gap-3 mb-4">
-          <span className="font-display font-medium text-xl lg:text-2xl text-district-red">
-            {planTitle}
-          </span>
-          <span className="px-2.5 py-1 bg-gray-100 rounded-md text-sm font-semibold text-gray-700">
-            {planPeriod}
-          </span>
-        </div>
-        <p className="text-gray-500 text-base lg:text-lg leading-relaxed max-w-3xl">
-          {planTagline}
+      {/* Title */}
+      <h1 className="font-display font-semibold text-3xl lg:text-4xl text-gray-900 tracking-tight mb-8">
+        {planTitle}
+      </h1>
+
+      {/* Narrative Card */}
+      <div className="bg-white rounded-xl border-l-4 border-l-gray-200 border border-gray-100 px-8 py-6">
+        {/* Opening paragraph */}
+        <p className="text-gray-700 text-base lg:text-lg leading-relaxed mb-6">
+          In August 2021, {district.name} launched a five-year strategic plan built on input from teachers, staff, parents, students, and community members. From the start, our committee made a commitment: <strong className="text-gray-900">progress would be shared openly and regularly with our community.</strong>
         </p>
-      </div>
 
-      {/* Narrative Content (if district has executive summary) */}
-      {district.description && (
-        <div className="bg-white rounded-xl border border-gray-100 p-6 mb-8">
-          <p className="text-gray-600 leading-relaxed">
-            {district.description}
-          </p>
-        </div>
-      )}
+        {/* Metrics highlight paragraph */}
+        <p className="text-gray-700 text-base lg:text-lg leading-relaxed mb-6">
+          Today, we're proud to report that <span className="font-display font-semibold text-xl text-district-red">{statusCounts.onTarget} of {totalObjectives}</span> strategic objectives are on target. Our students' sense of belonging has reached <span className="font-display font-semibold text-xl text-district-red">3.74</span> out of 5.0—exceeding our goal. Daily attendance stands strong at <span className="font-display font-semibold text-xl text-district-red">96.2%</span>, and we've maintained healthy cash reserves of <span className="font-display font-semibold text-xl text-district-red">$34.4M</span> to invest in our future.
+        </p>
 
-      {/* Stats Summary */}
-      <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-gray-100">
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-full bg-green-500" />
-          <span className="text-sm font-medium text-gray-700">
-            {statusCounts.onTarget} objective{statusCounts.onTarget !== 1 ? 's' : ''} on target
-          </span>
-        </div>
-
+        {/* Areas needing attention paragraph */}
         {statusCounts.needsAttention > 0 && (
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-amber-500" />
-            <span className="text-sm font-medium text-gray-700">
-              {statusCounts.needsAttention} need{statusCounts.needsAttention !== 1 ? '' : 's'} attention
-            </span>
-          </div>
+          <p className="text-gray-700 text-base lg:text-lg leading-relaxed">
+            We're also honest about where we have work to do. Student wellbeing and safety metrics need our attention, and we're actively addressing this through expanded mental health support and updated safety protocols.
+          </p>
         )}
 
-        {statusCounts.offTrack > 0 && (
+        {/* Divider and status summary */}
+        <div className="flex flex-wrap items-center gap-4 mt-8 pt-6 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-red-500" />
+            <span className="w-2.5 h-2.5 rounded-full bg-green-500" />
             <span className="text-sm font-medium text-gray-700">
-              {statusCounts.offTrack} off track
+              {statusCounts.onTarget} objective{statusCounts.onTarget !== 1 ? 's' : ''} on target
             </span>
           </div>
-        )}
 
-        <span className="text-gray-300">·</span>
-        <span className="text-sm text-gray-500">Last updated {getLastUpdated()}</span>
+          {statusCounts.needsAttention > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="text-sm font-medium text-gray-700">
+                {statusCounts.needsAttention} needs attention
+              </span>
+            </div>
+          )}
+
+          {statusCounts.offTrack > 0 && (
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+              <span className="text-sm font-medium text-gray-700">
+                {statusCounts.offTrack} off track
+              </span>
+            </div>
+          )}
+
+          <span className="text-gray-300">·</span>
+          <span className="text-sm text-gray-400">Last updated {getLastUpdated()}</span>
+        </div>
       </div>
     </div>
   );

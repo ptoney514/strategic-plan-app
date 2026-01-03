@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { useGoal, useChildGoals } from '../../../hooks/useGoals';
-import { useMetrics } from '../../../hooks/useMetrics';
+import { useMetrics, useMetricsByDistrict } from '../../../hooks/useMetrics';
 import { GoalHeader } from '../../../components/public/GoalHeader';
 import { MetricsGrid } from '../../../components/public/MetricsGrid';
 import { InitiativeRow } from '../../../components/public/InitiativeRow';
@@ -17,13 +18,36 @@ export function GoalDetailNew() {
   const context = useOutletContext<GoalDetailContext>();
 
   const { data: goal, isLoading: goalLoading } = useGoal(goalId!);
-  const { data: metrics, isLoading: metricsLoading } = useMetrics(goalId!);
   const { data: childGoals, isLoading: childrenLoading } = useChildGoals(goalId!);
+
+  // Fetch all metrics for the district to support both current goal and child goals
+  const districtId = context?.district?.id;
+  const { data: districtMetrics, isLoading: metricsLoading } = useMetricsByDistrict(districtId || '');
 
   const isLoading = goalLoading || metricsLoading || childrenLoading;
 
   // Find parent objective for breadcrumbs and color
   const parentObjective = context?.goals?.find(g => g.id === goal?.parent_id);
+
+  // Get all goal IDs in this subtree (current goal + all children)
+  const relevantGoalIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (goalId) ids.add(goalId);
+    childGoals?.forEach(child => ids.add(child.id));
+    return ids;
+  }, [goalId, childGoals]);
+
+  // Filter district metrics to only those belonging to this goal tree
+  const allMetrics = useMemo(() => {
+    if (!districtMetrics) return [];
+    return districtMetrics.filter(m => relevantGoalIds.has(m.goal_id));
+  }, [districtMetrics, relevantGoalIds]);
+
+  // Metrics for the current goal only (for MetricsGrid header display)
+  const currentGoalMetrics = useMemo(() => {
+    if (!goalId || !districtMetrics) return [];
+    return districtMetrics.filter(m => m.goal_id === goalId);
+  }, [goalId, districtMetrics]);
 
   if (isLoading) {
     return (
@@ -62,26 +86,23 @@ export function GoalDetailNew() {
   // Get Level 2 initiatives (children of this goal)
   const initiatives = childGoals?.filter(g => g.level === 2) || [];
 
-  // Get metrics for initiatives to pass to InitiativeRow
-  const allMetrics = metrics || [];
-
   return (
     <div>
       {/* Goal Header */}
       <GoalHeader goal={goal} parentObjective={parentObjective} />
 
-      {/* Metrics Grid */}
-      <MetricsGrid metrics={allMetrics} />
+      {/* Metrics Grid - shows metrics for current goal */}
+      <MetricsGrid metrics={currentGoalMetrics} />
 
       {/* Initiatives Section */}
       {initiatives.length > 0 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-6">
             <h2 className="font-display font-medium text-lg text-gray-900">
-              Strategic Initiatives
+              Sub-Goals
             </h2>
             <div className="text-xs text-gray-400 font-medium">
-              {initiatives.length} initiative{initiatives.length !== 1 ? 's' : ''}
+              {initiatives.length} sub-goal{initiatives.length !== 1 ? 's' : ''}
             </div>
           </div>
 

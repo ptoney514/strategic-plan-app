@@ -23,6 +23,7 @@ import { SchoolsDirectory } from './pages/client/public/SchoolsDirectory';
 // New Public Pages (sidebar design)
 import { Dashboard } from './pages/client/public/Dashboard';
 import { GoalDetailNew } from './pages/client/public/GoalDetailNew';
+import { ObjectiveDetail } from './pages/client/public/ObjectiveDetail';
 
 // Client Admin Pages
 import { AdminDashboard } from './pages/client/admin/AdminDashboard';
@@ -66,6 +67,7 @@ function App() {
         <Route path="/:slug" element={<PublicLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="overview" element={<Dashboard />} />
+          <Route path="objective/:goalId" element={<ObjectiveDetail />} />
           <Route path="goal/:goalId" element={<GoalDetailNew />} />
         </Route>
 

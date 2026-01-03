@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   LogOut,
-  Settings
+  Settings,
+  Database
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
 import { useAuth } from '../contexts/AuthContext';
@@ -166,6 +167,18 @@ export function ClientAdminLayout() {
               >
                 <FileText className="h-4 w-4" />
                 <span>Import Data</span>
+              </Link>
+
+              <Link
+                to={`${basePath}/data-manager`}
+                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                  isActiveRoute(`${basePath}/data-manager`)
+                    ? 'bg-gray-100 text-gray-900 font-medium'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <Database className="h-4 w-4" />
+                <span>Data Manager</span>
               </Link>
             </div>
           </div>
@@ -370,6 +383,19 @@ export function ClientAdminLayout() {
                   >
                     <FileText className="h-4 w-4" />
                     <span>Import Data</span>
+                  </Link>
+
+                  <Link
+                    to={`${basePath}/data-manager`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
+                      isActiveRoute(`${basePath}/data-manager`)
+                        ? 'bg-gray-100 text-gray-900 font-medium'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    <Database className="h-4 w-4" />
+                    <span>Data Manager</span>
                   </Link>
                 </div>
               </div>

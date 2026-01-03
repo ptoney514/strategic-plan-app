@@ -43,8 +43,67 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: system-ui, -apple-system, sans-serif;
   background-color: var(--color-background);
   color: var(--color-foreground);
+}
+
+/* Smooth scroll target highlight transition */
+[id^="goal-"] {
+  transition: box-shadow 0.3s ease-out, outline 0.3s ease-out;
+}
+
+/* Pulse glow animations for highlighted goals - color variants */
+
+/* Red glow */
+@keyframes pulse-glow-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.4), 0 0 20px rgba(185, 28, 28, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(185, 28, 28, 0.2), 0 0 30px rgba(185, 28, 28, 0.2); }
+}
+
+/* Blue glow */
+@keyframes pulse-glow-blue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4), 0 0 20px rgba(37, 99, 235, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.2), 0 0 30px rgba(37, 99, 235, 0.2); }
+}
+
+/* Amber glow */
+@keyframes pulse-glow-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.4), 0 0 20px rgba(217, 119, 6, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.2), 0 0 30px rgba(217, 119, 6, 0.2); }
+}
+
+/* Green glow */
+@keyframes pulse-glow-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.4), 0 0 20px rgba(22, 163, 74, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0.2), 0 0 30px rgba(22, 163, 74, 0.2); }
+}
+
+.goal-highlight-pulse-red {
+  animation: pulse-glow-red 2.5s ease-out forwards;
+  border-radius: 12px;
+}
+
+.goal-highlight-pulse-blue {
+  animation: pulse-glow-blue 2.5s ease-out forwards;
+  border-radius: 12px;
+}
+
+.goal-highlight-pulse-amber {
+  animation: pulse-glow-amber 2.5s ease-out forwards;
+  border-radius: 12px;
+}
+
+.goal-highlight-pulse-green {
+  animation: pulse-glow-green 2.5s ease-out forwards;
+  border-radius: 12px;
 }

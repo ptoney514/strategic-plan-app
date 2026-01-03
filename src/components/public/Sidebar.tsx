@@ -214,7 +214,39 @@ function SidebarContent({
   isLoading,
 }: SidebarContentProps) {
   const { slug } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  // Check if we're on an objective detail page
+  const isOnObjectiveDetailPage = location.pathname.includes('/objective/');
+  const currentObjectiveId = isOnObjectiveDetailPage
+    ? location.pathname.split('/objective/')[1]?.split('/')[0]
+    : null;
+
+  // Smooth scroll to an element by ID with color-matched pulse glow
+  const scrollToGoal = (goalId: string, color: keyof typeof colorClasses = 'red') => {
+    const element = document.getElementById(`goal-${goalId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Remove any existing pulse animations
+      const pulseClasses = ['goal-highlight-pulse-red', 'goal-highlight-pulse-blue', 'goal-highlight-pulse-amber', 'goal-highlight-pulse-green'];
+      pulseClasses.forEach(cls => element.classList.remove(cls));
+      void element.offsetWidth; // Trigger reflow to restart animation
+      // Add color-specific pulse animation
+      element.classList.add(`goal-highlight-pulse-${color}`);
+      setTimeout(() => {
+        element.classList.remove(`goal-highlight-pulse-${color}`);
+      }, 2500);
+    }
+  };
+
+  // Helper to get objective color by ID
+  const getObjectiveColorById = (objectiveId: string): keyof typeof colorClasses => {
+    const index = objectives.findIndex(o => o.id === objectiveId);
+    if (index === -1) return 'red';
+    const objective = objectives[index];
+    return getObjectiveColor(objective, index);
+  };
 
   // Handle objective click - navigate and expand
   const handleObjectiveClick = (objectiveId: string, isCurrentlyActive: boolean) => {
@@ -230,18 +262,65 @@ function SidebarContent({
     }
   };
 
-  // Handle Level 1 goal click - navigate and expand
-  const handleGoalClick = (goalId: string, isCurrentlyActive: boolean) => {
-    // If clicking on already active goal, just toggle expand/collapse
+  // Check if mobile
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
+  // Handle Level 1 goal click - mobile opens carousel, desktop scrolls
+  const handleGoalClick = (goalId: string, parentObjectiveId: string, isCurrentlyActive: boolean) => {
+    const objectiveColor = getObjectiveColorById(parentObjectiveId);
+
+    // If we're on the objective detail page that contains this goal
+    if (isOnObjectiveDetailPage && currentObjectiveId === parentObjectiveId) {
+      if (isMobile) {
+        // On mobile: set hash to open carousel (ObjectiveDetail will detect this)
+        window.history.replaceState(null, '', `#goal-${goalId}`);
+        // Trigger a hashchange event for React to detect
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      } else {
+        // On desktop: smooth scroll to the goal with color-matched glow
+        scrollToGoal(goalId, objectiveColor);
+      }
+      onItemClick?.(); // Close mobile drawer
+      return;
+    }
+
+    // If clicking on already active goal (on goal detail page), just toggle expand/collapse
     if (isCurrentlyActive) {
       toggleGoalExpanded(goalId);
     } else {
-      // Navigate to the goal detail page and expand
-      navigate(`/${slug}/goal/${goalId}`);
-      toggleGoalExpanded(goalId);
-      // Call onItemClick for mobile to close drawer
+      // Navigate to the objective page with hash
+      // On mobile: hash will trigger carousel; on desktop: will scroll
+      navigate(`/${slug}/objective/${parentObjectiveId}#goal-${goalId}`);
+      if (!isMobile) {
+        setTimeout(() => scrollToGoal(goalId, objectiveColor), 100);
+      }
       onItemClick?.();
     }
+  };
+
+  // Handle Level 2 initiative click - mobile opens carousel, desktop scrolls
+  const handleInitiativeClick = (initiativeId: string, parentObjectiveId: string) => {
+    const objectiveColor = getObjectiveColorById(parentObjectiveId);
+
+    // If we're on the objective detail page that contains this initiative
+    if (isOnObjectiveDetailPage && currentObjectiveId === parentObjectiveId) {
+      if (isMobile) {
+        // On mobile: set hash to open carousel
+        window.history.replaceState(null, '', `#goal-${initiativeId}`);
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      } else {
+        // On desktop: smooth scroll with color-matched glow
+        scrollToGoal(initiativeId, objectiveColor);
+      }
+      onItemClick?.();
+      return;
+    }
+    // Navigate to objective page with hash
+    navigate(`/${slug}/objective/${parentObjectiveId}#goal-${initiativeId}`);
+    if (!isMobile) {
+      setTimeout(() => scrollToGoal(initiativeId, objectiveColor), 100);
+    }
+    onItemClick?.();
   };
 
   return (
@@ -371,7 +450,7 @@ function SidebarContent({
                                 {/* Level 1 goal row */}
                                 {hasChildren ? (
                                   <button
-                                    onClick={() => handleGoalClick(goal.id, isGoalActive)}
+                                    onClick={() => handleGoalClick(goal.id, objective.id, isGoalActive)}
                                     className={`w-full flex items-center justify-between pl-6 pr-2 py-2 text-xs font-medium rounded-md transition-colors text-left ${
                                       isGoalActive
                                         ? `${colors.text} ${colors.bg}/50`
@@ -389,10 +468,9 @@ function SidebarContent({
                                     />
                                   </button>
                                 ) : (
-                                  <Link
-                                    to={`/${slug}/goal/${goal.id}`}
-                                    onClick={onItemClick}
-                                    className={`block pl-6 py-2 text-xs font-medium rounded-md transition-colors ${
+                                  <button
+                                    onClick={() => handleGoalClick(goal.id, objective.id, isGoalActive)}
+                                    className={`w-full text-left block pl-6 py-2 text-xs font-medium rounded-md transition-colors ${
                                       isGoalActive
                                         ? `${colors.text} ${colors.bg}/50`
                                         : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
@@ -402,7 +480,7 @@ function SidebarContent({
                                     <span className="truncate block">
                                       {goal.goal_number} {goal.title}
                                     </span>
-                                  </Link>
+                                  </button>
                                 )}
 
                                 {/* Level 2 initiatives (nested under Level 1) */}
@@ -413,11 +491,10 @@ function SidebarContent({
                                       {level2Children.map(initiative => {
                                         const isInitiativeActive = currentGoalId === initiative.id;
                                         return (
-                                          <Link
+                                          <button
                                             key={initiative.id}
-                                            to={`/${slug}/goal/${initiative.id}`}
-                                            onClick={onItemClick}
-                                            className={`block pl-6 py-1.5 text-[11px] font-medium rounded-md transition-colors ${
+                                            onClick={() => handleInitiativeClick(initiative.id, objective.id)}
+                                            className={`w-full text-left block pl-6 py-1.5 text-[11px] font-medium rounded-md transition-colors ${
                                               isInitiativeActive
                                                 ? `${colors.text} ${colors.bg}/30`
                                                 : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
@@ -427,7 +504,7 @@ function SidebarContent({
                                             <span className="truncate block">
                                               {initiative.goal_number} {initiative.title}
                                             </span>
-                                          </Link>
+                                          </button>
                                         );
                                       })}
                                     </div>

@@ -2,6 +2,19 @@ import { Menu } from 'lucide-react';
 import { Link, useParams, useLocation } from 'react-router-dom';
 import type { District } from '../../lib/types';
 
+// Local logo mapping for districts (can be moved to R2/CDN later)
+const districtLogos: Record<string, string> = {
+  westside: '/assets/districts/westside-logo.png',
+};
+
+// Get logo URL - prefers local file, falls back to database logo_url
+function getLogoUrl(district: District, slug: string): string | null {
+  if (slug && districtLogos[slug]) {
+    return districtLogos[slug];
+  }
+  return district.logo_url || null;
+}
+
 interface MobileHeaderProps {
   district: District;
   onMenuToggle: () => void;
@@ -33,13 +46,16 @@ export function MobileHeader({ district, onMenuToggle }: MobileHeaderProps) {
 
         {/* Logo */}
         <Link to={`/${slug}`} className="flex items-center gap-2">
-          {district.logo_url ? (
-            <img src={district.logo_url} alt={district.name} className="w-6 h-6 object-contain" />
-          ) : (
-            <div className="w-6 h-6 rounded bg-district-red flex items-center justify-center text-white font-display font-semibold text-xs">
-              {district.name.charAt(0)}
-            </div>
-          )}
+          {(() => {
+            const logoUrl = getLogoUrl(district, slug || '');
+            return logoUrl ? (
+              <img src={logoUrl} alt={district.name} className="w-6 h-6 object-contain" />
+            ) : (
+              <div className="w-6 h-6 rounded bg-district-red flex items-center justify-center text-white font-display font-semibold text-xs">
+                {district.name.charAt(0)}
+              </div>
+            );
+          })()}
           <span className="font-display font-semibold text-sm text-gray-900">
             {district.name.split(' ')[0]}
           </span>

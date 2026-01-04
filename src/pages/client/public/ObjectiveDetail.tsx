@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, Link, useLocation } from 'react-router-dom';
 import { useGoal, useChildGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
-import { StatusBadge, GoalCardWithMetrics, MobileGoalCarousel } from '../../../components/public';
+import { StatusBadge, GoalCardWithMetrics, MobileGoalBottomSheet } from '../../../components/public';
 import type { StatusType } from '../../../components/public/StatusBadge';
 import { FolderOpen } from 'lucide-react';
 import type { District, Goal, Metric } from '../../../lib/types';
@@ -296,13 +296,11 @@ export function ObjectiveDetail() {
         </div>
       )}
 
-      {/* Mobile Goal Carousel */}
+      {/* Mobile Goal Bottom Sheet */}
       {isMobile && focusedGoalId && level1Goals.length > 0 && (
-        <MobileGoalCarousel
-          goals={level1Goals}
+        <MobileGoalBottomSheet
+          goal={level1Goals.find(g => g.id === focusedGoalId)!}
           metrics={metrics}
-          initialGoalId={focusedGoalId}
-          objectiveTitle={objective.title}
           colorClass={colors.badge}
           onClose={handleCarouselClose}
         />

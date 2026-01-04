@@ -12,5 +12,4 @@ export { MetricCard } from './MetricCard';
 export { MetricsGrid } from './MetricsGrid';
 export { InitiativeRow } from './InitiativeRow';
 export { GoalCardWithMetrics } from './GoalCardWithMetrics';
-export { MobileGoalCarousel } from './MobileGoalCarousel';
-export { PageIndicator } from './PageIndicator';
+export { MobileGoalBottomSheet } from './MobileGoalBottomSheet';

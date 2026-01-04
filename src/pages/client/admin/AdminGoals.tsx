@@ -150,6 +150,17 @@ export function AdminGoals() {
                   <p className={`${isObjective ? 'font-bold text-lg' : 'font-medium'}`}>
                     {goal.goal_number} {goal.title}
                   </p>
+                  {goal.indicator_text && (
+                    <span
+                      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={{
+                        backgroundColor: `${goal.indicator_color || '#10b981'}20`,
+                        color: goal.indicator_color || '#10b981',
+                      }}
+                    >
+                      {goal.indicator_text}
+                    </span>
+                  )}
                 </div>
                 {goal.description && (
                   <p className="text-sm text-muted-foreground mt-1">
@@ -304,6 +315,17 @@ export function AdminGoals() {
                         <span className="inline-flex items-center justify-center px-2 py-0.5 rounded text-xs font-semibold bg-blue-100 text-blue-800">
                           {goal.goal_number}
                         </span>
+                        {goal.indicator_text && (
+                          <span
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: `${goal.indicator_color || '#10b981'}20`,
+                              color: goal.indicator_color || '#10b981',
+                            }}
+                          >
+                            {goal.indicator_text}
+                          </span>
+                        )}
                       </div>
                       <h3 className="font-semibold text-sm sm:text-base text-foreground line-clamp-2">
                         {goal.title}

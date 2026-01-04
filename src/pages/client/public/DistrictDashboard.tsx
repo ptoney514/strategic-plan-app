@@ -162,10 +162,8 @@ export function DistrictDashboard() {
               const status = getGoalStatus(goal.indicator_text);
               const isOffTrack = status === 'off-track';
 
-              // Gradient bar color based on status
-              const gradientClass = isOffTrack
-                ? 'from-amber-500 via-orange-600 to-red-600'
-                : 'from-emerald-400 via-emerald-500 to-teal-500';
+              // Use saved indicator_color, or fall back to status-based colors
+              const badgeColor = goal.indicator_color || (isOffTrack ? '#f59e0b' : '#10b981');
 
               return (
                 <article
@@ -176,8 +174,11 @@ export function DistrictDashboard() {
                     setShowSlidePanel(true);
                   }}
                 >
-                  {/* Top gradient bar */}
-                  <div className={`h-1 w-full bg-gradient-to-r ${gradientClass}`} />
+                  {/* Top gradient bar - uses saved indicator_color */}
+                  <div
+                    className="h-1 w-full"
+                    style={{ backgroundColor: badgeColor }}
+                  />
 
                   <div className="flex h-full flex-col p-6 md:p-7">
                     {/* Header with title and menu */}
@@ -190,19 +191,23 @@ export function DistrictDashboard() {
                           {goal.description || 'Strategic initiatives focused on this objective'}
                         </p>
 
-                        {/* Status badge below description */}
+                        {/* Status badge below description - uses saved indicator_color */}
                         <div className="mt-3">
-                          {isOffTrack ? (
-                            <button className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-700 ring-1 ring-amber-300 hover:bg-amber-100 hover:text-amber-800 hover:ring-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/50">
+                          <span
+                            className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium"
+                            style={{
+                              backgroundColor: `${badgeColor}20`,
+                              color: badgeColor,
+                              border: `1px solid ${badgeColor}40`,
+                            }}
+                          >
+                            {isOffTrack ? (
                               <AlertTriangle className="h-3.5 w-3.5" strokeWidth={1.5} />
-                              {goal.indicator_text || 'Off Track'}
-                            </button>
-                          ) : (
-                            <button className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-100 hover:text-emerald-800 hover:ring-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50">
+                            ) : (
                               <Check className="h-3.5 w-3.5" strokeWidth={1.5} />
-                              {goal.indicator_text || 'On Target'}
-                            </button>
-                          )}
+                            )}
+                            {goal.indicator_text || (isOffTrack ? 'Off Track' : 'On Target')}
+                          </span>
                         </div>
                       </div>
                       <button

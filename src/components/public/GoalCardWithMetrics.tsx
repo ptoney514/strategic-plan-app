@@ -306,13 +306,6 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
 }
 
 export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-gray-100' }: GoalCardWithMetricsProps) {
-  // Get manual status set by admin (stored in overall_progress_custom_value)
-  const validStatuses = ['on-target', 'needs-attention', 'off-track', 'not-started', 'on-track', 'complete'];
-  const manualStatus = goal.overall_progress_custom_value?.toLowerCase().replace(/\s+/g, '-');
-  const status = validStatuses.includes(manualStatus || '')
-    ? (manualStatus as 'on-target' | 'needs-attention' | 'off-track' | 'not-started')
-    : 'not-started';
-
   const goalMetrics = metrics.filter(m => m.goal_id === goal.id);
 
   return (
@@ -333,7 +326,6 @@ export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-
               <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
                 {goal.title}
               </h3>
-              <StatusBadge status={status} size="sm" />
             </div>
             {goal.description && (
               <p className="text-xs text-gray-500 line-clamp-2">

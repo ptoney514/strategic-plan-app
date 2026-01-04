@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { ChevronRight, Target, BarChart3 } from 'lucide-react';
+import { ChevronRight, Target } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
 import { StatusBadge } from './StatusBadge';
 
@@ -43,42 +43,20 @@ function getColor(goal: Goal, index: number): keyof typeof colorConfig {
   return defaultColors[index % defaultColors.length];
 }
 
-export function ObjectiveCard({ objective, childGoals, metrics, index }: ObjectiveCardProps) {
+export function ObjectiveCard({ objective, childGoals, metrics: _metrics, index }: ObjectiveCardProps) {
   const { slug } = useParams();
   const color = getColor(objective, index);
   const colors = colorConfig[color];
 
-  // Get metrics for this objective and its children
-  const objectiveMetrics = metrics.filter(m =>
-    m.goal_id === objective.id || childGoals.some(g => g.id === m.goal_id)
-  );
-
-  // Find hero metric (first metric with is_primary flag, or first metric)
-  const heroMetric = objectiveMetrics.find(m => m.is_primary) || objectiveMetrics[0];
-
-  // Get manual status set by admin (stored in overall_progress_custom_value)
-  // Valid values: 'on-target', 'needs-attention', 'off-track', 'not-started'
+  // Get manual status set by admin (stored in indicator_text)
+  // Default to 'on-target' to match admin2 behavior (which shows "On Target" when no status is set)
   const validStatuses = ['on-target', 'needs-attention', 'off-track', 'not-started', 'on-track', 'complete'];
-  const manualStatus = objective.overall_progress_custom_value?.toLowerCase().replace(/\s+/g, '-');
+  // Use indicator_text (set via badge UI) first, fall back to overall_progress_custom_value for backwards compat
+  const statusText = objective.indicator_text || objective.overall_progress_custom_value;
+  const manualStatus = statusText?.toLowerCase().replace(/\s+/g, '-');
   const status = validStatuses.includes(manualStatus || '')
     ? (manualStatus as 'on-target' | 'needs-attention' | 'off-track' | 'not-started')
-    : 'not-started';
-
-  // Format hero metric value
-  const formatMetricValue = (metric: Metric) => {
-    const value = metric.current_value ?? metric.actual_value ?? 0;
-
-    if (metric.metric_type === 'percent' || metric.is_percentage) {
-      return { value: value.toFixed(0), unit: '%' };
-    }
-    if (metric.metric_type === 'rating') {
-      return { value: value.toFixed(2), unit: `/ ${metric.target_value || 5}` };
-    }
-    if (metric.metric_type === 'currency') {
-      return { value: `$${value.toLocaleString()}`, unit: '' };
-    }
-    return { value: value.toString(), unit: metric.unit || '' };
-  };
+    : 'on-target';  // Default to on-target to match admin2
 
   return (
     <Link
@@ -86,21 +64,19 @@ export function ObjectiveCard({ objective, childGoals, metrics, index }: Objecti
       className={`group block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden border-t-[3px] ${colors.border} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
     >
       <div className="p-6">
-        {/* Header: Number badge + Title + Goal count */}
+        {/* Header: Number badge + Title + Status Badge */}
         <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
             <div
-              className={`w-8 h-8 rounded-lg ${colors.badge} ${colors.badgeText} flex items-center justify-center font-display font-semibold text-sm`}
+              className={`w-8 h-8 rounded-lg ${colors.badge} ${colors.badgeText} flex items-center justify-center font-display font-semibold text-sm flex-shrink-0`}
             >
               {objective.goal_number}
             </div>
-            <h3 className="font-display font-semibold text-lg text-gray-900 tracking-tight group-hover:text-gray-700 transition-colors">
+            <h3 className="font-display font-semibold text-lg text-gray-900 tracking-tight group-hover:text-gray-700 transition-colors truncate">
               {objective.title}
             </h3>
           </div>
-          <span className="text-xs font-medium text-gray-400 bg-gray-50 px-2 py-1 rounded">
-            {childGoals.length} goal{childGoals.length !== 1 ? 's' : ''}
-          </span>
+          <StatusBadge status={status} size="sm" />
         </div>
 
         {/* Description */}
@@ -108,33 +84,14 @@ export function ObjectiveCard({ objective, childGoals, metrics, index }: Objecti
           {objective.description || objective.executive_summary || 'Strategic objective for organizational growth and excellence.'}
         </p>
 
-        {/* Metrics Summary */}
-        <div className="flex items-center gap-4 mb-4 text-xs text-gray-400">
-          <div className="flex items-center gap-1">
-            <Target className="w-3.5 h-3.5" />
-            <span>{childGoals.length} Goals</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <BarChart3 className="w-3.5 h-3.5" />
-            <span>{objectiveMetrics.length} Metrics</span>
-          </div>
+        {/* Goals Count */}
+        <div className="flex items-center gap-1 mb-4 text-xs text-gray-400">
+          <Target className="w-3.5 h-3.5" />
+          <span>{childGoals.length} Goals</span>
         </div>
 
-        {/* Footer: Status + Hero metric + View details */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-          <div className="flex items-center gap-3">
-            <StatusBadge status={status} size="sm" />
-            {heroMetric && (
-              <div className="flex items-baseline gap-1">
-                <span className="font-display font-semibold text-xl text-gray-900">
-                  {formatMetricValue(heroMetric).value}
-                </span>
-                <span className="text-sm text-gray-400">
-                  {formatMetricValue(heroMetric).unit}
-                </span>
-              </div>
-            )}
-          </div>
+        {/* Footer: View details */}
+        <div className="flex items-center justify-end pt-4 border-t border-gray-50">
           <span className="flex items-center gap-1 text-xs font-medium text-gray-400 group-hover:text-district-red transition-colors">
             View details
             <ChevronRight className="w-4 h-4" />

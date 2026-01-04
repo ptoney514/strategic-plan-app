@@ -206,13 +206,17 @@ function GoalTreeNode({
           )}
         </div>
 
-        {/* Status indicator */}
+        {/* Status indicator badge */}
         {goal.indicator_text && (
-          <div
-            className="w-2 h-2 rounded-full flex-shrink-0"
-            style={{ backgroundColor: goal.indicator_color || '#10b981' }}
-            title={goal.indicator_text}
-          />
+          <span
+            className="ml-auto px-2 py-0.5 rounded-full text-xs font-medium flex-shrink-0"
+            style={{
+              backgroundColor: `${goal.indicator_color || '#10b981'}20`,
+              color: goal.indicator_color || '#10b981',
+            }}
+          >
+            {goal.indicator_text}
+          </span>
         )}
       </div>
 

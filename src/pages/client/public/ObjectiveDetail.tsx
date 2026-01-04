@@ -151,13 +151,16 @@ export function ObjectiveDetail() {
     return aNum - bNum;
   });
 
-  // Helper to get manual status set by admin (stored in overall_progress_custom_value)
+  // Helper to get manual status set by admin (stored in indicator_text)
+  // Default to 'on-target' to match admin2 behavior
   const getManualStatus = (goal: Goal): StatusType => {
     const validStatuses = ['on-target', 'needs-attention', 'off-track', 'not-started', 'on-track', 'complete'];
-    const manualStatus = goal.overall_progress_custom_value?.toLowerCase().replace(/\s+/g, '-');
+    // Use indicator_text (set via badge UI) first, fall back to overall_progress_custom_value for backwards compat
+    const statusText = goal.indicator_text || goal.overall_progress_custom_value;
+    const manualStatus = statusText?.toLowerCase().replace(/\s+/g, '-');
     return validStatuses.includes(manualStatus || '')
       ? (manualStatus as StatusType)
-      : 'not-started';
+      : 'on-target';  // Default to on-target to match admin2
   };
 
   const status = getManualStatus(objective);

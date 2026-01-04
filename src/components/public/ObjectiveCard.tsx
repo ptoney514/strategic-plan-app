@@ -82,7 +82,7 @@ export function ObjectiveCard({ objective, childGoals, metrics, index }: Objecti
 
   return (
     <Link
-      to={`/${slug}/goal/${objective.id}`}
+      to={`/${slug}/objective/${objective.id}`}
       className={`group block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden border-t-[3px] ${colors.border} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
     >
       <div className="p-6">

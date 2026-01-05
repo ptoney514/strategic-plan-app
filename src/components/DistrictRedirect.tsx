@@ -14,12 +14,21 @@ export function DistrictRedirect() {
   useEffect(() => {
     if (!slug) return;
 
-    // Build the new URL
-    const baseUrl = getSubdomainUrl('district', slug);
-
     // Preserve the path after the slug
     const remainingPath = location.pathname.replace(`/${slug}`, '') || '/';
-    const newUrl = `${baseUrl}${remainingPath}${location.search}${location.hash}`;
+
+    let newUrl: string;
+
+    if (isLocalDev()) {
+      // For localhost, build URL with path BEFORE query param
+      // This avoids malformed URLs like ?subdomain=westside/admin
+      const port = window.location.port ? `:${window.location.port}` : '';
+      newUrl = `${window.location.protocol}//localhost${port}${remainingPath}?subdomain=${slug}`;
+    } else {
+      // For production subdomains, use standard URL construction
+      const baseUrl = getSubdomainUrl('district', slug);
+      newUrl = `${baseUrl}${remainingPath}${location.hash}`;
+    }
 
     // Redirect
     window.location.href = newUrl;

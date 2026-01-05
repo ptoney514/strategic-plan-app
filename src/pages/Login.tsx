@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useSubdomain } from '../contexts/SubdomainContext';
 import { supabase } from '../lib/supabase';
+import { getSubdomainUrl } from '../lib/subdomain';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 
 interface LocationState {
@@ -12,6 +14,7 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated } = useAuth();
+  const { type: subdomainType } = useSubdomain();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,9 +22,17 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Redirect if already authenticated
+  // Preserve query params for subdomain context in local dev
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = (location.state as LocationState)?.from || '/';
+      const redirectUrl = from + location.search;
+      navigate(redirectUrl, { replace: true });
+    }
+  }, [isAuthenticated, location.state, location.search, navigate]);
+
+  // Show nothing while redirecting
   if (isAuthenticated) {
-    const from = (location.state as LocationState)?.from || '/';
-    navigate(from, { replace: true });
     return null;
   }
 
@@ -41,24 +52,46 @@ export function Login() {
       const response = await login(email, password);
       const user = response.data.user;
 
-      // Check if user has a specific district assigned
-      if (user) {
-        const { data: districtAdmin } = await supabase
-          .from('spb_district_admins')
-          .select('district_slug')
-          .eq('user_id', user.id)
-          .maybeSingle();
+      if (!user) {
+        setError('Login failed. Please try again.');
+        return;
+      }
 
-        // If district admin, redirect to their district admin page
-        if (districtAdmin?.district_slug) {
-          navigate(`/${districtAdmin.district_slug}/admin`, { replace: true });
-          return;
+      // Check user roles
+      const isSystemAdmin =
+        user.user_metadata?.role === 'system_admin' ||
+        user.app_metadata?.role === 'system_admin';
+
+      // Handle admin subdomain login
+      if (subdomainType === 'admin') {
+        if (isSystemAdmin) {
+          // System admin on admin subdomain - go to admin dashboard
+          navigate(`/${location.search}`, { replace: true });
+        } else {
+          // Non-system-admin on admin subdomain - redirect to root domain
+          // They shouldn't be here!
+          window.location.href = getSubdomainUrl('root');
         }
+        return;
+      }
+
+      // For district subdomain or root domain, check district admin access
+      const { data: districtAdmin } = await supabase
+        .from('spb_district_admins')
+        .select('district_slug')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      // If district admin, redirect to their district admin page
+      if (districtAdmin?.district_slug) {
+        navigate(`/${districtAdmin.district_slug}/admin${location.search}`, { replace: true });
+        return;
       }
 
       // Otherwise use the page they tried to access, or home
       const from = (location.state as LocationState)?.from || '/';
-      navigate(from, { replace: true });
+      const redirectUrl = from + location.search;
+      navigate(redirectUrl, { replace: true });
     } catch (err) {
       console.error('[Login] Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.');
@@ -230,38 +263,6 @@ export function Login() {
               Contact your district administrator to request access
             </p>
           </div>
-
-          {/* Test Credentials - Development Only */}
-          {import.meta.env.DEV && (
-            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-xs font-semibold text-blue-900 mb-2">Test Credentials</p>
-              <p className="text-xs text-blue-700 mb-3">
-                <a
-                  href="http://127.0.0.1:54323"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-blue-900 font-medium"
-                >
-                  Open Supabase Studio →
-                </a>
-              </p>
-              <div className="space-y-2 text-xs">
-                <div className="bg-white p-2.5 rounded border border-blue-100">
-                  <p className="font-medium text-blue-900 mb-1">Westside Admin</p>
-                  <p className="text-blue-700 font-mono text-[11px]">admin@westside66.org</p>
-                  <p className="text-blue-600 font-mono text-[11px] mt-0.5">Password: Westside123!</p>
-                </div>
-                <div className="bg-white p-2.5 rounded border border-blue-100">
-                  <p className="font-medium text-blue-900 mb-1">Eastside Admin</p>
-                  <p className="text-blue-700 font-mono text-[11px]">admin@eastside.edu</p>
-                  <p className="text-blue-600 font-mono text-[11px] mt-0.5">Password: Eastside123!</p>
-                </div>
-              </div>
-              <p className="text-xs text-blue-600 mt-3 leading-relaxed">
-                Run <code className="bg-blue-100 px-1 rounded">./scripts/create-test-users.sh</code> to create these test users
-              </p>
-            </div>
-          )}
         </div>
       </div>
     </div>

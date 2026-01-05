@@ -32,7 +32,8 @@ export function getSubdomainInfo(): SubdomainInfo {
   // Handle localhost development with query param fallback
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     const urlParams = new URLSearchParams(window.location.search);
-    const devSubdomain = urlParams.get('subdomain');
+    // Normalize: trim whitespace and trailing slashes
+    const devSubdomain = urlParams.get('subdomain')?.trim().replace(/\/+$/, '') || null;
 
     if (devSubdomain === 'admin') {
       return { type: 'admin', slug: null, hostname };
@@ -135,4 +136,40 @@ export function buildDistrictPath(basePath: string, slug: string, isSubdomain: b
   }
   // On root domain, include slug in path
   return `/${slug}${basePath}`;
+}
+
+/**
+ * Build a full URL for a subdomain with an optional path.
+ * Handles localhost query params correctly (path before query param).
+ *
+ * Examples:
+ * - buildSubdomainUrlWithPath('admin', '/districts') =>
+ *   - localhost: http://localhost:5174/districts?subdomain=admin
+ *   - production: https://admin.stratadash.org/districts
+ */
+export function buildSubdomainUrlWithPath(type: SubdomainType, path: string = '', slug?: string): string {
+  // Ensure path starts with /
+  const normalizedPath = path && !path.startsWith('/') ? `/${path}` : path;
+
+  if (isLocalDev()) {
+    const port = window.location.port ? `:${window.location.port}` : '';
+    const protocol = window.location.protocol;
+
+    // For lvh.me - subdomains work naturally
+    if (window.location.hostname.includes('lvh.me')) {
+      if (type === 'admin') return `${protocol}//admin.lvh.me${port}${normalizedPath}`;
+      if (type === 'district' && slug) return `${protocol}//${slug}.lvh.me${port}${normalizedPath}`;
+      return `${protocol}//lvh.me${port}${normalizedPath}`;
+    }
+
+    // For localhost - path must come BEFORE query param
+    if (type === 'admin') return `${protocol}//localhost${port}${normalizedPath}?subdomain=admin`;
+    if (type === 'district' && slug) return `${protocol}//localhost${port}${normalizedPath}?subdomain=${slug}`;
+    return `${protocol}//localhost${port}${normalizedPath}`;
+  }
+
+  // Production URLs - simple concatenation works
+  if (type === 'admin') return `https://admin.stratadash.org${normalizedPath}`;
+  if (type === 'district' && slug) return `https://${slug}.stratadash.org${normalizedPath}`;
+  return `https://stratadash.org${normalizedPath}`;
 }

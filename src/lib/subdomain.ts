@@ -121,3 +121,18 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
   if (type === 'district' && slug) return `https://${slug}.stratadash.org`;
   return 'https://stratadash.org';
 }
+
+/**
+ * Build a path that works for both subdomain and path-based routing.
+ *
+ * On subdomain (westside.stratadash.org): returns "/objective/123"
+ * On root domain (stratadash.org/westside): returns "/westside/objective/123"
+ */
+export function buildDistrictPath(basePath: string, slug: string, isSubdomain: boolean): string {
+  // On subdomain, paths don't need slug prefix
+  if (isSubdomain) {
+    return basePath;
+  }
+  // On root domain, include slug in path
+  return `/${slug}${basePath}`;
+}

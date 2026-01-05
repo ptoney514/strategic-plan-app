@@ -3,6 +3,7 @@ import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Calendar, X } from 'lucide-react';
 import type { District, Goal } from '../../lib/types';
 import { useSubdomain } from '../../contexts/SubdomainContext';
+import { buildDistrictPath } from '../../lib/subdomain';
 
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
@@ -67,9 +68,10 @@ function getObjectiveColor(goal: Goal, index: number): keyof typeof colorClasses
 
 export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoading }: SidebarProps) {
   const params = useParams<{ slug?: string; goalId?: string }>();
-  const { slug: subdomainSlug } = useSubdomain();
+  const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
   // Use URL param slug if available, otherwise use subdomain slug
   const slug = params.slug || subdomainSlug || district.slug;
+  const isOnSubdomain = subdomainType === 'district';
   const goalId = params.goalId;
   const location = useLocation();
   const [expandedObjective, setExpandedObjective] = useState<string | null>(null);
@@ -129,7 +131,9 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
     });
   };
 
-  const isOverviewActive = location.pathname === `/${slug}` || location.pathname === `/${slug}/overview`;
+  const homePath = buildDistrictPath('', slug, isOnSubdomain);
+  const overviewPath = buildDistrictPath('/overview', slug, isOnSubdomain);
+  const isOverviewActive = location.pathname === homePath || location.pathname === '/' || location.pathname === overviewPath;
 
   return (
     <>
@@ -219,9 +223,10 @@ function SidebarContent({
   isLoading,
 }: SidebarContentProps) {
   const params = useParams<{ slug?: string }>();
-  const { slug: subdomainSlug } = useSubdomain();
+  const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
   // Use URL param slug if available, otherwise use subdomain slug
   const slug = params.slug || subdomainSlug || district.slug;
+  const isOnSubdomain = subdomainType === 'district';
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -263,7 +268,7 @@ function SidebarContent({
       setExpandedObjective(expandedObjective === objectiveId ? null : objectiveId);
     } else {
       // Navigate to the objective detail page and expand
-      navigate(`/${slug}/objective/${objectiveId}`);
+      navigate(buildDistrictPath(`/objective/${objectiveId}`, slug, isOnSubdomain));
       setExpandedObjective(objectiveId);
       // Call onItemClick for mobile to close drawer
       onItemClick?.();
@@ -298,7 +303,7 @@ function SidebarContent({
     } else {
       // Navigate to the objective page with hash
       // On mobile: hash will trigger carousel; on desktop: will scroll
-      navigate(`/${slug}/objective/${parentObjectiveId}#goal-${goalId}`);
+      navigate(buildDistrictPath(`/objective/${parentObjectiveId}#goal-${goalId}`, slug, isOnSubdomain));
       if (!isMobile) {
         setTimeout(() => scrollToGoal(goalId, objectiveColor), 100);
       }
@@ -324,18 +329,21 @@ function SidebarContent({
       return;
     }
     // Navigate to objective page with hash
-    navigate(`/${slug}/objective/${parentObjectiveId}#goal-${initiativeId}`);
+    navigate(buildDistrictPath(`/objective/${parentObjectiveId}#goal-${initiativeId}`, slug, isOnSubdomain));
     if (!isMobile) {
       setTimeout(() => scrollToGoal(initiativeId, objectiveColor), 100);
     }
     onItemClick?.();
   };
 
+  // Build subdomain-aware paths for links
+  const homePath = buildDistrictPath('/', slug, isOnSubdomain);
+
   return (
     <>
       {/* Logo Area */}
       <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 h-16 flex items-center">
-        <Link to={`/${slug}`} className="flex items-center gap-3" onClick={onItemClick}>
+        <Link to={homePath} className="flex items-center gap-3" onClick={onItemClick}>
           {(() => {
             const logoUrl = getLogoUrl(district, slug || '');
             return logoUrl ? (
@@ -361,7 +369,7 @@ function SidebarContent({
       <nav className="flex-1 pt-6 px-3 pb-6 space-y-6 overflow-y-auto">
         {/* Overview Link */}
         <Link
-          to={`/${slug}`}
+          to={homePath}
           onClick={onItemClick}
           className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
             isOverviewActive

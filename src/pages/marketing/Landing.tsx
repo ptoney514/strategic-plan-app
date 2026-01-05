@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import { BarChart3, Target, TrendingUp, Users, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+import { UserMenu } from '../../components/common/UserMenu';
 
 /**
  * Marketing landing page for stratadash.org
@@ -8,6 +10,7 @@ import { BarChart3, Target, TrendingUp, Users, CheckCircle2, ArrowRight, Sparkle
  */
 export function MarketingLanding() {
   const observerRef = useRef<IntersectionObserver | null>(null);
+  const { isAuthenticated } = useAuth();
 
   // Setup intersection observer for reveal-on-scroll animations
   useEffect(() => {
@@ -131,12 +134,16 @@ export function MarketingLanding() {
               <span className="text-2xl font-bold text-gray-900">StrataDash</span>
             </div>
             <div className="flex items-center gap-4">
-              <Link
-                to="/login"
-                className="px-5 py-2.5 text-gray-600 hover:text-gray-900 transition-colors font-medium"
-              >
-                Sign In
-              </Link>
+              {isAuthenticated ? (
+                <UserMenu />
+              ) : (
+                <Link
+                  to="/login"
+                  className="px-5 py-2.5 text-gray-600 hover:text-gray-900 transition-colors font-medium"
+                >
+                  Sign In
+                </Link>
+              )}
               <a
                 href="mailto:hello@stratadash.org"
                 className="animated-border-btn px-5 py-2.5 rounded-full"

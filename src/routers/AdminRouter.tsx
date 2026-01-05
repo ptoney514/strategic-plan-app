@@ -3,6 +3,7 @@ import { SystemAdminGuard } from '../middleware/SystemAdminGuard';
 import { SystemAdminLayout } from '../layouts/SystemAdminLayout';
 import { SystemDashboard } from '../pages/admin/SystemDashboard';
 import { SystemSettings } from '../pages/admin/SystemSettings';
+import { UserManagement } from '../pages/admin/UserManagement';
 import { Login } from '../pages/Login';
 
 /**
@@ -25,6 +26,7 @@ export function AdminRouter() {
         }
       >
         <Route index element={<SystemDashboard />} />
+        <Route path="users" element={<UserManagement />} />
         <Route path="settings" element={<SystemSettings />} />
       </Route>
 

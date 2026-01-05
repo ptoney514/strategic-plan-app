@@ -1,5 +1,5 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Building2, Settings, LogOut, Shield } from 'lucide-react';
+import { Building2, Settings, LogOut, Shield, Users } from 'lucide-react';
 
 /**
  * SystemAdminLayout - Layout for system administrator area (/admin)
@@ -26,14 +26,21 @@ export function SystemAdminLayout() {
             {/* Navigation */}
             <nav className="flex items-center gap-4">
               <Link
-                to="/admin"
+                to="/"
                 className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 <Building2 className="h-4 w-4 inline mr-1" />
                 Districts
               </Link>
               <Link
-                to="/admin/settings"
+                to="/users"
+                className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+              >
+                <Users className="h-4 w-4 inline mr-1" />
+                Users
+              </Link>
+              <Link
+                to="/settings"
                 className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 <Settings className="h-4 w-4 inline mr-1" />

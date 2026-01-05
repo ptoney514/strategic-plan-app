@@ -4,6 +4,8 @@ import { ChevronRight, Home, Calendar, X } from 'lucide-react';
 import type { District, Goal } from '../../lib/types';
 import { useSubdomain } from '../../contexts/SubdomainContext';
 import { buildDistrictPath } from '../../lib/subdomain';
+import { useAuth } from '../../contexts/AuthContext';
+import { UserMenu } from '../common/UserMenu';
 
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
@@ -69,6 +71,7 @@ function getObjectiveColor(goal: Goal, index: number): keyof typeof colorClasses
 export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoading }: SidebarProps) {
   const params = useParams<{ slug?: string; goalId?: string }>();
   const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
+  const { isAuthenticated } = useAuth();
   // Use URL param slug if available, otherwise use subdomain slug
   const slug = params.slug || subdomainSlug || district.slug;
   const isOnSubdomain = subdomainType === 'district';
@@ -342,20 +345,20 @@ function SidebarContent({
   return (
     <>
       {/* Logo Area */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 h-16 flex items-center">
-        <Link to={homePath} className="flex items-center gap-3" onClick={onItemClick}>
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 h-16 flex items-center justify-between">
+        <Link to={homePath} className="flex items-center gap-3 min-w-0" onClick={onItemClick}>
           {(() => {
             const logoUrl = getLogoUrl(district, slug || '');
             return logoUrl ? (
-              <img src={logoUrl} alt={district.name} className="w-8 h-8 object-contain" />
+              <img src={logoUrl} alt={district.name} className="w-8 h-8 object-contain flex-shrink-0" />
             ) : (
-              <div className="w-8 h-8 rounded bg-district-red flex items-center justify-center text-white font-display font-semibold text-sm">
+              <div className="w-8 h-8 rounded bg-district-red flex items-center justify-center text-white font-display font-semibold text-sm flex-shrink-0">
                 {district.name.charAt(0)}
               </div>
             );
           })()}
-          <div className="flex flex-col">
-            <span className="font-display font-semibold text-sm tracking-tight text-gray-900 leading-none truncate max-w-[180px]">
+          <div className="flex flex-col min-w-0">
+            <span className="font-display font-semibold text-sm tracking-tight text-gray-900 leading-none truncate max-w-[140px]">
               {district.name.split(' ')[0].toUpperCase()}
             </span>
             <span className="text-[10px] uppercase tracking-widest text-gray-500 font-medium mt-0.5">
@@ -363,6 +366,7 @@ function SidebarContent({
             </span>
           </div>
         </Link>
+        {isAuthenticated && <UserMenu />}
       </div>
 
       {/* Navigation */}

@@ -154,6 +154,7 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
           isOverviewActive={isOverviewActive}
           currentGoalId={goalId}
           isLoading={isLoading}
+          isAuthenticated={isAuthenticated}
         />
       </aside>
 
@@ -188,6 +189,7 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
           currentGoalId={goalId}
           onItemClick={onClose}
           isLoading={isLoading}
+          isAuthenticated={isAuthenticated}
         />
       </aside>
 
@@ -210,6 +212,7 @@ interface SidebarContentProps {
   currentGoalId?: string;
   onItemClick?: () => void;
   isLoading?: boolean;
+  isAuthenticated?: boolean;
 }
 
 function SidebarContent({
@@ -224,6 +227,7 @@ function SidebarContent({
   currentGoalId,
   onItemClick,
   isLoading,
+  isAuthenticated,
 }: SidebarContentProps) {
   const params = useParams<{ slug?: string }>();
   const { slug: subdomainSlug, type: subdomainType } = useSubdomain();

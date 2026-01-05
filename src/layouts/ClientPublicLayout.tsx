@@ -2,12 +2,19 @@ import { Outlet, Link, useParams } from 'react-router-dom';
 import { useDistrict } from '../hooks/useDistricts';
 import { HomepageHeader } from '../components/homepage/HomepageHeader';
 
+interface ClientPublicLayoutProps {
+  /** Optional: For subdomain-based routing, pass the slug directly */
+  districtSlug?: string;
+}
+
 /**
  * ClientPublicLayout - Layout for public client pages (/:slug)
  * Accessible to everyone, displays public strategic plan information
  */
-export function ClientPublicLayout() {
-  const { slug } = useParams<{ slug: string }>();
+export function ClientPublicLayout({ districtSlug }: ClientPublicLayoutProps = {}) {
+  const params = useParams<{ slug: string }>();
+  // Use prop if provided (subdomain routing), otherwise use URL param (path routing)
+  const slug = districtSlug || params.slug;
   const { data: district, isLoading } = useDistrict(slug!);
 
   if (isLoading) {

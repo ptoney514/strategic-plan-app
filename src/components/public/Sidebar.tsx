@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation, useParams, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, Calendar, X } from 'lucide-react';
 import type { District, Goal } from '../../lib/types';
+import { useSubdomain } from '../../contexts/SubdomainContext';
 
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
@@ -65,7 +66,11 @@ function getObjectiveColor(goal: Goal, index: number): keyof typeof colorClasses
 }
 
 export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoading }: SidebarProps) {
-  const { slug, goalId } = useParams();
+  const params = useParams<{ slug?: string; goalId?: string }>();
+  const { slug: subdomainSlug } = useSubdomain();
+  // Use URL param slug if available, otherwise use subdomain slug
+  const slug = params.slug || subdomainSlug || district.slug;
+  const goalId = params.goalId;
   const location = useLocation();
   const [expandedObjective, setExpandedObjective] = useState<string | null>(null);
   const [expandedGoals, setExpandedGoals] = useState<Set<string>>(new Set());
@@ -213,7 +218,10 @@ function SidebarContent({
   onItemClick,
   isLoading,
 }: SidebarContentProps) {
-  const { slug } = useParams();
+  const params = useParams<{ slug?: string }>();
+  const { slug: subdomainSlug } = useSubdomain();
+  // Use URL param slug if available, otherwise use subdomain slug
+  const slug = params.slug || subdomainSlug || district.slug;
   const location = useLocation();
   const navigate = useNavigate();
 

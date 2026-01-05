@@ -5,6 +5,8 @@ import { SchoolAdminService } from '../lib/services';
 
 interface SchoolAdminGuardProps {
   children: ReactNode;
+  /** Optional: For subdomain-based routing, pass the slug directly */
+  districtSlug?: string;
 }
 
 /**
@@ -18,9 +20,17 @@ interface SchoolAdminGuardProps {
  * <SchoolAdminGuard>
  *   <SchoolAdminLayout />
  * </SchoolAdminGuard>
+ *
+ * With subdomain routing:
+ * <SchoolAdminGuard districtSlug="westside">
+ *   <SchoolAdminLayout />
+ * </SchoolAdminGuard>
  */
-export function SchoolAdminGuard({ children }: SchoolAdminGuardProps) {
-  const { slug, schoolSlug } = useParams<{ slug: string; schoolSlug: string }>();
+export function SchoolAdminGuard({ children, districtSlug }: SchoolAdminGuardProps) {
+  const params = useParams<{ slug: string; schoolSlug: string }>();
+  // Use prop if provided (subdomain routing), otherwise use URL param (path routing)
+  const slug = districtSlug || params.slug;
+  const schoolSlug = params.schoolSlug;
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [checking, setChecking] = useState(true);

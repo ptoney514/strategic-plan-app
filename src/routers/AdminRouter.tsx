@@ -1,0 +1,35 @@
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { SystemAdminGuard } from '../middleware/SystemAdminGuard';
+import { SystemAdminLayout } from '../layouts/SystemAdminLayout';
+import { SystemDashboard } from '../pages/admin/SystemDashboard';
+import { SystemSettings } from '../pages/admin/SystemSettings';
+import { Login } from '../pages/Login';
+
+/**
+ * Router for the admin subdomain (admin.stratadash.org)
+ * Handles system admin routes - requires system_admin role.
+ */
+export function AdminRouter() {
+  return (
+    <Routes>
+      {/* Login page */}
+      <Route path="/login" element={<Login />} />
+
+      {/* System Admin Routes */}
+      <Route
+        path="/"
+        element={
+          <SystemAdminGuard>
+            <SystemAdminLayout />
+          </SystemAdminGuard>
+        }
+      >
+        <Route index element={<SystemDashboard />} />
+        <Route path="settings" element={<SystemSettings />} />
+      </Route>
+
+      {/* Catch-all redirects to admin dashboard */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}

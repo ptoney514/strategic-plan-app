@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface ClientAdminGuardProps {
   children: ReactNode;
+  /** Optional: For subdomain-based routing, pass the slug directly */
+  districtSlug?: string;
 }
 
 /**
@@ -14,9 +16,16 @@ interface ClientAdminGuardProps {
  * <ClientAdminGuard>
  *   <ClientAdminLayout />
  * </ClientAdminGuard>
+ *
+ * With subdomain routing:
+ * <ClientAdminGuard districtSlug="westside">
+ *   <ClientAdminLayout />
+ * </ClientAdminGuard>
  */
-export function ClientAdminGuard({ children }: ClientAdminGuardProps) {
-  const { slug } = useParams<{ slug: string }>();
+export function ClientAdminGuard({ children, districtSlug }: ClientAdminGuardProps) {
+  const params = useParams<{ slug: string }>();
+  // Use prop if provided (subdomain routing), otherwise use URL param (path routing)
+  const slug = districtSlug || params.slug;
   const { isAuthenticated, loading: authLoading, hasDistrictAccess } = useAuth();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [checking, setChecking] = useState(true);

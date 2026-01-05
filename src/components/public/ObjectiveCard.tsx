@@ -2,6 +2,8 @@ import { Link, useParams } from 'react-router-dom';
 import { ChevronRight, Target } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
 import { StatusBadge } from './StatusBadge';
+import { useSubdomain } from '../../contexts/SubdomainContext';
+import { buildDistrictPath } from '../../lib/subdomain';
 
 interface ObjectiveCardProps {
   objective: Goal;
@@ -44,7 +46,10 @@ function getColor(goal: Goal, index: number): keyof typeof colorConfig {
 }
 
 export function ObjectiveCard({ objective, childGoals, metrics: _metrics, index }: ObjectiveCardProps) {
-  const { slug } = useParams();
+  const params = useParams<{ slug?: string }>();
+  const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
+  const slug = params.slug || subdomainSlug || '';
+  const isOnSubdomain = subdomainType === 'district';
   const color = getColor(objective, index);
   const colors = colorConfig[color];
 
@@ -60,7 +65,7 @@ export function ObjectiveCard({ objective, childGoals, metrics: _metrics, index 
 
   return (
     <Link
-      to={`/${slug}/objective/${objective.id}`}
+      to={buildDistrictPath(`/objective/${objective.id}`, slug, isOnSubdomain)}
       className={`group block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden border-t-[3px] ${colors.border} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
     >
       <div className="p-6">

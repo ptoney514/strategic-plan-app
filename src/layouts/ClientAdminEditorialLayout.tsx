@@ -33,7 +33,7 @@ export function ClientAdminEditorialLayout() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const basePath = `/${slug}/admin2`;
+  const basePath = `/${slug}/admin`;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -126,21 +126,9 @@ export function ClientAdminEditorialLayout() {
           </Link>
 
           <Link
-            to={`${basePath}/dashboard`}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              isActiveRoute(`${basePath}/dashboard`)
-                ? 'bg-[#333333] text-white'
-                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
-            }`}
-          >
-            <Grid className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>Dashboard</span>}
-          </Link>
-
-          <Link
             to={`${basePath}/objectives`}
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              isActiveRoute(`${basePath}/objectives`) || isActiveRoute(`${basePath}/goals`)
+              isActiveRoute(`${basePath}/objectives`)
                 ? 'bg-[#333333] text-white'
                 : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
             }`}
@@ -149,24 +137,14 @@ export function ClientAdminEditorialLayout() {
             {!isSidebarCollapsed && <span>Objectives</span>}
           </Link>
 
-          <Link
-            to={`${basePath}/team`}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              isActiveRoute(`${basePath}/team`)
-                ? 'bg-[#333333] text-white'
-                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
-            }`}
+          {/* View Public Site */}
+          <a
+            href={`/${slug}`}
+            className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white"
           >
-            <Users className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && (
-              <>
-                <span>Team</span>
-                <span className="ml-auto text-[9px] uppercase tracking-wide bg-white/15 px-1.5 py-0.5 rounded text-[#9a9a9a]">
-                  Soon
-                </span>
-              </>
-            )}
-          </Link>
+            <Eye className="h-[18px] w-[18px] opacity-70" />
+            {!isSidebarCollapsed && <span>View Public Site</span>}
+          </a>
         </nav>
 
         {/* Sidebar Footer */}

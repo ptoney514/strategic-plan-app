@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Outlet, Link, useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { useSubdomain } from '../contexts/SubdomainContext';
 import {
   Home,
   Target,
@@ -24,16 +25,16 @@ import { useAuth } from '../contexts/AuthContext';
  * Inspired by OKR/strategic planning tools with warm paper aesthetic
  */
 export function ClientAdminEditorialLayout() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useSubdomain();
   const navigate = useNavigate();
   const location = useLocation();
-  const { data: district, isLoading } = useDistrict(slug!);
+  const { data: district, isLoading } = useDistrict(slug || '');
   const { user, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
-  const basePath = `/${slug}/admin`;
+  const basePath = '/admin';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -139,7 +140,7 @@ export function ClientAdminEditorialLayout() {
 
           {/* View Public Site */}
           <a
-            href={`/${slug}`}
+            href="/"
             className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white"
           >
             <Eye className="h-[18px] w-[18px] opacity-70" />

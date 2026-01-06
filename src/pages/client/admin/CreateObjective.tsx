@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSubdomain } from '../../../contexts/SubdomainContext';
 import {
   ChevronRight,
   Plus,
@@ -38,9 +39,9 @@ interface StoredGoal {
  * Now with enhanced GoalEditor for adding goals with metrics
  */
 export function CreateObjective() {
-  const { slug } = useParams();
+  const { slug } = useSubdomain();
   const navigate = useNavigate();
-  const { data: district } = useDistrict(slug!);
+  const { data: district } = useDistrict(slug || '');
   const { data: existingGoals } = useGoals(district?.id || '');
   const createGoal = useCreateGoal();
 
@@ -170,7 +171,7 @@ export function CreateObjective() {
       }
 
       // Navigate to the objectives list
-      navigate(`/${slug}/admin/objectives`);
+      navigate('/admin/objectives');
     } catch (error) {
       console.error('Failed to create objective:', error);
     } finally {
@@ -192,7 +193,7 @@ export function CreateObjective() {
       <div className="px-10 py-8 max-w-[1100px]">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-[13px] text-[#8a8a8a] mb-6">
-          <Link to={`/${slug}/admin/objectives`} className="hover:text-[#4a4a4a] transition-colors">
+          <Link to="/admin/objectives" className="hover:text-[#4a4a4a] transition-colors">
             All objectives
           </Link>
           <ChevronRight className="h-3.5 w-3.5" />
@@ -206,7 +207,7 @@ export function CreateObjective() {
           </h1>
           <p className="text-[14px] text-[#6a6a6a]">
             To create strategic objectives with more advanced settings, go to the{' '}
-            <Link to={`/${slug}/admin/settings/objectives`} className="text-[#4a6fa5] hover:underline">
+            <Link to="/admin/settings/objectives" className="text-[#4a6fa5] hover:underline">
               Strategic objectives settings page
             </Link>.
           </p>

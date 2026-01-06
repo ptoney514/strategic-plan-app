@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Building2, Plus, Eye, Settings, Trash2, Search, Users, Target, BarChart3, Loader2, X, Edit2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useDistricts, useCreateDistrict, useDeleteDistrict, useUpdateDistrict } from '../../hooks/useDistricts';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 import type { District } from '../../lib/types';
 
 /**
@@ -11,7 +11,6 @@ import type { District } from '../../lib/types';
  * Displays all districts and allows system-level management
  */
 export function SystemDashboard() {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingDistrict, setEditingDistrict] = useState<District | null>(null);
@@ -221,7 +220,7 @@ export function SystemDashboard() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => navigate(`/${district.slug}/admin`)}
+                          onClick={() => window.location.href = buildSubdomainUrlWithPath('district', '/admin', district.slug)}
                         >
                           <Settings className="h-4 w-4" />
                         </Button>

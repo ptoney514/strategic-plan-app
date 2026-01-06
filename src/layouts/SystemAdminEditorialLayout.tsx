@@ -1,41 +1,28 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { useSubdomain } from '../contexts/SubdomainContext';
 import {
-  Home,
-  Target,
+  Shield,
   Building2,
-  FileText,
-  Palette,
-  BarChart2,
-  Eye,
-  User,
-  Bell,
+  Users,
   Settings,
+  Bell,
+  Grid,
   ChevronsLeft,
   LogOut,
-  Grid,
-  Users
 } from 'lucide-react';
-import { useDistrict } from '../hooks/useDistricts';
 import { useAuth } from '../contexts/AuthContext';
-import { buildSubdomainUrlWithPath } from '../lib/subdomain';
 
 /**
- * ClientAdminEditorialLayout - Editorial-style admin layout with dark sidebar
- * Inspired by OKR/strategic planning tools with warm paper aesthetic
+ * SystemAdminEditorialLayout - Editorial-style admin layout for system administrators
+ * Features dark sidebar with warm paper aesthetic for system-level administration
  */
-export function ClientAdminEditorialLayout() {
-  const { slug } = useSubdomain();
+export function SystemAdminEditorialLayout() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { data: district, isLoading } = useDistrict(slug || '');
   const { user, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  const basePath = '/admin';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -57,37 +44,11 @@ export function ClientAdminEditorialLayout() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#c9a227] mx-auto"></div>
-          <p className="mt-4 text-[#8a8a8a]">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!district) {
-    return (
-      <div className="min-h-screen bg-[#faf9f7] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-xl text-[#4a4a4a]">District not found</p>
-          <Link to="/" className="mt-4 inline-flex items-center text-[#b85c38] hover:underline">
-            Return to Home
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
   const isActiveRoute = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
-  };
-
-  // Get district initials for logo
-  const getInitials = (name: string) => {
-    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+    if (path === '/') {
+      return location.pathname === '/';
+    }
+    return location.pathname.startsWith(path);
   };
 
   return (
@@ -98,16 +59,14 @@ export function ClientAdminEditorialLayout() {
         <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-[#c9a227] rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-[#1a1a1a] font-bold text-sm font-['Playfair_Display',_Georgia,_serif]">
-                {getInitials(district.name)}
-              </span>
+              <Shield className="h-5 w-5 text-[#1a1a1a]" />
             </div>
             {!isSidebarCollapsed && (
               <div className="min-w-0">
                 <div className="font-semibold text-sm text-white truncate leading-tight">
-                  {district.name}
+                  System Admin
                 </div>
-                <div className="text-xs text-[#9a9a9a]">Strategic Planning</div>
+                <div className="text-xs text-[#9a9a9a]">Strategic Plan Builder</div>
               </div>
             )}
           </div>
@@ -116,39 +75,40 @@ export function ClientAdminEditorialLayout() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           <Link
-            to={basePath}
+            to="/"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              location.pathname === basePath
+              isActiveRoute('/')
                 ? 'bg-[#333333] text-white'
                 : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
             }`}
           >
-            <Home className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>Home</span>}
+            <Building2 className="h-[18px] w-[18px] opacity-70" />
+            {!isSidebarCollapsed && <span>Districts</span>}
           </Link>
 
           <Link
-            to={`${basePath}/objectives`}
+            to="/users"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              isActiveRoute(`${basePath}/objectives`)
+              isActiveRoute('/users')
                 ? 'bg-[#333333] text-white'
                 : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
             }`}
           >
-            <Target className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>Objectives</span>}
+            <Users className="h-[18px] w-[18px] opacity-70" />
+            {!isSidebarCollapsed && <span>Users</span>}
           </Link>
 
-          {/* View Public Site */}
-          <a
-            href={buildSubdomainUrlWithPath('district', '', slug || '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white"
+          <Link
+            to="/settings"
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              isActiveRoute('/settings')
+                ? 'bg-[#333333] text-white'
+                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
+            }`}
           >
-            <Eye className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>View Public Site</span>}
-          </a>
+            <Settings className="h-[18px] w-[18px] opacity-70" />
+            {!isSidebarCollapsed && <span>Settings</span>}
+          </Link>
         </nav>
 
         {/* Sidebar Footer */}
@@ -185,10 +145,10 @@ export function ClientAdminEditorialLayout() {
                 className="flex items-center gap-2 px-2.5 py-1 rounded-lg hover:bg-[#f5f3ef] transition-colors"
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e8d5e8] to-[#d4b8d4] flex items-center justify-center text-xs font-semibold text-[#6b4c6b]">
-                  {user?.email?.slice(0, 2).toUpperCase() || 'AD'}
+                  {user?.email?.slice(0, 2).toUpperCase() || 'SA'}
                 </div>
                 <span className="text-sm font-medium text-[#1a1a1a]">
-                  {user?.email?.split('@')[0] || 'Admin'}
+                  {user?.email?.split('@')[0] || 'System Admin'}
                 </span>
               </button>
 
@@ -226,7 +186,7 @@ export function ClientAdminEditorialLayout() {
             <a href="#" className="text-xs text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors">Terms</a>
           </div>
           <div className="text-xs text-[#8a8a8a]">
-            &copy; {new Date().getFullYear()} {district.name}
+            &copy; {new Date().getFullYear()} Strategic Plan Builder
           </div>
         </footer>
       </div>

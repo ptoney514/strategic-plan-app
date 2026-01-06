@@ -101,31 +101,9 @@ export function DistrictRouter() {
         <Route path="settings" element={<AdminSettings />} />
       </Route>
 
-      {/* District Admin Routes */}
+      {/* District Admin Routes (Editorial Design) */}
       <Route
         path="/admin"
-        element={
-          <ClientAdminGuard districtSlug={slug}>
-            <ClientAdminLayout />
-          </ClientAdminGuard>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="goals" element={<AdminGoals />} />
-        <Route path="goals-v2" element={<AdminGoalsV2 />} />
-        <Route path="objectives/new" element={<ObjectiveBuilder />} />
-        <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
-        <Route path="goals/:goalId/edit" element={<ObjectiveBuilder />} />
-        <Route path="import" element={<ImportWizard />} />
-        <Route path="data-manager" element={<DataManager />} />
-        <Route path="schools" element={<AdminSchools />} />
-        <Route path="settings" element={<AdminSettings />} />
-        <Route path="audit" element={<AdminAudit />} />
-      </Route>
-
-      {/* District Admin v2 Routes (Editorial Design) */}
-      <Route
-        path="/admin2"
         element={
           <ClientAdminGuard districtSlug={slug}>
             <ClientAdminEditorialLayout />
@@ -135,9 +113,15 @@ export function DistrictRouter() {
         <Route index element={<AdminDashboard2 />} />
         <Route path="objectives" element={<AdminDashboard2 />} />
         <Route path="objectives/create" element={<CreateObjective />} />
-        <Route path="objectives/new" element={<ObjectiveBuilder />} />
         <Route path="objectives/:objectiveId/edit" element={<EditObjective />} />
+        {/* Backwards compatibility redirects */}
+        <Route path="goals" element={<Navigate to="../objectives" replace />} />
+        <Route path="objectives/new" element={<Navigate to="../objectives/create" replace />} />
       </Route>
+
+      {/* Redirect /admin2 to /admin for backwards compatibility */}
+      <Route path="/admin2" element={<Navigate to="/admin" replace />} />
+      <Route path="/admin2/*" element={<Navigate to="/admin" replace />} />
 
       {/* Catch-all redirects to district dashboard */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -170,7 +170,7 @@ export function CreateObjective() {
       }
 
       // Navigate to the objectives list
-      navigate(`/${slug}/admin2/objectives`);
+      navigate(`/${slug}/admin/objectives`);
     } catch (error) {
       console.error('Failed to create objective:', error);
     } finally {
@@ -192,7 +192,7 @@ export function CreateObjective() {
       <div className="px-10 py-8 max-w-[1100px]">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-[13px] text-[#8a8a8a] mb-6">
-          <Link to={`/${slug}/admin2/objectives`} className="hover:text-[#4a4a4a] transition-colors">
+          <Link to={`/${slug}/admin/objectives`} className="hover:text-[#4a4a4a] transition-colors">
             All objectives
           </Link>
           <ChevronRight className="h-3.5 w-3.5" />
@@ -206,7 +206,7 @@ export function CreateObjective() {
           </h1>
           <p className="text-[14px] text-[#6a6a6a]">
             To create strategic objectives with more advanced settings, go to the{' '}
-            <Link to={`/${slug}/admin2/settings/objectives`} className="text-[#4a6fa5] hover:underline">
+            <Link to={`/${slug}/admin/settings/objectives`} className="text-[#4a6fa5] hover:underline">
               Strategic objectives settings page
             </Link>.
           </p>
@@ -540,7 +540,7 @@ export function CreateObjective() {
             {/* Action Buttons */}
             <div className="flex items-center gap-3 pt-4">
               <button
-                onClick={() => navigate(`/${slug}/admin2/objectives`)}
+                onClick={() => navigate(`/${slug}/admin/objectives`)}
                 className="px-6 py-2.5 text-[14px] font-medium text-[#4a4a4a] bg-[#f5f3ef] rounded-lg hover:bg-[#e8e6e1] transition-colors"
               >
                 Cancel

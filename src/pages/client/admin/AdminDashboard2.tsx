@@ -128,7 +128,7 @@ export function AdminDashboard2() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              to={`/${slug}/admin2/objectives/create`}
+              to={`/${slug}/admin/objectives/create`}
               className="bg-[#b85c38] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors"
             >
               Create new strategic objective
@@ -415,7 +415,7 @@ export function AdminDashboard2() {
                     {/* Title and Description - stacked vertically */}
                     <div className="flex-1 min-w-0 flex flex-col gap-1">
                       <Link
-                        to={`/${slug}/admin2/objectives/${objective.id}/edit`}
+                        to={`/${slug}/admin/objectives/${objective.id}/edit`}
                         className="text-[15px] font-bold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                         data-testid="objective-title"
                       >
@@ -484,7 +484,7 @@ export function AdminDashboard2() {
                               {/* Title and Description */}
                               <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                                 <Link
-                                  to={`/${slug}/admin2/objectives/${child.id}/edit`}
+                                  to={`/${slug}/admin/objectives/${child.id}/edit`}
                                   className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                                   data-testid="child-goal-title"
                                 >
@@ -535,7 +535,7 @@ export function AdminDashboard2() {
                                     {/* Title and Description */}
                                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                                       <Link
-                                        to={`/${slug}/admin2/objectives/${grandchild.id}/edit`}
+                                        to={`/${slug}/admin/objectives/${grandchild.id}/edit`}
                                         className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                                         data-testid="grandchild-goal-title"
                                       >

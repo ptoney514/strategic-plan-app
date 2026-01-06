@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useCreateGoal, useUpdateGoal } from '../hooks/useGoals';
 import type { Goal } from '../lib/types';
 
@@ -11,15 +11,17 @@ interface GoalFormProps {
   onCancel?: () => void;
 }
 
+type StatusDetail = NonNullable<Goal['status_detail']>;
+
 export function GoalForm({ goal, districtId, parentId, level, onSuccess, onCancel }: GoalFormProps) {
   const createGoal = useCreateGoal();
   const updateGoal = useUpdateGoal();
-  
+
   const [formData, setFormData] = useState({
     title: goal?.title || '',
     description: goal?.description || '',
-    target_date: goal?.target_date || '',
-    status: goal?.status || 'not-started' as Goal['status'],
+    end_date: goal?.end_date || '',
+    status_detail: goal?.status_detail || 'not_started' as StatusDetail,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -29,13 +31,13 @@ export function GoalForm({ goal, districtId, parentId, level, onSuccess, onCance
       setFormData({
         title: goal.title,
         description: goal.description || '',
-        target_date: goal.target_date || '',
-        status: goal.status,
+        end_date: goal.end_date || '',
+        status_detail: goal.status_detail || 'not_started',
       });
     }
   }, [goal]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setErrors({});
 
@@ -76,7 +78,7 @@ export function GoalForm({ goal, districtId, parentId, level, onSuccess, onCance
     }
   };
 
-  const statusOptions: Goal['status'][] = ['not-started', 'in-progress', 'completed', 'on-hold'];
+  const statusOptions: StatusDetail[] = ['not_started', 'planning', 'in_progress', 'completed', 'on_hold'];
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -112,32 +114,32 @@ export function GoalForm({ goal, districtId, parentId, level, onSuccess, onCance
       </div>
 
       <div>
-        <label htmlFor="status" className="block text-sm font-medium text-foreground mb-1">
+        <label htmlFor="status_detail" className="block text-sm font-medium text-foreground mb-1">
           Status
         </label>
         <select
-          id="status"
-          value={formData.status}
-          onChange={(e) => setFormData({ ...formData, status: e.target.value as Goal['status'] })}
+          id="status_detail"
+          value={formData.status_detail}
+          onChange={(e) => setFormData({ ...formData, status_detail: e.target.value as StatusDetail })}
           className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
         >
           {statusOptions.map((status) => (
             <option key={status} value={status}>
-              {status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+              {status.replace(/_/g, ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
             </option>
           ))}
         </select>
       </div>
 
       <div>
-        <label htmlFor="target_date" className="block text-sm font-medium text-foreground mb-1">
+        <label htmlFor="end_date" className="block text-sm font-medium text-foreground mb-1">
           Target Date
         </label>
         <input
           type="date"
-          id="target_date"
-          value={formData.target_date}
-          onChange={(e) => setFormData({ ...formData, target_date: e.target.value })}
+          id="end_date"
+          value={formData.end_date}
+          onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
           className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
         />
       </div>

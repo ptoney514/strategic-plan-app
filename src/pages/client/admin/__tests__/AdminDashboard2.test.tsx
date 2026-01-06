@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SubdomainProvider } from '../../../../contexts/SubdomainContext';
 import { AdminDashboard2 } from '../AdminDashboard2';
 import type { HierarchicalGoal } from '../../../../lib/types';
 
@@ -112,11 +114,23 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+const createTestQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: { retry: false, gcTime: 0 },
+    },
+  });
+
 const renderComponent = () => {
+  const queryClient = createTestQueryClient();
   return render(
-    <BrowserRouter>
-      <AdminDashboard2 />
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <SubdomainProvider>
+        <BrowserRouter>
+          <AdminDashboard2 />
+        </BrowserRouter>
+      </SubdomainProvider>
+    </QueryClientProvider>
   );
 };
 

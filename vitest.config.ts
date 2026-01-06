@@ -7,7 +7,11 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
+    setupFiles: ['./src/test/setup.tsx'],
+    exclude: ['**/node_modules/**', '**/e2e/**'],
+    typecheck: {
+      tsconfig: './tsconfig.app.json',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

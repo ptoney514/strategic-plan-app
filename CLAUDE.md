@@ -62,21 +62,109 @@ strategic-plan-vite/
 ## Development Commands
 
 ### Essential commands
+
 ```bash
 npm run dev              # Start dev server (http://localhost:5173)
-npm test                # Run tests
-npm run build           # Production build
-npm run preview         # Preview production build
+npm test                 # Run tests in watch mode
+npm run test:run         # Run tests once
+npm run build            # Production build
+npm run preview          # Preview production build
 ```
 
-### Less common but important
+### Quality checks
+
 ```bash
-npm run lint            # Lint code with ESLint
-npm run type-check      # TypeScript checking
-supabase start          # Start local Supabase
-supabase stop           # Stop local Supabase
-supabase db reset       # Reset local DB with migrations
+npm run lint             # Lint code with ESLint
+npm run lint:fix         # Lint and auto-fix issues
+npm run type-check       # TypeScript type checking
 ```
+
+### Local Supabase (Docker)
+
+```bash
+npm run db:start         # Start local Supabase containers
+npm run db:stop          # Stop local Supabase
+npm run db:reset         # Reset DB with migrations + seed data
+npm run db:status        # Show connection info and keys
+npm run db:studio        # Open Supabase Studio UI
+npm run db:diff          # Show uncommitted schema changes
+npm run dev:local        # Start Supabase + Vite together
+```
+
+## Local Supabase Development
+
+### Prerequisites
+
+1. Docker Desktop installed and running
+2. Supabase CLI: `brew install supabase/tap/supabase`
+3. Node.js 20+
+
+### First-Time Setup
+
+1. Copy environment template: `cp .env.local.example .env.local`
+2. Start local Supabase: `npm run db:start`
+3. Get local keys: `npm run db:status`
+4. Update `.env.local` with the anon key
+5. Start development: `npm run dev`
+
+### Daily Workflow
+
+```bash
+npm run dev:local        # Start everything (Supabase + Vite)
+npm run db:studio        # Open Supabase Studio at localhost:54323
+```
+
+## Database Migration Workflow
+
+### Creating a New Migration
+
+1. **Develop Locally**
+   - Make schema changes in Supabase Studio (localhost:54323)
+   - Test thoroughly with your application
+
+2. **Generate Migration File**
+
+   ```bash
+   supabase db diff -f <descriptive_name>
+   # Example: supabase db diff -f add_user_preferences
+   ```
+
+3. **Review Generated SQL**
+   - Check `supabase/migrations/<timestamp>_<name>.sql`
+   - Verify RLS policies are included
+   - Check for destructive operations
+
+4. **Test Migration Locally**
+
+   ```bash
+   npm run db:reset        # Reset and re-run all migrations
+   npm test -- --run       # Run unit tests
+   ```
+
+5. **Commit and Push**
+
+   ```bash
+   git add supabase/migrations/
+   git commit -m "feat(db): add user preferences table"
+   ```
+
+6. **Deploy to Production**
+   After PR merge:
+   ```bash
+   supabase db push --linked
+   ```
+   **CRITICAL**: Reload schema cache in Supabase Dashboard!
+   - Go to: Project → Settings → API
+   - Click "Reload Schema"
+   - Verify changes in API documentation
+
+### Migration Checklist
+
+- [ ] Migration tested locally with `db:reset`
+- [ ] All tests passing
+- [ ] No destructive operations without backup plan
+- [ ] RLS policies reviewed
+- [ ] Schema cache reloaded after production deploy
 
 ## Critical Constraints
 
@@ -106,17 +194,20 @@ supabase db reset       # Reset local DB with migrations
 Our testing strategy prioritizes **confidence over coverage**. Write tests that give you confidence to ship.
 
 ### Testing Pyramid
+
 1. **Unit Tests (60%)** - Services, utilities, calculations
 2. **Integration Tests (30%)** - Components with React Query
 3. **E2E Tests (10%)** - Critical user flows
 
 ### Coverage Targets
+
 - Critical paths: 100%
 - Components: >80%
 - Utilities: >90%
 - Custom hooks: >85%
 
 ### Testing Framework
+
 - **Vitest** for unit tests
 - **Testing Library** for component tests
 - **ResizeObserver** mocked for Recharts
@@ -125,11 +216,13 @@ Our testing strategy prioritizes **confidence over coverage**. Write tests that 
 ## Development Pattern: Tests-as-You-Go (Encouraged)
 
 When building features or fixing bugs, consider:
+
 1. Writing a test that specifies the behavior
 2. Implementing minimum code to pass
 3. Refactoring while keeping tests green
 
 ### What to Test (When Practical)
+
 - User-facing behavior, not implementation details
 - Edge cases and error states
 - Integration points (API calls, database operations)
@@ -139,20 +232,24 @@ Note: Tests encouraged but not strictly required for MVP pace. Focus on critical
 ## Performance Budgets
 
 ### Build Performance
+
 - Vite build time: <15s (currently ~12s) ✅
 - TypeScript compilation: <5s ✅
 
 ### Runtime Performance
+
 - Bundle Size (gzipped): <600KB (currently ~480KB) ✅
 - Time to Interactive: <2s ✅
 - Lighthouse Score: >90 (currently 92) ✅
 
 ### Database Performance
+
 - Query Response: <500ms for 90th percentile
 - Goal Hierarchy Fetch: <300ms for 3-level deep
 - Dashboard Load: <1s with 100+ goals
 
 ### Optimization Checklist
+
 - [ ] Images optimized and lazy-loaded
 - [ ] Route-based code splitting
 - [ ] React Query caching configured ✅
@@ -166,6 +263,7 @@ Note: Tests encouraged but not strictly required for MVP pace. Focus on critical
 All features must meet **WCAG 2.1 Level AA** standards.
 
 ### Core Requirements
+
 - Semantic HTML (proper headings, landmarks)
 - Keyboard navigation (all interactive elements)
 - Screen reader support (ARIA labels, alt text)
@@ -174,6 +272,7 @@ All features must meet **WCAG 2.1 Level AA** standards.
 - Form labels (every input labeled)
 
 ### Common Pitfalls to Avoid
+
 - ❌ `<div>` or `<span>` as buttons (use `<button>`)
 - ❌ Removing focus outlines
 - ❌ Poor color contrast in status indicators
@@ -183,18 +282,21 @@ All features must meet **WCAG 2.1 Level AA** standards.
 ## Database Conventions
 
 ### Table Naming
+
 - All tables use `spb_` prefix (strategic plan builder)
 - Hierarchical data uses `parent_id` self-referencing
 - UUIDs for all primary keys
 - Soft deletes where appropriate
 
 ### Row Level Security (RLS)
+
 - **Public read** for `is_public = true` districts
 - **District admins** can manage their assigned districts only
 - **System admins** have full access
 - **Anonymous users**: SELECT only (no INSERT/UPDATE/DELETE)
 
 ### Key Tables
+
 - `spb_districts` - District organizations
 - `spb_goals` - Hierarchical goals (3 levels: 0, 1, 2)
 - `spb_metrics` - Measurable outcomes
@@ -203,17 +305,20 @@ All features must meet **WCAG 2.1 Level AA** standards.
 ## Authentication & Authorization
 
 ### Authentication Flow
+
 1. User logs in via `/login` (Supabase Auth)
 2. Session stored in localStorage
 3. `useAuth` hook provides auth state
 4. Guards protect admin routes
 
 ### Route Protection
+
 - **Public routes**: No auth required (`/`, `/:slug`, `/:slug/goals`)
 - **Admin routes**: Require auth + district access (`/:slug/admin/*`)
 - **System admin**: Require system_admin role (`/admin/*`)
 
 ### Guards
+
 - `ClientAdminGuard` - Protects district admin routes
 - `SystemAdminGuard` - Protects system admin routes
 - Both show loading states and redirect properly
@@ -225,6 +330,7 @@ See [project_status.md](project_status.md) for current work and GitHub Issues fo
 ## Development Workflow
 
 ### GitHub Flow
+
 - `main` is always deployable
 - Create feature branches: `feature/issue-{number}-description`
 - Open PRs early (draft mode for WIP)
@@ -233,6 +339,7 @@ See [project_status.md](project_status.md) for current work and GitHub Issues fo
 - Vercel auto-deploys from main
 
 ### Branch Naming
+
 - Features: `feature/issue-123-add-excel-template`
 - Bugs: `fix/issue-456-schema-cache`
 - Docs: `docs/issue-789-deployment-guide`
@@ -240,6 +347,7 @@ See [project_status.md](project_status.md) for current work and GitHub Issues fo
 - Chore: `chore/update-dependencies`
 
 ### Commit Messages (Conventional Commits)
+
 ```
 feat: add Excel template download
 fix: resolve schema cache issue
@@ -262,6 +370,7 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 ```
 
 **Setup:**
+
 1. Copy `.env.example` to `.env.local`
 2. Never commit `.env.local`
 3. Vite requires `VITE_` prefix to expose to client
@@ -271,10 +380,12 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 **Platform**: Vercel
 
 **Auto-Deploy**:
+
 - Push to `main` → Vercel builds & deploys
 - Requires `vercel.json` for client-side routing
 
 **Post-Deployment Checklist**:
+
 1. Verify build succeeded
 2. Test login flow
 3. Check admin route protection
@@ -288,6 +399,7 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 ## Quick Reference
 
 ### Key Files
+
 - [project_status.md](project_status.md) - Current project status
 - [src/lib/types.ts](src/lib/types.ts) - TypeScript interfaces
 - [src/lib/services/](src/lib/services/) - Business logic
@@ -295,6 +407,7 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 - [supabase/migrations/](supabase/migrations/) - Database migrations
 
 ### Important Patterns
+
 - Service layer: All API calls go through services (no direct Supabase calls in components)
 - React Query: All server state managed with React Query hooks
 - Type safety: No `any` types (strict mode enabled)
@@ -303,6 +416,7 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 ## What NOT to Do
 
 ### Avoid These Patterns
+
 - ❌ Direct database queries from components
 - ❌ Mixing business logic with UI components
 - ❌ Hardcoding environment-specific values
@@ -311,6 +425,7 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 - ❌ Bypassing authentication guards
 
 ### Always Remember
+
 - ✅ Follow established patterns
 - ✅ Use `/pre-commit` before committing
 - ✅ Test locally before committing
@@ -318,4 +433,4 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 
 ---
 
-*For detailed project status, see [project_status.md](project_status.md)*
+_For detailed project status, see [project_status.md](project_status.md)_

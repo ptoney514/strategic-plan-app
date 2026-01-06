@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useSubdomain } from '../../../contexts/SubdomainContext';
 import {
   ChevronRight,
   Plus,
@@ -40,9 +41,10 @@ interface StoredGoal {
  * Loads existing objective data and allows editing
  */
 export function EditObjective() {
-  const { slug, objectiveId } = useParams();
+  const { objectiveId } = useParams();
+  const { slug } = useSubdomain();
   const navigate = useNavigate();
-  const { data: district } = useDistrict(slug!);
+  const { data: district } = useDistrict(slug || '');
   const { data: existingGoals } = useGoals(district?.id || '');
   const { data: objective, isLoading: objectiveLoading, error: objectiveError } = useGoal(objectiveId || '');
   const { data: childGoals } = useChildGoals(objectiveId || '');
@@ -214,7 +216,7 @@ export function EditObjective() {
       // This could be enhanced to handle creates/updates/deletes of children
 
       // Navigate back to the objectives list
-      navigate(`/${slug}/admin/objectives`);
+      navigate('/admin/objectives');
     } catch (error) {
       console.error('Failed to update objective:', error);
     } finally {
@@ -252,7 +254,7 @@ export function EditObjective() {
             <h2 className="text-lg font-semibold text-[#1a1a1a] mb-2">Objective not found</h2>
             <p className="text-[#8a8a8a] mb-4">The objective you're looking for doesn't exist or you don't have access to it.</p>
             <Link
-              to={`/${slug}/admin/objectives`}
+              to="/admin/objectives"
               className="inline-flex items-center gap-2 text-[#4a6fa5] hover:underline"
             >
               <ChevronRight className="h-4 w-4 rotate-180" />
@@ -269,7 +271,7 @@ export function EditObjective() {
       <div className="px-10 py-8 max-w-[1100px]">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-[13px] text-[#8a8a8a] mb-6">
-          <Link to={`/${slug}/admin/objectives`} className="hover:text-[#4a4a4a] transition-colors">
+          <Link to="/admin/objectives" className="hover:text-[#4a4a4a] transition-colors">
             All objectives
           </Link>
           <ChevronRight className="h-3.5 w-3.5" />

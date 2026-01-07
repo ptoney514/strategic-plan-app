@@ -27,6 +27,7 @@
     "db:diff": "supabase db diff --local",
     "db:push": "supabase db push",
     "db:studio": "open http://localhost:54323",
+    "db:test": "npm run db:reset && ./scripts/test-migrations.sh",
     "dev:local": "npm run db:start && npm run dev",
     "prepare": "husky"
   },

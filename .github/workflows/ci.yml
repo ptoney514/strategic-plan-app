@@ -28,6 +28,40 @@ jobs:
       - name: Run ESLint
         run: npm run lint -- --max-warnings 100
 
+  migration-tests:
+    name: Migration Tests
+    runs-on: ubuntu-latest
+    needs: lint-typecheck
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Start Supabase local services
+        run: supabase start
+
+      - name: Wait for services to be healthy
+        run: |
+          echo "Waiting for Supabase services to be healthy..."
+          timeout 60 bash -c 'until supabase status | grep -q "API URL"; do sleep 2; done'
+          echo "Services are ready!"
+
+      - name: Run migration validation
+        run: ./scripts/validate-migrations.sh
+
+      - name: Run database reset
+        run: supabase db reset
+
+      - name: Run smoke tests
+        run: ./scripts/test-migrations.sh
+
+      - name: Cleanup
+        if: always()
+        run: supabase stop --no-backup
+
   unit-tests:
     name: Unit Tests
     runs-on: ubuntu-latest

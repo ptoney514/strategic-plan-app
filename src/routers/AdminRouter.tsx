@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { SystemAdminGuard } from '../middleware/SystemAdminGuard';
-import { SystemAdminLayout } from '../layouts/SystemAdminLayout';
+import { SystemAdminEditorialLayout } from '../layouts/SystemAdminEditorialLayout';
 import { SystemDashboard } from '../pages/admin/SystemDashboard';
 import { SystemSettings } from '../pages/admin/SystemSettings';
 import { UserManagement } from '../pages/admin/UserManagement';
@@ -21,7 +21,7 @@ export function AdminRouter() {
         path="/"
         element={
           <SystemAdminGuard>
-            <SystemAdminLayout />
+            <SystemAdminEditorialLayout />
           </SystemAdminGuard>
         }
       >

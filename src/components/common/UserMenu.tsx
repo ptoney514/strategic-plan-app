@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Settings, LogOut, ChevronDown, LayoutDashboard, Building2, Users } from 'lucide-react';
+import { Settings, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 
@@ -93,22 +93,6 @@ export function UserMenu() {
               >
                 <LayoutDashboard className="w-4 h-4 text-primary" />
                 Admin Dashboard
-              </a>
-              <a
-                href={buildSubdomainUrlWithPath('admin', '/districts')}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <Building2 className="w-4 h-4 text-primary" />
-                Districts
-              </a>
-              <a
-                href={buildSubdomainUrlWithPath('admin', '/users')}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-              >
-                <Users className="w-4 h-4 text-primary" />
-                User Management
               </a>
             </div>
           )}

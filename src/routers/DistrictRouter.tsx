@@ -24,18 +24,13 @@ import { SchoolsDirectory } from '../pages/client/public/SchoolsDirectory';
 import { DistrictLandingPage } from '../pages/client/public/DistrictLandingPage';
 
 // Admin Pages
-import { AdminDashboard } from '../pages/client/admin/AdminDashboard';
 import { AdminGoals } from '../pages/client/admin/AdminGoals';
-import AdminGoalsV2 from '../pages/client/admin/AdminGoalsV2';
-import { AdminAudit } from '../pages/client/admin/AdminAudit';
 import { AdminSettings } from '../pages/client/admin/AdminSettings';
 import { ObjectiveBuilder } from '../pages/client/admin/ObjectiveBuilder';
-import { ImportWizard } from '../pages/client/admin/ImportWizard';
-import { AdminSchools } from '../pages/client/admin/AdminSchools';
-import { DataManager } from '../pages/client/admin/DataManager';
 import { AdminDashboard2 } from '../pages/client/admin/AdminDashboard2';
 import { CreateObjective } from '../pages/client/admin/CreateObjective';
 import { EditObjective } from '../pages/client/admin/EditObjective';
+import { ObjectiveDetail as AdminObjectiveDetail } from '../pages/client/admin/ObjectiveDetail';
 
 // Auth
 import { Login } from '../pages/Login';
@@ -113,6 +108,7 @@ export function DistrictRouter() {
         <Route index element={<AdminDashboard2 />} />
         <Route path="objectives" element={<AdminDashboard2 />} />
         <Route path="objectives/create" element={<CreateObjective />} />
+        <Route path="objectives/:objectiveId" element={<AdminObjectiveDetail />} />
         <Route path="objectives/:objectiveId/edit" element={<EditObjective />} />
         {/* Backwards compatibility redirects */}
         <Route path="goals" element={<Navigate to="../objectives" replace />} />

@@ -416,7 +416,7 @@ export function AdminDashboard2() {
                     {/* Title and Description - stacked vertically */}
                     <div className="flex-1 min-w-0 flex flex-col gap-1">
                       <Link
-                        to={`/admin/objectives/${objective.id}/edit`}
+                        to={`/admin/objectives/${objective.id}`}
                         className="text-[15px] font-bold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                         data-testid="objective-title"
                       >
@@ -485,7 +485,7 @@ export function AdminDashboard2() {
                               {/* Title and Description */}
                               <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                                 <Link
-                                  to={`/admin/objectives/${child.id}/edit`}
+                                  to={`/admin/objectives/${child.id}`}
                                   className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                                   data-testid="child-goal-title"
                                 >
@@ -536,7 +536,7 @@ export function AdminDashboard2() {
                                     {/* Title and Description */}
                                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                                       <Link
-                                        to={`/admin/objectives/${grandchild.id}/edit`}
+                                        to={`/admin/objectives/${grandchild.id}`}
                                         className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                                         data-testid="grandchild-goal-title"
                                       >

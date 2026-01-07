@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
 import { useAuth } from '../contexts/AuthContext';
+import { buildSubdomainUrlWithPath } from '../lib/subdomain';
 
 /**
  * ClientAdminEditorialLayout - Editorial-style admin layout with dark sidebar
@@ -140,7 +141,9 @@ export function ClientAdminEditorialLayout() {
 
           {/* View Public Site */}
           <a
-            href="/"
+            href={buildSubdomainUrlWithPath('district', '', slug || '')}
+            target="_blank"
+            rel="noopener noreferrer"
             className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white"
           >
             <Eye className="h-[18px] w-[18px] opacity-70" />

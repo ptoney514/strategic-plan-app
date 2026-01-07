@@ -215,8 +215,8 @@ export function EditObjective() {
       // For now, child goals would need to be updated individually
       // This could be enhanced to handle creates/updates/deletes of children
 
-      // Navigate back to the objectives list
-      navigate('/admin/objectives');
+      // Navigate back to the objective detail view
+      navigate(`/admin/objectives/${objectiveId}`);
     } catch (error) {
       console.error('Failed to update objective:', error);
     } finally {

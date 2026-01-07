@@ -2,6 +2,7 @@ export interface District {
   id: string;
   name: string;
   slug: string;
+  tagline?: string;
   primary_color: string;
   secondary_color?: string;
   logo_url?: string;
@@ -9,6 +10,10 @@ export interface District {
   is_public: boolean;
   created_at: string;
   updated_at: string;
+  // Computed fields (populated by service layer)
+  goals_count?: number;
+  metrics_count?: number;
+  admins_count?: number;
 }
 
 export interface DistrictWithSummary extends District {

@@ -91,6 +91,27 @@ npm run db:diff          # Show uncommitted schema changes
 npm run dev:local        # Start Supabase + Vite together
 ```
 
+### Migration testing
+
+```bash
+npm run db:test          # Run full migration test suite
+./scripts/test-migrations.sh      # Run smoke tests only (requires running DB)
+./scripts/validate-migrations.sh  # Lint migrations only
+```
+
+**Full Local Test Workflow:**
+
+```bash
+# 1. Reset database (applies all migrations + seed)
+npm run db:reset
+
+# 2. Run smoke tests
+./scripts/test-migrations.sh
+
+# 3. (Optional) Run app tests against fresh DB
+npm run test:run
+```
+
 ## Local Supabase Development
 
 ### Prerequisites
@@ -165,6 +186,50 @@ npm run db:studio        # Open Supabase Studio at localhost:54323
 - [ ] No destructive operations without backup plan
 - [ ] RLS policies reviewed
 - [ ] Schema cache reloaded after production deploy
+
+## Migration Testing in CI
+
+All pull requests automatically test database migrations via GitHub Actions.
+
+### What's Tested
+
+1. **Migration Linting** - File naming, sequential numbering, idempotency patterns
+2. **Migration Execution** - All migrations apply cleanly from scratch (fresh database)
+3. **Seed Data Loading** - Test data loads without errors
+4. **Database State** - Tables, indexes, RLS policies, helper functions all verified
+5. **Access Control** - Anonymous users can read public data only (RLS validation)
+6. **Data Integrity** - Row counts match expectations from seed data
+
+### CI Job Flow
+
+```
+lint-typecheck
+    ├──> unit-tests (parallel)
+    ├──> build (parallel)
+    └──> migration-tests (parallel)
+            ├──> validate-migrations.sh (linting)
+            ├──> supabase db reset (apply all migrations + seed)
+            └──> test-migrations.sh (smoke tests)
+```
+
+**Job Runtime:** ~2-3 minutes
+
+### Debugging Failed Migration Tests
+
+1. Check CI logs for specific error section (tests organized in 6 sections)
+2. Reproduce locally: `npm run db:test`
+3. Fix migration or seed data
+4. Re-test locally before pushing
+5. Verify CI passes on your PR
+
+### What the Smoke Tests Check
+
+**Section 1: Table Existence** - Verifies all 10 core `spb_*` tables exist
+**Section 2: Seed Data** - Validates row counts (2 districts, 3 objectives, 10-12 goals, etc.)
+**Section 3: Database Structure** - Confirms indexes and constraints are created
+**Section 4: RLS Policies** - Counts policies per table, verifies RLS is enabled
+**Section 5: Helper Functions** - Checks that database functions exist
+**Section 6: Anonymous Access** - Tests public data is readable, private data protected
 
 ## Critical Constraints
 
@@ -386,10 +451,12 @@ VITE_SUPABASE_ANON_KEY=your_production_anon_key
 
 **Post-Deployment Checklist**:
 
-1. Verify build succeeded
-2. Test login flow
-3. Check admin route protection
-4. After database migrations: **Reload Supabase schema cache!**
+1. **Before merging PR:** Verify migration tests pass in CI (check GitHub Actions)
+2. **Before deploying:** Run migration tests locally: `npm run db:test`
+3. Verify build succeeded in Vercel
+4. Test login flow
+5. Check admin route protection
+6. After database migrations: **Reload Supabase schema cache!**
    - Go to Supabase Dashboard
    - Navigate to: Project → Settings → API
    - Click "Reload Schema" button

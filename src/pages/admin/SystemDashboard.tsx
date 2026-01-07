@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building2, Plus, Eye, Settings, Trash2, Search, Users, Target, BarChart3, Loader2, X, Edit2, Shield, MoreHorizontal, List, LayoutGrid, Grid as GridIcon } from 'lucide-react';
+import { Building2, Plus, Eye, Search, Users, Target, BarChart3, Loader2, X, Shield, MoreHorizontal, LayoutGrid, Grid as GridIcon } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { useDistricts, useCreateDistrict, useDeleteDistrict, useUpdateDistrict } from '../../hooks/useDistricts';
@@ -16,7 +16,7 @@ export function SystemDashboard() {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingDistrict, setEditingDistrict] = useState<District | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'table' | 'card' | 'grid'>('table');
+  const [viewMode, setViewMode] = useState<'card' | 'grid'>('grid');
   const [actionMenuOpen, setActionMenuOpen] = useState<string | null>(null);
 
   // Fetch real data
@@ -89,7 +89,7 @@ export function SystemDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
-        <div className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
+        <div data-testid="stats-card" className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wide mb-2">
@@ -105,7 +105,7 @@ export function SystemDashboard() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
+        <div data-testid="stats-card" className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wide mb-2">
@@ -121,7 +121,7 @@ export function SystemDashboard() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
+        <div data-testid="stats-card" className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wide mb-2">
@@ -137,7 +137,7 @@ export function SystemDashboard() {
           </div>
         </div>
 
-        <div className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
+        <div data-testid="stats-card" className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-md transition-shadow">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-semibold text-[#8a8a8a] uppercase tracking-wide mb-2">
@@ -171,22 +171,12 @@ export function SystemDashboard() {
                 className="pl-10 w-full sm:w-64 border-[#e8e6e1] focus:border-[#c9a227]"
               />
             </div>
-            {/* View mode toggle */}
+            {/* View mode toggle - Cards vs Grid only */}
             <div className="flex border border-[#e8e6e1] rounded-lg overflow-hidden bg-white">
               <button
-                onClick={() => setViewMode('table')}
-                className={`px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors ${
-                  viewMode === 'table'
-                    ? 'bg-[#1a1a1a] text-white'
-                    : 'bg-white text-[#8a8a8a] hover:bg-[#f5f3ef]'
-                }`}
-              >
-                <List className="h-4 w-4" />
-                <span className="hidden sm:inline">Table</span>
-              </button>
-              <button
                 onClick={() => setViewMode('card')}
-                className={`px-4 py-2 flex items-center gap-2 text-sm font-medium border-l border-[#e8e6e1] transition-colors ${
+                aria-label="Card view"
+                className={`px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors ${
                   viewMode === 'card'
                     ? 'bg-[#1a1a1a] text-white'
                     : 'bg-white text-[#8a8a8a] hover:bg-[#f5f3ef]'
@@ -197,6 +187,7 @@ export function SystemDashboard() {
               </button>
               <button
                 onClick={() => setViewMode('grid')}
+                aria-label="Grid view"
                 className={`px-4 py-2 flex items-center gap-2 text-sm font-medium border-l border-[#e8e6e1] transition-colors ${
                   viewMode === 'grid'
                     ? 'bg-[#1a1a1a] text-white'
@@ -211,105 +202,6 @@ export function SystemDashboard() {
         </div>
       </div>
 
-      {/* Table View */}
-      {viewMode === 'table' && (
-        <div className="bg-white border border-[#e8e6e1] rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#f5f3ef]">
-                <tr>
-                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                    District
-                  </th>
-                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                    Slug
-                  </th>
-                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                    Goals
-                  </th>
-                  <th className="px-6 py-3 text-left text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                    Metrics
-                  </th>
-                  <th className="px-6 py-3 text-right text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#e8e6e1]">
-                {filteredDistricts.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-[#8a8a8a]">
-                      {searchTerm ? 'No districts match your search' : 'No districts yet. Create your first district!'}
-                    </td>
-                  </tr>
-                ) : (
-                  filteredDistricts.map((district) => (
-                    <tr key={district.id} className="hover:bg-[#f5f3ef] transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-3">
-                        {district.logo_url ? (
-                          <img src={district.logo_url} alt="" className="w-8 h-8 rounded object-cover" />
-                        ) : (
-                          <div
-                            className="w-8 h-8 rounded flex items-center justify-center text-white text-xs font-bold"
-                            style={{ backgroundColor: district.primary_color || '#C03537' }}
-                          >
-                            {district.name.charAt(0)}
-                          </div>
-                        )}
-                        <div>
-                          <div className="text-sm font-medium text-foreground">{district.name}</div>
-                          {district.tagline && (
-                            <div className="text-xs text-muted-foreground">{district.tagline}</div>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <code className="text-sm text-muted-foreground bg-muted px-2 py-0.5 rounded">{district.slug}</code>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-foreground">{district.goals_count || 0}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-foreground">{district.metrics_count || 0}</span>
-                    </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex justify-end">
-                          <div className="relative">
-                            <button
-                              onClick={() => setActionMenuOpen(actionMenuOpen === district.id ? null : district.id)}
-                              className="w-8 h-8 rounded-lg hover:bg-[#f5f3ef] text-[#8a8a8a] hover:text-[#1a1a1a] flex items-center justify-center transition-colors"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </button>
-                            {actionMenuOpen === district.id && (
-                              <DistrictActionsMenu
-                                district={district}
-                                isOpen={true}
-                                onClose={() => setActionMenuOpen(null)}
-                                onEdit={() => {
-                                  setEditingDistrict(district);
-                                  setActionMenuOpen(null);
-                                }}
-                                onDelete={() => {
-                                  setDeleteConfirm(district.id);
-                                  setActionMenuOpen(null);
-                                }}
-                              />
-                            )}
-                          </div>
-                        </div>
-                      </td>
-                  </tr>
-                ))
-              )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-
       {/* Card View */}
       {viewMode === 'card' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -321,6 +213,7 @@ export function SystemDashboard() {
             filteredDistricts.map((district) => (
               <div
                 key={district.id}
+                data-testid="district-card"
                 className="bg-white border border-[#e8e6e1] rounded-xl p-6 hover:shadow-lg transition-all group"
               >
                 {/* Header */}
@@ -340,10 +233,20 @@ export function SystemDashboard() {
                         {district.name.charAt(0)}
                       </div>
                     )}
-                    <div className="min-w-0">
-                      <h3 className="text-base font-semibold text-[#1a1a1a] mb-0.5 truncate">
-                        {district.name}
-                      </h3>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <h3 className="text-base font-semibold text-[#1a1a1a] truncate">
+                          {district.name}
+                        </h3>
+                        {/* Status Badge */}
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium flex-shrink-0 ${
+                          district.is_public
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {district.is_public ? 'Public' : 'Private'}
+                        </span>
+                      </div>
                       {district.tagline && (
                         <p className="text-xs text-[#8a8a8a] truncate">{district.tagline}</p>
                       )}
@@ -423,6 +326,7 @@ export function SystemDashboard() {
             filteredDistricts.map((district) => (
               <div
                 key={district.id}
+                data-testid="district-grid-item"
                 className="bg-white border border-[#e8e6e1] rounded-xl p-4 hover:shadow-lg transition-all text-center group relative"
               >
                 {/* Action Button */}
@@ -472,6 +376,16 @@ export function SystemDashboard() {
                 <h3 className="text-sm font-semibold text-[#1a1a1a] mb-1 truncate px-2">
                   {district.name}
                 </h3>
+                {/* Status Badge */}
+                <div className="flex justify-center mb-2">
+                  <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                    district.is_public
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {district.is_public ? 'Public' : 'Private'}
+                  </span>
+                </div>
                 {district.tagline && (
                   <p className="text-xs text-[#8a8a8a] mb-3 truncate px-2">{district.tagline}</p>
                 )}

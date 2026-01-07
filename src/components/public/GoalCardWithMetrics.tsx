@@ -8,6 +8,7 @@ interface GoalCardWithMetricsProps {
   metrics: Metric[];
   children?: React.ReactNode; // For nested sub-goals
   colorClass?: string;
+  hideHeader?: boolean; // Hide goal header when embedded
 }
 
 // Chart colors
@@ -29,22 +30,6 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
 
   const vizDataPoints = vizConfig?.dataPoints || [];
   const vizTargetValue = vizConfig?.targetValue;
-
-  // Check if metric has data
-  const hasData = (): boolean => {
-    if (metric.current_value != null && metric.current_value !== 0) return true;
-    if (metric.actual_value != null && metric.actual_value !== 0) return true;
-    if (metric.ytd_value != null && metric.ytd_value !== 0) return true;
-    if (vizDataPoints.length > 0 && vizDataPoints.some(dp => dp.value > 0)) return true;
-    if (chartData && chartData.length > 0 && chartData.some(d => d.actual != null && d.actual !== 0)) return true;
-    if (metric.data_points && metric.data_points.length > 0) {
-      const hasValue = metric.data_points.some(dp => 'value' in dp && dp.value != null && dp.value !== 0);
-      if (hasValue) return true;
-    }
-    return false;
-  };
-
-  if (!hasData()) return null;
 
   // Get current value with fallbacks
   const getCurrentValue = (): number => {
@@ -253,7 +238,23 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
       const y = padding.top + (chartHeight / gridLines) * i + 3;
       ctx.fillText(gridValue.toFixed(1), padding.left - 6, y);
     }
-  }, [metric, chartColor, chartData, vizDataPoints, targetValue]);
+  }, [metric, chartColor, chartData, vizDataPoints, targetValue, getCurrentValue]);
+
+  // Check if metric has data - must be after all hooks
+  const hasData = (): boolean => {
+    if (metric.current_value != null && metric.current_value !== 0) return true;
+    if (metric.actual_value != null && metric.actual_value !== 0) return true;
+    if (metric.ytd_value != null && metric.ytd_value !== 0) return true;
+    if (vizDataPoints.length > 0 && vizDataPoints.some(dp => dp.value > 0)) return true;
+    if (chartData && chartData.length > 0 && chartData.some(d => d.actual != null && d.actual !== 0)) return true;
+    if (metric.data_points && metric.data_points.length > 0) {
+      const hasValue = metric.data_points.some(dp => 'value' in dp && dp.value != null && dp.value !== 0);
+      if (hasValue) return true;
+    }
+    return false;
+  };
+
+  if (!hasData()) return null;
 
   return (
     <div className="bg-gray-50 rounded-lg p-4">
@@ -305,7 +306,7 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
   );
 }
 
-export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-gray-100' }: GoalCardWithMetricsProps) {
+export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-gray-100', hideHeader = false }: GoalCardWithMetricsProps) {
   const goalMetrics = metrics.filter(m => m.goal_id === goal.id);
 
   return (
@@ -314,27 +315,29 @@ export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-
       className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden scroll-mt-24"
     >
       {/* Goal Header */}
-      <div className="p-5 border-b border-gray-100">
-        <div className="flex items-start gap-3">
-          {/* Number badge */}
-          <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${colorClass} flex items-center justify-center text-xs font-bold text-white`}>
-            {goal.goal_number}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
-                {goal.title}
-              </h3>
+      {!hideHeader && (
+        <div className="p-5 border-b border-gray-100">
+          <div className="flex items-start gap-3">
+            {/* Number badge */}
+            <div className={`flex-shrink-0 w-10 h-10 rounded-lg ${colorClass} flex items-center justify-center text-xs font-bold text-white`}>
+              {goal.goal_number}
             </div>
-            {goal.description && (
-              <p className="text-xs text-gray-500 line-clamp-2">
-                {goal.description}
-              </p>
-            )}
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">
+                  {goal.title}
+                </h3>
+              </div>
+              {goal.description && (
+                <p className="text-xs text-gray-500 line-clamp-2">
+                  {goal.description}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Metrics Section - Only show if there are metrics */}
       {goalMetrics.length > 0 && (

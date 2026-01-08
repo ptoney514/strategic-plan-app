@@ -12,6 +12,7 @@ interface MetricEditFormProps {
 interface DataPoint {
   label: string;
   value: string; // Use string for input control
+  target?: string; // Optional target value per year
 }
 
 /**
@@ -32,16 +33,24 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
   // Form state
   const [name, setName] = useState(metric.metric_name || metric.name || '');
   const [description, setDescription] = useState(metric.description || '');
+  const [indicatorText, setIndicatorText] = useState(metric.indicator_text || '');
+  const [indicatorColor, setIndicatorColor] = useState<'green' | 'amber' | 'red' | 'gray'>(
+    (metric.indicator_color as 'green' | 'amber' | 'red' | 'gray') || 'green'
+  );
   const [currentValue, setCurrentValue] = useState(
     metric.current_value?.toString() || ''
   );
   const [targetValue, setTargetValue] = useState(
     metric.target_value?.toString() || ''
   );
+  const [baselineValue, setBaselineValue] = useState(
+    metric.baseline_value?.toString() || ''
+  );
   const [dataPoints, setDataPoints] = useState<DataPoint[]>(
     existingDataPoints.map(dp => ({
       label: dp.label,
       value: dp.value.toString(),
+      target: (dp as any).target?.toString() || '',
     }))
   );
 
@@ -50,14 +59,19 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     metricName: string;
     currentValue: number;
     targetValue?: number;
-    dataPoints: { label: string; value: number }[];
+    dataPoints: { label: string; value: number; target?: number }[];
+    indicatorText?: string;
+    indicatorColor?: 'green' | 'amber' | 'red' | 'gray';
   } | null>(null);
 
   // Validation state
   const [errors, setErrors] = useState<{
     name?: string;
+    indicatorText?: string;
+    indicatorColor?: string;
     currentValue?: string;
     targetValue?: string;
+    baselineValue?: string;
     dataPoints?: string;
   }>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -75,7 +89,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
   // Update data point
   const handleUpdateDataPoint = (
     index: number,
-    field: 'label' | 'value',
+    field: 'label' | 'value' | 'target',
     value: string
   ) => {
     const updated = [...dataPoints];
@@ -93,6 +107,12 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       newErrors.name = 'Metric name must be 200 characters or less';
     }
 
+    if (!indicatorText.trim()) {
+      newErrors.indicatorText = 'Badge text is required';
+    } else if (indicatorText.length > 50) {
+      newErrors.indicatorText = 'Badge text must be 50 characters or less';
+    }
+
     if (!currentValue.trim()) {
       newErrors.currentValue = 'Current value is required';
     } else if (isNaN(parseFloat(currentValue))) {
@@ -103,13 +123,18 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       newErrors.targetValue = 'Must be a valid number';
     }
 
+    if (baselineValue && isNaN(parseFloat(baselineValue))) {
+      newErrors.baselineValue = 'Must be a valid number';
+    }
+
     // Validate data points
     const invalidDataPoints = dataPoints.filter(
       dp => (dp.label.trim() && isNaN(parseFloat(dp.value))) ||
-           (dp.value.trim() && !dp.label.trim())
+           (dp.value.trim() && !dp.label.trim()) ||
+           (dp.target && dp.target.trim() && isNaN(parseFloat(dp.target)))
     );
     if (invalidDataPoints.length > 0) {
-      newErrors.dataPoints = 'All data points must have both label and valid number value';
+      newErrors.dataPoints = 'All data points must have valid label and number values';
     }
 
     setErrors(newErrors);
@@ -125,6 +150,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       .map(dp => ({
         label: dp.label.trim(),
         value: parseFloat(dp.value),
+        target: dp.target && dp.target.trim() ? parseFloat(dp.target) : undefined,
       }))
       .filter(dp => !isNaN(dp.value)); // Filter out NaN values
 
@@ -133,6 +159,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       currentValue: parseFloat(currentValue),
       targetValue: targetValue ? parseFloat(targetValue) : undefined,
       dataPoints: validDataPoints,
+      indicatorText,
+      indicatorColor,
     });
   };
 
@@ -147,14 +175,18 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
         .map(dp => ({
           label: dp.label.trim(),
           value: parseFloat(dp.value),
+          target: dp.target && dp.target.trim() ? parseFloat(dp.target) : undefined,
         }))
-        .filter(dp => !isNaN(dp.value));
+        .filter(dp => !isNaN(dp.value) && (!dp.target || !isNaN(dp.target as number)));
 
       await onSave({
         metric_name: name.trim(),
         description: description.trim() || undefined,
+        indicator_text: indicatorText.trim(),
+        indicator_color: indicatorColor,
         current_value: parseFloat(currentValue),
         target_value: targetValue ? parseFloat(targetValue) : undefined,
+        baseline_value: baselineValue ? parseFloat(baselineValue) : undefined,
         visualization_config: {
           ...metric.visualization_config,
           dataPoints: validDataPoints,
@@ -225,8 +257,64 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
         </div>
       </div>
 
-      {/* Current & Target Values */}
-      <div className="grid grid-cols-2 gap-4 mb-4">
+      {/* Badge Editing Section */}
+      <div className="mb-4 p-4 bg-white border border-[#e8e6e1] rounded-lg">
+        <h3 className="text-[13px] font-semibold text-[#1a1a1a] mb-3">
+          Status Indicator
+        </h3>
+
+        {/* Badge Text */}
+        <div className="mb-3">
+          <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
+            Badge Text <span className="text-[#ef4444]">*</span>
+          </label>
+          <input
+            type="text"
+            value={indicatorText}
+            onChange={(e) => setIndicatorText(e.target.value.slice(0, 50))}
+            placeholder="e.g., On Target, Needs Improvement, Exceeding Goals"
+            className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+              errors.indicatorText
+                ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
+                : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
+            }`}
+          />
+          {errors.indicatorText && (
+            <p className="mt-1 text-[12px] text-[#ef4444]">{errors.indicatorText}</p>
+          )}
+          <div className="text-right text-[12px] text-[#8a8a8a] mt-1">
+            {indicatorText.length} / 50 characters
+          </div>
+        </div>
+
+        {/* Badge Color */}
+        <div>
+          <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
+            Badge Color <span className="text-[#ef4444]">*</span>
+          </label>
+          <div className="flex gap-3">
+            {(['green', 'amber', 'red', 'gray'] as const).map((color) => (
+              <label
+                key={color}
+                className="flex items-center cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="indicatorColor"
+                  value={color}
+                  checked={indicatorColor === color}
+                  onChange={(e) => setIndicatorColor(e.target.value as typeof indicatorColor)}
+                  className="mr-2"
+                />
+                <span className="text-[13px] capitalize">{color}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Current, Target & Baseline Values */}
+      <div className="grid grid-cols-3 gap-4 mb-4">
         {/* Current Value */}
         <div>
           <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
@@ -270,13 +358,38 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             <p className="mt-1 text-[12px] text-[#ef4444]">{errors.targetValue}</p>
           )}
         </div>
+
+        {/* Baseline Value */}
+        <div>
+          <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
+            Baseline <span className="text-[#6a6a6a] font-normal">(optional)</span>
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={baselineValue}
+            onChange={(e) => setBaselineValue(e.target.value)}
+            placeholder="3.50"
+            className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+              errors.baselineValue
+                ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
+                : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
+            }`}
+          />
+          {errors.baselineValue && (
+            <p className="mt-1 text-[12px] text-[#ef4444]">{errors.baselineValue}</p>
+          )}
+          <p className="mt-1 text-[11px] text-[#8a8a8a]">
+            Starting point for progress calculation
+          </p>
+        </div>
       </div>
 
       {/* Year-over-Year Data Points */}
       <div className="mb-4 pb-4 border-b border-[#e8e6e1]">
         <div className="flex items-center justify-between mb-3">
           <label className="block text-[13px] font-semibold text-[#1a1a1a]">
-            Year-over-Year Data Points
+            Year-over-Year Data
           </label>
           <button
             onClick={handleAddDataPoint}
@@ -295,34 +408,55 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {dataPoints.map((dp, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <input
-                  type="text"
-                  value={dp.label}
-                  onChange={(e) => handleUpdateDataPoint(index, 'label', e.target.value)}
-                  placeholder="Year (e.g., 2024)"
-                  className="flex-1 px-3 py-2 text-[13px] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors"
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  value={dp.value}
-                  onChange={(e) => handleUpdateDataPoint(index, 'value', e.target.value)}
-                  placeholder="Value (e.g., 3.75)"
-                  className="flex-1 px-3 py-2 text-[13px] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors"
-                />
-                <button
-                  onClick={() => handleRemoveDataPoint(index)}
-                  className="p-2 text-[#6a6a6a] hover:text-[#ef4444] hover:bg-[#fee2e2] rounded-lg transition-colors"
-                  type="button"
-                  title="Remove data point"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
-              </div>
-            ))}
+          <div className="bg-white border border-[#e8e6e1] rounded-lg overflow-hidden">
+            {/* Table Header */}
+            <div className="grid grid-cols-[1.5fr_1.5fr_1.5fr_auto] gap-2 px-3 py-2 bg-gray-50 border-b border-[#e8e6e1]">
+              <div className="text-[11px] font-semibold text-[#6a6a6a]">Year/Period</div>
+              <div className="text-[11px] font-semibold text-[#6a6a6a]">Actual Value</div>
+              <div className="text-[11px] font-semibold text-[#6a6a6a]">Target Value</div>
+              <div className="text-[11px] font-semibold text-[#6a6a6a] text-right">Actions</div>
+            </div>
+
+            {/* Table Rows */}
+            <div className="divide-y divide-[#e8e6e1]">
+              {dataPoints.map((dp, index) => (
+                <div key={index} className="grid grid-cols-[1.5fr_1.5fr_1.5fr_auto] gap-2 px-3 py-2 items-center">
+                  <input
+                    type="text"
+                    value={dp.label}
+                    onChange={(e) => handleUpdateDataPoint(index, 'label', e.target.value)}
+                    placeholder="2024"
+                    className="px-2 py-1.5 text-[13px] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={dp.value}
+                    onChange={(e) => handleUpdateDataPoint(index, 'value', e.target.value)}
+                    placeholder="3.75"
+                    className="px-2 py-1.5 text-[13px] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
+                  />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={dp.target || ''}
+                    onChange={(e) => handleUpdateDataPoint(index, 'target', e.target.value)}
+                    placeholder="3.50"
+                    className="px-2 py-1.5 text-[13px] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => handleRemoveDataPoint(index)}
+                      className="p-1.5 text-[#6a6a6a] hover:text-[#ef4444] hover:bg-[#fee2e2] rounded transition-colors"
+                      type="button"
+                      title="Remove data point"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
@@ -382,9 +516,15 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             currentValue={previewData.currentValue}
             targetValue={previewData.targetValue}
             dataPoints={previewData.dataPoints}
-            metricType={metric.metric_type || 'number'}
+            metricType={
+              metric.metric_type && ['rating', 'percent', 'currency', 'number'].includes(metric.metric_type)
+                ? (metric.metric_type as 'rating' | 'percent' | 'currency' | 'number')
+                : 'number'
+            }
             chartColor="#2563EB"
             isHigherBetter={metric.is_higher_better !== false}
+            indicatorText={previewData.indicatorText}
+            indicatorColor={previewData.indicatorColor}
           />
         </div>
       )}

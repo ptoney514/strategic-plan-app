@@ -39,6 +39,7 @@ export function ObjectiveDetail() {
   // Inline editing state
   const [editingSection, setEditingSection] = useState<'header' | null>(null);
   const [editingGoalId, setEditingGoalId] = useState<string | null>(null);
+  const [editingMetricId, setEditingMetricId] = useState<string | null>(null);
   const [metricsModalGoalId, setMetricsModalGoalId] = useState<string | null>(null);
   const updateGoalMutation = useUpdateGoal();
   const updateMetricMutation = useUpdateMetric();
@@ -112,9 +113,35 @@ export function ObjectiveDetail() {
     }
   };
 
-  // Handle edit metrics
+  // Handle edit metrics (modal)
   const handleEditMetrics = (goalId: string) => {
     setMetricsModalGoalId(goalId);
+  };
+
+  // Handle edit individual metric (inline)
+  const handleEditMetric = (metricId: string) => {
+    setEditingMetricId(metricId);
+  };
+
+  // Handle save metric
+  const handleSaveMetric = async (metricId: string, updates: Partial<Goal>) => {
+    try {
+      await updateMetricMutation.mutateAsync({
+        id: metricId,
+        updates,
+      });
+      toast.success('Metric updated successfully');
+      setEditingMetricId(null);
+    } catch (error) {
+      console.error('Failed to update metric:', error);
+      toast.error('Failed to update metric');
+      throw error; // Re-throw to keep edit mode active on error
+    }
+  };
+
+  // Handle cancel edit metric
+  const handleCancelEditMetric = () => {
+    setEditingMetricId(null);
   };
 
   // Determine if a section should be dimmed
@@ -244,7 +271,10 @@ export function ObjectiveDetail() {
                     onEdit={() => handleEditGoal(goal.id)}
                     onSave={(updates) => handleSaveGoal(goal.id, updates)}
                     onCancel={() => setEditingGoalId(null)}
-                    onEditMetrics={() => handleEditMetrics(goal.id)}
+                    editingMetricId={editingMetricId}
+                    onEditMetric={handleEditMetric}
+                    onSaveMetric={handleSaveMetric}
+                    onCancelEditMetric={handleCancelEditMetric}
                   />
                 );
               })}

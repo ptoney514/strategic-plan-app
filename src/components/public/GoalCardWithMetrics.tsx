@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { Edit2 } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
 import { StatusBadge, calculateStatus } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
+import { MetricEditForm } from '../admin/MetricEditForm';
 
 interface GoalCardWithMetricsProps {
   goal: Goal;
@@ -9,13 +11,31 @@ interface GoalCardWithMetricsProps {
   children?: React.ReactNode; // For nested sub-goals
   colorClass?: string;
   hideHeader?: boolean; // Hide goal header when embedded
+  editingMetricId?: string | null; // ID of metric being edited (for admin)
+  onEditMetric?: (metricId: string) => void; // Callback to start editing a metric
+  onSaveMetric?: (metricId: string, updates: Partial<Metric>) => Promise<void>; // Callback to save metric changes
+  onCancelEditMetric?: () => void; // Callback to cancel editing
 }
 
 // Chart colors
 const chartColors = ['#B91C1C', '#2563EB', '#059669', '#D97706'];
 
 // Compact metric display component
-function CompactMetricCard({ metric, index }: { metric: Metric; index: number }) {
+function CompactMetricCard({
+  metric,
+  index,
+  isEditing,
+  onEdit,
+  onSave,
+  onCancel,
+}: {
+  metric: Metric;
+  index: number;
+  isEditing?: boolean;
+  onEdit?: () => void;
+  onSave?: (updates: Partial<Metric>) => Promise<void>;
+  onCancel?: () => void;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartColor = chartColors[index % chartColors.length];
 
@@ -256,6 +276,11 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
 
   if (!hasData()) return null;
 
+  // Show edit form if in edit mode
+  if (isEditing && onSave && onCancel) {
+    return <MetricEditForm metric={metric} onSave={onSave} onCancel={onCancel} />;
+  }
+
   return (
     <div className="bg-gray-50 rounded-lg p-4">
       {/* Header */}
@@ -263,7 +288,26 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
         <span className="text-[10px] font-semibold tracking-widest text-gray-400 uppercase">
           {metric.metric_type === 'rating' ? 'Rating' : metric.metric_category || 'Metric'}
         </span>
-        <StatusBadge status={status} size="sm" />
+        <div className="flex items-center gap-2">
+          {metric.indicator_text && metric.indicator_color ? (
+            <StatusBadge
+              customText={metric.indicator_text}
+              customColor={metric.indicator_color as 'green' | 'amber' | 'red' | 'gray'}
+              size="sm"
+            />
+          ) : (
+            <StatusBadge status={status} size="sm" />
+          )}
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="p-1 hover:bg-blue-50 text-blue-600 rounded transition-colors"
+              title="Edit metric"
+            >
+              <Edit2 className="h-3 w-3" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Title */}
@@ -306,7 +350,17 @@ function CompactMetricCard({ metric, index }: { metric: Metric; index: number })
   );
 }
 
-export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-gray-100', hideHeader = false }: GoalCardWithMetricsProps) {
+export function GoalCardWithMetrics({
+  goal,
+  metrics,
+  children,
+  colorClass = 'bg-gray-100',
+  hideHeader = false,
+  editingMetricId = null,
+  onEditMetric,
+  onSaveMetric,
+  onCancelEditMetric,
+}: GoalCardWithMetricsProps) {
   const goalMetrics = metrics.filter(m => m.goal_id === goal.id);
 
   return (
@@ -343,7 +397,15 @@ export function GoalCardWithMetrics({ goal, metrics, children, colorClass = 'bg-
       {goalMetrics.length > 0 && (
         <div className="p-4 space-y-3">
           {goalMetrics.map((metric, idx) => (
-            <CompactMetricCard key={metric.id} metric={metric} index={idx} />
+            <CompactMetricCard
+              key={metric.id}
+              metric={metric}
+              index={idx}
+              isEditing={editingMetricId === metric.id}
+              onEdit={onEditMetric ? () => onEditMetric(metric.id) : undefined}
+              onSave={onSaveMetric ? (updates) => onSaveMetric(metric.id, updates) : undefined}
+              onCancel={onCancelEditMetric}
+            />
           ))}
         </div>
       )}

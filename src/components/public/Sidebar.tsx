@@ -4,8 +4,6 @@ import { ChevronRight, Home, Calendar, X } from 'lucide-react';
 import type { District, Goal } from '../../lib/types';
 import { useSubdomain } from '../../contexts/SubdomainContext';
 import { buildDistrictPath } from '../../lib/subdomain';
-import { useAuth } from '../../contexts/AuthContext';
-import { UserMenu } from '../common/UserMenu';
 
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
@@ -71,7 +69,6 @@ function getObjectiveColor(goal: Goal, index: number): keyof typeof colorClasses
 export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoading }: SidebarProps) {
   const params = useParams<{ slug?: string; goalId?: string }>();
   const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
-  const { isAuthenticated } = useAuth();
   // Use URL param slug if available, otherwise use subdomain slug
   const slug = params.slug || subdomainSlug || district.slug;
   const isOnSubdomain = subdomainType === 'district';
@@ -154,7 +151,6 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
           isOverviewActive={isOverviewActive}
           currentGoalId={goalId}
           isLoading={isLoading}
-          isAuthenticated={isAuthenticated}
         />
       </aside>
 
@@ -189,7 +185,6 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
           currentGoalId={goalId}
           onItemClick={onClose}
           isLoading={isLoading}
-          isAuthenticated={isAuthenticated}
         />
       </aside>
 
@@ -212,7 +207,6 @@ interface SidebarContentProps {
   currentGoalId?: string;
   onItemClick?: () => void;
   isLoading?: boolean;
-  isAuthenticated?: boolean;
 }
 
 function SidebarContent({
@@ -227,7 +221,6 @@ function SidebarContent({
   currentGoalId,
   onItemClick,
   isLoading,
-  isAuthenticated,
 }: SidebarContentProps) {
   const params = useParams<{ slug?: string }>();
   const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
@@ -370,7 +363,6 @@ function SidebarContent({
             </span>
           </div>
         </Link>
-        {isAuthenticated && <UserMenu />}
       </div>
 
       {/* Navigation */}

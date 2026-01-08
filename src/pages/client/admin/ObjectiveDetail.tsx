@@ -113,11 +113,6 @@ export function ObjectiveDetail() {
     }
   };
 
-  // Handle edit metrics (modal)
-  const handleEditMetrics = (goalId: string) => {
-    setMetricsModalGoalId(goalId);
-  };
-
   // Handle edit individual metric (inline)
   const handleEditMetric = (metricId: string) => {
     setEditingMetricId(metricId);

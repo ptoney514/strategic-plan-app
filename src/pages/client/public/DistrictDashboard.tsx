@@ -157,7 +157,7 @@ export function DistrictDashboard() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
-            {objectives.map((goal, index) => {
+            {objectives.map((goal) => {
               // Determine goal status using helper function
               const status = getGoalStatus(goal.indicator_text);
               const isOffTrack = status === 'off-track';
@@ -343,23 +343,6 @@ export function DistrictDashboard() {
                         target: Number(dp.target || primaryMetric?.target_value) || undefined
                       })).filter(d => d.year) // Only include entries with a year/date
                       : null;
-
-                    const mockNarrative = index === 1 ? {
-                      summary: "The Department of Education ranks schools based on State testing of Needs Improvement, Good, Great, and Excellent. The district has received a marking of Great the last three years. This past year, the district missed excellent, by .06 overall.",
-                      highlights: [
-                        "District received 'Great' classification for the third consecutive year",
-                        "Composite scores developed from Math, ELA, and Science proficiency",
-                        "Student assessments in grades 3-8 and 11th grade",
-                        "Missed 'Excellent' rating by only 0.06 points"
-                      ],
-                      links: [
-                        {
-                          label: "Compare district scores to state average",
-                          url: "#"
-                        }
-                      ],
-                      dataSource: "Nebraska Department of Education District Classification"
-                    } : null;
 
                     return (
                       <div key={child.id} id={`goal-${child.id}`} className="bg-white border border-neutral-200 rounded-lg overflow-hidden transition-all">

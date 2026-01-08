@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { useGoal, useChildGoals } from '../../../hooks/useGoals';
-import { useMetrics, useMetricsByDistrict } from '../../../hooks/useMetrics';
+import { useMetricsByDistrict } from '../../../hooks/useMetrics';
 import { GoalHeader } from '../../../components/public/GoalHeader';
 import { MetricsGrid } from '../../../components/public/MetricsGrid';
 import { InitiativeRow } from '../../../components/public/InitiativeRow';

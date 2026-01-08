@@ -4,14 +4,12 @@ import {
   Upload,
   FileSpreadsheet,
   CheckCircle,
-  AlertCircle,
   ArrowRight,
   ArrowLeft,
   Download,
   Loader2
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
-import { useGoals } from '../../../hooks/useGoals';
 import { ExcelParserService } from '../../../lib/services/excelParser.service';
 import { ExcelTemplateService } from '../../../lib/services/excelTemplate.service';
 import { ImportService } from '../../../lib/services/import.service';
@@ -186,7 +184,7 @@ export function ImportWizard() {
     setCurrentStep('import');
 
     try {
-      const summary = await ImportService.executeImport(
+      await ImportService.executeImport(
         importSession.id,
         district.id,
         (progress) => {
@@ -236,7 +234,7 @@ export function ImportWizard() {
     if (!importSession) return;
 
     try {
-      const newGoal = await AutoFixService.applyAutoFix(
+      await AutoFixService.applyAutoFix(
         importSession.id,
         suggestion,
         customTitle,

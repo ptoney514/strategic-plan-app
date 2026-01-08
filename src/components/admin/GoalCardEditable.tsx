@@ -12,7 +12,10 @@ interface GoalCardEditableProps {
   onEdit: () => void;
   onSave: (updates: Partial<Goal>) => Promise<void>;
   onCancel: () => void;
-  onEditMetrics: () => void;
+  editingMetricId?: string | null;
+  onEditMetric?: (metricId: string) => void;
+  onSaveMetric?: (metricId: string, updates: Partial<Metric>) => Promise<void>;
+  onCancelEditMetric?: () => void;
 }
 
 /**
@@ -29,7 +32,10 @@ export function GoalCardEditable({
   onEdit,
   onSave,
   onCancel,
-  onEditMetrics,
+  editingMetricId,
+  onEditMetric,
+  onSaveMetric,
+  onCancelEditMetric,
 }: GoalCardEditableProps) {
   // Apply dimming when other sections are being edited
   const containerClasses = `transition-opacity ${isDimmed ? 'opacity-60 pointer-events-none' : ''}`;
@@ -49,8 +55,11 @@ export function GoalCardEditable({
           isExpanded={isExpanded}
           onToggleExpand={onToggleExpand}
           onEdit={onEdit}
-          onEditMetrics={onEditMetrics}
           showMetricsContent={!isDimmed} // Hide metrics content when dimmed
+          editingMetricId={editingMetricId}
+          onEditMetric={onEditMetric}
+          onSaveMetric={onSaveMetric}
+          onCancelEditMetric={onCancelEditMetric}
         />
       )}
     </div>

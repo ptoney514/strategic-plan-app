@@ -1,4 +1,4 @@
-import { Edit2, BarChart3, ChevronUp, ChevronDown } from 'lucide-react';
+import { Edit2, ChevronUp, ChevronDown } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
 import { GoalCardWithMetrics } from '../public';
 
@@ -8,8 +8,11 @@ interface GoalCardViewProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
   onEdit: () => void;
-  onEditMetrics: () => void;
   showMetricsContent: boolean;
+  editingMetricId?: string | null;
+  onEditMetric?: (metricId: string) => void;
+  onSaveMetric?: (metricId: string, updates: Partial<Metric>) => Promise<void>;
+  onCancelEditMetric?: () => void;
 }
 
 /**
@@ -22,8 +25,11 @@ export function GoalCardView({
   isExpanded,
   onToggleExpand,
   onEdit,
-  onEditMetrics,
   showMetricsContent,
+  editingMetricId,
+  onEditMetric,
+  onSaveMetric,
+  onCancelEditMetric,
 }: GoalCardViewProps) {
   const hasMetrics = metrics.length > 0;
 
@@ -70,15 +76,9 @@ export function GoalCardView({
               </div>
             )}
 
-            {/* Metrics Count + Expand/Collapse */}
+            {/* Expand/Collapse Chevron */}
             {hasMetrics && (
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#f5f3ef] rounded-md">
-                  <BarChart3 className="h-3.5 w-3.5 text-[#6a6a6a]" />
-                  <span className="text-[12px] font-medium text-[#6a6a6a]">
-                    {metrics.length}
-                  </span>
-                </div>
+              <div className="flex-shrink-0">
                 {isExpanded ? (
                   <ChevronUp className="h-4 w-4 text-[#8a8a8a]" />
                 ) : (
@@ -89,31 +89,18 @@ export function GoalCardView({
           </div>
         </button>
 
-        {/* Hover-to-reveal Edit Buttons - Top Right Corner */}
-        <div className="absolute top-2 right-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEditMetrics();
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-[#6a6a6a] bg-white border border-[#e8e6e1] rounded-lg hover:bg-[#fafaf8] hover:text-[#1a1a1a] hover:border-[#d4d1cb] shadow-sm"
-            title="Edit metrics"
-          >
-            <BarChart3 className="h-3.5 w-3.5" />
-            Metrics
-          </button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit();
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-[#6a6a6a] bg-white border border-[#e8e6e1] rounded-lg hover:bg-[#fafaf8] hover:text-[#1a1a1a] hover:border-[#d4d1cb] shadow-sm"
-            title="Edit goal"
-          >
-            <Edit2 className="h-3.5 w-3.5" />
-            Edit
-          </button>
-        </div>
+        {/* Hover-to-reveal Edit Button - Top Right Corner */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit();
+          }}
+          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-semibold text-[#6a6a6a] bg-white border border-[#e8e6e1] rounded-lg hover:bg-[#fafaf8] hover:text-[#1a1a1a] hover:border-[#d4d1cb] shadow-sm"
+          title="Edit goal"
+        >
+          <Edit2 className="h-3.5 w-3.5" />
+          Edit
+        </button>
       </div>
 
       {/* Expanded Metrics Section */}
@@ -123,6 +110,10 @@ export function GoalCardView({
             goal={goal}
             metrics={metrics}
             hideHeader={true}
+            editingMetricId={editingMetricId}
+            onEditMetric={onEditMetric}
+            onSaveMetric={onSaveMetric}
+            onCancelEditMetric={onCancelEditMetric}
           />
         </div>
       )}

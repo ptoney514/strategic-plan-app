@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { StatusBadge } from '../public/StatusBadge';
 
 interface MetricChartPreviewProps {
   /** Display name for the metric */
@@ -8,13 +9,17 @@ interface MetricChartPreviewProps {
   /** Target value (optional, will show as dashed line if provided) */
   targetValue?: number;
   /** Year-over-year or time series data points */
-  dataPoints: { label: string; value: number }[];
+  dataPoints: { label: string; value: number; target?: number }[];
   /** Type of metric for formatting */
   metricType?: 'rating' | 'percent' | 'number' | 'currency';
   /** Chart color (defaults to blue) */
   chartColor?: string;
   /** Whether higher values are better (affects comparison text) */
   isHigherBetter?: boolean;
+  /** Custom badge text (overrides calculated status) */
+  indicatorText?: string;
+  /** Custom badge color */
+  indicatorColor?: 'green' | 'amber' | 'red' | 'gray';
 }
 
 /**
@@ -48,6 +53,8 @@ export function MetricChartPreview({
   metricType = 'number',
   chartColor = '#2563EB',
   isHigherBetter = true,
+  indicatorText,
+  indicatorColor,
 }: MetricChartPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -212,10 +219,13 @@ export function MetricChartPreview({
   return (
     <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-xl p-6">
       {/* Header */}
-      <div className="mb-4">
+      <div className="flex items-center justify-between mb-4">
         <span className="text-xs font-semibold tracking-widest text-[#8a8a8a] uppercase">
           {metricType === 'rating' ? 'Rating' : metricType === 'percent' ? 'Percentage' : 'Metric'}
         </span>
+        {indicatorText && indicatorColor && (
+          <StatusBadge customText={indicatorText} customColor={indicatorColor} size="sm" />
+        )}
       </div>
 
       {/* Title */}

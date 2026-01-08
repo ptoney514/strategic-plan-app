@@ -51,11 +51,6 @@ interface BuilderState {
   };
 }
 
-const AVAILABLE_COMPONENTS: ComponentItem[] = [
-  // Goals only - objective fields are now inline
-  { id: 'new_goal', type: 'goal', icon: <Target size={20} />, label: 'Add Goal', description: 'Add a sub-goal', category: 'Goals' },
-];
-
 export function ObjectiveBuilder() {
   const { slug, objectiveId, goalId } = useParams();
   const navigate = useNavigate();

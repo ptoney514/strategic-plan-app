@@ -169,6 +169,10 @@ export interface Metric {
   created_at?: string;
   updated_at?: string;
 
+  // Custom badge fields (manual status indicator override)
+  indicator_text?: string; // Custom badge text (e.g., "On Target", "Exceeding Goals")
+  indicator_color?: string; // Custom badge color: green, amber, red, gray
+
   // Visualization fields (for custom metric visualizations)
   visualization_type?: string;
   visualization_config?: VisualizationConfig; // JSONB field containing chart-specific configuration

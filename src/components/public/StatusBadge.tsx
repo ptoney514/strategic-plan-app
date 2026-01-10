@@ -104,7 +104,7 @@ export function StatusBadge({ status, customText, customColor, size = 'md', show
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-medium ${config.border ? 'border' : ''} ${config.bg} ${config.text} ${config.border} ${sizeClasses}`}
+      className={`inline-flex items-center gap-1.5 rounded-md font-medium ${config.border ? 'border' : ''} ${config.bg} ${config.text} ${config.border} ${sizeClasses}`}
     >
       {showDot && (
         <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { ChevronRight } from 'lucide-react';
+import { ArrowRight, Target } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
 import { StatusBadge } from './StatusBadge';
 import { useSubdomain } from '../../contexts/SubdomainContext';
@@ -12,88 +12,57 @@ interface ObjectiveCardProps {
   index: number;
 }
 
-// Color mapping for objective cards
-const colorConfig = {
-  red: {
-    border: 'border-t-district-red',
-    badge: 'bg-district-red',
-    badgeText: 'text-white',
-  },
-  blue: {
-    border: 'border-t-district-blue',
-    badge: 'bg-district-blue',
-    badgeText: 'text-white',
-  },
-  amber: {
-    border: 'border-t-district-amber',
-    badge: 'bg-district-amber',
-    badgeText: 'text-white',
-  },
-  green: {
-    border: 'border-t-district-green',
-    badge: 'bg-district-green',
-    badgeText: 'text-white',
-  },
-};
-
-// Get color based on goal's color field or default by position
-function getColor(goal: Goal, index: number): keyof typeof colorConfig {
-  if (goal.color && goal.color in colorConfig) {
-    return goal.color as keyof typeof colorConfig;
-  }
-  const defaultColors: (keyof typeof colorConfig)[] = ['red', 'blue', 'amber', 'green'];
-  return defaultColors[index % defaultColors.length];
-}
-
-export function ObjectiveCard({ objective, childGoals, metrics: _metrics, index }: ObjectiveCardProps) {
+export function ObjectiveCard({ objective }: ObjectiveCardProps) {
   const params = useParams<{ slug?: string }>();
   const { slug: subdomainSlug, type: subdomainType } = useSubdomain();
   const slug = params.slug || subdomainSlug || '';
   const isOnSubdomain = subdomainType === 'district';
-  const color = getColor(objective, index);
-  const colors = colorConfig[color];
 
   // Get manual status set by admin (stored in indicator_text)
-  // Default to 'on-target' to match admin2 behavior (which shows "On Target" when no status is set)
+  // Default to 'on-target' to match admin2 behavior
   const validStatuses = ['on-target', 'needs-attention', 'off-track', 'not-started', 'on-track', 'complete'];
-  // Use indicator_text (set via badge UI) first, fall back to overall_progress_custom_value for backwards compat
   const statusText = objective.indicator_text || objective.overall_progress_custom_value;
   const manualStatus = statusText?.toLowerCase().replace(/\s+/g, '-');
   const status = validStatuses.includes(manualStatus || '')
     ? (manualStatus as 'on-target' | 'needs-attention' | 'off-track' | 'not-started')
-    : 'on-target';  // Default to on-target to match admin2
+    : 'on-target';
+
+  // Hover color based on status - green for positive statuses, neutral for others
+  const isPositiveStatus = status === 'on-target' || status === 'on-track' || status === 'complete';
+  const hoverColor = isPositiveStatus
+    ? 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
+    : 'group-hover:text-slate-600 dark:group-hover:text-slate-300';
 
   return (
     <Link
       to={buildDistrictPath(`/objective/${objective.id}`, slug, isOnSubdomain)}
-      className={`group block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden border-t-[3px] ${colors.border} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
+      className="group block bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 flex flex-col h-full"
     >
-      <div className="p-5">
-        {/* Header: Number badge + Title */}
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className={`w-8 h-8 rounded-lg ${colors.badge} ${colors.badgeText} flex items-center justify-center font-display font-semibold text-sm flex-shrink-0`}
-          >
-            {objective.goal_number}
-          </div>
-          <h3 className="font-display font-semibold text-base text-gray-900 tracking-tight group-hover:text-gray-700 transition-colors line-clamp-2">
-            {objective.title}
-          </h3>
+      {/* Header: Icon + Status Badge */}
+      <div className="flex justify-between items-start w-full mb-5">
+        {/* Neutral Icon Box */}
+        <div className="w-9 h-9 rounded-md border border-slate-100 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center">
+          <Target className="w-[18px] h-[18px]" strokeWidth={1.5} />
         </div>
+        {/* Status Badge */}
+        <StatusBadge status={status} size="sm" />
+      </div>
 
-        {/* Description */}
-        <p className="text-xs text-gray-500 line-clamp-3 mb-4">
-          {objective.description || objective.executive_summary || 'Strategic objective for organizational growth and excellence.'}
-        </p>
+      {/* Title with number prefix */}
+      <h2 className={`text-base font-semibold tracking-tight text-slate-900 dark:text-slate-100 mb-2 transition-colors ${hoverColor}`}>
+        <span className="text-slate-400 dark:text-slate-500 font-medium mr-2">{objective.goal_number}.</span>
+        {objective.title}
+      </h2>
 
-        {/* Footer: Status badge (left) + View details (right) */}
-        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
-          <StatusBadge status={status} size="sm" />
-          <span className="flex items-center gap-1 text-xs font-medium text-gray-400 group-hover:text-district-red transition-colors">
-            View details
-            <ChevronRight className="w-4 h-4" />
-          </span>
-        </div>
+      {/* Description */}
+      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-6 line-clamp-3">
+        {objective.description || objective.executive_summary || 'Strategic objective for organizational growth and excellence.'}
+      </p>
+
+      {/* Footer: View details with arrow animation */}
+      <div className={`mt-auto flex items-center text-xs font-medium text-slate-400 dark:text-slate-500 transition-colors ${hoverColor}`}>
+        View details
+        <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform duration-300 group-hover:translate-x-1" />
       </div>
     </Link>
   );

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
@@ -9,6 +10,7 @@ import {
   Check,
   AlertTriangle
 } from 'lucide-react';
+import { ThemeToggle } from '../../../components/public/ThemeToggle';
 import { SlidePanel } from '../../../components/SlidePanel';
 import { PerformanceIndicator } from '../../../components/PerformanceIndicator';
 import { AnnualProgressChart } from '../../../components/AnnualProgressChart';
@@ -18,7 +20,10 @@ import { NarrativeDisplay } from '../../../components/NarrativeDisplay';
 import type { Goal } from '../../../lib/types';
 
 export function DistrictDashboard() {
-  const { slug } = useParams<{ slug: string }>();
+  const params = useParams<{ slug: string }>();
+  const { slug: subdomainSlug } = useSubdomain();
+  // Use subdomain slug (for subdomain routing) or URL param slug (for path routing)
+  const slug = subdomainSlug || params.slug;
   const { data: district, isLoading: districtLoading } = useDistrict(slug!);
 
   // Always call hooks in the same order - use empty string as fallback
@@ -131,16 +136,20 @@ export function DistrictDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col antialiased text-neutral-800 bg-neutral-50">
+    <div className="min-h-screen flex flex-col antialiased text-neutral-800 dark:text-slate-200 bg-neutral-50 dark:bg-slate-950">
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-white py-12 md:py-16">
+      <section className="relative overflow-hidden bg-white dark:bg-slate-900 py-12 md:py-16">
+        {/* Theme Toggle positioned top-right */}
+        <div className="absolute top-4 right-4 md:top-6 md:right-8">
+          <ThemeToggle variant="default" />
+        </div>
         <div className="max-w-4xl mx-auto px-6 md:px-8 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-neutral-900">
+          <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-neutral-900 dark:text-slate-100">
             {district.name}
           </h1>
-          <p className="mt-2 text-base md:text-lg text-neutral-600">
-            <span className="text-red-600 font-semibold">Strategic Plan 2021-2026</span>
+          <p className="mt-2 text-base md:text-lg text-neutral-600 dark:text-slate-400">
+            <span className="text-red-600 dark:text-red-400 font-semibold">Strategic Plan 2021-2026</span>
           </p>
         </div>
       </section>
@@ -168,7 +177,7 @@ export function DistrictDashboard() {
               return (
                 <article
                   key={goal.id}
-                  className="group relative h-full overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-zinc-300 cursor-pointer"
+                  className="group relative h-full overflow-hidden rounded-2xl border border-zinc-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md hover:border-zinc-300 dark:hover:border-slate-600 cursor-pointer"
                   onClick={() => {
                     setSelectedGoal(goal);
                     setShowSlidePanel(true);
@@ -184,10 +193,10 @@ export function DistrictDashboard() {
                     {/* Header with title and menu */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
-                        <h2 className="text-xl md:text-2xl tracking-tight font-semibold text-zinc-900">
+                        <h2 className="text-xl md:text-2xl tracking-tight font-semibold text-zinc-900 dark:text-slate-100">
                           {goal.goal_number}. {goal.title}
                         </h2>
-                        <p className="mt-1 text-sm text-zinc-500">
+                        <p className="mt-1 text-sm text-zinc-500 dark:text-slate-400">
                           {goal.description || 'Strategic initiatives focused on this objective'}
                         </p>
 
@@ -211,7 +220,7 @@ export function DistrictDashboard() {
                         </div>
                       </div>
                       <button
-                        className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/70"
+                        className="ml-3 inline-flex h-8 w-8 items-center justify-center rounded-lg text-zinc-400 dark:text-slate-500 hover:text-zinc-600 dark:hover:text-slate-300 hover:bg-zinc-50 dark:hover:bg-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-300/70"
                         onClick={(e) => {
                           e.stopPropagation();
                           // TODO: Add dropdown menu (View Details, Share Goal, etc.)
@@ -231,9 +240,9 @@ export function DistrictDashboard() {
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto bg-white border-t border-neutral-200">
+      <footer className="mt-auto bg-white dark:bg-slate-900 border-t border-neutral-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-4">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-neutral-600">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-neutral-600 dark:text-slate-400">
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-neutral-900 text-white text-xs font-medium">
                 ©
@@ -241,9 +250,9 @@ export function DistrictDashboard() {
               <span>© 2025 {district?.name || 'Westside Community Schools'}</span>
             </div>
             <div className="flex items-center gap-6">
-              <Link to="#" className="hover:text-neutral-900 transition-colors">Privacy</Link>
-              <Link to="#" className="hover:text-neutral-900 transition-colors">Terms</Link>
-              <Link to="#" className="hover:text-neutral-900 transition-colors">Contact</Link>
+              <Link to="#" className="hover:text-neutral-900 dark:hover:text-slate-200 transition-colors">Privacy</Link>
+              <Link to="#" className="hover:text-neutral-900 dark:hover:text-slate-200 transition-colors">Terms</Link>
+              <Link to="#" className="hover:text-neutral-900 dark:hover:text-slate-200 transition-colors">Contact</Link>
             </div>
           </div>
         </div>

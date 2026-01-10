@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown, User, Globe, GraduationCap, Settings } from 'lucide-react';
 import { ImageWithFallback } from './ImageWithFallback';
-import { ThemeToggle } from '../public/ThemeToggle';
 
 interface HomepageHeaderProps {
   districtName: string;
@@ -76,7 +75,6 @@ export function HomepageHeader({
 
             {/* Utility Buttons */}
             <div className="hidden md:flex items-center space-x-4">
-              <ThemeToggle />
               <button className="flex items-center gap-2 text-white hover:bg-white/10 px-3 py-2 rounded text-sm transition">
                 <User className="w-4 h-4" />
                 Sign In

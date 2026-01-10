@@ -36,7 +36,7 @@ export function ObjectiveCard({ objective }: ObjectiveCardProps) {
   return (
     <Link
       to={buildDistrictPath(`/objective/${objective.id}`, slug, isOnSubdomain)}
-      className="group block bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-200 flex flex-col h-full"
+      className="group block bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-xl hover:-translate-y-1 hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 flex flex-col h-full"
     >
       {/* Header: Icon + Status Badge */}
       <div className="flex justify-between items-start w-full mb-5">

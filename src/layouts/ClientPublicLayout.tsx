@@ -42,7 +42,7 @@ export function ClientPublicLayout({ districtSlug }: ClientPublicLayoutProps = {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Use the same header as the landing page */}
       <HomepageHeader
         districtName={district.name}

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { ChevronRight, Target } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import type { Goal, Metric } from '../../lib/types';
 import { StatusBadge } from './StatusBadge';
 import { useSubdomain } from '../../contexts/SubdomainContext';
@@ -68,35 +68,27 @@ export function ObjectiveCard({ objective, childGoals, metrics: _metrics, index 
       to={buildDistrictPath(`/objective/${objective.id}`, slug, isOnSubdomain)}
       className={`group block bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden border-t-[3px] ${colors.border} hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200`}
     >
-      <div className="p-6">
-        {/* Header: Number badge + Title + Status Badge */}
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center gap-3 flex-1 min-w-0">
-            <div
-              className={`w-8 h-8 rounded-lg ${colors.badge} ${colors.badgeText} flex items-center justify-center font-display font-semibold text-sm flex-shrink-0`}
-            >
-              {objective.goal_number}
-            </div>
-            <h3 className="font-display font-semibold text-lg text-gray-900 tracking-tight group-hover:text-gray-700 transition-colors truncate">
-              {objective.title}
-            </h3>
+      <div className="p-5">
+        {/* Header: Number badge + Title */}
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className={`w-8 h-8 rounded-lg ${colors.badge} ${colors.badgeText} flex items-center justify-center font-display font-semibold text-sm flex-shrink-0`}
+          >
+            {objective.goal_number}
           </div>
-          <StatusBadge status={status} size="sm" />
+          <h3 className="font-display font-semibold text-base text-gray-900 tracking-tight group-hover:text-gray-700 transition-colors line-clamp-2">
+            {objective.title}
+          </h3>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-500 line-clamp-2 mb-4">
+        <p className="text-xs text-gray-500 line-clamp-3 mb-4">
           {objective.description || objective.executive_summary || 'Strategic objective for organizational growth and excellence.'}
         </p>
 
-        {/* Goals Count */}
-        <div className="flex items-center gap-1 mb-4 text-xs text-gray-400">
-          <Target className="w-3.5 h-3.5" />
-          <span>{childGoals.length} Goals</span>
-        </div>
-
-        {/* Footer: View details */}
-        <div className="flex items-center justify-end pt-4 border-t border-gray-50">
+        {/* Footer: Status badge (left) + View details (right) */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+          <StatusBadge status={status} size="sm" />
           <span className="flex items-center gap-1 text-xs font-medium text-gray-400 group-hover:text-district-red transition-colors">
             View details
             <ChevronRight className="w-4 h-4" />

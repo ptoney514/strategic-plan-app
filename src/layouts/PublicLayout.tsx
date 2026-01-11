@@ -43,10 +43,10 @@ export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
 
   if (districtLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-district-red mx-auto"></div>
-          <p className="mt-4 text-gray-500 font-sans">Loading...</p>
+          <p className="mt-4 text-gray-500 dark:text-slate-400 font-sans">Loading...</p>
         </div>
       </div>
     );
@@ -54,9 +54,9 @@ export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
 
   if (!district) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-gray-500 font-sans">District not found</p>
+          <p className="text-xl text-gray-500 dark:text-slate-400 font-sans">District not found</p>
           <Link to="/" className="mt-4 inline-flex items-center text-district-red hover:underline font-sans">
             Return to Home
           </Link>
@@ -72,7 +72,7 @@ export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
   const objectives = allGoals.filter(g => g.level === 0);
 
   return (
-    <div className="flex min-h-screen bg-gray-50 font-sans">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-slate-950 font-sans">
       {/* Mobile backdrop overlay */}
       {sidebarOpen && (
         <div

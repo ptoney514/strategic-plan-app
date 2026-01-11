@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { X, Plus, Trash2, Eye, Check } from 'lucide-react';
-import type { Metric } from '../../lib/types';
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { X, Plus, Trash2, Eye, Check, BarChart3, LineChart, PieChart, AreaChart } from 'lucide-react';
+import type { Metric, ChartType } from '../../lib/types';
 import { MetricChartPreview } from './MetricChartPreview';
+import { useMetricChartData } from '../../hooks/useMetrics';
 
 interface MetricEditFormProps {
   metric: Metric;
@@ -23,12 +24,31 @@ interface DataPoint {
  * Includes a manual "Preview" button to update the chart visualization.
  */
 export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps) {
+  // Fetch time series data as fallback source for year-over-year data
+  const { data: timeSeriesData } = useMetricChartData(metric.id, 10);
+
   // Extract existing data points from visualization_config
   const vizConfig = metric.visualization_config as {
-    dataPoints?: { label: string; value: number }[];
+    dataPoints?: { label: string; value: number; target?: number }[];
+    chartType?: ChartType;
   } | undefined;
 
-  const existingDataPoints = vizConfig?.dataPoints || [];
+  // Use visualization_config.dataPoints first, then fall back to time series data
+  const existingDataPoints = useMemo(() => {
+    // First priority: visualization_config.dataPoints
+    if (vizConfig?.dataPoints && vizConfig.dataPoints.length > 0) {
+      return vizConfig.dataPoints;
+    }
+    // Fallback: time series data from spb_metric_time_series table
+    if (timeSeriesData && timeSeriesData.length > 0) {
+      return timeSeriesData.map(ts => ({
+        label: ts.period,
+        value: ts.actual ?? 0,
+        target: ts.target,
+      }));
+    }
+    return [];
+  }, [vizConfig?.dataPoints, timeSeriesData]);
 
   // Form state
   const [name, setName] = useState(metric.metric_name || metric.name || '');
@@ -50,9 +70,34 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     existingDataPoints.map(dp => ({
       label: dp.label,
       value: dp.value.toString(),
-      target: (dp as any).target?.toString() || '',
+      target: dp.target?.toString() || '',
     }))
   );
+  const [chartType, setChartType] = useState<ChartType>(
+    vizConfig?.chartType || 'bar'
+  );
+
+  // Track if we've loaded time series data to avoid overwriting user edits
+  const hasLoadedTimeSeriesRef = useRef(false);
+
+  // Sync time series data to form when it loads (only if no existing data points)
+  useEffect(() => {
+    if (
+      !hasLoadedTimeSeriesRef.current &&
+      dataPoints.length === 0 &&
+      timeSeriesData &&
+      timeSeriesData.length > 0
+    ) {
+      hasLoadedTimeSeriesRef.current = true;
+      setDataPoints(
+        timeSeriesData.map(ts => ({
+          label: ts.period,
+          value: ts.actual?.toString() ?? '0',
+          target: ts.target?.toString() || '',
+        }))
+      );
+    }
+  }, [timeSeriesData, dataPoints.length]);
 
   // Preview state (separate from form state, updates on "Preview" button click)
   const [previewData, setPreviewData] = useState<{
@@ -62,6 +107,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     dataPoints: { label: string; value: number; target?: number }[];
     indicatorText?: string;
     indicatorColor?: 'green' | 'amber' | 'red' | 'gray';
+    chartType?: ChartType;
   } | null>(null);
 
   // Validation state
@@ -107,9 +153,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       newErrors.name = 'Metric name must be 200 characters or less';
     }
 
-    if (!indicatorText.trim()) {
-      newErrors.indicatorText = 'Badge text is required';
-    } else if (indicatorText.length > 50) {
+    // Badge text is optional - only validate length if provided
+    if (indicatorText.length > 50) {
       newErrors.indicatorText = 'Badge text must be 50 characters or less';
     }
 
@@ -161,6 +206,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       dataPoints: validDataPoints,
       indicatorText,
       indicatorColor,
+      chartType,
     });
   };
 
@@ -182,14 +228,15 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       await onSave({
         metric_name: name.trim(),
         description: description.trim() || undefined,
-        indicator_text: indicatorText.trim(),
-        indicator_color: indicatorColor,
+        indicator_text: indicatorText.trim() || undefined,
+        indicator_color: indicatorText.trim() ? indicatorColor : undefined,
         current_value: parseFloat(currentValue),
         target_value: targetValue ? parseFloat(targetValue) : undefined,
         baseline_value: baselineValue ? parseFloat(baselineValue) : undefined,
         visualization_config: {
           ...metric.visualization_config,
           dataPoints: validDataPoints,
+          chartType,
         },
       });
     } catch (error) {
@@ -226,7 +273,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Overall average of responses (1-5 rating)"
-          className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+          className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
             errors.name
               ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
               : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
@@ -250,7 +297,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
           onChange={(e) => setDescription(e.target.value.slice(0, 500))}
           placeholder="Brief description of the metric..."
           rows={2}
-          className="w-full px-4 py-3 text-[14px] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors resize-none"
+          className="w-full px-4 py-3 text-[14px] text-[#1a1a1a] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors resize-none"
         />
         <div className="text-right text-[12px] text-[#8a8a8a] mt-1">
           {description.length} / 500 characters
@@ -266,14 +313,14 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
         {/* Badge Text */}
         <div className="mb-3">
           <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-            Badge Text <span className="text-[#ef4444]">*</span>
+            Badge Text <span className="text-[#6a6a6a] font-normal">(optional)</span>
           </label>
           <input
             type="text"
             value={indicatorText}
             onChange={(e) => setIndicatorText(e.target.value.slice(0, 50))}
             placeholder="e.g., On Target, Needs Improvement, Exceeding Goals"
-            className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
               errors.indicatorText
                 ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
                 : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
@@ -290,7 +337,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
         {/* Badge Color */}
         <div>
           <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-            Badge Color <span className="text-[#ef4444]">*</span>
+            Badge Color <span className="text-[#6a6a6a] font-normal">(optional)</span>
           </label>
           <div className="flex gap-3">
             {(['green', 'amber', 'red', 'gray'] as const).map((color) => (
@@ -306,10 +353,39 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
                   onChange={(e) => setIndicatorColor(e.target.value as typeof indicatorColor)}
                   className="mr-2"
                 />
-                <span className="text-[13px] capitalize">{color}</span>
+                <span className="text-[13px] text-[#1a1a1a] capitalize">{color}</span>
               </label>
             ))}
           </div>
+        </div>
+      </div>
+
+      {/* Chart Type Selector */}
+      <div className="mb-4 p-4 bg-white border border-[#e8e6e1] rounded-lg">
+        <h3 className="text-[13px] font-semibold text-[#1a1a1a] mb-3">
+          Visualization Type
+        </h3>
+        <div className="grid grid-cols-4 gap-2">
+          {([
+            { type: 'bar' as ChartType, icon: BarChart3, label: 'Bar' },
+            { type: 'line' as ChartType, icon: LineChart, label: 'Line' },
+            { type: 'area' as ChartType, icon: AreaChart, label: 'Area' },
+            { type: 'donut' as ChartType, icon: PieChart, label: 'Donut' },
+          ]).map(({ type, icon: Icon, label }) => (
+            <button
+              key={type}
+              type="button"
+              onClick={() => setChartType(type)}
+              className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border-2 transition-colors ${
+                chartType === type
+                  ? 'border-[#10b981] bg-[#d1fae5] text-[#059669]'
+                  : 'border-[#e8e6e1] bg-white text-[#6a6a6a] hover:border-[#10b981] hover:bg-[#f0fdf4]'
+              }`}
+            >
+              <Icon className="h-5 w-5" />
+              <span className="text-[11px] font-medium">{label}</span>
+            </button>
+          ))}
         </div>
       </div>
 
@@ -326,7 +402,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             value={currentValue}
             onChange={(e) => setCurrentValue(e.target.value)}
             placeholder="3.83"
-            className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
               errors.currentValue
                 ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
                 : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
@@ -348,7 +424,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             value={targetValue}
             onChange={(e) => setTargetValue(e.target.value)}
             placeholder="3.66"
-            className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
               errors.targetValue
                 ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
                 : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
@@ -370,7 +446,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             value={baselineValue}
             onChange={(e) => setBaselineValue(e.target.value)}
             placeholder="3.50"
-            className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
               errors.baselineValue
                 ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
                 : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
@@ -426,7 +502,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
                     value={dp.label}
                     onChange={(e) => handleUpdateDataPoint(index, 'label', e.target.value)}
                     placeholder="2024"
-                    className="px-2 py-1.5 text-[13px] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
+                    className="px-2 py-1.5 text-[13px] text-[#1a1a1a] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
                   />
                   <input
                     type="number"
@@ -434,7 +510,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
                     value={dp.value}
                     onChange={(e) => handleUpdateDataPoint(index, 'value', e.target.value)}
                     placeholder="3.75"
-                    className="px-2 py-1.5 text-[13px] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
+                    className="px-2 py-1.5 text-[13px] text-[#1a1a1a] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
                   />
                   <input
                     type="number"
@@ -442,7 +518,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
                     value={dp.target || ''}
                     onChange={(e) => handleUpdateDataPoint(index, 'target', e.target.value)}
                     placeholder="3.50"
-                    className="px-2 py-1.5 text-[13px] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
+                    className="px-2 py-1.5 text-[13px] text-[#1a1a1a] border border-[#e8e6e1] rounded bg-white focus:outline-none focus:border-[#10b981] focus:ring-1 focus:ring-[#d1fae5] transition-colors"
                   />
                   <div className="flex justify-end">
                     <button
@@ -525,6 +601,7 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             isHigherBetter={metric.is_higher_better !== false}
             indicatorText={previewData.indicatorText}
             indicatorColor={previewData.indicatorColor}
+            chartType={previewData.chartType}
           />
         </div>
       )}

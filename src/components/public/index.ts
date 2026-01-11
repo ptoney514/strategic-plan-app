@@ -13,3 +13,6 @@ export { MetricsGrid } from './MetricsGrid';
 export { InitiativeRow } from './InitiativeRow';
 export { GoalCardWithMetrics } from './GoalCardWithMetrics';
 export { MobileGoalBottomSheet } from './MobileGoalBottomSheet';
+export { CompactGoalSummaryCard } from './CompactGoalSummaryCard';
+export { ExpandedGoalPanel } from './ExpandedGoalPanel';
+export { GoalsOverviewGrid } from './GoalsOverviewGrid';

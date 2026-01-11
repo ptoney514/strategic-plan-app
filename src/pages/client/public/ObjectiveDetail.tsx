@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, Link, useLocation } from 'react-router-dom';
 import { useGoal, useChildGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
-import { StatusBadge, GoalCardWithMetrics, MobileGoalBottomSheet } from '../../../components/public';
+import { StatusBadge, MobileGoalBottomSheet, GoalsOverviewGrid } from '../../../components/public';
 import type { StatusType } from '../../../components/public/StatusBadge';
 import { FolderOpen } from 'lucide-react';
 import type { District, Goal, Metric } from '../../../lib/types';
@@ -121,9 +121,9 @@ export function ObjectiveDetail() {
             <div className="h-1 bg-gray-100 rounded w-24" />
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="h-64 bg-gray-100 rounded-xl" />
+            <div key={i} className="h-44 bg-gray-100 dark:bg-slate-800 rounded-xl" />
           ))}
         </div>
       </div>
@@ -165,20 +165,6 @@ export function ObjectiveDetail() {
 
   const status = getManualStatus(objective);
 
-  // Get Level 2 goals (sub-goals)
-  const level2Goals = childGoals?.filter(g => g.level === 2) || [];
-
-  // Helper to get sub-goals for a parent
-  const getSubGoals = (parentId: string): Goal[] => {
-    return level2Goals
-      .filter(g => g.parent_id === parentId)
-      .sort((a, b) => {
-        const aNum = parseFloat(a.goal_number?.replace(/[^\d.]/g, '') || '0');
-        const bNum = parseFloat(b.goal_number?.replace(/[^\d.]/g, '') || '0');
-        return aNum - bNum;
-      });
-  };
-
   // All metrics for filtering
   const metrics: Metric[] = allMetrics || [];
 
@@ -214,88 +200,28 @@ export function ObjectiveDetail() {
         </div>
       </div>
 
-      {/* Goals Grid - 3 columns on desktop, single column on mobile */}
+      {/* Goals Overview Grid - 3 columns on desktop, single column on mobile */}
       {level1Goals.length > 0 && (
         <div>
-          <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-6">
-            <h2 className="font-display font-medium text-lg text-gray-900">
-              Goals
+          <div className="flex items-center justify-between pb-4 mb-6">
+            <h2 className="font-display font-medium text-lg text-gray-900 dark:text-gray-100">
+              Goals Overview
             </h2>
-            <div className="text-xs text-gray-400 font-medium">
-              {level1Goals.length} goal{level1Goals.length !== 1 ? 's' : ''}
-              {isMobile && <span className="ml-1">(tap to expand)</span>}
+            <div className="text-xs text-gray-400 dark:text-gray-500 font-medium">
+              {level1Goals.length} goal{level1Goals.length !== 1 ? 's' : ''} total
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {level1Goals.map(goal => {
-              const subGoals = getSubGoals(goal.id);
-
-              return (
-                <div
-                  key={goal.id}
-                  onClick={() => {
-                    if (isMobile) {
-                      setFocusedGoalId(goal.id);
-                      window.history.replaceState(null, '', `#goal-${goal.id}`);
-                    }
-                  }}
-                  className={isMobile ? 'cursor-pointer active:scale-[0.98] transition-transform' : ''}
-                >
-                  <GoalCardWithMetrics
-                    goal={goal}
-                    metrics={metrics}
-                    colorClass={colors.badge}
-                  >
-                    {/* Nested sub-goals (Level 2) - only show on desktop */}
-                    {!isMobile && subGoals.length > 0 && (
-                      <div className="space-y-3 mt-3 pt-3 border-t border-gray-100">
-                        {subGoals.map(subGoal => (
-                          <div
-                            key={subGoal.id}
-                            id={`goal-${subGoal.id}`}
-                            className="bg-gray-50 rounded-lg p-3 scroll-mt-24"
-                          >
-                            <div className="flex items-start gap-2 mb-2">
-                              <span className="flex-shrink-0 w-8 h-8 rounded bg-gray-200 flex items-center justify-center text-[10px] font-bold text-gray-600">
-                                {subGoal.goal_number}
-                              </span>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                  <h4 className="text-xs font-semibold text-gray-900 line-clamp-2">
-                                    {subGoal.title}
-                                  </h4>
-                                  <StatusBadge status={getManualStatus(subGoal)} size="sm" />
-                                </div>
-                              </div>
-                            </div>
-                            {/* Sub-goal metrics */}
-                            {metrics.filter(m => m.goal_id === subGoal.id).length > 0 && (
-                              <div className="mt-2 space-y-2">
-                                {metrics
-                                  .filter(m => m.goal_id === subGoal.id)
-                                  .map(metric => (
-                                    <div key={metric.id} className="text-xs text-gray-600 bg-white rounded p-2">
-                                      <span className="font-medium">{metric.metric_name || metric.name}</span>
-                                      {metric.current_value != null && (
-                                        <span className="ml-2 text-gray-900 font-semibold">
-                                          {metric.current_value}
-                                          {metric.unit || ''}
-                                        </span>
-                                      )}
-                                    </div>
-                                  ))}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </GoalCardWithMetrics>
-                </div>
-              );
-            })}
-          </div>
+          <GoalsOverviewGrid
+            goals={level1Goals}
+            metrics={metrics}
+            colorClass={colors.badge}
+            isMobile={isMobile}
+            onMobileGoalSelect={(goalId) => {
+              setFocusedGoalId(goalId);
+              window.history.replaceState(null, '', `#goal-${goalId}`);
+            }}
+          />
         </div>
       )}
 

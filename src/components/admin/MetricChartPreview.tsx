@@ -2,6 +2,16 @@ import { useEffect, useRef } from 'react';
 import { StatusBadge } from '../public/StatusBadge';
 import type { ChartType } from '../../lib/types';
 
+/** Default color palette for multi-segment charts (donut, pie) */
+export const DEFAULT_CHART_COLORS = [
+  '#2563EB', // Blue
+  '#10B981', // Green
+  '#F59E0B', // Amber
+  '#EF4444', // Red
+  '#8B5CF6', // Purple
+  '#EC4899', // Pink
+];
+
 interface MetricChartPreviewProps {
   /** Display name for the metric */
   metricName: string;
@@ -23,6 +33,8 @@ interface MetricChartPreviewProps {
   indicatorColor?: 'green' | 'amber' | 'red' | 'gray';
   /** Chart visualization type */
   chartType?: ChartType;
+  /** Color palette for multi-segment charts (donut, pie). Defaults to DEFAULT_CHART_COLORS */
+  chartColors?: string[];
 }
 
 /**
@@ -59,6 +71,7 @@ export function MetricChartPreview({
   indicatorText,
   indicatorColor,
   chartType = 'bar',
+  chartColors = DEFAULT_CHART_COLORS,
 }: MetricChartPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -150,7 +163,7 @@ export function MetricChartPreview({
       const innerRadius = radius * 0.6;
 
       const total = data.reduce((sum, d) => sum + d.value, 0);
-      const colors = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+      const colors = chartColors;
 
       let startAngle = -Math.PI / 2;
       data.forEach((d, i) => {
@@ -320,7 +333,7 @@ export function MetricChartPreview({
       const y = padding.top + (chartHeight / gridLines) * i + 4;
       ctx.fillText(gridValue.toFixed(1), padding.left - 8, y);
     }
-  }, [dataPoints, targetValue, chartColor, chartType]);
+  }, [dataPoints, targetValue, chartColor, chartType, chartColors]);
 
   return (
     <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-xl p-6">

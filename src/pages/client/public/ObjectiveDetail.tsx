@@ -226,14 +226,17 @@ export function ObjectiveDetail() {
       )}
 
       {/* Mobile Goal Bottom Sheet */}
-      {isMobile && focusedGoalId && level1Goals.length > 0 && (
-        <MobileGoalBottomSheet
-          goal={level1Goals.find(g => g.id === focusedGoalId)!}
-          metrics={metrics}
-          colorClass={colors.badge}
-          onClose={handleCarouselClose}
-        />
-      )}
+      {isMobile && focusedGoalId && level1Goals.length > 0 && (() => {
+        const focusedGoal = level1Goals.find(g => g.id === focusedGoalId);
+        return focusedGoal ? (
+          <MobileGoalBottomSheet
+            goal={focusedGoal}
+            metrics={metrics}
+            colorClass={colors.badge}
+            onClose={handleCarouselClose}
+          />
+        ) : null;
+      })()}
 
       {/* Empty state for objectives with no goals */}
       {level1Goals.length === 0 && (

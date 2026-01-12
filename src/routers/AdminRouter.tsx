@@ -4,6 +4,7 @@ import { SystemAdminEditorialLayout } from '../layouts/SystemAdminEditorialLayou
 import { SystemDashboard } from '../pages/admin/SystemDashboard';
 import { SystemSettings } from '../pages/admin/SystemSettings';
 import { UserManagement } from '../pages/admin/UserManagement';
+import { ContactSubmissions } from '../pages/admin/ContactSubmissions';
 import { Login } from '../pages/Login';
 
 /**
@@ -27,6 +28,7 @@ export function AdminRouter() {
       >
         <Route index element={<SystemDashboard />} />
         <Route path="users" element={<UserManagement />} />
+        <Route path="contacts" element={<ContactSubmissions />} />
         <Route path="settings" element={<SystemSettings />} />
       </Route>
 

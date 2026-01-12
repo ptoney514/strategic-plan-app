@@ -1,0 +1,1 @@
+export { AddSchoolModal } from './AddSchoolModal';

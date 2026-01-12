@@ -4,10 +4,23 @@ import type { Goal, HierarchicalGoal } from '../lib/types';
 
 export function useGoals(districtId: string) {
   return useQuery({
-    queryKey: ['goals', districtId],
+    queryKey: ['goals', 'district', districtId],
     queryFn: () => GoalsService.getByDistrict(districtId),
     enabled: !!districtId && districtId.length > 0,
     retry: false, // Don't retry on failure
+  });
+}
+
+/**
+ * Hook to fetch goals for a specific school
+ * @param schoolId - The school ID to fetch goals for
+ */
+export function useSchoolGoals(schoolId: string) {
+  return useQuery({
+    queryKey: ['goals', 'school', schoolId],
+    queryFn: () => GoalsService.getBySchool(schoolId),
+    enabled: !!schoolId && schoolId.length > 0,
+    retry: false,
   });
 }
 
@@ -29,11 +42,16 @@ export function useChildGoals(parentId: string) {
 
 export function useCreateGoal() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (goal: Partial<Goal>) => GoalsService.create(goal),
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['goals', data.district_id] });
+      // Invalidate the appropriate goals list based on whether it's a district or school goal
+      if (data.school_id) {
+        queryClient.invalidateQueries({ queryKey: ['goals', 'school', data.school_id] });
+      } else if (data.district_id) {
+        queryClient.invalidateQueries({ queryKey: ['goals', 'district', data.district_id] });
+      }
       if (data.parent_id) {
         queryClient.invalidateQueries({ queryKey: ['goals', 'children', data.parent_id] });
       }
@@ -77,19 +95,25 @@ export function useReorderGoals() {
   });
 }
 
+/**
+ * Hook to reorder and renumber goals
+ * Supports both district and school contexts
+ */
 export function useReorderAndRenumberGoals() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({
       districtId,
+      schoolId,
       parentId,
       reorderedGoals,
     }: {
-      districtId: string;
+      districtId?: string;
+      schoolId?: string;
       parentId: string | null;
       reorderedGoals: { id: string; order_position: number }[];
-    }) => GoalsService.reorderAndRenumber(districtId, parentId, reorderedGoals),
+    }) => GoalsService.reorderAndRenumber({ districtId, schoolId }, parentId, reorderedGoals),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },

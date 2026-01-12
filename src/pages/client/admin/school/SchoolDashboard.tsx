@@ -1,26 +1,20 @@
 import { useNavigate } from 'react-router-dom';
-import { useAdminContext } from '../../../hooks/useAdminContext';
-import { useGoals, useSchoolGoals } from '../../../hooks/useGoals';
+import { useAdminContext } from '../../../../hooks/useAdminContext';
+import { useSchoolGoals } from '../../../../hooks/useGoals';
 import {
   SiteStatusBanner,
   QuickActionsGrid,
   ObjectivesList,
   UsersList,
-} from '../../../components/admin/dashboard';
+} from '../../../../components/admin/dashboard';
 
 /**
- * AdminDashboard - Redesigned dashboard for district/school admins
- * Features: Site status banner, quick actions, objectives list, team preview
- *
- * Works for both district and school contexts:
- * - District admin: Shows district objectives and all district users
- * - School admin: Shows school objectives and school users
+ * SchoolDashboard - Dashboard for school administrators
+ * Shows school-specific objectives, status, and quick actions
  */
-export function AdminDashboard() {
+export function SchoolDashboard() {
   const navigate = useNavigate();
   const {
-    type,
-    district,
     school,
     districtSlug,
     schoolSlug,
@@ -29,31 +23,23 @@ export function AdminDashboard() {
     isLoading: contextLoading,
   } = useAdminContext();
 
-  // Fetch goals based on context
-  const districtGoals = useGoals(type === 'district' ? district?.id || '' : '');
-  const schoolGoals = useSchoolGoals(type === 'school' ? school?.id || '' : '');
-
-  const goals = type === 'school' ? schoolGoals : districtGoals;
-  const goalsData = goals.data || [];
-  const goalsLoading = goals.isLoading;
+  // Fetch school goals
+  const { data: goalsData = [], isLoading: goalsLoading } = useSchoolGoals(school?.id || '');
 
   // Extract objectives (level 0 goals)
   const objectives = goalsData.filter((g) => g.level === 0);
   const draftObjectives = objectives.filter((g) => !g.is_public);
 
-  // Context-specific data
-  const contextName = type === 'school' ? school?.name : district?.name;
-  const contextPublic = type === 'school' ? school?.is_public : district?.is_public;
-  const siteUrl = type === 'school'
-    ? `${school?.slug || ''}.strategicplanner.app`
-    : `${district?.slug || ''}.strategicplanner.app`;
+  // School URL
+  const siteUrl = `${schoolSlug || ''}.strategicplanner.app`;
 
-  // Mock users for now - will be replaced with actual user management
+  // Mock users - will be replaced with actual user management
   const mockUsers = [
     {
       id: '1',
-      email: district?.admin_email || 'admin@example.com',
-      role: 'district_admin' as const,
+      email: school?.principal_email || 'admin@school.com',
+      role: 'school_admin' as const,
+      name: school?.principal_name,
     },
   ];
 
@@ -97,12 +83,12 @@ export function AdminDashboard() {
     <div className="p-6 space-y-6">
       {/* Site Status Banner */}
       <SiteStatusBanner
-        districtName={contextName || 'Loading...'}
+        districtName={school?.name || 'Loading...'}
         publicUrl={siteUrl}
         objectivesCount={objectives.length}
         draftsCount={draftObjectives.length}
         usersCount={mockUsers.length}
-        isPublic={contextPublic || false}
+        isPublic={school?.is_public || false}
         onViewSite={handleViewSite}
       />
 

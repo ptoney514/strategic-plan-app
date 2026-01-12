@@ -1,0 +1,15 @@
+name = "r2-upload-worker"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+# R2 bucket binding
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "assets"
+
+[vars]
+# Public domain for R2 bucket (custom domain)
+R2_PUBLIC_DOMAIN = "assets.stratadash.org"
+
+# Allowed origins for CORS (comma-separated)
+ALLOWED_ORIGINS = "http://localhost:5173,https://stratadash.org,https://*.stratadash.org"

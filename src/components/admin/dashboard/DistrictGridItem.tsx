@@ -8,7 +8,7 @@ interface DistrictGridItemProps {
 
 export function DistrictGridItem({ district }: DistrictGridItemProps) {
   const publicUrl = buildSubdomainUrlWithPath('district', '', district.slug);
-  const adminUrl = `/${district.slug}/admin`;
+  const adminUrl = buildSubdomainUrlWithPath('district', '/admin', district.slug);
 
   const handleViewPublic = () => {
     window.open(publicUrl, '_blank');

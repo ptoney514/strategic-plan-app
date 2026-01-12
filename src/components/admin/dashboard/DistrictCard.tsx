@@ -8,7 +8,7 @@ interface DistrictCardProps {
 
 export function DistrictCard({ district }: DistrictCardProps) {
   const publicUrl = buildSubdomainUrlWithPath('district', '', district.slug);
-  const adminUrl = `/${district.slug}/admin`;
+  const adminUrl = buildSubdomainUrlWithPath('district', '/admin', district.slug);
 
   const handleViewPublic = () => {
     window.open(publicUrl, '_blank');

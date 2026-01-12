@@ -1,5 +1,16 @@
 import { useEffect, useRef } from 'react';
 import { StatusBadge } from '../public/StatusBadge';
+import type { ChartType } from '../../lib/types';
+
+/** Default color palette for multi-segment charts (donut, pie) */
+export const DEFAULT_CHART_COLORS = [
+  '#2563EB', // Blue
+  '#10B981', // Green
+  '#F59E0B', // Amber
+  '#EF4444', // Red
+  '#8B5CF6', // Purple
+  '#EC4899', // Pink
+];
 
 interface MetricChartPreviewProps {
   /** Display name for the metric */
@@ -20,6 +31,10 @@ interface MetricChartPreviewProps {
   indicatorText?: string;
   /** Custom badge color */
   indicatorColor?: 'green' | 'amber' | 'red' | 'gray';
+  /** Chart visualization type */
+  chartType?: ChartType;
+  /** Color palette for multi-segment charts (donut, pie). Defaults to DEFAULT_CHART_COLORS */
+  chartColors?: string[];
 }
 
 /**
@@ -55,6 +70,8 @@ export function MetricChartPreview({
   isHigherBetter = true,
   indicatorText,
   indicatorColor,
+  chartType = 'bar',
+  chartColors = DEFAULT_CHART_COLORS,
 }: MetricChartPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -135,7 +152,55 @@ export function MetricChartPreview({
       return;
     }
 
-    // Calculate chart dimensions
+    // Clear canvas
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    // Handle donut chart separately
+    if (chartType === 'donut') {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const radius = Math.min(centerX, centerY) - 30;
+      const innerRadius = radius * 0.6;
+
+      const total = data.reduce((sum, d) => sum + d.value, 0);
+      const colors = chartColors;
+
+      let startAngle = -Math.PI / 2;
+      data.forEach((d, i) => {
+        const sliceAngle = (d.value / total) * 2 * Math.PI;
+        const endAngle = startAngle + sliceAngle;
+
+        // Draw slice
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.fill();
+
+        // Draw label
+        const midAngle = startAngle + sliceAngle / 2;
+        const labelRadius = radius + 15;
+        const labelX = centerX + Math.cos(midAngle) * labelRadius;
+        const labelY = centerY + Math.sin(midAngle) * labelRadius;
+
+        ctx.fillStyle = '#374151';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = midAngle > Math.PI / 2 && midAngle < 3 * Math.PI / 2 ? 'right' : 'left';
+        ctx.fillText(`${d.label}: ${d.value.toFixed(1)}`, labelX, labelY);
+
+        startAngle = endAngle;
+      });
+
+      // Draw center text
+      ctx.fillStyle = '#1a1a1a';
+      ctx.font = 'bold 16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(total.toFixed(1), centerX, centerY + 6);
+      return;
+    }
+
+    // Calculate chart dimensions for bar/line/area charts
     const padding = { top: 20, right: 20, bottom: 30, left: 40 };
     const chartWidth = rect.width - padding.left - padding.right;
     const chartHeight = rect.height - padding.top - padding.bottom;
@@ -145,14 +210,11 @@ export function MetricChartPreview({
     const minValue = Math.min(0, Math.min(...data.map(d => d.value)) * 0.9);
     const barWidth = chartWidth / data.length * 0.6;
     const barGap = chartWidth / data.length;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, rect.width, rect.height);
+    const gridLines = 4;
 
     // Draw grid lines
     ctx.strokeStyle = '#F3F4F6';
     ctx.lineWidth = 1;
-    const gridLines = 4;
     for (let i = 0; i <= gridLines; i++) {
       const y = padding.top + (chartHeight / gridLines) * i;
       ctx.beginPath();
@@ -180,30 +242,87 @@ export function MetricChartPreview({
       ctx.fillText('Target', rect.width - padding.right + 5, targetY + 4);
     }
 
-    // Draw bars
-    data.forEach((d, i) => {
+    // Calculate data point positions
+    const points = data.map((d, i) => {
       const valueRange = maxValue - minValue;
-      const barHeight = valueRange > 0 ? ((d.value - minValue) / valueRange) * chartHeight : 0;
-      const x = padding.left + barGap * i + (barGap - barWidth) / 2;
-      const y = padding.top + chartHeight - barHeight;
-
-      // Bar
-      ctx.fillStyle = chartColor;
-      ctx.beginPath();
-      ctx.roundRect(x, y, barWidth, barHeight, 4);
-      ctx.fill();
-
-      // Value label on top of bar
-      ctx.fillStyle = '#374151';
-      ctx.font = 'bold 11px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 6);
-
-      // Label below bar
-      ctx.fillStyle = '#6B7280';
-      ctx.font = '11px Inter, sans-serif';
-      ctx.fillText(d.label, x + barWidth / 2, rect.height - 8);
+      const x = padding.left + barGap * i + barGap / 2;
+      const y = valueRange > 0
+        ? padding.top + chartHeight - ((d.value - minValue) / valueRange) * chartHeight
+        : padding.top + chartHeight;
+      return { x, y, value: d.value, label: d.label };
     });
+
+    // Draw based on chart type
+    if (chartType === 'line' || chartType === 'area') {
+      // Draw area fill for area chart
+      if (chartType === 'area' && points.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, padding.top + chartHeight);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(points[points.length - 1].x, padding.top + chartHeight);
+        ctx.closePath();
+        ctx.fillStyle = chartColor + '30'; // 30% opacity
+        ctx.fill();
+      }
+
+      // Draw line
+      if (points.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = chartColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+
+      // Draw points and labels
+      points.forEach((p) => {
+        // Point circle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = chartColor;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Value label
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.value.toFixed(2), p.x, p.y - 10);
+
+        // X-axis label
+        ctx.fillStyle = '#6B7280';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(p.label, p.x, rect.height - 8);
+      });
+    } else {
+      // Default: Bar chart
+      data.forEach((d, i) => {
+        const valueRange = maxValue - minValue;
+        const barHeight = valueRange > 0 ? ((d.value - minValue) / valueRange) * chartHeight : 0;
+        const x = padding.left + barGap * i + (barGap - barWidth) / 2;
+        const y = padding.top + chartHeight - barHeight;
+
+        // Bar
+        ctx.fillStyle = chartColor;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, 4);
+        ctx.fill();
+
+        // Value label on top of bar
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 6);
+
+        // Label below bar
+        ctx.fillStyle = '#6B7280';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(d.label, x + barWidth / 2, rect.height - 8);
+      });
+    }
 
     // Draw y-axis labels
     ctx.fillStyle = '#9CA3AF';
@@ -214,7 +333,7 @@ export function MetricChartPreview({
       const y = padding.top + (chartHeight / gridLines) * i + 4;
       ctx.fillText(gridValue.toFixed(1), padding.left - 8, y);
     }
-  }, [dataPoints, targetValue, chartColor]);
+  }, [dataPoints, targetValue, chartColor, chartType, chartColors]);
 
   return (
     <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-xl p-6">

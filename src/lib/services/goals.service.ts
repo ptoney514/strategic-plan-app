@@ -9,6 +9,9 @@ export class GoalsService {
   static async getByDistrict(districtId: string): Promise<HierarchicalGoal[]> {
     log.debug('Fetching goals for district:', districtId);
 
+    // Note: We don't filter by school_id IS NULL because:
+    // 1. The database constraint ensures district goals have school_id = NULL
+    // 2. The .is() filter can cause issues with some Supabase versions
     const { data: goals, error } = await supabase
       .from('spb_goals')
       .select(`
@@ -28,6 +31,37 @@ export class GoalsService {
     const hierarchy = buildGoalHierarchy(goals || []);
 
     log.debug('After buildGoalHierarchy:', hierarchy.length, 'top-level goals');
+
+    return hierarchy;
+  }
+
+  /**
+   * Get goals for a specific school
+   * @param schoolId - The school ID to fetch goals for
+   * @returns Hierarchical array of goals belonging to the school
+   */
+  static async getBySchool(schoolId: string): Promise<HierarchicalGoal[]> {
+    log.debug('Fetching goals for school:', schoolId);
+
+    const { data: goals, error } = await supabase
+      .from('spb_goals')
+      .select(`
+        *,
+        metrics:spb_metrics(*)
+      `)
+      .eq('school_id', schoolId)
+      .order('goal_number');
+
+    if (error) {
+      log.error('Error fetching school goals:', error);
+      throw error;
+    }
+
+    log.debug('Raw school goals from DB:', goals?.length ?? 0, 'goals');
+
+    const hierarchy = buildGoalHierarchy(goals || []);
+
+    log.debug('After buildGoalHierarchy:', hierarchy.length, 'top-level school goals');
 
     return hierarchy;
   }
@@ -68,12 +102,30 @@ export class GoalsService {
     return data || [];
   }
 
+  /**
+   * Create a new goal for district or school
+   * Note: Goal can belong to either a district OR a school, not both (mutual exclusivity)
+   * @param goal - Goal data including either district_id or school_id
+   */
   static async create(goal: Partial<Goal>): Promise<Goal> {
-    // Get all goals for the district to calculate next number
-    const { data: existingGoals } = await supabase
-      .from('spb_goals')
-      .select('*')
-      .eq('district_id', goal.district_id);
+    // Validate mutual exclusivity - goal belongs to district OR school, not both
+    if (goal.district_id && goal.school_id) {
+      throw new Error('Goal cannot belong to both district and school');
+    }
+    if (!goal.district_id && !goal.school_id) {
+      throw new Error('Goal must belong to either a district or a school');
+    }
+
+    // Get all goals for the district or school to calculate next number
+    let query = supabase.from('spb_goals').select('*');
+
+    if (goal.school_id) {
+      query = query.eq('school_id', goal.school_id);
+    } else {
+      query = query.eq('district_id', goal.district_id).is('school_id', null);
+    }
+
+    const { data: existingGoals } = await query;
 
     const goalNumber = getNextGoalNumber(
       existingGoals || [],
@@ -168,18 +220,34 @@ export class GoalsService {
   /**
    * Renumber goals within a specific parent based on their order_position
    * This is called after reordering to update goal_number display values
+   * Supports both district and school contexts
    *
-   * @param districtId - The district ID
-   * @param parentId - The parent goal ID (null for root goals)
+   * @param options - Object containing either districtId or schoolId, and parentId
    */
-  static async renumberGoals(districtId: string, parentId: string | null): Promise<void> {
+  static async renumberGoals(
+    options: { districtId?: string; schoolId?: string },
+    parentId: string | null
+  ): Promise<void> {
+    const { districtId, schoolId } = options;
+
+    // Validate that exactly one of districtId or schoolId is provided
+    if (districtId && schoolId) {
+      throw new Error('Cannot renumber with both districtId and schoolId');
+    }
+    if (!districtId && !schoolId) {
+      throw new Error('Must provide either districtId or schoolId');
+    }
+
     console.log('[GoalsService] Renumbering goals for parent:', parentId);
 
     // Get all sibling goals under this parent
-    let query = supabase
-      .from('spb_goals')
-      .select('*')
-      .eq('district_id', districtId);
+    let query = supabase.from('spb_goals').select('*');
+
+    if (schoolId) {
+      query = query.eq('school_id', schoolId);
+    } else {
+      query = query.eq('district_id', districtId).is('school_id', null);
+    }
 
     // Use .is() for null check, .eq() for specific parent_id
     if (parentId === null) {
@@ -242,19 +310,20 @@ export class GoalsService {
 
     // Recursively renumber all children of the goals we just renumbered
     for (const goal of siblings) {
-      await this.renumberGoals(districtId, goal.id);
+      await this.renumberGoals(options, goal.id);
     }
   }
 
   /**
    * Reorder goals and automatically renumber them
+   * Supports both district and school contexts
    *
-   * @param districtId - The district ID
+   * @param options - Object containing either districtId or schoolId
    * @param parentId - The parent goal ID (null for root goals)
    * @param reorderedGoals - Array of goal IDs in their new order
    */
   static async reorderAndRenumber(
-    districtId: string,
+    options: { districtId?: string; schoolId?: string },
     parentId: string | null,
     reorderedGoals: { id: string; order_position: number }[]
   ): Promise<void> {
@@ -264,6 +333,6 @@ export class GoalsService {
     await this.reorder(reorderedGoals);
 
     // Then renumber the goals
-    await this.renumberGoals(districtId, parentId);
+    await this.renumberGoals(options, parentId);
   }
 }

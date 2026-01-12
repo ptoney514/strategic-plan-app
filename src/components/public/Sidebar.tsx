@@ -32,28 +32,28 @@ interface SidebarProps {
 // Color mapping for objective badges
 const colorClasses = {
   red: {
-    badge: 'bg-white text-district-red border-red-100',
-    badgeActive: 'bg-white text-district-red border-red-100 shadow-sm',
+    badge: 'bg-white dark:bg-slate-800 text-district-red border-red-100 dark:border-red-900',
+    badgeActive: 'bg-white dark:bg-slate-800 text-district-red border-red-100 dark:border-red-900 shadow-sm',
     text: 'text-district-red',
-    bg: 'bg-red-50',
+    bg: 'bg-red-50 dark:bg-red-950',
   },
   blue: {
-    badge: 'bg-white text-district-blue border-blue-100',
-    badgeActive: 'bg-white text-district-blue border-blue-100 shadow-sm',
+    badge: 'bg-white dark:bg-slate-800 text-district-blue border-blue-100 dark:border-blue-900',
+    badgeActive: 'bg-white dark:bg-slate-800 text-district-blue border-blue-100 dark:border-blue-900 shadow-sm',
     text: 'text-district-blue',
-    bg: 'bg-blue-50',
+    bg: 'bg-blue-50 dark:bg-blue-950',
   },
   amber: {
-    badge: 'bg-white text-district-amber border-amber-100',
-    badgeActive: 'bg-white text-district-amber border-amber-100 shadow-sm',
+    badge: 'bg-white dark:bg-slate-800 text-district-amber border-amber-100 dark:border-amber-900',
+    badgeActive: 'bg-white dark:bg-slate-800 text-district-amber border-amber-100 dark:border-amber-900 shadow-sm',
     text: 'text-district-amber',
-    bg: 'bg-amber-50',
+    bg: 'bg-amber-50 dark:bg-amber-950',
   },
   green: {
-    badge: 'bg-white text-district-green border-green-100',
-    badgeActive: 'bg-white text-district-green border-green-100 shadow-sm',
+    badge: 'bg-white dark:bg-slate-800 text-district-green border-green-100 dark:border-green-900',
+    badgeActive: 'bg-white dark:bg-slate-800 text-district-green border-green-100 dark:border-green-900 shadow-sm',
     text: 'text-district-green',
-    bg: 'bg-green-50',
+    bg: 'bg-green-50 dark:bg-green-950',
   },
 };
 
@@ -138,7 +138,7 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
   return (
     <>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 flex-col">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex-col">
         <SidebarContent
           district={district}
           objectives={objectives}
@@ -156,16 +156,16 @@ export function Sidebar({ district, objectives, goals, isOpen, onClose, isLoadin
 
       {/* Mobile Sidebar (Drawer) */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${
+        className={`fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out lg:hidden flex flex-col shadow-2xl ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Close button */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <span className="font-display font-semibold text-gray-900">Menu</span>
+        <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-slate-800">
+          <span className="font-display font-semibold text-gray-900 dark:text-slate-100">Menu</span>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 p-1"
+            className="text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 p-1"
             aria-label="Close menu"
           >
             <X className="w-5 h-5" />
@@ -342,7 +342,7 @@ function SidebarContent({
   return (
     <>
       {/* Logo Area */}
-      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur-md border-b border-gray-100 px-6 h-16 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-gray-100 dark:border-slate-800 px-6 h-16 flex items-center justify-between">
         <Link to={homePath} className="flex items-center gap-3 min-w-0" onClick={onItemClick}>
           {(() => {
             const logoUrl = getLogoUrl(district, slug || '');
@@ -355,10 +355,10 @@ function SidebarContent({
             );
           })()}
           <div className="flex flex-col min-w-0">
-            <span className="font-display font-semibold text-sm tracking-tight text-gray-900 leading-none truncate max-w-[140px]">
+            <span className="font-display font-semibold text-sm tracking-tight text-gray-900 dark:text-slate-100 leading-none truncate max-w-[140px]">
               {district.name.split(' ')[0].toUpperCase()}
             </span>
-            <span className="text-[10px] uppercase tracking-widest text-gray-500 font-medium mt-0.5">
+            <span className="text-[10px] uppercase tracking-widest text-gray-500 dark:text-slate-400 font-medium mt-0.5">
               Strategic Plan
             </span>
           </div>
@@ -373,8 +373,8 @@ function SidebarContent({
           onClick={onItemClick}
           className={`relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
             isOverviewActive
-              ? 'bg-red-50 text-district-red'
-              : 'text-gray-600 hover:bg-gray-50'
+              ? 'bg-red-50 dark:bg-red-950 text-district-red'
+              : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
           }`}
         >
           {isOverviewActive && (
@@ -387,12 +387,12 @@ function SidebarContent({
         {/* Strategic Goals Section */}
         <div>
           <div className="px-3 mb-3 flex items-center justify-between">
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-widest">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-slate-400 uppercase tracking-widest">
               Strategic Goals
             </h3>
-            <div className="flex items-center shadow-sm border border-gray-200 rounded-md bg-white px-2 py-1">
-              <Calendar className="w-3 h-3 text-gray-400 mr-1.5" />
-              <span className="text-[10px] font-semibold text-gray-900">2021–2026</span>
+            <div className="flex items-center shadow-sm border border-gray-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-800 px-2 py-1">
+              <Calendar className="w-3 h-3 text-gray-400 dark:text-slate-500 mr-1.5" />
+              <span className="text-[10px] font-semibold text-gray-900 dark:text-slate-100">2021–2026</span>
             </div>
           </div>
 
@@ -400,7 +400,7 @@ function SidebarContent({
             <div className="space-y-2 px-3">
               {[1, 2, 3, 4].map(i => (
                 <div key={i} className="animate-pulse">
-                  <div className="h-10 bg-gray-100 rounded-lg" />
+                  <div className="h-10 bg-gray-100 dark:bg-slate-800 rounded-lg" />
                 </div>
               ))}
             </div>
@@ -420,7 +420,7 @@ function SidebarContent({
                       onClick={() => handleObjectiveClick(objective.id, isActive)}
                       data-testid={`objective-${objective.goal_number}`}
                       className={`relative w-full flex items-start gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left ${
-                        isActive ? `${colors.bg} ${colors.text}` : 'text-gray-600 hover:bg-gray-50'
+                        isActive ? `${colors.bg} ${colors.text}` : 'text-gray-600 dark:text-slate-400 hover:bg-gray-50 dark:hover:bg-slate-800'
                       }`}
                     >
                       {isActive && (
@@ -444,7 +444,7 @@ function SidebarContent({
                           <ChevronRight
                             className={`w-4 h-4 flex-shrink-0 transition-transform ${
                               isExpanded ? 'rotate-90' : ''
-                            } ${isActive ? `text-${color}-300` : 'text-gray-400'}`}
+                            } ${isActive ? `text-${color}-300` : 'text-gray-400 dark:text-slate-500'}`}
                           />
                         </div>
                       </div>
@@ -454,7 +454,7 @@ function SidebarContent({
                     {isExpanded && childGoals.length > 0 && (
                       <div className="pl-4 pr-1 mt-1 space-y-0.5">
                         <div className="relative">
-                          <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200" />
+                          <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-200 dark:bg-slate-700" />
                           {childGoals.map(goal => {
                             const isGoalActive = currentGoalId === goal.id;
                             const level2Children = getChildGoals(goal.id);
@@ -470,7 +470,7 @@ function SidebarContent({
                                     className={`w-full flex items-center justify-between pl-6 pr-2 py-2 text-xs font-medium rounded-md transition-colors text-left ${
                                       isGoalActive
                                         ? `${colors.text} ${colors.bg}/50`
-                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                                        : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-800'
                                     }`}
                                     title={`${goal.goal_number} ${goal.title}`}
                                   >
@@ -480,7 +480,7 @@ function SidebarContent({
                                     <ChevronRight
                                       className={`w-3 h-3 flex-shrink-0 ml-1 transition-transform ${
                                         isGoalExpanded ? 'rotate-90' : ''
-                                      } text-gray-400`}
+                                      } text-gray-400 dark:text-slate-500`}
                                     />
                                   </button>
                                 ) : (
@@ -489,7 +489,7 @@ function SidebarContent({
                                     className={`w-full text-left block pl-6 py-2 text-xs font-medium rounded-md transition-colors ${
                                       isGoalActive
                                         ? `${colors.text} ${colors.bg}/50`
-                                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                                        : 'text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 hover:bg-gray-50 dark:hover:bg-slate-800'
                                     }`}
                                     title={`${goal.goal_number} ${goal.title}`}
                                   >
@@ -503,7 +503,7 @@ function SidebarContent({
                                 {hasChildren && isGoalExpanded && (
                                   <div className="pl-4 mt-0.5 space-y-0.5">
                                     <div className="relative">
-                                      <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-100" />
+                                      <div className="absolute left-3 top-0 bottom-0 w-px bg-gray-100 dark:bg-slate-700" />
                                       {level2Children.map(initiative => {
                                         const isInitiativeActive = currentGoalId === initiative.id;
                                         return (
@@ -513,7 +513,7 @@ function SidebarContent({
                                             className={`w-full text-left block pl-6 py-1.5 text-[11px] font-medium rounded-md transition-colors ${
                                               isInitiativeActive
                                                 ? `${colors.text} ${colors.bg}/30`
-                                                : 'text-gray-400 hover:text-gray-700 hover:bg-gray-50'
+                                                : 'text-gray-400 dark:text-slate-500 hover:text-gray-700 dark:hover:text-slate-300 hover:bg-gray-50 dark:hover:bg-slate-800'
                                             }`}
                                             title={`${initiative.goal_number} ${initiative.title}`}
                                           >
@@ -541,12 +541,12 @@ function SidebarContent({
       </nav>
 
       {/* Footer Link */}
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-gray-100 dark:border-slate-800">
         <a
           href={`https://www.${district.slug}.org`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-3 px-3 py-2 text-xs font-medium text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 transition-colors"
         >
           <Home className="w-4 h-4" />
           Return to District Home

@@ -17,26 +17,26 @@ interface ObjectiveDetailContext {
 const colorConfig = {
   red: {
     badge: 'bg-district-red',
-    light: 'bg-red-50',
-    border: 'border-red-200',
+    light: 'bg-red-50 dark:bg-red-950',
+    border: 'border-red-200 dark:border-red-800',
     text: 'text-district-red',
   },
   blue: {
     badge: 'bg-district-blue',
-    light: 'bg-blue-50',
-    border: 'border-blue-200',
+    light: 'bg-blue-50 dark:bg-blue-950',
+    border: 'border-blue-200 dark:border-blue-800',
     text: 'text-district-blue',
   },
   amber: {
     badge: 'bg-district-amber',
-    light: 'bg-amber-50',
-    border: 'border-amber-200',
+    light: 'bg-amber-50 dark:bg-amber-950',
+    border: 'border-amber-200 dark:border-amber-800',
     text: 'text-district-amber',
   },
   green: {
     badge: 'bg-district-green',
-    light: 'bg-green-50',
-    border: 'border-green-200',
+    light: 'bg-green-50 dark:bg-green-950',
+    border: 'border-green-200 dark:border-green-800',
     text: 'text-district-green',
   },
 };
@@ -113,12 +113,12 @@ export function ObjectiveDetail() {
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-6">
-        <div className="h-4 bg-gray-100 rounded w-1/4" />
+        <div className="h-4 bg-gray-100 dark:bg-slate-800 rounded w-1/4" />
         <div className="flex items-start gap-4">
-          <div className="w-14 h-14 bg-gray-100 rounded-lg" />
+          <div className="w-14 h-14 bg-gray-100 dark:bg-slate-800 rounded-lg" />
           <div className="flex-1">
-            <div className="h-8 bg-gray-100 rounded w-2/3 mb-2" />
-            <div className="h-1 bg-gray-100 rounded w-24" />
+            <div className="h-8 bg-gray-100 dark:bg-slate-800 rounded w-2/3 mb-2" />
+            <div className="h-1 bg-gray-100 dark:bg-slate-800 rounded w-24" />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -133,7 +133,7 @@ export function ObjectiveDetail() {
   if (!objective) {
     return (
       <div className="text-center py-12">
-        <p className="text-xl text-gray-500">Objective not found</p>
+        <p className="text-xl text-gray-500 dark:text-slate-400">Objective not found</p>
         <Link to={`/${slug}`} className="mt-4 inline-flex items-center text-district-red hover:underline">
           Return to Overview
         </Link>
@@ -171,12 +171,12 @@ export function ObjectiveDetail() {
   return (
     <div className="space-y-8">
       {/* Breadcrumbs */}
-      <nav className="flex text-xs text-gray-500 space-x-2 items-center">
-        <Link to={`/${slug}`} className="hover:text-gray-900 transition-colors">
+      <nav className="flex text-xs text-gray-500 dark:text-slate-400 space-x-2 items-center">
+        <Link to={`/${slug}`} className="hover:text-gray-900 dark:hover:text-slate-100 transition-colors">
           Strategic Plan
         </Link>
-        <span className="text-gray-300">/</span>
-        <span className="text-gray-900 font-medium">{objective.goal_number} {objective.title}</span>
+        <span className="text-gray-300 dark:text-slate-600">/</span>
+        <span className="text-gray-900 dark:text-slate-100 font-medium">{objective.goal_number} {objective.title}</span>
       </nav>
 
       {/* Header with Number Badge and Title */}
@@ -188,12 +188,12 @@ export function ObjectiveDetail() {
         </div>
         <div className="max-w-3xl">
           <div className="flex items-center gap-3 mb-2 flex-wrap">
-            <h1 className="font-display font-semibold text-2xl lg:text-3xl text-gray-900 tracking-tight">
+            <h1 className="font-display font-semibold text-2xl lg:text-3xl text-gray-900 dark:text-slate-100 tracking-tight">
               {objective.title}
             </h1>
             <StatusBadge status={status} />
           </div>
-          <p className="text-gray-500 text-sm lg:text-base leading-relaxed">
+          <p className="text-gray-500 dark:text-slate-400 text-sm lg:text-base leading-relaxed">
             {objective.description || objective.executive_summary ||
               `This strategic objective encompasses our commitment to excellence and continuous improvement.`}
           </p>
@@ -240,10 +240,10 @@ export function ObjectiveDetail() {
 
       {/* Empty state for objectives with no goals */}
       {level1Goals.length === 0 && (
-        <div className="text-center py-12 bg-gray-50 rounded-xl border border-gray-100">
-          <FolderOpen className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Goals Yet</h3>
-          <p className="text-sm text-gray-500 max-w-md mx-auto">
+        <div className="text-center py-12 bg-gray-50 dark:bg-slate-900 rounded-xl border border-gray-100 dark:border-slate-800">
+          <FolderOpen className="w-12 h-12 text-gray-300 dark:text-slate-600 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100 mb-2">No Goals Yet</h3>
+          <p className="text-sm text-gray-500 dark:text-slate-400 max-w-md mx-auto">
             This objective doesn't have any goals defined yet. Goals help track progress toward achieving this strategic objective.
           </p>
         </div>

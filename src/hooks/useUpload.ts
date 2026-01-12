@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { UploadService, UploadFolder, UploadProgress } from '../lib/services/upload.service';
+import { UploadService } from '../lib/services/upload.service';
+import type { UploadFolder, UploadProgress } from '../lib/services/upload.service';
 
 interface UseImageUploadOptions {
   folder: UploadFolder;

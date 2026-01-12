@@ -132,7 +132,7 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
   return (
     <div className="bg-card rounded-lg border border-border">
       {/* Toolbar */}
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-muted/30">
+      <div className="px-4 py-3 border-b border-border flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-muted/30">
         <div className="flex items-center space-x-4">
           <span className="text-sm font-medium">
             Period: {period === 'current' ? 'Current' : period}
@@ -140,22 +140,152 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
           {unsavedChanges && (
             <span className="text-sm text-yellow-600 flex items-center">
               <AlertTriangle className="h-4 w-4 mr-1" />
-              Unsaved changes
+              <span className="hidden sm:inline">Unsaved changes</span>
+              <span className="sm:hidden">Unsaved</span>
             </span>
           )}
         </div>
         <button
           onClick={handleSaveAll}
           disabled={!unsavedChanges}
-          className="px-3 py-1.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
+          className="px-3 py-1.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 w-full sm:w-auto"
         >
           <Save className="h-4 w-4" />
           <span>Save Changes</span>
         </button>
       </div>
       
-      {/* Data Grid */}
-      <div className="overflow-x-auto">
+      {/* Mobile Card View */}
+      <div className="lg:hidden p-4 space-y-4">
+        {Object.entries(metricsByGoal).map(([goalId, goalMetrics]) => {
+          const goal = goals.find(g => g.id === goalId);
+          return (
+            <div key={goalId} className="space-y-3">
+              {/* Goal Header */}
+              <div className="bg-muted/20 px-3 py-2 rounded-lg">
+                <p className="font-medium text-sm">{goal?.goal_number} {goal?.title}</p>
+              </div>
+
+              {/* Metric Cards */}
+              {goalMetrics.map(metric => {
+                const entry = dataEntries.get(metric.id);
+                const currentValue = entry?.currentValue ?? metric.current_value;
+                const targetValue = entry?.targetValue ?? metric.target_value;
+                const progress = currentValue && targetValue
+                  ? (currentValue / targetValue * 100).toFixed(1)
+                  : null;
+
+                return (
+                  <div
+                    key={metric.id}
+                    className={`border border-border rounded-lg p-4 bg-background ${
+                      entry?.validation.hasWarning ? 'border-yellow-500' : ''
+                    }`}
+                  >
+                    {/* Metric Name & Status */}
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex-1">
+                        <p className="font-medium text-sm">{metric.name || metric.metric_name}</p>
+                        {metric.unit && (
+                          <p className="text-xs text-muted-foreground">Unit: {metric.unit}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center">
+                        {currentValue && targetValue && (
+                          currentValue >= targetValue * 0.95 ? (
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                          ) : currentValue >= targetValue * 0.8 ? (
+                            <AlertTriangle className="h-5 w-5 text-yellow-600" />
+                          ) : (
+                            <AlertTriangle className="h-5 w-5 text-red-600" />
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Values Grid */}
+                    <div className="grid grid-cols-3 gap-2 mb-3">
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">Previous</p>
+                        <p className="text-sm font-medium">{metric.current_value || '—'}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">Current</p>
+                        <div className="relative">
+                          <input
+                            type="number"
+                            value={entry?.currentValue ?? ''}
+                            onChange={(e) => handleValueChange(metric.id, 'currentValue', e.target.value)}
+                            placeholder={metric.current_value?.toString() || '—'}
+                            className={`w-full px-2 py-1 text-sm text-center border rounded ${
+                              entry?.hasChanges
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border'
+                            } ${
+                              entry?.validation.hasWarning
+                                ? 'border-yellow-500'
+                                : ''
+                            }`}
+                          />
+                        </div>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-muted-foreground mb-1">Target</p>
+                        <input
+                          type="number"
+                          value={entry?.targetValue ?? ''}
+                          onChange={(e) => handleValueChange(metric.id, 'targetValue', e.target.value)}
+                          placeholder={metric.target_value?.toString() || '—'}
+                          className={`w-full px-2 py-1 text-sm text-center border rounded ${
+                            entry?.hasChanges
+                              ? 'border-primary bg-primary/5'
+                              : 'border-border'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Progress & YTD */}
+                    <div className="flex items-center justify-between pt-2 border-t border-border">
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">Progress:</span>
+                        {progress && (
+                          <span className={`text-sm font-medium ${getProgressColor(currentValue, targetValue)}`}>
+                            {progress}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-xs text-muted-foreground">YTD:</span>
+                        {getTrendIcon(metric)}
+                        <span className="text-sm">
+                          {metric.ytd_change
+                            ? `${metric.ytd_change > 0 ? '+' : ''}${metric.ytd_change.toFixed(1)}`
+                            : '—'
+                          }
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Warning Message */}
+                    {entry?.validation.hasWarning && (
+                      <div className="mt-2 pt-2 border-t border-yellow-200">
+                        <p className="text-xs text-yellow-600 flex items-center">
+                          <AlertTriangle className="h-3 w-3 mr-1" />
+                          {entry.validation.message}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Desktop Data Grid */}
+      <div className="hidden lg:block overflow-x-auto">
         <table className="w-full">
           <thead>
             <tr className="border-b bg-muted/20">
@@ -193,18 +323,18 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
                       {goal?.goal_number} {goal?.title}
                     </td>
                   </tr>
-                  
+
                   {/* Metric Rows */}
                   {goalMetrics.map(metric => {
                     const entry = dataEntries.get(metric.id);
                     const currentValue = entry?.currentValue ?? metric.current_value;
                     const targetValue = entry?.targetValue ?? metric.target_value;
-                    const progress = currentValue && targetValue 
+                    const progress = currentValue && targetValue
                       ? (currentValue / targetValue * 100).toFixed(1)
                       : null;
-                    
+
                     return (
-                      <tr 
+                      <tr
                         key={metric.id}
                         className="border-b hover:bg-muted/5 group"
                       >
@@ -220,13 +350,13 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
                             )}
                           </div>
                         </td>
-                        
+
                         <td className="py-2 px-4 text-center">
                           <span className="text-sm text-muted-foreground">
                             {metric.current_value || '—'}
                           </span>
                         </td>
-                        
+
                         <td className="py-2 px-4">
                           <div className="relative">
                             <input
@@ -235,12 +365,12 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
                               onChange={(e) => handleValueChange(metric.id, 'currentValue', e.target.value)}
                               placeholder={metric.current_value?.toString() || '—'}
                               className={`w-full px-2 py-1 text-sm text-center border rounded ${
-                                entry?.hasChanges 
-                                  ? 'border-primary bg-primary/5' 
+                                entry?.hasChanges
+                                  ? 'border-primary bg-primary/5'
                                   : 'border-border'
                               } ${
-                                entry?.validation.hasWarning 
-                                  ? 'border-yellow-500' 
+                                entry?.validation.hasWarning
+                                  ? 'border-yellow-500'
                                   : ''
                               }`}
                             />
@@ -249,7 +379,7 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
                             )}
                           </div>
                         </td>
-                        
+
                         <td className="py-2 px-4">
                           <input
                             type="number"
@@ -257,13 +387,13 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
                             onChange={(e) => handleValueChange(metric.id, 'targetValue', e.target.value)}
                             placeholder={metric.target_value?.toString() || '—'}
                             className={`w-full px-2 py-1 text-sm text-center border rounded ${
-                              entry?.hasChanges 
-                                ? 'border-primary bg-primary/5' 
+                              entry?.hasChanges
+                                ? 'border-primary bg-primary/5'
                                 : 'border-border'
                             }`}
                           />
                         </td>
-                        
+
                         <td className="py-2 px-4 text-center">
                           {progress && (
                             <span className={`text-sm font-medium ${getProgressColor(currentValue, targetValue)}`}>
@@ -271,19 +401,19 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
                             </span>
                           )}
                         </td>
-                        
+
                         <td className="py-2 px-4">
                           <div className="flex items-center justify-center space-x-1">
                             {getTrendIcon(metric)}
                             <span className="text-sm">
-                              {metric.ytd_change 
+                              {metric.ytd_change
                                 ? `${metric.ytd_change > 0 ? '+' : ''}${metric.ytd_change.toFixed(1)}`
                                 : '—'
                               }
                             </span>
                           </div>
                         </td>
-                        
+
                         <td className="py-2 px-4">
                           <div className="flex items-center justify-center">
                             {currentValue && targetValue && (

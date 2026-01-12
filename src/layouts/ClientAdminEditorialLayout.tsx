@@ -8,6 +8,8 @@ import {
   Settings,
   Eye,
   ChevronsLeft,
+  Menu,
+  X,
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
 import { useSchools } from '../hooks/useSchools';
@@ -30,6 +32,7 @@ export function ClientAdminEditorialLayout() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isAddSchoolModalOpen, setIsAddSchoolModalOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const basePath = '/admin';
@@ -82,8 +85,8 @@ export function ClientAdminEditorialLayout() {
 
   return (
     <div className="min-h-screen bg-[#faf9f7] flex font-['Source_Sans_3',_-apple-system,_sans-serif]">
-      {/* Sidebar */}
-      <aside className={`${isSidebarCollapsed ? 'w-16' : 'w-[260px]'} bg-white border-r border-slate-200 flex flex-col fixed top-0 left-0 bottom-0 z-50 transition-all duration-200`}>
+      {/* Desktop Sidebar */}
+      <aside className={`hidden lg:flex lg:flex-col ${isSidebarCollapsed ? 'w-16' : 'w-[260px]'} bg-white border-r border-slate-200 fixed top-0 left-0 bottom-0 z-50 transition-all duration-200`}>
         {/* Sidebar Header */}
         {!isSidebarCollapsed && <SidebarHeader district={district} />}
 
@@ -144,9 +147,25 @@ export function ClientAdminEditorialLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col min-w-0 ${isSidebarCollapsed ? 'ml-16' : 'ml-[260px]'} transition-all duration-200`}>
+      <div className={`flex-1 flex flex-col min-w-0 ${isSidebarCollapsed ? 'lg:ml-16' : 'lg:ml-[260px]'} transition-all duration-200`}>
         {/* Top Header */}
-        <header className="h-16 bg-[#faf9f7] border-b border-[#e8e6e1] flex items-center justify-end px-8 sticky top-0 z-40">
+        <header className="h-16 bg-[#faf9f7] border-b border-[#e8e6e1] flex items-center justify-between px-4 lg:px-8 sticky top-0 z-40">
+          {/* Left: Mobile menu + Title */}
+          <div className="flex items-center gap-3 lg:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="p-2 -ml-2 rounded-lg hover:bg-[#f5f3ef] transition-colors"
+            >
+              <Menu className="h-5 w-5 text-[#4a4a4a]" />
+            </button>
+            <div>
+              <div className="font-semibold text-sm text-[#1a1a1a]">{district.name}</div>
+              <div className="text-xs text-[#8a8a8a]">District Admin</div>
+            </div>
+          </div>
+          {/* Spacer for desktop */}
+          <div className="hidden lg:block" />
+          {/* Right: Actions */}
           <div className="flex items-center gap-1.5">
             <button className="w-9 h-9 rounded-lg hover:bg-[#f5f3ef] text-[#4a4a4a] flex items-center justify-center transition-colors">
               <Bell className="h-5 w-5" />
@@ -210,6 +229,79 @@ export function ClientAdminEditorialLayout() {
           </div>
         </footer>
       </div>
+
+      {/* Mobile Sidebar */}
+      {isMobileMenuOpen && (
+        <>
+          <div
+            className="lg:hidden fixed inset-0 bg-black/20 z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-200 z-50 flex flex-col">
+            {/* Mobile Header with Close */}
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {district.logo_url ? (
+                  <img
+                    src={district.logo_url}
+                    alt=""
+                    className="w-10 h-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                    style={{ backgroundColor: district.primary_color || '#D97706' }}
+                  >
+                    {district.name.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <div className="font-semibold text-sm text-[#1a1a1a]">{district.name}</div>
+                  <div className="text-xs text-[#8a8a8a]">Strategic Planning</div>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1 rounded-lg hover:bg-slate-100 transition-colors"
+              >
+                <X className="h-5 w-5 text-[#8a8a8a]" />
+              </button>
+            </div>
+
+            {/* Mobile Navigation */}
+            <SidebarNav
+              district={district}
+              schools={schools}
+              districtSlug={slug || ''}
+              onAddSchool={() => {
+                setIsAddSchoolModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+              onMobileClose={() => setIsMobileMenuOpen(false)}
+            />
+
+            {/* Mobile View Public Site */}
+            <div className="p-3 border-t border-slate-200">
+              <a
+                href={publicSiteUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+              >
+                <Eye size={16} />
+                <span>View Public Site</span>
+              </a>
+            </div>
+
+            {/* Mobile User Footer */}
+            <SidebarUserFooter
+              userName={user?.email?.split('@')[0] || 'Admin'}
+              userRole="District Admin"
+            />
+          </aside>
+        </>
+      )}
 
       {/* Floating Help Button */}
       <button className="fixed bottom-6 right-6 w-11 h-11 rounded-full bg-[#b85c38] text-white shadow-lg hover:scale-105 transition-transform flex items-center justify-center">

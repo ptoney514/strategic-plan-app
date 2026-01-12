@@ -80,7 +80,7 @@ export function AdminDashboard2() {
   };
 
   return (
-    <div className="px-10 py-8 max-w-[1100px]">
+    <div className="px-4 sm:px-6 lg:px-10 py-6 lg:py-8 max-w-[1100px]">
       {/* Page Header */}
       <div className="mb-8">
         {/* Tabs */}
@@ -108,9 +108,9 @@ export function AdminDashboard2() {
         </div>
 
         {/* Title Row with Video Link */}
-        <div className="flex items-center justify-between mb-5">
-          <div className="flex items-center gap-4">
-            <h1 className="font-['Playfair_Display',_Georgia,_serif] text-[32px] font-medium text-[#1a1a1a] tracking-tight">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+            <h1 className="font-['Playfair_Display',_Georgia,_serif] text-2xl sm:text-[32px] font-medium text-[#1a1a1a] tracking-tight">
               All objectives
             </h1>
             <button
@@ -127,11 +127,12 @@ export function AdminDashboard2() {
           <div className="flex items-center gap-3">
             <Link
               to="/admin/objectives/create"
-              className="bg-[#b85c38] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors"
+              className="bg-[#b85c38] text-white px-4 sm:px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors flex-1 sm:flex-none text-center"
             >
-              Create new strategic objective
+              <span className="hidden sm:inline">Create new strategic objective</span>
+              <span className="sm:hidden">New objective</span>
             </Link>
-            <button className="w-10 h-10 rounded-lg border border-[#e8e6e1] bg-white text-[#4a4a4a] hover:bg-[#f5f3ef] transition-colors flex items-center justify-center">
+            <button className="w-10 h-10 rounded-lg border border-[#e8e6e1] bg-white text-[#4a4a4a] hover:bg-[#f5f3ef] transition-colors flex items-center justify-center flex-shrink-0">
               <MoreHorizontal className="h-[18px] w-[18px]" />
             </button>
           </div>
@@ -182,8 +183,8 @@ export function AdminDashboard2() {
       )}
 
       {/* Objectives Summary */}
-      <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#e8e6e1]">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4 pb-4 border-b border-[#e8e6e1]">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <h2 className="font-['Playfair_Display',_Georgia,_serif] text-lg font-medium italic text-[#1a1a1a] flex items-center gap-2">
             Objectives summary
             <span className="not-italic bg-[#f5f3ef] px-2.5 py-0.5 rounded-full font-['Source_Sans_3'] text-[13px] font-semibold">
@@ -203,9 +204,9 @@ export function AdminDashboard2() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
           {/* Search */}
-          <div className="relative w-[220px]">
+          <div className="relative w-full sm:w-[220px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[#8a8a8a]" />
             <input
               type="text"
@@ -225,7 +226,7 @@ export function AdminDashboard2() {
           </div>
 
           {/* View Toggles */}
-          <div className="flex border border-[#e8e6e1] rounded-lg overflow-hidden">
+          <div className="flex border border-[#e8e6e1] rounded-lg overflow-hidden self-start">
             <button
               onClick={() => setViewMode('compact')}
               className={`w-9 h-9 flex items-center justify-center transition-colors ${
@@ -265,9 +266,10 @@ export function AdminDashboard2() {
       </div>
 
       {/* List Controls */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
         <div className="text-[13px] text-[#8a8a8a]">
-          Showing {objectives.length} of {objectives.length} objectives
+          <span className="hidden sm:inline">Showing {objectives.length} of {objectives.length} objectives</span>
+          <span className="sm:hidden">{objectives.length} objectives</span>
           <button
             onClick={expandAll}
             className="text-[#4a6fa5] ml-1.5 hover:underline"
@@ -392,7 +394,7 @@ export function AdminDashboard2() {
 
                 {/* Children (Level 1 Goals) */}
                 {isExpanded && hasChildGoals && (
-                  <div className="ml-12 mt-2 flex flex-col gap-2" data-testid="children-container">
+                  <div className="ml-4 sm:ml-8 lg:ml-12 mt-2 flex flex-col gap-2" data-testid="children-container">
                     {objective.children?.map((child: HierarchicalGoal) => {
                       const isChildExpanded = expandedIds.has(child.id);
                       const hasGrandchildren = child.children && child.children.length > 0;
@@ -461,7 +463,7 @@ export function AdminDashboard2() {
 
                           {/* Grandchildren (Level 2 Sub-goals) */}
                           {isChildExpanded && hasGrandchildren && (
-                            <div className="ml-10 mt-1.5 flex flex-col gap-1.5" data-testid="grandchildren-container">
+                            <div className="ml-4 sm:ml-6 lg:ml-10 mt-1.5 flex flex-col gap-1.5" data-testid="grandchildren-container">
                               {child.children?.map((grandchild: HierarchicalGoal) => (
                                 <div
                                   key={grandchild.id}

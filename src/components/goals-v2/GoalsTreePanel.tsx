@@ -55,7 +55,7 @@ export function GoalsTreePanel({
   const filteredGoals = filterGoals(goals, searchQuery);
 
   return (
-    <div className="w-1/2 border-r border-gray-200 bg-white overflow-hidden flex flex-col">
+    <div className="w-full lg:border-r border-gray-200 bg-white overflow-hidden flex flex-col">
       <div className="p-4 border-b border-gray-200">
         <h2 className="font-semibold text-gray-900">Strategic Objectives</h2>
         <p className="text-xs text-gray-500 mt-1">

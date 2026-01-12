@@ -251,26 +251,26 @@ export const StagedDataTable: React.FC<StagedDataTableProps> = ({
       )}
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-5 gap-4">
-        <div className="bg-card border border-border rounded-lg p-4">
-          <p className="text-sm text-muted-foreground">Total Rows</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 lg:gap-4">
+        <div className="bg-card border border-border rounded-lg p-3 lg:p-4">
+          <p className="text-xs lg:text-sm text-muted-foreground">Total Rows</p>
+          <p className="text-xl lg:text-2xl font-bold">{stats.total}</p>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-          <p className="text-sm text-green-700">Valid</p>
-          <p className="text-2xl font-bold text-green-700">{stats.valid}</p>
+        <div className="bg-green-50 border border-green-200 rounded-lg p-3 lg:p-4">
+          <p className="text-xs lg:text-sm text-green-700">Valid</p>
+          <p className="text-xl lg:text-2xl font-bold text-green-700">{stats.valid}</p>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-700">Fixable</p>
-          <p className="text-2xl font-bold text-blue-700">{stats.fixable}</p>
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 lg:p-4">
+          <p className="text-xs lg:text-sm text-blue-700">Fixable</p>
+          <p className="text-xl lg:text-2xl font-bold text-blue-700">{stats.fixable}</p>
         </div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-sm text-yellow-700">Warnings</p>
-          <p className="text-2xl font-bold text-yellow-700">{stats.warnings}</p>
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 lg:p-4">
+          <p className="text-xs lg:text-sm text-yellow-700">Warnings</p>
+          <p className="text-xl lg:text-2xl font-bold text-yellow-700">{stats.warnings}</p>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-sm text-red-700">Errors</p>
-          <p className="text-2xl font-bold text-red-700">{stats.errors}</p>
+        <div className="bg-red-50 border border-red-200 rounded-lg p-3 lg:p-4 col-span-2 sm:col-span-1">
+          <p className="text-xs lg:text-sm text-red-700">Errors</p>
+          <p className="text-xl lg:text-2xl font-bold text-red-700">{stats.errors}</p>
         </div>
       </div>
 
@@ -296,8 +296,8 @@ export const StagedDataTable: React.FC<StagedDataTableProps> = ({
       )}
 
       {/* Filters and Actions */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setFilterStatus('all')}
             className={`px-3 py-1 rounded-md text-sm font-medium ${
@@ -355,13 +355,140 @@ export const StagedDataTable: React.FC<StagedDataTableProps> = ({
             htmlFor="select-all-import"
             className="text-sm text-foreground cursor-pointer select-none"
           >
-            Select all rows to import ({importCount} selected)
+            <span className="hidden sm:inline">Select all rows to import ({importCount} selected)</span>
+            <span className="sm:hidden">Select all ({importCount})</span>
           </label>
         </div>
       </div>
 
-      {/* Table */}
-      <div className="border border-border rounded-lg overflow-hidden">
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-3">
+        {filteredData.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground border border-border rounded-lg bg-white">
+            <p>No data to display</p>
+          </div>
+        ) : (
+          filteredData.map((goal) => {
+            const isSkipped = goal.action === 'skip';
+            const levelLabels = ['Strategic Objective', 'Goal', 'Goal'];
+            const levelColors = ['bg-purple-100 text-purple-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700'];
+            const hasFix = goal.validation_status === 'fixable' && goal.auto_fix_suggestions && goal.auto_fix_suggestions.length > 0;
+
+            return (
+              <div
+                key={goal.id}
+                className={`border border-border rounded-lg p-4 bg-white ${
+                  isSkipped
+                    ? 'opacity-50'
+                    : goal.validation_status === 'error'
+                    ? 'border-red-200 bg-red-50/30'
+                    : goal.validation_status === 'warning'
+                    ? 'border-yellow-200 bg-yellow-50/30'
+                    : goal.validation_status === 'fixable'
+                    ? 'border-blue-200 bg-blue-50/30'
+                    : goal.is_auto_generated
+                    ? 'border-l-4 border-l-green-500'
+                    : ''
+                }`}
+              >
+                {/* Card Header */}
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={goal.action !== 'skip'}
+                      onChange={(e) => onToggleImport?.(goal.id, e.target.checked)}
+                      className="rounded border-border mt-0.5"
+                    />
+                    {/* Status Badge */}
+                    {goal.validation_status === 'valid' ? (
+                      <div className="flex items-center text-green-600">
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        <span className="text-xs font-medium">Valid</span>
+                        {goal.is_auto_generated && <Sparkles className="h-3 w-3 ml-1" />}
+                      </div>
+                    ) : goal.validation_status === 'warning' ? (
+                      <div className="flex items-center text-yellow-600">
+                        <AlertTriangle className="h-4 w-4 mr-1" />
+                        <span className="text-xs font-medium">Warning</span>
+                      </div>
+                    ) : goal.validation_status === 'fixable' ? (
+                      <div className="flex items-center text-blue-600">
+                        <Wrench className="h-4 w-4 mr-1" />
+                        <span className="text-xs font-medium">Fixable</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-red-600">
+                        <AlertCircle className="h-4 w-4 mr-1" />
+                        <span className="text-xs font-medium">Error</span>
+                      </div>
+                    )}
+                  </div>
+                  {/* Row Number */}
+                  {goal.row_number === -1 ? (
+                    <span className="text-xs text-blue-600 font-medium px-2 py-0.5 bg-blue-50 rounded">NEW</span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">Row {goal.row_number}</span>
+                  )}
+                </div>
+
+                {/* Goal Number and Level */}
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-mono text-sm font-semibold">{goal.goal_number || '-'}</span>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${goal.level !== undefined ? levelColors[goal.level] : 'bg-gray-100 text-gray-700'}`}>
+                    {goal.level !== undefined ? levelLabels[goal.level] : '-'}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <p className={`text-sm mb-2 ${isSkipped ? 'line-through text-muted-foreground' : ''}`}>
+                  {goal.title || '-'}
+                </p>
+
+                {/* Owner */}
+                {goal.owner_name && (
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Owner: {goal.owner_name}
+                  </p>
+                )}
+
+                {/* Issues */}
+                {goal.validation_messages && goal.validation_messages.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-border">
+                    <p className="text-xs font-medium text-muted-foreground mb-1">Issues:</p>
+                    <div className="space-y-0.5">
+                      {goal.validation_messages.slice(0, 2).map((msg, idx) => (
+                        <p key={idx} className={`text-xs ${goal.validation_status === 'fixable' ? 'text-blue-600' : 'text-red-600'}`}>
+                          • {msg}
+                        </p>
+                      ))}
+                      {goal.validation_messages.length > 2 && (
+                        <p className="text-xs text-muted-foreground">+{goal.validation_messages.length - 2} more</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fix Button */}
+                {hasFix && onFix && (
+                  <div className="mt-3 pt-2 border-t border-border">
+                    <button
+                      onClick={() => onFix(goal, goal.auto_fix_suggestions![0])}
+                      className="text-blue-600 hover:text-blue-800 font-medium text-sm flex items-center gap-1"
+                    >
+                      <Wrench className="h-4 w-4" />
+                      Auto-fix this issue
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Table */}
+      <div className="hidden lg:block border border-border rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50 border-b border-border">

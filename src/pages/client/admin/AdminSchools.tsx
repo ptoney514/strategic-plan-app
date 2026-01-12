@@ -1,12 +1,16 @@
 import { useState, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useSchools } from '../../../hooks/useSchools';
+import { useDistrict } from '../../../hooks/useDistricts';
 import { Building2, Search, Plus, ExternalLink, Users, Target } from 'lucide-react';
+import { AddSchoolModal } from '../../../components/admin/schools';
 
 export function AdminSchools() {
   const { slug } = useParams<{ slug: string }>();
-  const { data: schools, isLoading } = useSchools(slug!);
+  const { data: district } = useDistrict(slug!);
+  const { data: schools, isLoading, refetch } = useSchools(slug!);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showAddModal, setShowAddModal] = useState(false);
 
   // Filter schools based on search
   const filteredSchools = useMemo(() => {
@@ -58,8 +62,8 @@ export function AdminSchools() {
             </p>
           </div>
           <button
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition"
-            onClick={() => alert('Create school feature coming soon!')}
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition"
+            onClick={() => setShowAddModal(true)}
           >
             <Plus className="h-4 w-4" />
             Add New School
@@ -226,6 +230,17 @@ export function AdminSchools() {
           District admins can manage all schools. School admins can only manage their assigned school.
         </p>
       </div>
+
+      {/* Add School Modal */}
+      {district && (
+        <AddSchoolModal
+          districtId={district.id}
+          districtSlug={slug!}
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          onSuccess={() => refetch()}
+        />
+      )}
     </div>
   );
 }

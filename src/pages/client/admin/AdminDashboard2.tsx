@@ -8,8 +8,6 @@ import {
   Search,
   List,
   LayoutGrid,
-  EyeOff,
-  Eye,
   HelpCircle,
   MoreHorizontal,
   X,
@@ -32,7 +30,6 @@ export function AdminDashboard2() {
 
   const [activeTab, setActiveTab] = useState<'all' | 'following'>('all');
   const [viewMode, setViewMode] = useState<'compact' | 'list' | 'board'>('compact');
-  const [showFilters, setShowFilters] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -183,55 +180,6 @@ export function AdminDashboard2() {
           </div>
         </div>
       )}
-
-      {/* Filters Section */}
-      <div className="bg-white border border-[#e8e6e1] rounded-xl p-5 mb-7">
-        <div className={showFilters ? 'mb-4' : ''}>
-          <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 text-[#6b46c1] text-[13px] font-medium hover:opacity-80 transition-opacity"
-          >
-            {showFilters ? (
-              <EyeOff className="h-4 w-4" />
-            ) : (
-              <Eye className="h-4 w-4" />
-            )}
-            {showFilters ? 'Hide filters' : 'Show filters'}
-          </button>
-        </div>
-
-        {showFilters && (
-          <div className="grid grid-cols-3 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                Objective Type
-              </label>
-              <select className="px-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg bg-white text-[#4a4a4a] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238a8a8a%22%20stroke-width%3D%222%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_10px_center] pr-8 focus:outline-none focus:border-[#c9a227]">
-                <option>Search for an objective type</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                Objective Status
-              </label>
-              <select className="px-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg bg-white text-[#4a4a4a] appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238a8a8a%22%20stroke-width%3D%222%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_10px_center] pr-8 focus:outline-none focus:border-[#c9a227]">
-                <option>Select a status</option>
-              </select>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-semibold text-[#8a8a8a] uppercase tracking-wide">
-                Objective State (1)
-              </label>
-              <div className="inline-flex items-center gap-1.5 px-3 py-2 bg-[#f5f3ef] rounded-md text-[13px] text-[#1a1a1a]">
-                Current
-                <button className="text-[#8a8a8a] hover:text-[#b85c38] transition-colors">
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Objectives Summary */}
       <div className="flex items-center justify-between mb-4 pb-4 border-b border-[#e8e6e1]">

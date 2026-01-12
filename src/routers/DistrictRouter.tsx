@@ -31,6 +31,16 @@ import { AdminDashboard2 } from '../pages/client/admin/AdminDashboard2';
 import { CreateObjective } from '../pages/client/admin/CreateObjective';
 import { EditObjective } from '../pages/client/admin/EditObjective';
 import { ObjectiveDetail as AdminObjectiveDetail } from '../pages/client/admin/ObjectiveDetail';
+import { DistrictUsers } from '../pages/client/admin/DistrictUsers';
+import { DistrictAppearance } from '../pages/client/admin/DistrictAppearance';
+
+// School Admin Pages
+import {
+  SchoolDashboard,
+  SchoolObjectives,
+  SchoolUsers,
+  SchoolAppearance,
+} from '../pages/client/admin/school';
 
 // Auth
 import { Login } from '../pages/Login';
@@ -89,11 +99,16 @@ export function DistrictRouter() {
           </SchoolAdminGuard>
         }
       >
-        <Route index element={<div>School Admin Dashboard - Coming Soon</div>} />
-        <Route path="goals" element={<AdminGoals />} />
+        <Route index element={<SchoolDashboard />} />
+        <Route path="objectives" element={<SchoolObjectives />} />
         <Route path="objectives/new" element={<ObjectiveBuilder />} />
+        <Route path="objectives/:objectiveId" element={<AdminObjectiveDetail />} />
         <Route path="objectives/:objectiveId/edit" element={<ObjectiveBuilder />} />
+        <Route path="users" element={<SchoolUsers />} />
+        <Route path="appearance" element={<SchoolAppearance />} />
         <Route path="settings" element={<AdminSettings />} />
+        {/* Legacy redirects */}
+        <Route path="goals" element={<AdminGoals />} />
       </Route>
 
       {/* District Admin Routes (Editorial Design) */}
@@ -110,6 +125,10 @@ export function DistrictRouter() {
         <Route path="objectives/create" element={<CreateObjective />} />
         <Route path="objectives/:objectiveId" element={<AdminObjectiveDetail />} />
         <Route path="objectives/:objectiveId/edit" element={<EditObjective />} />
+        {/* District-level pages */}
+        <Route path="users" element={<DistrictUsers />} />
+        <Route path="appearance" element={<DistrictAppearance />} />
+        <Route path="settings" element={<AdminSettings />} />
         {/* Backwards compatibility redirects */}
         <Route path="goals" element={<Navigate to="../objectives" replace />} />
         <Route path="objectives/new" element={<Navigate to="../objectives/create" replace />} />

@@ -1,40 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
-import { Outlet, Link, useParams, useNavigate, useLocation } from 'react-router-dom';
-import {
-  Home,
-  Target,
-  Building2,
-  FileText,
-  Palette,
-  BarChart2,
-  Eye,
-  User,
-  ChevronDown,
-  Menu,
-  X,
-  LogOut,
-  Settings,
-  Database
-} from 'lucide-react';
-import { useDistrict } from '../hooks/useDistricts';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Menu, X, User, ChevronDown, LogOut } from 'lucide-react';
+import { useAdminContext } from '../hooks/useAdminContext';
 import { useAuth } from '../contexts/AuthContext';
+import {
+  SidebarNav,
+  SidebarHeader,
+  SidebarFooter,
+  SidebarUserFooter,
+  ContextHeader,
+} from '../components/admin/nav';
 
 /**
- * ClientAdminLayout - Redesigned admin layout with left sidebar (Webflow-style)
+ * ClientAdminLayout - Redesigned admin layout with hierarchical sidebar
+ * Supports both district and school admin contexts
  */
 export function ClientAdminLayout() {
-  const { slug, schoolSlug } = useParams<{ slug: string; schoolSlug?: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
-  const { data: district, isLoading } = useDistrict(slug!);
+  const {
+    district,
+    school,
+    schools,
+    districtSlug,
+    schoolSlug,
+    publicUrl,
+    isLoading,
+  } = useAdminContext();
   const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  // Determine if we're in school admin context
-  const isSchoolAdmin = !!schoolSlug;
-  const basePath = isSchoolAdmin ? `/${slug}/schools/${schoolSlug}/admin` : `/${slug}/admin`;
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -58,12 +54,17 @@ export function ClientAdminLayout() {
     }
   };
 
+  // Handle view public site
+  const handleViewPublic = () => {
+    navigate(publicUrl);
+  };
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-muted-foreground">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto" />
+          <p className="mt-4 text-slate-500">Loading...</p>
         </div>
       </div>
     );
@@ -71,10 +72,10 @@ export function ClientAdminLayout() {
 
   if (!district) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <p className="text-xl text-muted-foreground">District not found</p>
-          <Link to="/" className="mt-4 inline-flex items-center text-primary hover:underline">
+          <p className="text-xl text-slate-500">District not found</p>
+          <Link to="/" className="mt-4 inline-flex items-center text-amber-600 hover:underline">
             Return to Home
           </Link>
         </div>
@@ -82,169 +83,56 @@ export function ClientAdminLayout() {
     );
   }
 
-  const isActiveRoute = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
-  };
+  // Get user display info
+  const userName = user?.email?.split('@')[0] || 'Admin';
+  const userRole = schoolSlug ? 'School Admin' : 'District Admin';
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* Left Sidebar - Desktop */}
-      <aside className="hidden lg:flex lg:flex-col w-64 bg-white border-r border-gray-200">
+      <aside className="hidden lg:flex lg:flex-col w-72 bg-white border-r border-slate-200">
         {/* Sidebar Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-sm">SP</span>
-            </div>
-            <div className="min-w-0">
-              <div className="font-semibold text-sm text-gray-900 truncate">
-                {isSchoolAdmin ? schoolSlug?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) : district.name}
-              </div>
-              <div className="text-xs text-gray-500 truncate">
-                {isSchoolAdmin ? 'School Admin' : 'District Admin'}
-              </div>
-            </div>
-          </div>
-        </div>
+        <SidebarHeader
+          district={district}
+          userEmail={user?.email}
+          userRole={userRole}
+        />
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4 space-y-6">
-          {/* Main */}
-          <div>
-            <Link
-              to={basePath}
-              className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                location.pathname === basePath
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <Home className="h-4 w-4" />
-              <span>Dashboard</span>
-            </Link>
-          </div>
+        <SidebarNav
+          district={district}
+          schools={schools}
+          districtSlug={districtSlug}
+          schoolSlug={schoolSlug}
+          onAddSchool={() => setShowAddSchoolModal(true)}
+        />
 
-          {/* Content Section */}
-          <div>
-            <div className="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              Content
-            </div>
-            <div className="space-y-1">
-              <Link
-                to={`${basePath}/goals`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActiveRoute(`${basePath}/goals`) || isActiveRoute(`${basePath}/objectives`)
-                    ? 'bg-gray-100 text-gray-900 font-medium'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Target className="h-4 w-4" />
-                <span>Goals</span>
-              </Link>
+        {/* User Footer */}
+        <SidebarUserFooter userName={userName} userRole={userRole} />
 
-              {/* Schools - Only show for district admins */}
-              {!isSchoolAdmin && (
-                <Link
-                  to={`/${slug}/admin/schools`}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                    isActiveRoute(`/${slug}/admin/schools`)
-                      ? 'bg-gray-100 text-gray-900 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <Building2 className="h-4 w-4" />
-                  <span>Schools</span>
-                </Link>
-              )}
-
-              <Link
-                to={`${basePath}/import`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActiveRoute(`${basePath}/import`)
-                    ? 'bg-gray-100 text-gray-900 font-medium'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <FileText className="h-4 w-4" />
-                <span>Import Data</span>
-              </Link>
-
-              <Link
-                to={`${basePath}/data-manager`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActiveRoute(`${basePath}/data-manager`)
-                    ? 'bg-gray-100 text-gray-900 font-medium'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Database className="h-4 w-4" />
-                <span>Data Manager</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Settings Section */}
-          <div>
-            <div className="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-              Settings
-            </div>
-            <div className="space-y-1">
-              <Link
-                to={`${basePath}/settings`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActiveRoute(`${basePath}/settings`)
-                    ? 'bg-gray-100 text-gray-900 font-medium'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <Palette className="h-4 w-4" />
-                <span>Branding</span>
-              </Link>
-
-              <Link
-                to={`${basePath}/audit`}
-                className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                  isActiveRoute(`${basePath}/audit`)
-                    ? 'bg-gray-100 text-gray-900 font-medium'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <BarChart2 className="h-4 w-4" />
-                <span>Activity Log</span>
-              </Link>
-            </div>
-          </div>
-        </nav>
-
-        {/* Sidebar Footer */}
-        <div className="p-4 border-t border-gray-200">
-          <button
-            onClick={() => navigate(isSchoolAdmin ? `/${slug}/schools/${schoolSlug}` : `/${slug}`)}
-            className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-          >
-            <Eye className="h-4 w-4" />
-            <span>View Public</span>
-          </button>
-        </div>
+        {/* View Public Footer */}
+        <SidebarFooter publicUrl={publicUrl} onNavigate={handleViewPublic} />
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 px-6 py-4">
+        <header className="bg-white border-b border-slate-200 px-6 py-4">
           <div className="flex items-center justify-between">
             {/* Left: Mobile menu + Title */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 -ml-2 rounded-md hover:bg-gray-50 transition-colors"
+                className="lg:hidden p-2 -ml-2 rounded-md hover:bg-slate-50 transition-colors"
               >
-                <Menu className="h-5 w-5 text-gray-700" />
+                <Menu className="h-5 w-5 text-slate-700" />
               </button>
 
               <div className="lg:hidden">
-                <div className="font-semibold text-sm text-gray-900">{district.name}</div>
-                <div className="text-xs text-gray-500">{isSchoolAdmin ? 'School' : 'District'} Admin</div>
+                <div className="font-semibold text-sm text-slate-900">
+                  {school?.name || district.name}
+                </div>
+                <div className="text-xs text-slate-500">{userRole}</div>
               </div>
             </div>
 
@@ -253,32 +141,40 @@ export function ClientAdminLayout() {
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-gray-50 transition-colors"
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                    <User className="h-4 w-4 text-gray-600" />
+                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                    <span className="text-amber-700 font-medium text-sm">
+                      {userName.substring(0, 2).toUpperCase()}
+                    </span>
                   </div>
-                  <span className="text-sm font-medium text-gray-700 hidden sm:inline">Admin</span>
-                  <ChevronDown className={`h-3 w-3 text-gray-400 hidden sm:inline transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+                  <span className="text-sm font-medium text-slate-700 hidden sm:inline">
+                    {userName}
+                  </span>
+                  <ChevronDown
+                    className={`h-3 w-3 text-slate-400 hidden sm:inline transition-transform ${
+                      isUserMenuOpen ? 'rotate-180' : ''
+                    }`}
+                  />
                 </button>
 
                 {/* Dropdown Menu */}
                 {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
                     {/* User Info */}
-                    <div className="px-4 py-2 border-b border-gray-100">
-                      <p className="text-xs text-gray-500">Signed in as</p>
-                      <p className="text-sm font-medium text-gray-900 truncate">{user?.email || 'admin@example.com'}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">
-                        {isSchoolAdmin ? 'School Admin' : 'District Admin'}
+                    <div className="px-4 py-2 border-b border-slate-100">
+                      <p className="text-xs text-slate-500">Signed in as</p>
+                      <p className="text-sm font-medium text-slate-900 truncate">
+                        {user?.email || 'admin@example.com'}
                       </p>
+                      <p className="text-xs text-slate-500 mt-0.5">{userRole}</p>
                     </div>
 
                     {/* Menu Items */}
                     <div className="py-1">
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
                       >
                         <LogOut className="h-4 w-4" />
                         <span>Sign out</span>
@@ -292,10 +188,8 @@ export function ClientAdminLayout() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">
-            <Outlet />
-          </div>
+        <main className="flex-1 overflow-auto">
+          <Outlet />
         </main>
       </div>
 
@@ -306,148 +200,78 @@ export function ClientAdminLayout() {
             className="lg:hidden fixed inset-0 bg-black/20 z-40"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-50 flex flex-col">
-            <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-200 z-50 flex flex-col">
+            {/* Mobile Header with Close */}
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">SP</span>
-                </div>
+                {district.logo_url ? (
+                  <img
+                    src={district.logo_url}
+                    alt=""
+                    className="w-10 h-10 rounded-lg object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
+                    style={{ backgroundColor: district.primary_color || '#D97706' }}
+                  >
+                    {district.name.substring(0, 2).toUpperCase()}
+                  </div>
+                )}
                 <div>
-                  <div className="font-semibold text-sm text-gray-900">{district.name}</div>
-                  <div className="text-xs text-gray-500">{isSchoolAdmin ? 'School' : 'District'} Admin</div>
+                  <div className="font-semibold text-sm text-slate-900">{district.name}</div>
+                  <div className="text-xs text-slate-500">Strategic Planning</div>
                 </div>
               </div>
               <button onClick={() => setIsMobileMenuOpen(false)}>
-                <X className="h-5 w-5 text-gray-500" />
+                <X className="h-5 w-5 text-slate-500" />
               </button>
             </div>
 
-            <nav className="flex-1 overflow-y-auto p-4 space-y-6">
-              {/* Same navigation as desktop */}
-              <div>
-                <Link
-                  to={basePath}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                    location.pathname === basePath
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
-                >
-                  <Home className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </Link>
-              </div>
+            {/* Mobile Navigation */}
+            <SidebarNav
+              district={district}
+              schools={schools}
+              districtSlug={districtSlug}
+              schoolSlug={schoolSlug}
+              onAddSchool={() => {
+                setShowAddSchoolModal(true);
+                setIsMobileMenuOpen(false);
+              }}
+              onMobileClose={() => setIsMobileMenuOpen(false)}
+            />
 
-              <div>
-                <div className="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                  Content
-                </div>
-                <div className="space-y-1">
-                  <Link
-                    to={`${basePath}/goals`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                      isActiveRoute(`${basePath}/goals`)
-                        ? 'bg-gray-100 text-gray-900 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <Target className="h-4 w-4" />
-                    <span>Goals</span>
-                  </Link>
+            {/* Mobile User Footer */}
+            <SidebarUserFooter userName={userName} userRole={userRole} />
 
-                  {!isSchoolAdmin && (
-                    <Link
-                      to={`/${slug}/admin/schools`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                        isActiveRoute(`/${slug}/admin/schools`)
-                          ? 'bg-gray-100 text-gray-900 font-medium'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                      }`}
-                    >
-                      <Building2 className="h-4 w-4" />
-                      <span>Schools</span>
-                    </Link>
-                  )}
-
-                  <Link
-                    to={`${basePath}/import`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                      isActiveRoute(`${basePath}/import`)
-                        ? 'bg-gray-100 text-gray-900 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <FileText className="h-4 w-4" />
-                    <span>Import Data</span>
-                  </Link>
-
-                  <Link
-                    to={`${basePath}/data-manager`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                      isActiveRoute(`${basePath}/data-manager`)
-                        ? 'bg-gray-100 text-gray-900 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <Database className="h-4 w-4" />
-                    <span>Data Manager</span>
-                  </Link>
-                </div>
-              </div>
-
-              <div>
-                <div className="px-3 mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                  Settings
-                </div>
-                <div className="space-y-1">
-                  <Link
-                    to={`${basePath}/settings`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                      isActiveRoute(`${basePath}/settings`)
-                        ? 'bg-gray-100 text-gray-900 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <Palette className="h-4 w-4" />
-                    <span>Branding</span>
-                  </Link>
-
-                  <Link
-                    to={`${basePath}/audit`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors ${
-                      isActiveRoute(`${basePath}/audit`)
-                        ? 'bg-gray-100 text-gray-900 font-medium'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                  >
-                    <BarChart2 className="h-4 w-4" />
-                    <span>Activity</span>
-                  </Link>
-                </div>
-              </div>
-            </nav>
-
-            <div className="p-4 border-t border-gray-200">
-              <button
-                onClick={() => {
-                  navigate(isSchoolAdmin ? `/${slug}/schools/${schoolSlug}` : `/${slug}`);
-                  setIsMobileMenuOpen(false);
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
-              >
-                <Eye className="h-4 w-4" />
-                <span>View Public</span>
-              </button>
-            </div>
+            {/* Mobile View Public Footer */}
+            <SidebarFooter
+              publicUrl={publicUrl}
+              onNavigate={() => {
+                handleViewPublic();
+                setIsMobileMenuOpen(false);
+              }}
+            />
           </aside>
         </>
+      )}
+
+      {/* Add School Modal Placeholder */}
+      {showAddSchoolModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl w-full max-w-md mx-4 p-6">
+            <h2 className="font-semibold text-slate-900 mb-4">Add School</h2>
+            <p className="text-slate-500 text-sm mb-4">
+              School creation modal coming soon...
+            </p>
+            <button
+              onClick={() => setShowAddSchoolModal(false)}
+              className="px-4 py-2 text-sm font-medium bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200"
+            >
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

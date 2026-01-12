@@ -2,24 +2,19 @@ import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import {
-  Home,
-  Target,
-  Building2,
-  FileText,
-  Palette,
-  BarChart2,
-  Eye,
-  User,
   Bell,
-  Settings,
-  ChevronsLeft,
   LogOut,
   Grid,
-  Users
+  Settings,
+  Eye,
+  ChevronsLeft,
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
+import { useSchools } from '../hooks/useSchools';
 import { useAuth } from '../contexts/AuthContext';
 import { buildSubdomainUrlWithPath } from '../lib/subdomain';
+import { SidebarNav, SidebarHeader, SidebarUserFooter } from '../components/admin/nav/SidebarNav';
+import { AddSchoolModal } from '../components/admin/schools/AddSchoolModal';
 
 /**
  * ClientAdminEditorialLayout - Editorial-style admin layout with dark sidebar
@@ -30,9 +25,11 @@ export function ClientAdminEditorialLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: district, isLoading } = useDistrict(slug || '');
+  const { data: schools = [] } = useSchools(slug || '');
   const { user, logout } = useAuth();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isAddSchoolModalOpen, setIsAddSchoolModalOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   const basePath = '/admin';
@@ -81,81 +78,64 @@ export function ClientAdminEditorialLayout() {
     );
   }
 
-  const isActiveRoute = (path: string) => {
-    return location.pathname === path || location.pathname.startsWith(path + '/');
-  };
-
-  // Get district initials for logo
-  const getInitials = (name: string) => {
-    return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-  };
+  const publicSiteUrl = buildSubdomainUrlWithPath('district', '', slug || '');
 
   return (
     <div className="min-h-screen bg-[#faf9f7] flex font-['Source_Sans_3',_-apple-system,_sans-serif]">
-      {/* Dark Sidebar */}
-      <aside className={`${isSidebarCollapsed ? 'w-16' : 'w-[220px]'} bg-[#1a1a1a] flex flex-col fixed top-0 left-0 bottom-0 z-50 transition-all duration-200`}>
+      {/* Sidebar */}
+      <aside className={`${isSidebarCollapsed ? 'w-16' : 'w-[260px]'} bg-white border-r border-slate-200 flex flex-col fixed top-0 left-0 bottom-0 z-50 transition-all duration-200`}>
         {/* Sidebar Header */}
-        <div className="p-5 border-b border-white/10">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#c9a227] rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-[#1a1a1a] font-bold text-sm font-['Playfair_Display',_Georgia,_serif]">
-                {getInitials(district.name)}
-              </span>
+        {!isSidebarCollapsed && <SidebarHeader district={district} />}
+
+        {isSidebarCollapsed ? (
+          <div className="p-3">
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold mx-auto"
+              style={{ backgroundColor: district.primary_color || '#D97706' }}
+            >
+              {district.name.substring(0, 2).toUpperCase()}
             </div>
-            {!isSidebarCollapsed && (
-              <div className="min-w-0">
-                <div className="font-semibold text-sm text-white truncate leading-tight">
-                  {district.name}
-                </div>
-                <div className="text-xs text-[#9a9a9a]">Strategic Planning</div>
-              </div>
-            )}
           </div>
-        </div>
+        ) : null}
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-          <Link
-            to={basePath}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              location.pathname === basePath
-                ? 'bg-[#333333] text-white'
-                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
-            }`}
-          >
-            <Home className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>Home</span>}
-          </Link>
+        {!isSidebarCollapsed && (
+          <SidebarNav
+            district={district}
+            schools={schools}
+            districtSlug={slug || ''}
+            onAddSchool={() => setIsAddSchoolModalOpen(true)}
+          />
+        )}
 
-          <Link
-            to={`${basePath}/objectives`}
-            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
-              isActiveRoute(`${basePath}/objectives`)
-                ? 'bg-[#333333] text-white'
-                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
-            }`}
-          >
-            <Target className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>Objectives</span>}
-          </Link>
+        {/* View Public Site */}
+        {!isSidebarCollapsed && (
+          <div className="p-3 border-t border-slate-200">
+            <a
+              href={publicSiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <Eye size={16} />
+              <span>View Public Site</span>
+            </a>
+          </div>
+        )}
 
-          {/* View Public Site */}
-          <a
-            href={buildSubdomainUrlWithPath('district', '', slug || '')}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white"
-          >
-            <Eye className="h-[18px] w-[18px] opacity-70" />
-            {!isSidebarCollapsed && <span>View Public Site</span>}
-          </a>
-        </nav>
+        {/* User Footer */}
+        {!isSidebarCollapsed && (
+          <SidebarUserFooter
+            userName={user?.email?.split('@')[0] || 'Admin'}
+            userRole="District Admin"
+          />
+        )}
 
-        {/* Sidebar Footer */}
-        <div className="p-3 border-t border-white/10">
+        {/* Collapse Button */}
+        <div className="p-3 border-t border-slate-200">
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-[13px] text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white transition-all w-full"
+            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-700 transition-all w-full"
           >
             <ChevronsLeft className={`h-4 w-4 transition-transform ${isSidebarCollapsed ? 'rotate-180' : ''}`} />
             {!isSidebarCollapsed && <span>Collapse</span>}
@@ -164,7 +144,7 @@ export function ClientAdminEditorialLayout() {
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col min-w-0 ${isSidebarCollapsed ? 'ml-16' : 'ml-[220px]'} transition-all duration-200`}>
+      <div className={`flex-1 flex flex-col min-w-0 ${isSidebarCollapsed ? 'ml-16' : 'ml-[260px]'} transition-all duration-200`}>
         {/* Top Header */}
         <header className="h-16 bg-[#faf9f7] border-b border-[#e8e6e1] flex items-center justify-end px-8 sticky top-0 z-40">
           <div className="flex items-center gap-1.5">
@@ -239,6 +219,13 @@ export function ClientAdminEditorialLayout() {
           <line x1="12" y1="17" x2="12.01" y2="17" />
         </svg>
       </button>
+
+      {/* Add School Modal */}
+      <AddSchoolModal
+        isOpen={isAddSchoolModalOpen}
+        onClose={() => setIsAddSchoolModalOpen(false)}
+        districtId={district.id}
+      />
     </div>
   );
 }

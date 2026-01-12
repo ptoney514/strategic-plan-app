@@ -8,6 +8,8 @@ import {
   Bell,
   Grid,
   ChevronsLeft,
+  ExternalLink,
+  Search,
 } from 'lucide-react';
 import { UserMenu } from '../components/common/UserMenu';
 
@@ -15,6 +17,15 @@ import { UserMenu } from '../components/common/UserMenu';
  * SystemAdminEditorialLayout - Editorial-style admin layout for system administrators
  * Features dark sidebar with warm paper aesthetic for system-level administration
  */
+const externalTools = [
+  { name: 'Stripe', url: 'https://dashboard.stripe.com' },
+  { name: 'Supabase', url: 'https://supabase.com/dashboard' },
+  { name: 'Vercel', url: 'https://vercel.com/dashboard' },
+  { name: 'Cloudflare', url: 'https://dash.cloudflare.com' },
+  { name: 'Sentry', url: 'https://sentry.io' },
+  { name: 'Google Analytics', url: 'https://analytics.google.com' },
+];
+
 export function SystemAdminEditorialLayout() {
   const location = useLocation();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
@@ -84,10 +95,38 @@ export function SystemAdminEditorialLayout() {
             <Settings className="h-[18px] w-[18px] opacity-70" />
             {!isSidebarCollapsed && <span>Settings</span>}
           </Link>
+
+          {/* External Tools */}
+          {!isSidebarCollapsed && (
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <p className="px-3.5 text-[10px] font-semibold text-[#6a6a6a] uppercase tracking-wider mb-2">
+                External Tools
+              </p>
+              <div className="space-y-0.5">
+                {externalTools.map((tool) => (
+                  <a
+                    key={tool.name}
+                    href={tool.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 px-3.5 py-2 rounded-lg text-[13px] text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white transition-all group"
+                  >
+                    <ExternalLink className="h-3.5 w-3.5 opacity-50 group-hover:opacity-100" />
+                    <span>{tool.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </nav>
 
         {/* Sidebar Footer */}
         <div className="p-3 border-t border-white/10">
+          {!isSidebarCollapsed && (
+            <div className="px-3.5 py-2 text-xs text-[#6a6a6a]">
+              v1.2.0 &bull; Production
+            </div>
+          )}
           <button
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
             className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg text-[13px] text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white transition-all w-full"
@@ -101,16 +140,23 @@ export function SystemAdminEditorialLayout() {
       {/* Main Content */}
       <div className={`flex-1 flex flex-col min-w-0 ${isSidebarCollapsed ? 'ml-16' : 'ml-[220px]'} transition-all duration-200`}>
         {/* Top Header */}
-        <header className="h-16 bg-[#faf9f7] border-b border-[#e8e6e1] flex items-center justify-end px-8 sticky top-0 z-40">
+        <header className="h-16 bg-[#faf9f7] border-b border-[#e8e6e1] flex items-center justify-between px-8 sticky top-0 z-40">
+          {/* Global Search */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#8a8a8a]" />
+            <input
+              type="text"
+              placeholder="Search districts, users..."
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#e8e6e1] bg-white text-sm focus:outline-none focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] placeholder:text-[#8a8a8a]"
+            />
+          </div>
+
           <div className="flex items-center gap-1.5">
             <button className="w-9 h-9 rounded-lg hover:bg-[#f5f3ef] text-[#4a4a4a] flex items-center justify-center transition-colors">
               <Bell className="h-5 w-5" />
             </button>
             <button className="w-9 h-9 rounded-lg hover:bg-[#f5f3ef] text-[#4a4a4a] flex items-center justify-center transition-colors">
               <Grid className="h-5 w-5" />
-            </button>
-            <button className="w-9 h-9 rounded-lg hover:bg-[#f5f3ef] text-[#4a4a4a] flex items-center justify-center transition-colors">
-              <Settings className="h-5 w-5" />
             </button>
 
             {/* User Profile - Consistent across all auth pages */}

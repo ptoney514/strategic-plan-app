@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { BarChart3, Target, TrendingUp, Users, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserMenu } from '../../components/common/UserMenu';
+import { ContactModal } from '../../components/ContactModal';
 
 /**
  * Marketing landing page for stratadash.org
@@ -11,6 +12,7 @@ import { UserMenu } from '../../components/common/UserMenu';
 export function MarketingLanding() {
   const observerRef = useRef<IntersectionObserver | null>(null);
   const { isAuthenticated } = useAuth();
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   // Setup intersection observer for reveal-on-scroll animations
   useEffect(() => {
@@ -51,11 +53,6 @@ export function MarketingLanding() {
           to { transform: rotate(360deg); }
         }
 
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-
         .clip-intro {
           animation: clipReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
@@ -85,15 +82,6 @@ export function MarketingLanding() {
         .hover-3d:hover {
           transform: perspective(900px) rotateX(4deg) rotateY(-4deg) scale(1.02);
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-        }
-
-        .ticker-track {
-          animation: ticker 40s linear infinite;
-          width: max-content;
-        }
-
-        .ticker-track:hover {
-          animation-play-state: paused;
         }
 
         .animated-border-btn {
@@ -144,14 +132,14 @@ export function MarketingLanding() {
                   Sign In
                 </Link>
               )}
-              <a
-                href="mailto:hello@stratadash.org"
+              <button
+                onClick={() => setIsContactModalOpen(true)}
                 className="animated-border-btn px-5 py-2.5 rounded-full"
               >
                 <span className="animated-border-btn-inner px-5 py-2.5 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors font-medium inline-block -m-[10px]">
                   Get Started
                 </span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -182,13 +170,13 @@ export function MarketingLanding() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a
-              href="mailto:hello@stratadash.org"
+            <button
+              onClick={() => setIsContactModalOpen(true)}
               className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-primary text-white rounded-xl hover:bg-primary/90 transition-all text-lg font-medium shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:-translate-y-0.5"
             >
               Schedule a Demo
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
             <Link
               to="/login"
               className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-lg font-medium"
@@ -223,34 +211,6 @@ export function MarketingLanding() {
         </div>
       </header>
 
-      {/* Trusted By Section */}
-      <section className="py-16 border-y border-gray-100 bg-gray-50/50 overflow-hidden">
-        <div className="container mx-auto px-6">
-          <p className="text-center text-xs font-medium text-gray-400 uppercase tracking-widest mb-8">
-            Trusted by educational districts across the nation
-          </p>
-          <div className="relative overflow-hidden" style={{ maskImage: 'linear-gradient(to right, transparent, black 15%, black 85%, transparent)' }}>
-            <div className="ticker-track flex gap-16 items-center">
-              {/* First set */}
-              <div className="flex gap-16 shrink-0 items-center">
-                {['Westside ISD', 'Northern District', 'Valley Schools', 'Metro Education', 'Unified Learning', 'Pioneer Academy'].map((name) => (
-                  <span key={name} className="text-lg font-semibold text-gray-300 hover:text-gray-500 transition-colors whitespace-nowrap">
-                    {name}
-                  </span>
-                ))}
-              </div>
-              {/* Duplicate for seamless loop */}
-              <div className="flex gap-16 shrink-0 items-center">
-                {['Westside ISD', 'Northern District', 'Valley Schools', 'Metro Education', 'Unified Learning', 'Pioneer Academy'].map((name) => (
-                  <span key={`${name}-2`} className="text-lg font-semibold text-gray-300 hover:text-gray-500 transition-colors whitespace-nowrap">
-                    {name}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Features Section */}
       <section className="container mx-auto px-6 py-24">
@@ -318,13 +278,13 @@ export function MarketingLanding() {
               Join educational districts already using StrataDash to achieve their
               strategic goals.
             </p>
-            <a
-              href="mailto:hello@stratadash.org"
+            <button
+              onClick={() => setIsContactModalOpen(true)}
               className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all text-lg font-medium shadow-lg hover:shadow-xl hover:-translate-y-0.5"
             >
               Contact Us
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
+            </button>
           </div>
         </div>
       </section>
@@ -343,6 +303,9 @@ export function MarketingLanding() {
           </p>
         </div>
       </footer>
+
+      {/* Contact Modal */}
+      <ContactModal isOpen={isContactModalOpen} onClose={() => setIsContactModalOpen(false)} />
     </div>
   );
 }

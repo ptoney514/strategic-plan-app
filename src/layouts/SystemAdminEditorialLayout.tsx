@@ -8,6 +8,7 @@ import {
   Bell,
   Grid,
   ChevronsLeft,
+  MessageSquare,
   ExternalLink,
   Search,
 } from 'lucide-react';
@@ -82,6 +83,18 @@ export function SystemAdminEditorialLayout() {
           >
             <Users className="h-[18px] w-[18px] opacity-70" />
             {!isSidebarCollapsed && <span>Users</span>}
+          </Link>
+
+          <Link
+            to="/contacts"
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              isActiveRoute('/contacts')
+                ? 'bg-[#333333] text-white'
+                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
+            }`}
+          >
+            <MessageSquare className="h-[18px] w-[18px] opacity-70" />
+            {!isSidebarCollapsed && <span>Contacts</span>}
           </Link>
 
           <Link

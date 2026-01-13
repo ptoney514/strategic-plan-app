@@ -1,5 +1,5 @@
 import type { Goal, Metric } from '../../lib/types';
-import { TrendingUp, TrendingDown, Check } from 'lucide-react';
+import { TrendingUp, TrendingDown, Check, ArrowRight } from 'lucide-react';
 
 interface CompactGoalSummaryCardProps {
   goal: Goal;
@@ -34,6 +34,56 @@ function ComparisonBadge({ comparison }: {
       {comparison.text}
     </span>
   );
+}
+
+// Check if metric uses narrative (text) visualization
+function isNarrativeVisualization(metric: Metric): boolean {
+  const vizConfig = metric.visualization_config as {
+    chartType?: string;
+  } | undefined;
+  return vizConfig?.chartType === 'narrative';
+}
+
+// Status badge for narrative metrics with trend icon
+function NarrativeStatusBadge({ metric }: { metric: Metric }) {
+  // Use custom indicator if available
+  if (metric.indicator_text && metric.indicator_color) {
+    const colorConfig: Record<string, { border: string; text: string; bg: string }> = {
+      green: {
+        border: 'border-green-200 dark:border-green-800',
+        text: 'text-green-600 dark:text-green-400',
+        bg: 'bg-green-50 dark:bg-green-950',
+      },
+      amber: {
+        border: 'border-amber-200 dark:border-amber-700',
+        text: 'text-amber-600 dark:text-amber-400',
+        bg: 'bg-amber-50 dark:bg-amber-950',
+      },
+      red: {
+        border: 'border-red-200 dark:border-red-800',
+        text: 'text-red-600 dark:text-red-400',
+        bg: 'bg-red-50 dark:bg-red-950',
+      },
+      gray: {
+        border: 'border-gray-200 dark:border-gray-700',
+        text: 'text-gray-600 dark:text-gray-400',
+        bg: 'bg-gray-50 dark:bg-gray-900',
+      },
+    };
+    const colors = colorConfig[metric.indicator_color] || colorConfig.gray;
+
+    return (
+      <span
+        className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium border ${colors.border} ${colors.text} ${colors.bg}`}
+      >
+        <TrendingUp className="w-3 h-3" />
+        {metric.indicator_text}
+      </span>
+    );
+  }
+
+  // No indicator set - return null
+  return null;
 }
 
 // Get primary metric (first with data)
@@ -205,7 +255,26 @@ export function CompactGoalSummaryCard({
       {/* Divider */}
       <div className="border-t border-gray-100 dark:border-slate-800 mt-4 pt-3">
         {/* Metric Section */}
-        {primaryMetric && formattedValue ? (
+        {primaryMetric && isNarrativeVisualization(primaryMetric) ? (
+          /* Narrative metric - show "Read more" pattern */
+          <div className="flex items-end justify-between">
+            {/* Left: Text label + Read more */}
+            <div>
+              <span className="text-[10px] font-semibold tracking-widest text-gray-400 dark:text-gray-500 uppercase block mb-1">
+                TEXT
+              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-base font-medium text-blue-600 dark:text-blue-400">
+                  Read more
+                </span>
+                <ArrowRight className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              </div>
+            </div>
+
+            {/* Right: Status Badge with trend icon */}
+            <NarrativeStatusBadge metric={primaryMetric} />
+          </div>
+        ) : primaryMetric && formattedValue ? (
           <div className="flex items-end justify-between">
             {/* Left: Metric Type + Value */}
             <div>

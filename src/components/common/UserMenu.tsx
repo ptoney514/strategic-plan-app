@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Settings, LogOut, ChevronDown, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
+import { supabase } from '../../lib/supabase';
 
 /**
  * UserMenu - Reusable user dropdown menu
@@ -46,6 +47,33 @@ export function UserMenu() {
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
   }, []);
+
+  // Fetch districts user is admin of
+  const [adminDistricts, setAdminDistricts] = useState<{slug: string, name: string}[]>([]);
+
+  useEffect(() => {
+    if (user && !isSystemAdmin) {
+      supabase
+        .from('spb_district_admins')
+        .select('district_slug, spb_districts(name)')
+        .eq('user_id', user.id)
+        .then(({ data }) => {
+          if (data) {
+            setAdminDistricts(data.map(d => {
+              // Handle Supabase join result - can be object or array
+              const districtData = d.spb_districts;
+              const districtName = Array.isArray(districtData)
+                ? districtData[0]?.name
+                : (districtData as { name: string } | null)?.name;
+              return {
+                slug: d.district_slug,
+                name: districtName || d.district_slug
+              };
+            }));
+          }
+        });
+    }
+  }, [user, isSystemAdmin]);
 
   if (!user) return null;
 
@@ -94,6 +122,23 @@ export function UserMenu() {
                 <LayoutDashboard className="w-4 h-4 text-primary" />
                 Admin Dashboard
               </a>
+            </div>
+          )}
+
+          {/* District Admin Links */}
+          {adminDistricts.length > 0 && (
+            <div className="py-1 border-b border-gray-100">
+              {adminDistricts.map(district => (
+                <a
+                  key={district.slug}
+                  href={buildSubdomainUrlWithPath('district', '/admin', district.slug)}
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-primary" />
+                  {district.name} Admin
+                </a>
+              ))}
             </div>
           )}
 

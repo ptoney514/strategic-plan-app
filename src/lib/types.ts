@@ -110,7 +110,7 @@ export interface Goal {
 
 export type MetricType = 'percent' | 'number' | 'rating' | 'currency' | 'status' | 'narrative' | 'link' | 'survey';
 export type DataSourceType = 'survey' | 'map_data' | 'state_testing' | 'total_number' | 'percent' | 'narrative' | 'link';
-export type ChartType = 'line' | 'bar' | 'donut' | 'area';
+export type ChartType = 'line' | 'bar' | 'donut' | 'area' | 'value' | 'narrative';
 export type MetricStatus = 'on-target' | 'off-target' | 'critical' | 'no-data';
 export type MetricCategory = 'enrollment' | 'achievement' | 'discipline' | 'attendance' | 'culture' | 'other';
 
@@ -180,7 +180,7 @@ export interface Metric {
 
 // Visualization configuration types
 export interface VisualizationConfig {
-  chartType?: 'line' | 'bar' | 'pie' | 'donut' | 'area' | 'scatter' | 'likert';
+  chartType?: 'line' | 'bar' | 'pie' | 'donut' | 'area' | 'scatter' | 'likert' | 'value' | 'narrative';
   colors?: string[];
   showLegend?: boolean;
   showGrid?: boolean;
@@ -189,6 +189,12 @@ export interface VisualizationConfig {
   xAxisLabel?: string;
   yAxisLabel?: string;
   legendPosition?: 'top' | 'bottom' | 'left' | 'right';
+  // For 'value' visualization type - displays just a value (number, text like "3.15", "758", "GREAT!")
+  displayValue?: string;
+  // For 'narrative' visualization type - rich text HTML content
+  content?: string;
+  title?: string;
+  showTitle?: boolean;
   [key: string]: unknown; // Allow additional properties for extensibility
 }
 

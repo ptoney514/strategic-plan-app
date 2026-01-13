@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { StatusBadge } from '../public/StatusBadge';
 import type { ChartType } from '../../lib/types';
+import { NarrativeDisplay } from '../NarrativeDisplay';
+import type { NarrativeConfig } from '../../lib/metric-visualizations';
 
 /** Default color palette for multi-segment charts (donut, pie) */
 export const DEFAULT_CHART_COLORS = [
@@ -35,6 +37,10 @@ interface MetricChartPreviewProps {
   chartType?: ChartType;
   /** Color palette for multi-segment charts (donut, pie). Defaults to DEFAULT_CHART_COLORS */
   chartColors?: string[];
+  /** Display value for 'value' visualization type */
+  displayValue?: string;
+  /** Narrative config for 'narrative' visualization type */
+  narrativeConfig?: NarrativeConfig;
 }
 
 /**
@@ -72,6 +78,8 @@ export function MetricChartPreview({
   indicatorColor,
   chartType = 'bar',
   chartColors = DEFAULT_CHART_COLORS,
+  displayValue,
+  narrativeConfig,
 }: MetricChartPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -334,6 +342,66 @@ export function MetricChartPreview({
       ctx.fillText(gridValue.toFixed(1), padding.left - 8, y);
     }
   }, [dataPoints, targetValue, chartColor, chartType, chartColors]);
+
+  // Handle 'value' visualization type
+  if (chartType === 'value') {
+    return (
+      <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-xl p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-xs font-semibold tracking-widest text-[#8a8a8a] uppercase">
+            Value
+          </span>
+          {indicatorText && indicatorColor && (
+            <StatusBadge customText={indicatorText} customColor={indicatorColor} size="sm" />
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-[#1a1a1a] font-semibold text-lg tracking-tight mb-4">
+          {metricName}
+        </h3>
+
+        {/* Display Value */}
+        <div className="flex items-center justify-center py-8">
+          <span className="text-5xl font-bold text-[#1a1a1a] tracking-tight">
+            {displayValue || currentValue || '—'}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle 'narrative' visualization type
+  if (chartType === 'narrative') {
+    return (
+      <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-xl p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-xs font-semibold tracking-widest text-[#8a8a8a] uppercase">
+            Narrative
+          </span>
+          {indicatorText && indicatorColor && (
+            <StatusBadge customText={indicatorText} customColor={indicatorColor} size="sm" />
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-[#1a1a1a] font-semibold text-lg tracking-tight mb-4">
+          {metricName}
+        </h3>
+
+        {/* Narrative Content */}
+        {narrativeConfig ? (
+          <NarrativeDisplay config={narrativeConfig} />
+        ) : (
+          <div className="text-center text-gray-400 py-8">
+            No content entered yet
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#fafaf8] border border-[#e8e6e1] rounded-xl p-6">

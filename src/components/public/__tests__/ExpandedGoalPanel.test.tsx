@@ -391,5 +391,49 @@ describe('ExpandedGoalPanel', () => {
       // Narrative content should render immediately
       expect(screen.getByText('Test narrative content')).toBeInTheDocument();
     });
+
+    it('does not show numeric value in left column for narrative metrics', () => {
+      const metricWithNarrativeViz: Metric = {
+        ...mockMetric,
+        current_value: 100,
+        target_value: 100,
+        visualization_config: {
+          chartType: 'narrative',
+          content: 'Test narrative content',
+        },
+      };
+
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithNarrativeViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should show TEXT CONTENT label instead of numeric metric type
+      expect(screen.getByText('TEXT CONTENT')).toBeInTheDocument();
+      // Should show helper text
+      expect(screen.getByText('View the full narrative content on the right.')).toBeInTheDocument();
+      // Should NOT show Target: line for narrative metrics
+      expect(screen.queryByText(/Target:/)).not.toBeInTheDocument();
+    });
+
+    it('still shows numeric value in left column for non-narrative metrics (regression)', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should show CURRENT SCORE label for numeric metrics
+      expect(screen.getByText('CURRENT SCORE')).toBeInTheDocument();
+      // Should show Target: line
+      expect(screen.getByText(/Target:/)).toBeInTheDocument();
+    });
   });
 });

@@ -128,6 +128,14 @@ function getMetricStatus(metric: Metric): StatusType {
   return calculateStatus(progress);
 }
 
+// Check if metric uses narrative (text) visualization
+function isNarrativeVisualization(metric: Metric): boolean {
+  const vizConfig = metric.visualization_config as {
+    chartType?: string;
+  } | undefined;
+  return vizConfig?.chartType === 'narrative';
+}
+
 // Animation delay constant - wait for parent layout animation to complete (300ms + buffer)
 const ANIMATION_DELAY_MS = 350;
 
@@ -490,30 +498,49 @@ export function ExpandedGoalPanel({
                 <FilledStatusBadge status={displayStatus} />
               </div>
 
-              {/* Metric Type Label */}
-              <div>
-                <span className="text-xs font-medium tracking-wider text-gray-400 dark:text-gray-500 uppercase">
-                  {metricTypeLabel}
-                </span>
-              </div>
+              {isNarrativeVisualization(primaryMetric) ? (
+                /* Narrative metric - show text label instead of numeric value */
+                <>
+                  <div>
+                    <span className="text-xs font-medium tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+                      TEXT CONTENT
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      View the full narrative content on the right.
+                    </p>
+                  </div>
+                </>
+              ) : (
+                /* Numeric metric - show value and target */
+                <>
+                  {/* Metric Type Label */}
+                  <div>
+                    <span className="text-xs font-medium tracking-wider text-gray-400 dark:text-gray-500 uppercase">
+                      {metricTypeLabel}
+                    </span>
+                  </div>
 
-              {/* Value Display */}
-              <div>
-                <span className="text-4xl font-semibold text-gray-900 dark:text-gray-100 font-display tracking-tight">
-                  {formattedValue?.value}
-                </span>
-                {formattedValue?.unit && (
-                  <span className="text-xl text-gray-400 dark:text-gray-500 ml-1">
-                    {formattedValue.unit}
-                  </span>
-                )}
-              </div>
+                  {/* Value Display */}
+                  <div>
+                    <span className="text-4xl font-semibold text-gray-900 dark:text-gray-100 font-display tracking-tight">
+                      {formattedValue?.value}
+                    </span>
+                    {formattedValue?.unit && (
+                      <span className="text-xl text-gray-400 dark:text-gray-500 ml-1">
+                        {formattedValue.unit}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Target */}
-              {target !== null && (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Target: {target}
-                </p>
+                  {/* Target */}
+                  {target !== null && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      Target: {target}
+                    </p>
+                  )}
+                </>
               )}
             </div>
 

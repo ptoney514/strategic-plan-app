@@ -298,6 +298,172 @@ describe('CompactGoalSummaryCard', () => {
     expect(title).toHaveClass('flex-1');
   });
 
+  describe('narrative metric handling', () => {
+    const mockNarrativeMetric: Metric = {
+      id: 'metric-narrative',
+      goal_id: 'goal-1',
+      district_id: 'district-1',
+      metric_name: 'Progress Update',
+      visualization_config: {
+        chartType: 'narrative',
+        content: '<p>This is narrative content about our progress...</p>',
+      },
+      indicator_text: 'On Target',
+      indicator_color: 'green',
+      frequency: 'yearly',
+      aggregation_method: 'latest',
+      unit: '',
+      created_at: '2024-01-01',
+      updated_at: '2024-01-01',
+    };
+
+    it('shows "Read more" for narrative metrics instead of numeric value', () => {
+      render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockNarrativeMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      expect(screen.getByText('Read more')).toBeInTheDocument();
+      // Should not show any rating values like "3.83" (but "1.1" goal number is fine)
+      expect(screen.queryByText(/^\d+\.\d{2}$/)).not.toBeInTheDocument();
+    });
+
+    it('shows TEXT label for narrative metrics', () => {
+      render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockNarrativeMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      expect(screen.getByText('TEXT')).toBeInTheDocument();
+    });
+
+    it('shows custom status badge with trend icon for narrative metrics with indicator', () => {
+      render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockNarrativeMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      expect(screen.getByText('On Target')).toBeInTheDocument();
+    });
+
+    it('does not show status badge when narrative metric has no indicator', () => {
+      const narrativeWithoutIndicator: Metric = {
+        ...mockNarrativeMetric,
+        indicator_text: undefined,
+        indicator_color: undefined,
+      };
+
+      render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[narrativeWithoutIndicator]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      expect(screen.getByText('Read more')).toBeInTheDocument();
+      // No status badge should be rendered
+      expect(screen.queryByText('On Target')).not.toBeInTheDocument();
+    });
+
+    it('applies correct color classes for green indicator', () => {
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockNarrativeMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      // Find the badge with green styling
+      const badge = container.querySelector('.border-green-200');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('text-green-600');
+      expect(badge).toHaveClass('bg-green-50');
+    });
+
+    it('applies correct color classes for amber indicator', () => {
+      const narrativeAmber: Metric = {
+        ...mockNarrativeMetric,
+        indicator_text: 'In Progress',
+        indicator_color: 'amber',
+      };
+
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[narrativeAmber]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      const badge = container.querySelector('.border-amber-200');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('text-amber-600');
+      expect(badge).toHaveClass('bg-amber-50');
+    });
+
+    it('applies correct color classes for red indicator', () => {
+      const narrativeRed: Metric = {
+        ...mockNarrativeMetric,
+        indicator_text: 'Off Track',
+        indicator_color: 'red',
+      };
+
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[narrativeRed]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      const badge = container.querySelector('.border-red-200');
+      expect(badge).toBeInTheDocument();
+      expect(badge).toHaveClass('text-red-600');
+      expect(badge).toHaveClass('bg-red-50');
+    });
+
+    it('still shows numeric values for non-narrative metrics (regression)', () => {
+      render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockRatingMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      // Should show the rating value, not "Read more"
+      expect(screen.getByText('3.83')).toBeInTheDocument();
+      expect(screen.queryByText('Read more')).not.toBeInTheDocument();
+    });
+  });
+
   describe('title height consistency', () => {
     it('applies min-height class to title for consistent card heights', () => {
       const { container } = render(

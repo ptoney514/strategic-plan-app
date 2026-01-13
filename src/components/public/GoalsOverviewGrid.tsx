@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import type { Goal, Metric } from '../../lib/types';
 import { CompactGoalSummaryCard } from './CompactGoalSummaryCard';
@@ -10,6 +10,8 @@ interface GoalsOverviewGridProps {
   colorClass: string;
   isMobile: boolean;
   onMobileGoalSelect: (goalId: string) => void;
+  expandedGoalId: string | null;
+  onExpandChange: (goalId: string | null) => void;
 }
 
 export function GoalsOverviewGrid({
@@ -18,20 +20,37 @@ export function GoalsOverviewGrid({
   colorClass,
   isMobile,
   onMobileGoalSelect,
+  expandedGoalId,
+  onExpandChange,
 }: GoalsOverviewGridProps) {
-  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
+  const prevExpandedRef = useRef<string | null>(null);
+
+  // Scroll expanded card to center when expansion state changes
+  useEffect(() => {
+    if (expandedGoalId && !isMobile && expandedGoalId !== prevExpandedRef.current) {
+      // Wait for layout animation to start before scrolling
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`goal-card-${expandedGoalId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+    prevExpandedRef.current = expandedGoalId;
+  }, [expandedGoalId, isMobile]);
 
   const handleCardClick = (goalId: string) => {
     if (isMobile) {
       onMobileGoalSelect(goalId);
     } else {
       // Toggle: if already expanded, collapse; otherwise expand
-      setExpandedGoalId(expandedGoalId === goalId ? null : goalId);
+      onExpandChange(expandedGoalId === goalId ? null : goalId);
     }
   };
 
   const handleClose = () => {
-    setExpandedGoalId(null);
+    onExpandChange(null);
   };
 
   return (
@@ -44,6 +63,7 @@ export function GoalsOverviewGrid({
             return (
               <motion.div
                 key={goal.id}
+                id={`goal-card-${goal.id}`}
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}

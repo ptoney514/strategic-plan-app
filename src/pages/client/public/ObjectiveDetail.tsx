@@ -62,6 +62,8 @@ export function ObjectiveDetail() {
 
   // Mobile carousel state
   const [focusedGoalId, setFocusedGoalId] = useState<string | null>(null);
+  // Desktop expanded card state
+  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
 
   // Detect mobile screen size
@@ -72,15 +74,23 @@ export function ObjectiveDetail() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Detect hash changes for mobile carousel
+  // Detect hash changes for mobile carousel and desktop expansion
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash;
-      if (hash.startsWith('#goal-') && isMobile) {
+      if (hash.startsWith('#goal-')) {
         const goalIdFromHash = hash.replace('#goal-', '');
-        setFocusedGoalId(goalIdFromHash);
-      } else if (!hash && isMobile) {
-        setFocusedGoalId(null);
+        if (isMobile) {
+          setFocusedGoalId(goalIdFromHash);
+        } else {
+          setExpandedGoalId(goalIdFromHash);
+        }
+      } else if (!hash) {
+        if (isMobile) {
+          setFocusedGoalId(null);
+        } else {
+          setExpandedGoalId(null);
+        }
       }
     };
 
@@ -95,9 +105,13 @@ export function ObjectiveDetail() {
   // Also respond to React Router location changes
   useEffect(() => {
     const hash = location.hash;
-    if (hash.startsWith('#goal-') && isMobile) {
+    if (hash.startsWith('#goal-')) {
       const goalIdFromHash = hash.replace('#goal-', '');
-      setFocusedGoalId(goalIdFromHash);
+      if (isMobile) {
+        setFocusedGoalId(goalIdFromHash);
+      } else {
+        setExpandedGoalId(goalIdFromHash);
+      }
     }
   }, [location.hash, isMobile]);
 
@@ -105,6 +119,16 @@ export function ObjectiveDetail() {
   const handleCarouselClose = () => {
     setFocusedGoalId(null);
     window.history.replaceState(null, '', location.pathname);
+  };
+
+  // Handle desktop expand change
+  const handleExpandChange = (goalId: string | null) => {
+    setExpandedGoalId(goalId);
+    if (goalId) {
+      window.history.replaceState(null, '', `#goal-${goalId}`);
+    } else {
+      window.history.replaceState(null, '', location.pathname);
+    }
   };
 
   // Find the objective index for color assignment
@@ -221,6 +245,8 @@ export function ObjectiveDetail() {
               setFocusedGoalId(goalId);
               window.history.replaceState(null, '', `#goal-${goalId}`);
             }}
+            expandedGoalId={expandedGoalId}
+            onExpandChange={handleExpandChange}
           />
         </div>
       )}

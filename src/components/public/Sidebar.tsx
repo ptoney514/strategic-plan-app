@@ -236,30 +236,6 @@ function SidebarContent({
     ? location.pathname.split('/objective/')[1]?.split('/')[0]
     : null;
 
-  // Smooth scroll to an element by ID with color-matched pulse glow
-  const scrollToGoal = (goalId: string, color: keyof typeof colorClasses = 'red') => {
-    const element = document.getElementById(`goal-${goalId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Remove any existing pulse animations
-      const pulseClasses = ['goal-highlight-pulse-red', 'goal-highlight-pulse-blue', 'goal-highlight-pulse-amber', 'goal-highlight-pulse-green'];
-      pulseClasses.forEach(cls => element.classList.remove(cls));
-      void element.offsetWidth; // Trigger reflow to restart animation
-      // Add color-specific pulse animation
-      element.classList.add(`goal-highlight-pulse-${color}`);
-      setTimeout(() => {
-        element.classList.remove(`goal-highlight-pulse-${color}`);
-      }, 2500);
-    }
-  };
-
-  // Helper to get objective color by ID
-  const getObjectiveColorById = (objectiveId: string): keyof typeof colorClasses => {
-    const index = objectives.findIndex(o => o.id === objectiveId);
-    if (index === -1) return 'red';
-    const objective = objectives[index];
-    return getObjectiveColor(objective, index);
-  };
 
   // Handle objective click - navigate and expand
   const handleObjectiveClick = (objectiveId: string, isCurrentlyActive: boolean) => {
@@ -275,24 +251,14 @@ function SidebarContent({
     }
   };
 
-  // Check if mobile
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
-  // Handle Level 1 goal click - mobile opens carousel, desktop scrolls
+  // Handle Level 1 goal click - uses hash to trigger expansion/carousel
   const handleGoalClick = (goalId: string, parentObjectiveId: string, isCurrentlyActive: boolean) => {
-    const objectiveColor = getObjectiveColorById(parentObjectiveId);
-
     // If we're on the objective detail page that contains this goal
     if (isOnObjectiveDetailPage && currentObjectiveId === parentObjectiveId) {
-      if (isMobile) {
-        // On mobile: set hash to open carousel (ObjectiveDetail will detect this)
-        window.history.replaceState(null, '', `#goal-${goalId}`);
-        // Trigger a hashchange event for React to detect
-        window.dispatchEvent(new HashChangeEvent('hashchange'));
-      } else {
-        // On desktop: smooth scroll to the goal with color-matched glow
-        scrollToGoal(goalId, objectiveColor);
-      }
+      // Use hash for both mobile and desktop - ObjectiveDetail listens for hash changes
+      // On mobile: opens carousel; on desktop: expands card and scrolls to center
+      window.history.replaceState(null, '', `#goal-${goalId}`);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
       onItemClick?.(); // Close mobile drawer
       return;
     }
@@ -302,37 +268,25 @@ function SidebarContent({
       toggleGoalExpanded(goalId);
     } else {
       // Navigate to the objective page with hash
-      // On mobile: hash will trigger carousel; on desktop: will scroll
+      // ObjectiveDetail will detect hash and expand/open carousel on load
       navigate(buildDistrictPath(`/objective/${parentObjectiveId}#goal-${goalId}`, slug, isOnSubdomain));
-      if (!isMobile) {
-        setTimeout(() => scrollToGoal(goalId, objectiveColor), 100);
-      }
       onItemClick?.();
     }
   };
 
-  // Handle Level 2 initiative click - mobile opens carousel, desktop scrolls
+  // Handle Level 2 initiative click - uses hash to trigger expansion/carousel
   const handleInitiativeClick = (initiativeId: string, parentObjectiveId: string) => {
-    const objectiveColor = getObjectiveColorById(parentObjectiveId);
-
     // If we're on the objective detail page that contains this initiative
     if (isOnObjectiveDetailPage && currentObjectiveId === parentObjectiveId) {
-      if (isMobile) {
-        // On mobile: set hash to open carousel
-        window.history.replaceState(null, '', `#goal-${initiativeId}`);
-        window.dispatchEvent(new HashChangeEvent('hashchange'));
-      } else {
-        // On desktop: smooth scroll with color-matched glow
-        scrollToGoal(initiativeId, objectiveColor);
-      }
+      // Use hash for both mobile and desktop - ObjectiveDetail listens for hash changes
+      window.history.replaceState(null, '', `#goal-${initiativeId}`);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
       onItemClick?.();
       return;
     }
     // Navigate to objective page with hash
+    // ObjectiveDetail will detect hash and expand/open carousel on load
     navigate(buildDistrictPath(`/objective/${parentObjectiveId}#goal-${initiativeId}`, slug, isOnSubdomain));
-    if (!isMobile) {
-      setTimeout(() => scrollToGoal(initiativeId, objectiveColor), 100);
-    }
     onItemClick?.();
   };
 

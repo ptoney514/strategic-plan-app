@@ -196,8 +196,8 @@ export function CompactGoalSummaryCard({
         >
           {goal.goal_number}
         </div>
-        {/* Title inline with badge */}
-        <h3 className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-3 leading-snug pt-2">
+        {/* Title inline with badge - min-h ensures consistent 3-line height */}
+        <h3 className="flex-1 text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-3 leading-snug pt-2 min-h-[3.75rem]">
           {goal.title}
         </h3>
       </div>

@@ -297,4 +297,73 @@ describe('CompactGoalSummaryCard', () => {
     expect(title).toBeInTheDocument();
     expect(title).toHaveClass('flex-1');
   });
+
+  describe('title height consistency', () => {
+    it('applies min-height class to title for consistent card heights', () => {
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockRatingMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      const title = container.querySelector('h3');
+      expect(title).toHaveClass('min-h-[3.75rem]');
+    });
+
+    it('applies line-clamp-3 to limit title to 3 lines maximum', () => {
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[mockRatingMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      const title = container.querySelector('h3');
+      expect(title).toHaveClass('line-clamp-3');
+    });
+
+    it('renders short title with same min-height as longer titles', () => {
+      const shortTitleGoal = { ...mockGoal, title: 'Short title' };
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={shortTitleGoal}
+          metrics={[mockRatingMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      const title = container.querySelector('h3');
+      expect(title).toHaveClass('min-h-[3.75rem]');
+      expect(title).toHaveTextContent('Short title');
+    });
+
+    it('clamps long title to 3 lines with line-clamp-3', () => {
+      const longTitleGoal = {
+        ...mockGoal,
+        title: 'This is a very long title that would normally span more than three lines when displayed in a narrow card container because it contains so many words and characters that it exceeds the typical line limit',
+      };
+      const { container } = render(
+        <CompactGoalSummaryCard
+          goal={longTitleGoal}
+          metrics={[mockRatingMetric]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={mockOnClick}
+        />
+      );
+
+      const title = container.querySelector('h3');
+      expect(title).toHaveClass('line-clamp-3');
+      expect(title).toHaveClass('min-h-[3.75rem]');
+    });
+  });
 });

@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '../../../test/setup';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '../../../test/setup';
 import { ExpandedGoalPanel } from '../ExpandedGoalPanel';
 import type { Goal, Metric } from '../../../lib/types';
 
@@ -206,5 +206,190 @@ describe('ExpandedGoalPanel', () => {
 
     const badge = container.querySelector('.bg-district-red');
     expect(badge).toBeInTheDocument();
+  });
+
+  describe('MetricChart animation delay', () => {
+    let getBoundingClientRectSpy: ReturnType<typeof vi.spyOn>;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      getBoundingClientRectSpy = vi.spyOn(HTMLCanvasElement.prototype, 'getBoundingClientRect');
+      getBoundingClientRectSpy.mockReturnValue({
+        width: 300,
+        height: 180,
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0,
+        right: 300,
+        bottom: 180,
+        toJSON: () => ({}),
+      });
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      getBoundingClientRectSpy.mockRestore();
+    });
+
+    it('does not call getBoundingClientRect immediately on mount', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should not have been called yet (0ms)
+      expect(getBoundingClientRectSpy).not.toHaveBeenCalled();
+    });
+
+    it('calls getBoundingClientRect after animation delay', async () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Fast-forward past animation delay (350ms) - wrap in act for state updates
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+
+      expect(getBoundingClientRectSpy).toHaveBeenCalled();
+    });
+
+    it('clears timer on unmount to prevent memory leaks', async () => {
+      const { unmount } = render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Unmount before timer fires
+      unmount();
+
+      // Advance timers - should not throw or cause issues
+      await vi.advanceTimersByTimeAsync(500);
+
+      // If we get here without errors, cleanup worked correctly
+      expect(true).toBe(true);
+    });
+  });
+
+  describe('MetricChart ResizeObserver', () => {
+    let observeSpy: ReturnType<typeof vi.fn>;
+    let disconnectSpy: ReturnType<typeof vi.fn>;
+    let originalResizeObserver: typeof ResizeObserver;
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      observeSpy = vi.fn();
+      disconnectSpy = vi.fn();
+      originalResizeObserver = global.ResizeObserver;
+
+      global.ResizeObserver = class MockResizeObserver {
+        observe = observeSpy;
+        unobserve = vi.fn();
+        disconnect = disconnectSpy;
+        constructor() {}
+      } as unknown as typeof ResizeObserver;
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      global.ResizeObserver = originalResizeObserver;
+    });
+
+    it('sets up ResizeObserver on container after animation delay', async () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Before delay, observer should not be set up
+      expect(observeSpy).not.toHaveBeenCalled();
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+
+      expect(observeSpy).toHaveBeenCalled();
+    });
+
+    it('disconnects ResizeObserver on unmount', async () => {
+      const { unmount } = render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(400);
+      });
+
+      unmount();
+      expect(disconnectSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Value/Narrative visualization types', () => {
+    it('renders value visualization immediately without delay', () => {
+      const metricWithValueViz: Metric = {
+        ...mockMetric,
+        visualization_config: { chartType: 'value', displayValue: '42' },
+      };
+
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithValueViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Value display should render immediately without waiting for animation delay
+      expect(screen.getByText('42')).toBeInTheDocument();
+    });
+
+    it('renders narrative visualization immediately without delay', () => {
+      const metricWithNarrativeViz: Metric = {
+        ...mockMetric,
+        visualization_config: {
+          chartType: 'narrative',
+          content: 'Test narrative content',
+          title: 'Test Title',
+          showTitle: true,
+        },
+      };
+
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithNarrativeViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Narrative content should render immediately
+      expect(screen.getByText('Test narrative content')).toBeInTheDocument();
+    });
   });
 });

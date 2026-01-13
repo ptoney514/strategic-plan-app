@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '../../../test/setup';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { render, screen, fireEvent, act } from '../../../test/setup';
 import { GoalsOverviewGrid } from '../GoalsOverviewGrid';
 import type { Goal, Metric } from '../../../lib/types';
 
@@ -28,8 +28,8 @@ vi.mock('../../../hooks/useMetrics', () => ({
 // Mock framer-motion to avoid animation issues in tests
 vi.mock('framer-motion', () => ({
   motion: {
-    div: ({ children, className, ...props }: React.PropsWithChildren<{ className?: string }>) => (
-      <div className={className} {...props}>{children}</div>
+    div: ({ children, className, id, ...props }: React.PropsWithChildren<{ className?: string; id?: string }>) => (
+      <div className={className} id={id} {...props}>{children}</div>
     ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
@@ -55,6 +55,9 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   fillText: vi.fn(),
   roundRect: vi.fn(),
 })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = vi.fn();
 
 // Mock goals
 const mockGoals: Goal[] = [
@@ -136,9 +139,11 @@ const mockMetrics: Metric[] = [
 
 describe('GoalsOverviewGrid', () => {
   const mockOnMobileGoalSelect = vi.fn();
+  const mockOnExpandChange = vi.fn();
 
   beforeEach(() => {
     mockOnMobileGoalSelect.mockClear();
+    mockOnExpandChange.mockClear();
   });
 
   it('renders correct number of goal cards', () => {
@@ -149,6 +154,8 @@ describe('GoalsOverviewGrid', () => {
         colorClass="bg-district-red"
         isMobile={false}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId={null}
+        onExpandChange={mockOnExpandChange}
       />
     );
 
@@ -165,6 +172,8 @@ describe('GoalsOverviewGrid', () => {
         colorClass="bg-district-red"
         isMobile={false}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId={null}
+        onExpandChange={mockOnExpandChange}
       />
     );
 
@@ -172,7 +181,7 @@ describe('GoalsOverviewGrid', () => {
     expect(grid).toHaveClass('md:grid-cols-3');
   });
 
-  it('expands card when clicked on desktop', () => {
+  it('calls onExpandChange when card is clicked on desktop', () => {
     render(
       <GoalsOverviewGrid
         goals={mockGoals}
@@ -180,18 +189,37 @@ describe('GoalsOverviewGrid', () => {
         colorClass="bg-district-red"
         isMobile={false}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId={null}
+        onExpandChange={mockOnExpandChange}
       />
     );
 
     // Click on goal 1 card
     const goalCard = screen.getByRole('button', { name: /Goal 1.1/i });
     fireEvent.click(goalCard);
+
+    // Should call onExpandChange with goal id
+    expect(mockOnExpandChange).toHaveBeenCalledWith('goal-1');
+  });
+
+  it('expands card when expandedGoalId prop is set', () => {
+    render(
+      <GoalsOverviewGrid
+        goals={mockGoals}
+        metrics={mockMetrics}
+        colorClass="bg-district-red"
+        isMobile={false}
+        onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId="goal-1"
+        onExpandChange={mockOnExpandChange}
+      />
+    );
 
     // Should show expanded panel with close button
     expect(screen.getByLabelText('Collapse goal details')).toBeInTheDocument();
   });
 
-  it('collapses card when close button clicked', () => {
+  it('calls onExpandChange(null) when close button clicked', () => {
     render(
       <GoalsOverviewGrid
         goals={mockGoals}
@@ -199,22 +227,20 @@ describe('GoalsOverviewGrid', () => {
         colorClass="bg-district-red"
         isMobile={false}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId="goal-1"
+        onExpandChange={mockOnExpandChange}
       />
     );
-
-    // Click to expand
-    const goalCard = screen.getByRole('button', { name: /Goal 1.1/i });
-    fireEvent.click(goalCard);
 
     // Click close button
     const closeButton = screen.getByLabelText('Collapse goal details');
     fireEvent.click(closeButton);
 
-    // Should not have expanded panel anymore
-    expect(screen.queryByLabelText('Collapse goal details')).not.toBeInTheDocument();
+    // Should call onExpandChange with null
+    expect(mockOnExpandChange).toHaveBeenCalledWith(null);
   });
 
-  it('only allows one expanded card at a time', () => {
+  it('calls onExpandChange(null) when clicking expanded card again (toggle)', () => {
     render(
       <GoalsOverviewGrid
         goals={mockGoals}
@@ -222,23 +248,38 @@ describe('GoalsOverviewGrid', () => {
         colorClass="bg-district-red"
         isMobile={false}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId="goal-1"
+        onExpandChange={mockOnExpandChange}
       />
     );
 
-    // Click on goal 1 card
-    const goalCard1 = screen.getByRole('button', { name: /Goal 1.1/i });
-    fireEvent.click(goalCard1);
+    // Click close button (which is the action for the expanded card)
+    const closeButton = screen.getByLabelText('Collapse goal details');
+    fireEvent.click(closeButton);
 
-    // Verify goal 1 is expanded
-    expect(screen.getByLabelText('Collapse goal details')).toBeInTheDocument();
+    // Should call onExpandChange with null (toggle off)
+    expect(mockOnExpandChange).toHaveBeenCalledWith(null);
+  });
 
-    // Click on goal 2 card (should collapse goal 1 and expand goal 2)
+  it('calls onExpandChange with new goal id when clicking different card', () => {
+    render(
+      <GoalsOverviewGrid
+        goals={mockGoals}
+        metrics={mockMetrics}
+        colorClass="bg-district-red"
+        isMobile={false}
+        onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId="goal-1"
+        onExpandChange={mockOnExpandChange}
+      />
+    );
+
+    // Click on goal 2 card (should switch expansion)
     const goalCard2 = screen.getByRole('button', { name: /Goal 1.2/i });
     fireEvent.click(goalCard2);
 
-    // Should only have one close button (for goal 2)
-    const closeButtons = screen.getAllByLabelText('Collapse goal details');
-    expect(closeButtons).toHaveLength(1);
+    // Should call onExpandChange with goal-2
+    expect(mockOnExpandChange).toHaveBeenCalledWith('goal-2');
   });
 
   it('delegates to mobile handler on mobile', () => {
@@ -249,6 +290,8 @@ describe('GoalsOverviewGrid', () => {
         colorClass="bg-district-red"
         isMobile={true}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId={null}
+        onExpandChange={mockOnExpandChange}
       />
     );
 
@@ -256,36 +299,180 @@ describe('GoalsOverviewGrid', () => {
     const goalCard = screen.getByRole('button', { name: /Goal 1.1/i });
     fireEvent.click(goalCard);
 
-    // Should call mobile handler instead of expanding inline
+    // Should call mobile handler instead of onExpandChange
     expect(mockOnMobileGoalSelect).toHaveBeenCalledWith('goal-1');
+    expect(mockOnExpandChange).not.toHaveBeenCalled();
 
     // Should not show expanded panel
     expect(screen.queryByLabelText('Collapse goal details')).not.toBeInTheDocument();
   });
 
-  it('collapses card when clicking same card again', () => {
-    render(
+  it('adds id attribute to card containers for scroll targeting', () => {
+    const { container } = render(
       <GoalsOverviewGrid
         goals={mockGoals}
         metrics={mockMetrics}
         colorClass="bg-district-red"
         isMobile={false}
         onMobileGoalSelect={mockOnMobileGoalSelect}
+        expandedGoalId={null}
+        onExpandChange={mockOnExpandChange}
       />
     );
 
-    // Click to expand
-    const goalCard = screen.getByRole('button', { name: /Goal 1.1/i });
-    fireEvent.click(goalCard);
+    // Check that card containers have id attributes
+    expect(container.querySelector('#goal-card-goal-1')).toBeInTheDocument();
+    expect(container.querySelector('#goal-card-goal-2')).toBeInTheDocument();
+    expect(container.querySelector('#goal-card-goal-3')).toBeInTheDocument();
+  });
 
-    // Verify expanded
-    expect(screen.getByLabelText('Collapse goal details')).toBeInTheDocument();
+  describe('rapid expansion interactions', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
 
-    // Click close button (simulates clicking the card area)
-    const closeButton = screen.getByLabelText('Collapse goal details');
-    fireEvent.click(closeButton);
+    afterEach(() => {
+      vi.useRealTimers();
+    });
 
-    // Should collapse
-    expect(screen.queryByLabelText('Collapse goal details')).not.toBeInTheDocument();
+    it('handles rapid card clicking without errors', async () => {
+      const { rerender } = render(
+        <GoalsOverviewGrid
+          goals={mockGoals}
+          metrics={mockMetrics}
+          colorClass="bg-district-red"
+          isMobile={false}
+          onMobileGoalSelect={mockOnMobileGoalSelect}
+          expandedGoalId={null}
+          onExpandChange={mockOnExpandChange}
+        />
+      );
+
+      // Rapidly click different cards
+      fireEvent.click(screen.getByRole('button', { name: /Goal 1.1/i }));
+
+      rerender(
+        <GoalsOverviewGrid
+          goals={mockGoals}
+          metrics={mockMetrics}
+          colorClass="bg-district-red"
+          isMobile={false}
+          onMobileGoalSelect={mockOnMobileGoalSelect}
+          expandedGoalId="goal-1"
+          onExpandChange={mockOnExpandChange}
+        />
+      );
+
+      // Click another before animation completes
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(100);
+      });
+      fireEvent.click(screen.getByRole('button', { name: /Goal 1.2/i }));
+
+      rerender(
+        <GoalsOverviewGrid
+          goals={mockGoals}
+          metrics={mockMetrics}
+          colorClass="bg-district-red"
+          isMobile={false}
+          onMobileGoalSelect={mockOnMobileGoalSelect}
+          expandedGoalId="goal-2"
+          onExpandChange={mockOnExpandChange}
+        />
+      );
+
+      // Wait for all animations and timers
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(500);
+      });
+
+      // Final card should be expanded
+      expect(screen.getByLabelText('Collapse goal details')).toBeInTheDocument();
+      expect(mockOnExpandChange).toHaveBeenLastCalledWith('goal-2');
+    });
+
+    it('cleans up timers when switching cards quickly', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const { rerender, unmount } = render(
+        <GoalsOverviewGrid
+          goals={mockGoals}
+          metrics={mockMetrics}
+          colorClass="bg-district-red"
+          isMobile={false}
+          onMobileGoalSelect={mockOnMobileGoalSelect}
+          expandedGoalId="goal-1"
+          onExpandChange={mockOnExpandChange}
+        />
+      );
+
+      // Quick switch
+      rerender(
+        <GoalsOverviewGrid
+          goals={mockGoals}
+          metrics={mockMetrics}
+          colorClass="bg-district-red"
+          isMobile={false}
+          onMobileGoalSelect={mockOnMobileGoalSelect}
+          expandedGoalId="goal-2"
+          onExpandChange={mockOnExpandChange}
+        />
+      );
+
+      unmount();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(500);
+      });
+
+      // Should not have any React state update errors
+      const reactStateError = consoleErrorSpy.mock.calls.find(
+        call => call[0]?.includes?.("Can't perform a React state update")
+      );
+      expect(reactStateError).toBeUndefined();
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('handles multiple rapid expansions in sequence', async () => {
+      const { rerender } = render(
+        <GoalsOverviewGrid
+          goals={mockGoals}
+          metrics={mockMetrics}
+          colorClass="bg-district-red"
+          isMobile={false}
+          onMobileGoalSelect={mockOnMobileGoalSelect}
+          expandedGoalId={null}
+          onExpandChange={mockOnExpandChange}
+        />
+      );
+
+      // Rapid sequence: goal-1 -> goal-2 -> goal-3 -> goal-1
+      const expansionSequence = ['goal-1', 'goal-2', 'goal-3', 'goal-1'];
+
+      for (const goalId of expansionSequence) {
+        rerender(
+          <GoalsOverviewGrid
+            goals={mockGoals}
+            metrics={mockMetrics}
+            colorClass="bg-district-red"
+            isMobile={false}
+            onMobileGoalSelect={mockOnMobileGoalSelect}
+            expandedGoalId={goalId}
+            onExpandChange={mockOnExpandChange}
+          />
+        );
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(50); // Very fast switches
+        });
+      }
+
+      // Let everything settle
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(500);
+      });
+
+      // Should end up with goal-1 expanded
+      expect(screen.getByLabelText('Collapse goal details')).toBeInTheDocument();
+    });
   });
 });

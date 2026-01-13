@@ -6,6 +6,8 @@ import { useMetricChartData } from '../../hooks/useMetrics';
 import { DataPointsEditor, type DataPoint } from './DataPointsEditor';
 import { ChartTypeSelector } from './ChartTypeSelector';
 import { StatusIndicatorEditor } from './StatusIndicatorEditor';
+import { NarrativeEditor } from '../NarrativeEditor';
+import type { NarrativeConfig } from '../../lib/metric-visualizations';
 
 interface MetricEditFormProps {
   metric: Metric;
@@ -28,6 +30,10 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
   const vizConfig = metric.visualization_config as {
     dataPoints?: { label: string; value: number; target?: number }[];
     chartType?: ChartType;
+    displayValue?: string;
+    content?: string;
+    title?: string;
+    showTitle?: boolean;
   } | undefined;
 
   // Use visualization_config.dataPoints first, then fall back to time series data
@@ -74,6 +80,18 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     vizConfig?.chartType || 'bar'
   );
 
+  // State for 'value' visualization type
+  const [displayValue, setDisplayValue] = useState(
+    vizConfig?.displayValue || ''
+  );
+
+  // State for 'narrative' visualization type
+  const [narrativeConfig, setNarrativeConfig] = useState<NarrativeConfig>({
+    content: vizConfig?.content || '',
+    title: vizConfig?.title || '',
+    showTitle: vizConfig?.showTitle !== false,
+  });
+
   // Track if we've loaded time series data to avoid overwriting user edits
   const hasLoadedTimeSeriesRef = useRef(false);
 
@@ -105,6 +123,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     indicatorText?: string;
     indicatorColor?: 'green' | 'amber' | 'red' | 'gray';
     chartType?: ChartType;
+    displayValue?: string;
+    narrativeConfig?: NarrativeConfig;
   } | null>(null);
 
   // Validation state
@@ -155,28 +175,31 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       newErrors.indicatorText = 'Badge text must be 50 characters or less';
     }
 
-    if (!currentValue.trim()) {
-      newErrors.currentValue = 'Current value is required';
-    } else if (isNaN(parseFloat(currentValue))) {
-      newErrors.currentValue = 'Must be a valid number';
-    }
+    // For 'value' and 'narrative' types, current value is optional
+    if (chartType !== 'value' && chartType !== 'narrative') {
+      if (!currentValue.trim()) {
+        newErrors.currentValue = 'Current value is required';
+      } else if (isNaN(parseFloat(currentValue))) {
+        newErrors.currentValue = 'Must be a valid number';
+      }
 
-    if (targetValue && isNaN(parseFloat(targetValue))) {
-      newErrors.targetValue = 'Must be a valid number';
-    }
+      if (targetValue && isNaN(parseFloat(targetValue))) {
+        newErrors.targetValue = 'Must be a valid number';
+      }
 
-    if (baselineValue && isNaN(parseFloat(baselineValue))) {
-      newErrors.baselineValue = 'Must be a valid number';
-    }
+      if (baselineValue && isNaN(parseFloat(baselineValue))) {
+        newErrors.baselineValue = 'Must be a valid number';
+      }
 
-    // Validate data points
-    const invalidDataPoints = dataPoints.filter(
-      dp => (dp.label.trim() && isNaN(parseFloat(dp.value))) ||
-           (dp.value.trim() && !dp.label.trim()) ||
-           (dp.target && dp.target.trim() && isNaN(parseFloat(dp.target)))
-    );
-    if (invalidDataPoints.length > 0) {
-      newErrors.dataPoints = 'All data points must have valid label and number values';
+      // Validate data points only for chart types
+      const invalidDataPoints = dataPoints.filter(
+        dp => (dp.label.trim() && isNaN(parseFloat(dp.value))) ||
+             (dp.value.trim() && !dp.label.trim()) ||
+             (dp.target && dp.target.trim() && isNaN(parseFloat(dp.target)))
+      );
+      if (invalidDataPoints.length > 0) {
+        newErrors.dataPoints = 'All data points must have valid label and number values';
+      }
     }
 
     setErrors(newErrors);
@@ -198,12 +221,14 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
 
     setPreviewData({
       metricName: name,
-      currentValue: parseFloat(currentValue),
+      currentValue: currentValue ? parseFloat(currentValue) : 0,
       targetValue: targetValue ? parseFloat(targetValue) : undefined,
       dataPoints: validDataPoints,
       indicatorText,
       indicatorColor,
       chartType,
+      displayValue,
+      narrativeConfig,
     });
   };
 
@@ -222,19 +247,31 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
         }))
         .filter(dp => !isNaN(dp.value) && (!dp.target || !isNaN(dp.target as number)));
 
+      // Build visualization_config based on chart type
+      const newVizConfig = {
+        ...metric.visualization_config,
+        chartType,
+        // For chart types, include data points
+        ...(chartType !== 'value' && chartType !== 'narrative' && { dataPoints: validDataPoints }),
+        // For 'value' type, include displayValue
+        ...(chartType === 'value' && { displayValue }),
+        // For 'narrative' type, include narrative content
+        ...(chartType === 'narrative' && {
+          content: narrativeConfig.content,
+          title: narrativeConfig.title,
+          showTitle: narrativeConfig.showTitle,
+        }),
+      };
+
       await onSave({
         metric_name: name.trim(),
         description: description.trim() || undefined,
         indicator_text: indicatorText.trim() || undefined,
         indicator_color: indicatorText.trim() ? indicatorColor : undefined,
-        current_value: parseFloat(currentValue),
+        current_value: currentValue ? parseFloat(currentValue) : undefined,
         target_value: targetValue ? parseFloat(targetValue) : undefined,
         baseline_value: baselineValue ? parseFloat(baselineValue) : undefined,
-        visualization_config: {
-          ...metric.visualization_config,
-          dataPoints: validDataPoints,
-          chartType,
-        },
+        visualization_config: newVizConfig,
       });
     } catch (error) {
       console.error('Failed to save metric:', error);
@@ -313,86 +350,117 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       {/* Chart Type Selector */}
       <ChartTypeSelector value={chartType} onChange={setChartType} />
 
-      {/* Current, Target & Baseline Values */}
-      <div className="grid grid-cols-3 gap-4 mb-4">
-        {/* Current Value */}
-        <div>
+      {/* Conditional fields based on chart type */}
+      {chartType === 'value' ? (
+        /* Value Type: Single text input for display value */
+        <div className="mb-4 p-4 bg-white border border-[#e8e6e1] rounded-lg">
           <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-            Current Value <span className="text-[#ef4444]">*</span>
+            Display Value
           </label>
           <input
-            type="number"
-            step="0.01"
-            value={currentValue}
-            onChange={(e) => setCurrentValue(e.target.value)}
-            placeholder="3.83"
-            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
-              errors.currentValue
-                ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
-                : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
-            }`}
+            type="text"
+            value={displayValue}
+            onChange={(e) => setDisplayValue(e.target.value)}
+            placeholder="e.g., 3.15, 758, GREAT!, A+"
+            className="w-full px-4 py-3 text-[14px] text-[#1a1a1a] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors"
           />
-          {errors.currentValue && (
-            <p className="mt-1 text-[12px] text-[#ef4444]">{errors.currentValue}</p>
-          )}
-        </div>
-
-        {/* Target Value */}
-        <div>
-          <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-            Target Value <span className="text-[#6a6a6a] font-normal">(optional)</span>
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            value={targetValue}
-            onChange={(e) => setTargetValue(e.target.value)}
-            placeholder="3.66"
-            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
-              errors.targetValue
-                ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
-                : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
-            }`}
-          />
-          {errors.targetValue && (
-            <p className="mt-1 text-[12px] text-[#ef4444]">{errors.targetValue}</p>
-          )}
-        </div>
-
-        {/* Baseline Value */}
-        <div>
-          <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-            Baseline <span className="text-[#6a6a6a] font-normal">(optional)</span>
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            value={baselineValue}
-            onChange={(e) => setBaselineValue(e.target.value)}
-            placeholder="3.50"
-            className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
-              errors.baselineValue
-                ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
-                : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
-            }`}
-          />
-          {errors.baselineValue && (
-            <p className="mt-1 text-[12px] text-[#ef4444]">{errors.baselineValue}</p>
-          )}
-          <p className="mt-1 text-[11px] text-[#8a8a8a]">
-            Starting point for progress calculation
+          <p className="mt-2 text-[12px] text-[#8a8a8a]">
+            Enter any value to display: numbers, text, grades, or status words.
           </p>
         </div>
-      </div>
+      ) : chartType === 'narrative' ? (
+        /* Narrative Type: Rich text editor */
+        <div className="mb-4 p-4 bg-white border border-[#e8e6e1] rounded-lg">
+          <NarrativeEditor
+            config={narrativeConfig}
+            onChange={setNarrativeConfig}
+          />
+        </div>
+      ) : (
+        /* Chart Types: Show values and data points */
+        <>
+          {/* Current, Target & Baseline Values */}
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            {/* Current Value */}
+            <div>
+              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
+                Current Value <span className="text-[#ef4444]">*</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={currentValue}
+                onChange={(e) => setCurrentValue(e.target.value)}
+                placeholder="3.83"
+                className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+                  errors.currentValue
+                    ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
+                    : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
+                }`}
+              />
+              {errors.currentValue && (
+                <p className="mt-1 text-[12px] text-[#ef4444]">{errors.currentValue}</p>
+              )}
+            </div>
 
-      {/* Year-over-Year Data Points */}
-      <DataPointsEditor
-        dataPoints={dataPoints}
-        onAdd={handleAddDataPoint}
-        onRemove={handleRemoveDataPoint}
-        onUpdate={handleUpdateDataPoint}
-        error={errors.dataPoints}
-      />
+            {/* Target Value */}
+            <div>
+              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
+                Target Value <span className="text-[#6a6a6a] font-normal">(optional)</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={targetValue}
+                onChange={(e) => setTargetValue(e.target.value)}
+                placeholder="3.66"
+                className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+                  errors.targetValue
+                    ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
+                    : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
+                }`}
+              />
+              {errors.targetValue && (
+                <p className="mt-1 text-[12px] text-[#ef4444]">{errors.targetValue}</p>
+              )}
+            </div>
+
+            {/* Baseline Value */}
+            <div>
+              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
+                Baseline <span className="text-[#6a6a6a] font-normal">(optional)</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={baselineValue}
+                onChange={(e) => setBaselineValue(e.target.value)}
+                placeholder="3.50"
+                className={`w-full px-4 py-3 text-[14px] text-[#1a1a1a] border rounded-lg bg-white focus:outline-none focus:ring-2 transition-colors ${
+                  errors.baselineValue
+                    ? 'border-[#ef4444] focus:border-[#ef4444] focus:ring-[#fee2e2]'
+                    : 'border-[#e8e6e1] focus:border-[#10b981] focus:ring-[#d1fae5]'
+                }`}
+              />
+              {errors.baselineValue && (
+                <p className="mt-1 text-[12px] text-[#ef4444]">{errors.baselineValue}</p>
+              )}
+              <p className="mt-1 text-[11px] text-[#8a8a8a]">
+                Starting point for progress calculation
+              </p>
+            </div>
+          </div>
+
+          {/* Year-over-Year Data Points */}
+          <DataPointsEditor
+            dataPoints={dataPoints}
+            onAdd={handleAddDataPoint}
+            onRemove={handleRemoveDataPoint}
+            onUpdate={handleUpdateDataPoint}
+            error={errors.dataPoints}
+          />
+        </>
+      )}
 
       {/* Action Buttons */}
       <div className="flex justify-between gap-3 mb-6">
@@ -455,6 +523,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             indicatorText={previewData.indicatorText}
             indicatorColor={previewData.indicatorColor}
             chartType={previewData.chartType}
+            displayValue={previewData.displayValue}
+            narrativeConfig={previewData.narrativeConfig}
           />
         </div>
       )}

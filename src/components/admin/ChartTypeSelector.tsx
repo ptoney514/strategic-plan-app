@@ -1,4 +1,4 @@
-import { BarChart3, LineChart, AreaChart, PieChart } from 'lucide-react';
+import { BarChart3, LineChart, AreaChart, PieChart, Hash, FileText } from 'lucide-react';
 import type { ChartType } from '../../lib/types';
 
 interface ChartTypeSelectorProps {
@@ -11,12 +11,14 @@ const CHART_OPTIONS = [
   { type: 'line' as ChartType, icon: LineChart, label: 'Line' },
   { type: 'area' as ChartType, icon: AreaChart, label: 'Area' },
   { type: 'donut' as ChartType, icon: PieChart, label: 'Donut' },
+  { type: 'value' as ChartType, icon: Hash, label: 'Value' },
+  { type: 'narrative' as ChartType, icon: FileText, label: 'Text' },
 ] as const;
 
 /**
  * ChartTypeSelector - Visualization type picker
  *
- * Displays a grid of chart type options (bar, line, area, donut)
+ * Displays a grid of chart type options (bar, line, area, donut, value, text)
  * with icons and labels. Selected type is highlighted.
  */
 export function ChartTypeSelector({ value, onChange }: ChartTypeSelectorProps) {
@@ -25,7 +27,7 @@ export function ChartTypeSelector({ value, onChange }: ChartTypeSelectorProps) {
       <h3 className="text-[13px] font-semibold text-[#1a1a1a] mb-3">
         Visualization Type
       </h3>
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-3 gap-2">
         {CHART_OPTIONS.map(({ type, icon: Icon, label }) => (
           <button
             key={type}

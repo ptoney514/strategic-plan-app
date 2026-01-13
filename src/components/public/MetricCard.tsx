@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { Metric } from '../../lib/types';
 import { StatusBadge, calculateStatus } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
+import { NarrativeDisplay } from '../NarrativeDisplay';
 
 interface MetricCardProps {
   metric: Metric;
@@ -25,8 +26,14 @@ export function MetricCard({ metric, index }: MetricCardProps) {
     scaleMin?: number;
     scaleMax?: number;
     showAverage?: boolean;
+    chartType?: 'bar' | 'line' | 'area' | 'donut' | 'value' | 'narrative';
+    displayValue?: string;
+    content?: string;
+    title?: string;
+    showTitle?: boolean;
   } | undefined;
 
+  const chartType = vizConfig?.chartType || 'bar';
   const vizDataPoints = vizConfig?.dataPoints || [];
   const vizTargetValue = vizConfig?.targetValue;
 
@@ -172,6 +179,9 @@ export function MetricCard({ metric, index }: MetricCardProps) {
 
   // Simple bar chart using canvas
   useEffect(() => {
+    // Skip canvas operations for value/narrative types
+    if (chartType === 'value' || chartType === 'narrative') return;
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -250,6 +260,55 @@ export function MetricCard({ metric, index }: MetricCardProps) {
       return;
     }
 
+    // Clear canvas
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    // Handle donut chart separately (different coordinate system)
+    if (chartType === 'donut') {
+      const donutColors = ['#2563EB', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      const radius = Math.min(centerX, centerY) - 30;
+      const innerRadius = radius * 0.6;
+
+      const total = data.reduce((sum, d) => sum + d.value, 0);
+
+      let startAngle = -Math.PI / 2;
+      data.forEach((d, i) => {
+        if (d.isTarget) return; // Skip target in donut
+        const sliceAngle = (d.value / total) * 2 * Math.PI;
+        const endAngle = startAngle + sliceAngle;
+
+        // Draw slice
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.arc(centerX, centerY, innerRadius, endAngle, startAngle, true);
+        ctx.closePath();
+        ctx.fillStyle = donutColors[i % donutColors.length];
+        ctx.fill();
+
+        // Draw label
+        const midAngle = startAngle + sliceAngle / 2;
+        const labelRadius = radius + 15;
+        const labelX = centerX + Math.cos(midAngle) * labelRadius;
+        const labelY = centerY + Math.sin(midAngle) * labelRadius;
+
+        ctx.fillStyle = '#374151';
+        ctx.font = '10px Inter, sans-serif';
+        ctx.textAlign = midAngle > Math.PI / 2 && midAngle < 3 * Math.PI / 2 ? 'right' : 'left';
+        ctx.fillText(`${d.label}: ${d.value.toFixed(1)}`, labelX, labelY);
+
+        startAngle = endAngle;
+      });
+
+      // Draw center text
+      ctx.fillStyle = '#1a1a1a';
+      ctx.font = 'bold 16px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(total.toFixed(1), centerX, centerY + 6);
+      return;
+    }
+
     // Calculate chart dimensions
     const padding = { top: 20, right: 20, bottom: 30, left: 40 };
     const chartWidth = rect.width - padding.left - padding.right;
@@ -260,9 +319,6 @@ export function MetricCard({ metric, index }: MetricCardProps) {
     const minValue = Math.min(0, Math.min(...data.map(d => d.value)) * 0.9);
     const barWidth = chartWidth / data.length * 0.6;
     const barGap = chartWidth / data.length;
-
-    // Clear canvas
-    ctx.clearRect(0, 0, rect.width, rect.height);
 
     // Draw grid lines
     ctx.strokeStyle = '#F3F4F6';
@@ -289,32 +345,91 @@ export function MetricCard({ metric, index }: MetricCardProps) {
       ctx.setLineDash([]);
     }
 
-    // Draw bars
-    data.forEach((d, i) => {
-      if (d.isTarget) return; // Skip target bar, we draw a line instead
+    // Calculate data point positions for line/area charts
+    const points = data
+      .filter(d => !d.isTarget)
+      .map((d, i) => {
+        const valueRange = maxValue - minValue;
+        const x = padding.left + barGap * i + barGap / 2;
+        const y = valueRange > 0
+          ? padding.top + chartHeight - ((d.value - minValue) / valueRange) * chartHeight
+          : padding.top + chartHeight;
+        return { x, y, value: d.value, label: d.label };
+      });
 
-      const valueRange = maxValue - minValue;
-      const barHeight = valueRange > 0 ? ((d.value - minValue) / valueRange) * chartHeight : 0;
-      const x = padding.left + barGap * i + (barGap - barWidth) / 2;
-      const y = padding.top + chartHeight - barHeight;
+    // Draw based on chart type
+    if (chartType === 'line' || chartType === 'area') {
+      // Draw area fill for area chart
+      if (chartType === 'area' && points.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, padding.top + chartHeight);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.lineTo(points[points.length - 1].x, padding.top + chartHeight);
+        ctx.closePath();
+        ctx.fillStyle = chartColor + '30'; // 30% opacity
+        ctx.fill();
+      }
 
-      // Bar color
-      ctx.fillStyle = chartColor;
-      ctx.beginPath();
-      ctx.roundRect(x, y, barWidth, barHeight, 4);
-      ctx.fill();
+      // Draw line
+      if (points.length > 0) {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+        points.forEach(p => ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = chartColor;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
 
-      // Value label on top of bar
-      ctx.fillStyle = '#374151';
-      ctx.font = 'bold 11px Inter, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 6);
+      // Draw points and labels
+      points.forEach((p) => {
+        // Point circle
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = chartColor;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-      // Label below bar
-      ctx.fillStyle = '#6B7280';
-      ctx.font = '11px Inter, sans-serif';
-      ctx.fillText(d.label, x + barWidth / 2, rect.height - 8);
-    });
+        // Value label
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.value.toFixed(2), p.x, p.y - 10);
+
+        // X-axis label
+        ctx.fillStyle = '#6B7280';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(p.label, p.x, rect.height - 8);
+      });
+    } else {
+      // Default: Bar chart
+      data.forEach((d, i) => {
+        if (d.isTarget) return; // Skip target bar, we draw a line instead
+
+        const valueRange = maxValue - minValue;
+        const barHeight = valueRange > 0 ? ((d.value - minValue) / valueRange) * chartHeight : 0;
+        const x = padding.left + barGap * i + (barGap - barWidth) / 2;
+        const y = padding.top + chartHeight - barHeight;
+
+        // Bar color
+        ctx.fillStyle = chartColor;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barWidth, barHeight, 4);
+        ctx.fill();
+
+        // Value label on top of bar
+        ctx.fillStyle = '#374151';
+        ctx.font = 'bold 11px Inter, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 6);
+
+        // Label below bar
+        ctx.fillStyle = '#6B7280';
+        ctx.font = '11px Inter, sans-serif';
+        ctx.fillText(d.label, x + barWidth / 2, rect.height - 8);
+      });
+    }
 
     // Draw y-axis labels
     ctx.fillStyle = '#9CA3AF';
@@ -325,11 +440,85 @@ export function MetricCard({ metric, index }: MetricCardProps) {
       const y = padding.top + (chartHeight / gridLines) * i + 4;
       ctx.fillText(gridValue.toFixed(1), padding.left - 8, y);
     }
-  }, [metric, chartColor, chartData, vizDataPoints, targetValue]);
+  }, [metric, chartColor, chartData, vizDataPoints, targetValue, chartType]);
 
   // Don't render metrics without data (filtering happens at MetricsGrid level)
   if (!metricHasData) {
     return null;
+  }
+
+  // Handle 'value' visualization type
+  if (chartType === 'value') {
+    const displayVal = vizConfig?.displayValue || metric.current_value?.toString() || '—';
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-lg transition-all duration-300">
+        {/* Header: Label + Status badge */}
+        <div className="flex justify-between items-start mb-4">
+          <span className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
+            Value
+          </span>
+          {metric.indicator_text && metric.indicator_color && (
+            <StatusBadge
+              customText={metric.indicator_text}
+              customColor={metric.indicator_color as 'green' | 'amber' | 'red' | 'gray'}
+              size="sm"
+            />
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-gray-900 font-semibold text-lg tracking-tight mb-4">
+          {metric.metric_name || metric.name}
+        </h3>
+
+        {/* Display Value */}
+        <div className="flex items-center justify-center py-8">
+          <span className="text-5xl lg:text-6xl font-bold text-gray-900 tracking-tight">
+            {displayVal}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle 'narrative' visualization type
+  if (chartType === 'narrative') {
+    const narrativeConfig = {
+      content: vizConfig?.content || '',
+      title: vizConfig?.title,
+      showTitle: vizConfig?.showTitle !== false,
+    };
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 hover:shadow-lg transition-all duration-300">
+        {/* Header: Label + Status badge */}
+        <div className="flex justify-between items-start mb-4">
+          <span className="text-xs font-semibold tracking-widest text-gray-400 uppercase">
+            Narrative
+          </span>
+          {metric.indicator_text && metric.indicator_color && (
+            <StatusBadge
+              customText={metric.indicator_text}
+              customColor={metric.indicator_color as 'green' | 'amber' | 'red' | 'gray'}
+              size="sm"
+            />
+          )}
+        </div>
+
+        {/* Title */}
+        <h3 className="text-gray-900 font-semibold text-lg tracking-tight mb-4">
+          {metric.metric_name || metric.name}
+        </h3>
+
+        {/* Narrative Content */}
+        {narrativeConfig.content ? (
+          <NarrativeDisplay config={narrativeConfig} />
+        ) : (
+          <div className="text-center text-gray-400 py-8">
+            No content available
+          </div>
+        )}
+      </div>
+    );
   }
 
   return (

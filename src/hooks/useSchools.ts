@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { SchoolService, SchoolAdminService } from '../lib/services';
-import type { School, SchoolWithSummary } from '../lib/types';
+import type { School } from '../lib/types';
 
 /**
  * Get all schools for a district
@@ -54,7 +54,7 @@ export function useCreateSchool() {
   return useMutation({
     mutationFn: (school: Omit<School, 'id' | 'created_at' | 'updated_at'>) =>
       SchoolService.create(school),
-    onSuccess: (data) => {
+    onSuccess: (_data) => {
       // Invalidate the schools list for the district
       queryClient.invalidateQueries({ queryKey: ['schools'] });
     },

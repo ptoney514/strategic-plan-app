@@ -1,4 +1,3 @@
-import React from 'react';
 import { visualizationOptions, type VisualizationType } from '../lib/metric-visualizations';
 import { Check } from 'lucide-react';
 

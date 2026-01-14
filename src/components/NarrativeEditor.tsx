@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Bold, Italic, Link as LinkIcon, List, Heading1, Heading2, Heading3, Eye, Code } from 'lucide-react';
 import type { NarrativeConfig } from '../lib/metric-visualizations';
 import { NarrativeDisplay } from './NarrativeDisplay';

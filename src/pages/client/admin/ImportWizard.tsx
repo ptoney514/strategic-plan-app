@@ -50,7 +50,7 @@ export function ImportWizard() {
   // Auto-fix state
   const [showAutoFixModal, setShowAutoFixModal] = useState(false);
   const [currentFixSuggestion, setCurrentFixSuggestion] = useState<AutoFixSuggestion | null>(null);
-  const [currentFixGoal, setCurrentFixGoal] = useState<StagedGoal | null>(null);
+  const [_currentFixGoal, setCurrentFixGoal] = useState<StagedGoal | null>(null);
 
   // Handle template download
   const handleDownloadTemplate = useCallback(() => {

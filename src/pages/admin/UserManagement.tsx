@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Plus, Trash2, Search, Loader2, X, Building2, Shield, AlertCircle } from 'lucide-react';
+import { Users, Plus, Search, Loader2, X, Building2, Shield, AlertCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { supabase } from '../../lib/supabase';

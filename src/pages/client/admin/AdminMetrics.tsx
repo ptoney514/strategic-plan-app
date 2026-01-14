@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { BulkDataEntry } from '../../../components/BulkDataEntry';
-import { 
-  Upload, 
-  Download, 
+import {
+  Upload,
+  Download,
   Save,
   AlertCircle,
-  TrendingUp,
-  Calendar,
-  Filter
+  TrendingUp
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals } from '../../../hooks/useGoals';

@@ -4,7 +4,6 @@
 import {
   BarChart3,
   PieChart,
-  TrendingUp,
   Percent,
   Hash,
   Gauge,

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Pencil, Trash2, Plus, MoreVertical } from 'lucide-react';
 import { useDeleteGoal } from '../hooks/useGoals';
 import { ConfirmDialog } from './Modal';

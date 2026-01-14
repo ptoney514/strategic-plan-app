@@ -1,4 +1,3 @@
-import React from 'react';
 import { Pencil, Trash2, BarChart3 } from 'lucide-react';
 import { MetricPreview } from '../MetricPreview';
 import type { Metric } from '../../lib/types';

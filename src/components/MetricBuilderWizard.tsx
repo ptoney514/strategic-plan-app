@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Save, X } from 'lucide-react';
 import { MetricTypeSelector } from './MetricTypeSelector';
 import { MetricDataForm } from './MetricDataForm';

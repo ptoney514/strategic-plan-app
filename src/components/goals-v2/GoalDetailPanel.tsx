@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Target, Plus, Edit2, Save, X } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Target, Edit2, Save, X } from 'lucide-react';
 import { useUpdateGoal } from '../../hooks';
 import { MetricsSection } from './MetricsSection';
 import { StrategicObjectiveEditor } from './StrategicObjectiveEditor';
@@ -13,7 +13,7 @@ interface GoalDetailPanelProps {
   mode?: 'full' | 'simple'; // 'full' for manage page, 'simple' for reorder page
 }
 
-export function GoalDetailPanel({ goal, districtSlug, onRefresh, mode = 'full' }: GoalDetailPanelProps) {
+export function GoalDetailPanel({ goal, districtSlug: _districtSlug, onRefresh, mode = 'full' }: GoalDetailPanelProps) {
   const updateGoalMutation = useUpdateGoal();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState('');

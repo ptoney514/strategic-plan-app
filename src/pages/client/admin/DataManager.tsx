@@ -22,7 +22,7 @@ import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals, useUpdateGoal, useDeleteGoal } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
 import type { Goal, HierarchicalGoal, Metric } from '../../../lib/types';
-import { parseSqlImportFile, compareGoals, compareMetrics, type ParsedImportData, type ParsedGoal, type ParsedMetric, type ComparisonResult, type MetricComparisonResult } from '../../../lib/services/sqlImportParser';
+import { parseSqlImportFile, compareGoals, compareMetrics, type ParsedImportData, type ComparisonResult, type MetricComparisonResult } from '../../../lib/services/sqlImportParser';
 
 type ViewTab = 'live' | 'staged' | 'compare';
 

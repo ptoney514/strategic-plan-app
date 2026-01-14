@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { useCreateMetric, useUpdateMetric, useDeleteMetric } from '../../hooks';
 import { MetricBuilderWizard } from '../MetricBuilderWizard';
 import { MetricCard } from './MetricCard';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronRight, ChevronDown, Target, BarChart3 } from 'lucide-react';
 import type { Goal } from '../../lib/types';
 import { DraggableGoalsTree } from './DraggableGoalsTree';

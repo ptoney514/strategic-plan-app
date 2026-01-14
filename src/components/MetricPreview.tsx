@@ -1,4 +1,3 @@
-import React from 'react';
 import { TrendingUp, CheckCircle, XCircle, AlertCircle, Clock } from 'lucide-react';
 import { type VisualizationType } from '../lib/metric-visualizations';
 import { NarrativeDisplay } from './NarrativeDisplay';
@@ -209,7 +208,7 @@ export function MetricPreview({ type, data }: MetricPreviewProps) {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {pieData.map((entry: any, index: number) => (
+                    {pieData.map((_entry: any, index: number) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

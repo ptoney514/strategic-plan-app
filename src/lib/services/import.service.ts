@@ -7,7 +7,7 @@ import type {
   ImportSummary,
   ImportProgress
 } from '../types/import.types';
-import type { Goal, Metric } from '../types';
+import type { Goal } from '../types';
 import { ValidationService } from './validation.service';
 
 /**
@@ -82,7 +82,7 @@ export class ImportService {
    */
   static async stageData(
     sessionId: string,
-    districtId: string,
+    _districtId: string,
     parsedData: ParsedExcelData,
     existingGoals: Goal[]
   ): Promise<{ stagedGoals: StagedGoal[]; stagedMetrics: StagedMetric[] }> {

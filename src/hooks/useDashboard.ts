@@ -211,7 +211,7 @@ function calculateDashboardStats(goals: Goal[], metrics: Metric[]) {
 }
 
 // Helper function to calculate trends
-function calculateTrends(metrics: Metric[], goals: Goal[], period: string) {
+function calculateTrends(metrics: Metric[], _goals: Goal[], period: string) {
   // This would calculate actual trends based on historical data
   // For now, returning mock trend data structure
   const now = new Date();

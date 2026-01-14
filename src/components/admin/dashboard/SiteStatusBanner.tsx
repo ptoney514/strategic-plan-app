@@ -14,7 +14,7 @@ interface SiteStatusBannerProps {
  * Dark gradient banner showing site live status and key stats
  */
 export function SiteStatusBanner({
-  districtName,
+  districtName: _districtName,
   publicUrl,
   objectivesCount,
   draftsCount,

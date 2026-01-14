@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { DistrictService } from '../lib/services';
-import type { District, DistrictWithSummary } from '../lib/types';
+import type { District } from '../lib/types';
 
 export function useDistricts() {
   return useQuery({

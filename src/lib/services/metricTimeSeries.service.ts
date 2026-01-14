@@ -111,7 +111,7 @@ export class MetricTimeSeriesService {
    */
   static async calculateEOYProjection(
     metricId: string,
-    frequency: 'monthly' | 'quarterly' | 'yearly',
+    _frequency: 'monthly' | 'quarterly' | 'yearly',
     year: number = new Date().getFullYear()
   ): Promise<number | null> {
     const { data, error } = await supabase

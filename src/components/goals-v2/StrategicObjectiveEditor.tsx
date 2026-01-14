@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Image as ImageIcon, Palette, Upload } from 'lucide-react';
+import { useState } from 'react';
+import { Image as ImageIcon, Palette } from 'lucide-react';
 import { DEFAULT_OBJECTIVE_IMAGES } from '../../lib/default-images';
 import type { Goal } from '../../lib/types';
 

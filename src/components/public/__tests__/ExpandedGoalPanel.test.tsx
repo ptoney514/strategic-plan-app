@@ -392,7 +392,67 @@ describe('ExpandedGoalPanel', () => {
       expect(screen.getByText('Test narrative content')).toBeInTheDocument();
     });
 
-    it('does not show numeric value in left column for narrative metrics', () => {
+    it('renders status badge inline with title for narrative metrics', () => {
+      const metricWithNarrativeViz: Metric = {
+        ...mockMetric,
+        current_value: 100,
+        target_value: 100,
+        indicator_text: 'On Target',
+        visualization_config: {
+          chartType: 'narrative',
+          content: 'Test narrative content',
+        },
+      };
+
+      const { container } = render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithNarrativeViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should NOT have stacked badge column
+      const stackedBadgeColumn = container.querySelector('.flex.flex-col.items-center.gap-2');
+      expect(stackedBadgeColumn).not.toBeInTheDocument();
+
+      // Should have inline title row with badge (flex-wrap for responsive)
+      const titleRow = container.querySelector('.flex.items-center.gap-3');
+      expect(titleRow).toBeInTheDocument();
+
+      // FilledStatusBadge (pill style) should be present
+      const pillBadge = screen.getByText('On Target').closest('span');
+      expect(pillBadge).toHaveClass('rounded-full');
+    });
+
+    it('renders full-width narrative content without two-column grid', () => {
+      const metricWithNarrativeViz: Metric = {
+        ...mockMetric,
+        visualization_config: {
+          chartType: 'narrative',
+          content: 'Test narrative content',
+        },
+      };
+
+      const { container } = render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithNarrativeViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should NOT have two-column grid for narrative metrics
+      const twoColumnGrid = container.querySelector('.grid.grid-cols-1.md\\:grid-cols-2');
+      expect(twoColumnGrid).not.toBeInTheDocument();
+
+      // Narrative content should be present
+      expect(screen.getByText('Test narrative content')).toBeInTheDocument();
+    });
+
+    it('does not show numeric value or Target for narrative metrics', () => {
       const metricWithNarrativeViz: Metric = {
         ...mockMetric,
         current_value: 100,
@@ -412,12 +472,10 @@ describe('ExpandedGoalPanel', () => {
         />
       );
 
-      // Should show TEXT CONTENT label instead of numeric metric type
-      expect(screen.getByText('TEXT CONTENT')).toBeInTheDocument();
-      // Should show helper text
-      expect(screen.getByText('View the full narrative content on the right.')).toBeInTheDocument();
       // Should NOT show Target: line for narrative metrics
       expect(screen.queryByText(/Target:/)).not.toBeInTheDocument();
+      // Should NOT show CURRENT SCORE label
+      expect(screen.queryByText('CURRENT SCORE')).not.toBeInTheDocument();
     });
 
     it('still shows numeric value in left column for non-narrative metrics (regression)', () => {
@@ -434,6 +492,92 @@ describe('ExpandedGoalPanel', () => {
       expect(screen.getByText('CURRENT SCORE')).toBeInTheDocument();
       // Should show Target: line
       expect(screen.getByText(/Target:/)).toBeInTheDocument();
+    });
+
+    it('still renders two-column layout for bar chart metrics (regression)', () => {
+      const barChartMetric: Metric = {
+        ...mockMetric,
+        visualization_config: {
+          chartType: 'bar',
+          dataPoints: [{ label: '2024', value: 85 }],
+        },
+      };
+
+      const { container } = render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[barChartMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should have two-column grid
+      const twoColumnGrid = container.querySelector('.grid');
+      expect(twoColumnGrid).toBeInTheDocument();
+    });
+
+    it('still renders FilledStatusBadge (pill style) for non-narrative metrics (regression)', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // The pill-style badge has rounded-full - search for a span with that class
+      const pillBadge = screen.getByText('On Target').closest('span');
+      expect(pillBadge).toHaveClass('rounded-full');
+    });
+
+    it('renders description next to title for narrative layout', () => {
+      const metricWithNarrativeViz: Metric = {
+        ...mockMetric,
+        visualization_config: {
+          chartType: 'narrative',
+          content: 'Test content',
+        },
+      };
+
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithNarrativeViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Description should be present
+      expect(screen.getByText(/Achieve and maintain excellent academic classification/)).toBeInTheDocument();
+    });
+
+    it('renders narrative content without fixed height', () => {
+      const metricWithNarrativeViz: Metric = {
+        ...mockMetric,
+        visualization_config: {
+          chartType: 'narrative',
+          content: '<p>Long content here</p>',
+        },
+      };
+
+      const { container } = render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithNarrativeViz]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // The narrative container should NOT have fixed height class
+      const narrativeContainer = container.querySelector('.narrative-display')?.closest('.bg-gray-50, .dark\\:bg-slate-800');
+      if (narrativeContainer) {
+        expect(narrativeContainer).not.toHaveClass('h-[180px]');
+        expect(narrativeContainer).not.toHaveClass('overflow-y-auto');
+      }
     });
   });
 });

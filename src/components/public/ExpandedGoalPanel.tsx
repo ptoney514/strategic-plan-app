@@ -6,8 +6,9 @@ import { calculateStatus } from './StatusBadge';
 import type { StatusType } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
 import { NarrativeDisplay } from '../NarrativeDisplay';
+import { formatMetricValue as formatMetricValueUtil } from '../../lib/utils/formatMetricValue';
 
-// Filled status badge for expanded panel
+// Filled status badge for expanded panel (pill style for non-narrative)
 function FilledStatusBadge({ status }: { status: StatusType }) {
   const config: Record<StatusType, { bg: string; text: string; label: string }> = {
     'not-started': { bg: 'bg-gray-100 dark:bg-gray-800', text: 'text-gray-600 dark:text-gray-400', label: 'Not Started' },
@@ -91,20 +92,16 @@ function formatMetricValue(metric: Metric): { value: string; unit: string } {
   const current = getCurrentValue(metric);
   const target = getTargetValue(metric);
 
-  if (metric.metric_type === 'percent' || metric.is_percentage) {
-    return { value: current.toFixed(1), unit: '%' };
-  }
-  if (metric.metric_type === 'rating') {
-    const targetDisplay = target ?? 5.0;
-    return { value: current.toFixed(2), unit: `/ ${targetDisplay.toFixed(1)}` };
-  }
-  if (metric.metric_type === 'currency') {
-    return { value: `$${current.toLocaleString()}`, unit: '' };
-  }
-  if (Number.isInteger(current)) {
-    return { value: current.toString(), unit: metric.unit || 'score' };
-  }
-  return { value: current.toFixed(2), unit: metric.unit || '' };
+  const result = formatMetricValueUtil({
+    value: current,
+    isPercentage: metric.is_percentage,
+    decimalPlaces: metric.decimal_places ?? 2,
+    metricType: metric.metric_type,
+    unit: metric.unit || 'score',
+    targetValue: target ?? undefined,
+  });
+
+  return { value: result.value, unit: result.unit };
 }
 
 function getMetricTypeLabel(metric: Metric): string {
@@ -159,6 +156,18 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
   const vizDataPoints = vizConfig?.dataPoints || [];
   const targetValue = getTargetValue(metric);
   const chartType = vizConfig?.chartType || 'bar';
+
+  // Format chart values using the centralized utility
+  const formatChartValue = (value: number): string => {
+    const result = formatMetricValueUtil({
+      value,
+      isPercentage: metric.is_percentage,
+      decimalPlaces: metric.decimal_places ?? 0,
+      metricType: metric.metric_type,
+      unit: metric.unit || '',
+    });
+    return result.display;
+  };
 
   // Wait for parent layout animation to complete before rendering
   useEffect(() => {
@@ -284,7 +293,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
         ctx.fillStyle = '#059669';
         ctx.font = '11px Inter, sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(`Target: ${targetValue}`, rect.width - padding.right, 14);
+        ctx.fillText(`Target: ${formatChartValue(targetValue)}`, rect.width - padding.right, 14);
       }
 
       // Target line (dashed green)
@@ -345,7 +354,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
           ctx.fillStyle = '#374151';
           ctx.font = 'bold 11px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(p.value.toFixed(p.value % 1 === 0 ? 0 : 2), p.x, p.y - 10);
+          ctx.fillText(formatChartValue(p.value), p.x, p.y - 10);
 
           ctx.fillStyle = '#6B7280';
           ctx.font = '11px Inter, sans-serif';
@@ -367,7 +376,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
           ctx.fillStyle = '#374151';
           ctx.font = 'bold 11px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(d.value.toFixed(d.value % 1 === 0 ? 0 : 2), x + barWidth / 2, y - 6);
+          ctx.fillText(formatChartValue(d.value), x + barWidth / 2, y - 6);
 
           ctx.fillStyle = '#6B7280';
           ctx.font = '11px Inter, sans-serif';
@@ -400,7 +409,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
     );
   }
 
-  // Handle 'narrative' visualization type
+  // Handle 'narrative' visualization type - auto-expanding height
   if (chartType === 'narrative') {
     const narrativeConfig = {
       content: vizConfig?.content || '',
@@ -408,7 +417,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
       showTitle: vizConfig?.showTitle !== false,
     };
     return (
-      <div className="relative w-full h-[180px] bg-gray-50 dark:bg-slate-800 rounded-lg p-4 overflow-y-auto">
+      <div className="relative w-full bg-gray-50 dark:bg-slate-800 rounded-lg p-4 sm:p-6">
         {narrativeConfig.content ? (
           <NarrativeDisplay config={narrativeConfig} />
         ) : (
@@ -441,11 +450,21 @@ export function ExpandedGoalPanel({
   const metricTypeLabel = primaryMetric ? getMetricTypeLabel(primaryMetric) : null;
   const metricStatus = primaryMetric ? getMetricStatus(primaryMetric) : status;
   const target = primaryMetric ? getTargetValue(primaryMetric) : null;
+  const formattedTarget = target !== null && primaryMetric ? formatMetricValueUtil({
+    value: target,
+    isPercentage: primaryMetric.is_percentage,
+    decimalPlaces: primaryMetric.decimal_places ?? 0,
+    metricType: primaryMetric.metric_type,
+    unit: primaryMetric.unit || '',
+  }).display : null;
 
   // Determine status to display
   const displayStatus: StatusType = primaryMetric?.indicator_text
     ? (primaryMetric.indicator_text.toLowerCase().replace(/\s+/g, '-') as StatusType)
     : metricStatus;
+
+  // Check if this is a narrative visualization
+  const isNarrative = primaryMetric && isNarrativeVisualization(primaryMetric);
 
   return (
     <motion.div
@@ -464,57 +483,75 @@ export function ExpandedGoalPanel({
         <Minimize2 className="w-5 h-5" />
       </button>
 
-      {/* Header: Badge + Title inline */}
-      <div className="flex items-start gap-4 p-6 pb-0">
-        <div
-          className={`w-12 h-12 flex-shrink-0 rounded-xl ${colorClass} text-white flex items-center justify-center text-sm font-bold shadow-sm`}
-        >
-          {goal.goal_number}
-        </div>
-        <div className="flex-1 pr-10">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight">
-            {goal.title}
-          </h3>
-        </div>
-      </div>
-
-      {/* Description - below header, indented to align with title */}
-      {goal.description && (
-        <div className="px-6 pt-2">
-          <p className="text-sm text-gray-500 dark:text-gray-400 pl-16">
-            {goal.description}
-          </p>
-        </div>
-      )}
-
-      {/* Content: Two columns */}
-      <div className="p-6 pt-6">
-        {primaryMetric ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Left: Metrics */}
-            <div className="space-y-3">
-              {/* Status Badge */}
-              <div>
+      {isNarrative ? (
+        /* NARRATIVE LAYOUT: Status badge inline with title, full-width text at bottom */
+        <>
+          {/* Header: Badge + Title with inline status */}
+          <div className="flex items-start gap-4 p-6 pb-0">
+            <div
+              className={`w-12 h-12 flex-shrink-0 rounded-xl ${colorClass} text-white flex items-center justify-center text-sm font-bold shadow-sm`}
+            >
+              {goal.goal_number}
+            </div>
+            <div className="flex-1 pr-10">
+              {/* Title row with inline status badge */}
+              <div className="flex items-center gap-3 flex-wrap">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                  {goal.title}
+                </h3>
                 <FilledStatusBadge status={displayStatus} />
               </div>
+              {/* Description below title */}
+              {goal.description && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  {goal.description}
+                </p>
+              )}
+            </div>
+          </div>
 
-              {isNarrativeVisualization(primaryMetric) ? (
-                /* Narrative metric - show text label instead of numeric value */
-                <>
+          {/* Full-width narrative content */}
+          <div className="p-6 pt-4">
+            <MetricChart metric={primaryMetric} chartColor={chartColor} />
+          </div>
+        </>
+      ) : (
+        /* STANDARD LAYOUT: Original two-column for non-narrative metrics */
+        <>
+          {/* Header: Badge + Title inline */}
+          <div className="flex items-start gap-4 p-6 pb-0">
+            <div
+              className={`w-12 h-12 flex-shrink-0 rounded-xl ${colorClass} text-white flex items-center justify-center text-sm font-bold shadow-sm`}
+            >
+              {goal.goal_number}
+            </div>
+            <div className="flex-1 pr-10">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                {goal.title}
+              </h3>
+            </div>
+          </div>
+
+          {/* Description - below header, indented to align with title */}
+          {goal.description && (
+            <div className="px-6 pt-2">
+              <p className="text-sm text-gray-500 dark:text-gray-400 pl-16">
+                {goal.description}
+              </p>
+            </div>
+          )}
+
+          {/* Content: Two columns */}
+          <div className="p-6 pt-6">
+            {primaryMetric ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Left: Metrics */}
+                <div className="space-y-3">
+                  {/* Status Badge */}
                   <div>
-                    <span className="text-xs font-medium tracking-wider text-gray-400 dark:text-gray-500 uppercase">
-                      TEXT CONTENT
-                    </span>
+                    <FilledStatusBadge status={displayStatus} />
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      View the full narrative content on the right.
-                    </p>
-                  </div>
-                </>
-              ) : (
-                /* Numeric metric - show value and target */
-                <>
+
                   {/* Metric Type Label */}
                   <div>
                     <span className="text-xs font-medium tracking-wider text-gray-400 dark:text-gray-500 uppercase">
@@ -535,26 +572,26 @@ export function ExpandedGoalPanel({
                   </div>
 
                   {/* Target */}
-                  {target !== null && (
+                  {formattedTarget !== null && (
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Target: {target}
+                      Target: {formattedTarget}
                     </p>
                   )}
-                </>
-              )}
-            </div>
+                </div>
 
-            {/* Right: Chart (UNCHANGED) */}
-            <div className="bg-gray-50 dark:bg-slate-800 rounded-lg overflow-hidden">
-              <MetricChart metric={primaryMetric} chartColor={chartColor} />
-            </div>
+                {/* Right: Chart */}
+                <div className="bg-gray-50 dark:bg-slate-800 rounded-lg overflow-hidden">
+                  <MetricChart metric={primaryMetric} chartColor={chartColor} />
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <p>No metrics defined for this goal</p>
+              </div>
+            )}
           </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <p>No metrics defined for this goal</p>
-          </div>
-        )}
-      </div>
+        </>
+      )}
     </motion.div>
   );
 }

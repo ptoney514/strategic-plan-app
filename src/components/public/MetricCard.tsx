@@ -3,6 +3,7 @@ import type { Metric } from '../../lib/types';
 import { StatusBadge, calculateStatus } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
 import { NarrativeDisplay } from '../NarrativeDisplay';
+import { formatMetricValue } from '../../lib/utils/formatMetricValue';
 
 interface MetricCardProps {
   metric: Metric;
@@ -109,23 +110,18 @@ export function MetricCard({ metric, index }: MetricCardProps) {
 
   const targetValue = getTargetValue();
 
-  // Format the metric value
-  const formatValue = () => {
-    const value = getCurrentValue();
-
-    if (metric.metric_type === 'percent' || metric.is_percentage) {
-      return { value: value.toFixed(1), unit: '%' };
-    }
-    if (metric.metric_type === 'rating') {
-      return { value: value.toFixed(2), unit: `/ ${metric.target_value || 5.0}` };
-    }
-    if (metric.metric_type === 'currency') {
-      return { value: `$${value.toLocaleString()}`, unit: '' };
-    }
-    if (Number.isInteger(value)) {
-      return { value: value.toString(), unit: metric.unit || '' };
-    }
-    return { value: value.toFixed(2), unit: metric.unit || '' };
+  // Format the metric value using centralized utility
+  const formatValue = (val?: number) => {
+    const value = val ?? getCurrentValue();
+    const formatted = formatMetricValue({
+      value,
+      isPercentage: metric.is_percentage,
+      decimalPlaces: metric.decimal_places ?? 2,
+      metricType: metric.metric_type,
+      unit: metric.unit,
+      targetValue: metric.target_value,
+    });
+    return { value: formatted.value, unit: formatted.unit };
   };
 
   // Calculate target comparison
@@ -296,7 +292,8 @@ export function MetricCard({ metric, index }: MetricCardProps) {
         ctx.fillStyle = '#374151';
         ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = midAngle > Math.PI / 2 && midAngle < 3 * Math.PI / 2 ? 'right' : 'left';
-        ctx.fillText(`${d.label}: ${d.value.toFixed(1)}`, labelX, labelY);
+        const donutLabelFormatted = formatValue(d.value);
+        ctx.fillText(`${d.label}: ${donutLabelFormatted.value}${donutLabelFormatted.unit}`, labelX, labelY);
 
         startAngle = endAngle;
       });
@@ -305,7 +302,8 @@ export function MetricCard({ metric, index }: MetricCardProps) {
       ctx.fillStyle = '#1a1a1a';
       ctx.font = 'bold 16px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(total.toFixed(1), centerX, centerY + 6);
+      const centerFormatted = formatValue(total);
+      ctx.fillText(centerFormatted.value + centerFormatted.unit, centerX, centerY + 6);
       return;
     }
 
@@ -395,7 +393,8 @@ export function MetricCard({ metric, index }: MetricCardProps) {
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 11px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(p.value.toFixed(2), p.x, p.y - 10);
+        const pointFormatted = formatValue(p.value);
+        ctx.fillText(pointFormatted.value + pointFormatted.unit, p.x, p.y - 10);
 
         // X-axis label
         ctx.fillStyle = '#6B7280';
@@ -422,7 +421,8 @@ export function MetricCard({ metric, index }: MetricCardProps) {
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 11px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 6);
+        const barFormatted = formatValue(d.value);
+        ctx.fillText(barFormatted.value + barFormatted.unit, x + barWidth / 2, y - 6);
 
         // Label below bar
         ctx.fillStyle = '#6B7280';
@@ -438,7 +438,8 @@ export function MetricCard({ metric, index }: MetricCardProps) {
     for (let i = 0; i <= gridLines; i++) {
       const gridValue = maxValue - ((maxValue - minValue) / gridLines) * i;
       const y = padding.top + (chartHeight / gridLines) * i + 4;
-      ctx.fillText(gridValue.toFixed(1), padding.left - 8, y);
+      const yAxisFormatted = formatValue(gridValue);
+      ctx.fillText(yAxisFormatted.value, padding.left - 8, y);
     }
   }, [metric, chartColor, chartData, vizDataPoints, targetValue, chartType]);
 
@@ -553,8 +554,8 @@ export function MetricCard({ metric, index }: MetricCardProps) {
         <div className="text-sm font-medium text-gray-500 mt-3">
           Target:{' '}
           <span className="text-gray-900">
-            {targetValue}
-            {metric.metric_type === 'percent' || metric.is_percentage ? '%' : ''}
+            {formatValue(targetValue).value}
+            {formatValue(targetValue).unit}
           </span>
           {targetComparison && (
             <>

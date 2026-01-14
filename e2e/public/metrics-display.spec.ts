@@ -5,6 +5,138 @@ import { test, expect } from '@playwright/test';
  * These tests verify that metrics fetch and display correctly
  */
 
+test.describe('Narrative Visualization Layout', () => {
+  test.beforeEach(async ({ page }) => {
+    // Enable console logging for debugging
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        console.log(`[Browser ${msg.type()}]: ${msg.text()}`);
+      }
+    });
+  });
+
+  test('expanded narrative card shows stacked badge and full-width content', async ({ page }) => {
+    // Navigate to the objective detail page which has the Goals Overview grid
+    await page.goto('/westside');
+    await page.waitForSelector('[data-testid^="objective-"]', { state: 'visible', timeout: 15000 });
+
+    // Click on Objective 1 to expand it and go to objective detail
+    const objective1 = page.locator('[data-testid="objective-1"]').first();
+    await objective1.click();
+    await page.waitForTimeout(500);
+
+    // Should be on objective detail page with Goals Overview
+    await expect(page).toHaveURL(/\/westside\/objective\//);
+
+    // Wait for goal cards to load
+    await page.waitForSelector('.rounded-xl.border', { state: 'visible', timeout: 10000 });
+
+    // Find and click on a goal card (Goal 1.1 typically has narrative content)
+    const goalCards = page.locator('button.rounded-xl.border');
+    const cardCount = await goalCards.count();
+    console.log(`Found ${cardCount} goal cards`);
+
+    if (cardCount > 0) {
+      // Click the first goal card to expand it
+      await goalCards.first().click();
+      await page.waitForTimeout(500);
+
+      // Check if expanded panel is visible
+      const expandedPanel = page.locator('.border-2.shadow-lg').first();
+      if (await expandedPanel.isVisible()) {
+        console.log('Expanded panel is visible');
+
+        // Check for layout elements
+        // For narrative cards: should have stacked badge column (flex-col)
+        const stackedBadgeColumn = expandedPanel.locator('.flex.flex-col.items-center.gap-2');
+        const hasStackedBadge = await stackedBadgeColumn.count() > 0;
+        console.log(`Has stacked badge column: ${hasStackedBadge}`);
+
+        // For non-narrative cards: should have two-column grid
+        const twoColumnGrid = expandedPanel.locator('.grid.grid-cols-1.md\\:grid-cols-2');
+        const hasTwoColumnGrid = await twoColumnGrid.count() > 0;
+        console.log(`Has two-column grid: ${hasTwoColumnGrid}`);
+
+        // Check for narrative content (full-width without grid)
+        const narrativeContent = expandedPanel.locator('.narrative-display');
+        const hasNarrativeContent = await narrativeContent.count() > 0;
+        console.log(`Has narrative content: ${hasNarrativeContent}`);
+
+        if (hasNarrativeContent) {
+          // Narrative card should have stacked badge, not two-column grid
+          expect(hasStackedBadge).toBe(true);
+          expect(hasTwoColumnGrid).toBe(false);
+
+          // Check for SquareStatusBadge with role="status"
+          const statusBadge = expandedPanel.locator('[role="status"]');
+          const hasStatusBadge = await statusBadge.count() > 0;
+          console.log(`Has status badge with role: ${hasStatusBadge}`);
+          expect(hasStatusBadge).toBe(true);
+        }
+
+        // Take screenshot for visual verification
+        await page.screenshot({
+          path: 'test-results/narrative-layout.png',
+          fullPage: true
+        });
+      } else {
+        console.log('No expanded panel found after clicking card');
+      }
+    }
+  });
+
+  test('non-narrative cards still use two-column layout', async ({ page }) => {
+    // Navigate to objective detail page
+    await page.goto('/westside');
+    await page.waitForSelector('[data-testid^="objective-"]', { state: 'visible', timeout: 15000 });
+
+    // Go to a different objective that likely has non-narrative metrics
+    const objectives = page.locator('[data-testid^="objective-"]');
+    const objCount = await objectives.count();
+
+    if (objCount > 1) {
+      // Click on second objective
+      await objectives.nth(1).click();
+    } else {
+      await objectives.first().click();
+    }
+    await page.waitForTimeout(500);
+
+    // Wait for goal cards
+    await page.waitForSelector('.rounded-xl.border', { state: 'visible', timeout: 10000 });
+
+    // Find and click a goal card
+    const goalCards = page.locator('button.rounded-xl.border');
+    if (await goalCards.count() > 0) {
+      await goalCards.first().click();
+      await page.waitForTimeout(500);
+
+      const expandedPanel = page.locator('.border-2.shadow-lg').first();
+      if (await expandedPanel.isVisible()) {
+        // Check for two-column grid (non-narrative layout)
+        const twoColumnGrid = expandedPanel.locator('.grid');
+        const hasTwoColumnGrid = await twoColumnGrid.count() > 0;
+
+        // Check for canvas (chart)
+        const canvas = expandedPanel.locator('canvas');
+        const hasCanvas = await canvas.count() > 0;
+
+        // If it has a canvas, it's a chart metric - should have two-column layout
+        if (hasCanvas) {
+          console.log('Found chart metric - checking for two-column layout');
+          expect(hasTwoColumnGrid).toBe(true);
+        }
+
+        // Take screenshot
+        await page.screenshot({
+          path: 'test-results/chart-layout.png',
+          fullPage: true
+        });
+      }
+    }
+  });
+});
+
 test.describe('Metrics Display', () => {
   test.beforeEach(async ({ page }) => {
     // Enable console logging for debugging

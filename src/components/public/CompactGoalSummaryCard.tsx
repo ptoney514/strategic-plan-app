@@ -1,5 +1,6 @@
 import type { Goal, Metric } from '../../lib/types';
 import { TrendingUp, TrendingDown, Check, ArrowRight } from 'lucide-react';
+import { formatMetricValue as formatMetricValueUtil } from '../../lib/utils/formatMetricValue';
 
 interface CompactGoalSummaryCardProps {
   goal: Goal;
@@ -139,20 +140,16 @@ function formatMetricValue(metric: Metric): { value: string; unit: string } {
   const current = getCurrentValue(metric);
   const target = getTargetValue(metric);
 
-  if (metric.metric_type === 'percent' || metric.is_percentage) {
-    return { value: current.toFixed(1), unit: ' %' };
-  }
-  if (metric.metric_type === 'rating') {
-    const targetDisplay = target ?? 5.0;
-    return { value: current.toFixed(2), unit: `/ ${targetDisplay.toFixed(2)}` };
-  }
-  if (metric.metric_type === 'currency') {
-    return { value: `$${current.toLocaleString()}`, unit: '' };
-  }
-  if (Number.isInteger(current)) {
-    return { value: current.toString(), unit: metric.unit || 'score' };
-  }
-  return { value: current.toFixed(2), unit: metric.unit || '' };
+  const result = formatMetricValueUtil({
+    value: current,
+    isPercentage: metric.is_percentage,
+    decimalPlaces: metric.decimal_places ?? 2,
+    metricType: metric.metric_type,
+    unit: metric.unit || 'score',
+    targetValue: target ?? undefined,
+  });
+
+  return { value: result.value, unit: result.unit };
 }
 
 // Get metric type label for display

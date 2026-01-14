@@ -128,7 +128,7 @@ describe('CompactGoalSummaryCard', () => {
       />
     );
 
-    expect(screen.getByText('100.0')).toBeInTheDocument();
+    expect(screen.getByText('100.00')).toBeInTheDocument();
     expect(screen.getByText('%')).toBeInTheDocument();
   });
 
@@ -143,7 +143,7 @@ describe('CompactGoalSummaryCard', () => {
       />
     );
 
-    expect(screen.getByText('$1,234,567')).toBeInTheDocument();
+    expect(screen.getByText('$1,234,567.00')).toBeInTheDocument();
   });
 
   it('shows comparison indicator for at target', () => {

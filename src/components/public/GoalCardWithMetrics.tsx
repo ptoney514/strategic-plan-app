@@ -5,6 +5,7 @@ import { StatusBadge, calculateStatus } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
 import { MetricEditForm } from '../admin/MetricEditForm';
 import { NarrativeDisplay } from '../NarrativeDisplay';
+import { formatMetricValue } from '../../lib/utils/formatMetricValue';
 
 interface GoalCardWithMetricsProps {
   goal: Goal;
@@ -94,21 +95,17 @@ function CompactMetricCard({
 
   const targetValue = getTargetValue();
 
-  const formatValue = () => {
-    const value = getCurrentValue();
-    if (metric.metric_type === 'percent' || metric.is_percentage) {
-      return { value: value.toFixed(1), unit: '%' };
-    }
-    if (metric.metric_type === 'rating') {
-      return { value: value.toFixed(2), unit: `/ ${metric.target_value || 5.0}` };
-    }
-    if (metric.metric_type === 'currency') {
-      return { value: `$${value.toLocaleString()}`, unit: '' };
-    }
-    if (Number.isInteger(value)) {
-      return { value: value.toString(), unit: metric.unit || '' };
-    }
-    return { value: value.toFixed(2), unit: metric.unit || '' };
+  const formatValue = (val?: number) => {
+    const value = val ?? getCurrentValue();
+    const formatted = formatMetricValue({
+      value,
+      isPercentage: metric.is_percentage,
+      decimalPlaces: metric.decimal_places ?? 2,
+      metricType: metric.metric_type,
+      unit: metric.unit,
+      targetValue: metric.target_value,
+    });
+    return { value: formatted.value, unit: formatted.unit };
   };
 
   const getTargetComparison = () => {
@@ -230,7 +227,8 @@ function CompactMetricCard({
         ctx.fillStyle = '#374151';
         ctx.font = '9px Inter, sans-serif';
         ctx.textAlign = midAngle > Math.PI / 2 && midAngle < 3 * Math.PI / 2 ? 'right' : 'left';
-        ctx.fillText(`${d.label}: ${d.value.toFixed(1)}`, labelX, labelY);
+        const donutLabelFormatted = formatValue(d.value);
+        ctx.fillText(`${d.label}: ${donutLabelFormatted.value}${donutLabelFormatted.unit}`, labelX, labelY);
 
         startAngle = endAngle;
       });
@@ -238,7 +236,8 @@ function CompactMetricCard({
       ctx.fillStyle = '#1a1a1a';
       ctx.font = 'bold 14px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(total.toFixed(1), centerX, centerY + 5);
+      const centerFormatted = formatValue(total);
+      ctx.fillText(centerFormatted.value + centerFormatted.unit, centerX, centerY + 5);
       return;
     }
 
@@ -321,7 +320,8 @@ function CompactMetricCard({
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 10px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(p.value.toFixed(2), p.x, p.y - 8);
+        const pointFormatted = formatValue(p.value);
+        ctx.fillText(pointFormatted.value + pointFormatted.unit, p.x, p.y - 8);
 
         ctx.fillStyle = '#6B7280';
         ctx.font = '9px Inter, sans-serif';
@@ -344,7 +344,8 @@ function CompactMetricCard({
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 10px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 4);
+        const barFormatted = formatValue(d.value);
+        ctx.fillText(barFormatted.value + barFormatted.unit, x + barWidth / 2, y - 4);
 
         ctx.fillStyle = '#6B7280';
         ctx.font = '9px Inter, sans-serif';
@@ -359,7 +360,8 @@ function CompactMetricCard({
     for (let i = 0; i <= gridLines; i++) {
       const gridValue = maxValue - ((maxValue - minValue) / gridLines) * i;
       const y = padding.top + (chartHeight / gridLines) * i + 3;
-      ctx.fillText(gridValue.toFixed(1), padding.left - 6, y);
+      const yAxisFormatted = formatValue(gridValue);
+      ctx.fillText(yAxisFormatted.value, padding.left - 6, y);
     }
   }, [metric, chartColor, chartData, vizDataPoints, targetValue, chartType, getCurrentValue]);
 
@@ -529,7 +531,7 @@ function CompactMetricCard({
       {/* Target */}
       {targetValue && (
         <div className="text-xs text-gray-500 mb-3">
-          Target: <span className="text-gray-700">{targetValue}</span>
+          Target: <span className="text-gray-700">{formatValue(targetValue).value}{formatValue(targetValue).unit}</span>
           {targetComparison && (
             <>
               <span className="text-gray-300 mx-1">·</span>

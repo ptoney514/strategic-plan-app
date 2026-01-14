@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
 import { useUpdateGoal } from '../hooks/useGoals';
 import { useMetrics, useCreateMetric, useUpdateMetric, useDeleteMetric } from '../hooks/useMetrics';

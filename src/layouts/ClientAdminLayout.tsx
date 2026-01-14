@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Menu, X, User, ChevronDown, LogOut } from 'lucide-react';
+import { Menu, X, ChevronDown, LogOut } from 'lucide-react';
 import { useAdminContext } from '../hooks/useAdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -8,7 +8,6 @@ import {
   SidebarHeader,
   SidebarFooter,
   SidebarUserFooter,
-  ContextHeader,
 } from '../components/admin/nav';
 
 /**

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { GoalsService } from '../lib/services';
-import type { Goal, HierarchicalGoal } from '../lib/types';
+import type { Goal } from '../lib/types';
 
 export function useGoals(districtId: string) {
   return useQuery({

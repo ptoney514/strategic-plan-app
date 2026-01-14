@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Target,
@@ -23,15 +23,6 @@ import { MetricsService } from '../../../lib/services/metrics.service';
 import type { Goal, Metric } from '../../../lib/types';
 import { MetricBuilderWizard } from '../../../components/MetricBuilderWizard';
 import { useUpdateMetric, useDeleteMetric } from '../../../hooks/useMetrics';
-
-interface ComponentItem {
-  id: string;
-  type: 'goal' | 'metric' | 'property';
-  icon: React.ReactNode;
-  label: string;
-  description: string;
-  category: string;
-}
 
 type GoalWithChildren = Partial<Goal> & {
   title: string;

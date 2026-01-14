@@ -20,7 +20,7 @@ interface SchoolNavItemProps {
  * School navigation item with expandable sub-navigation
  * Shows: Overview, Objectives, Users, Appearance
  */
-export function SchoolNavItem({ school, districtSlug, onMobileClose }: SchoolNavItemProps) {
+export function SchoolNavItem({ school, districtSlug: _districtSlug, onMobileClose }: SchoolNavItemProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [expanded, setExpanded] = useState(false);

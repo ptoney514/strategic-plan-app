@@ -9,10 +9,9 @@ import {
   type SortingState,
   type ColumnFiltersState
 } from '@tanstack/react-table';
-import { AlertCircle, CheckCircle, Edit2, Trash2, AlertTriangle, Wrench, Sparkles } from 'lucide-react';
+import { AlertCircle, CheckCircle, AlertTriangle, Wrench, Sparkles } from 'lucide-react';
 import type { StagedGoal, AutoFixSuggestion } from '../../lib/types/import.types';
 import { Button } from '../ui/Button';
-import { Input } from '../ui/Input';
 
 export interface StagedDataTableProps {
   data: StagedGoal[];

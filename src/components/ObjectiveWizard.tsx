@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X, ChevronRight, ChevronLeft, Target, TrendingUp, CheckCircle, Info, Plus, Trash2, Upload, AlertCircle, Clock } from 'lucide-react';
 
 interface ObjectiveWizardProps {
@@ -423,7 +423,7 @@ export function ObjectiveWizard({ isOpen, onClose, onComplete, districtId, exist
                     Goals under this objective
                   </label>
                   <div className="space-y-2">
-                    {existingObjective?.children?.map((child: any, index: number) => (
+                    {existingObjective?.children?.map((child: any, _index: number) => (
                       <div key={child.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                         <Clock className="h-4 w-4 text-muted-foreground" />
                         <span className="text-sm font-medium">{child.goal_number} {child.title}</span>

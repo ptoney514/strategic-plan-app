@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import {
   ChevronRight,
   Save,
-  X,
   Plus,
   Trash2,
   Edit2,
@@ -85,7 +84,7 @@ const BADGE_PRESETS: Record<BadgePreset, { text: string; color: string }> = {
 };
 
 export function GoalEditor({
-  districtId,
+  districtId: _districtId,
   parentObjectiveId,
   parentObjectiveTitle,
   existingGoals = [],

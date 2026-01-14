@@ -16,7 +16,7 @@ export function SchoolDashboard() {
   const navigate = useNavigate();
   const {
     school,
-    districtSlug,
+    districtSlug: _districtSlug,
     schoolSlug,
     basePath,
     publicUrl,

@@ -320,7 +320,7 @@ export class ExcelParserService {
       errors.push('No goals found in Excel file');
     }
 
-    data.goals.forEach((goal, index) => {
+    data.goals.forEach((goal, _index) => {
       if (!goal.title) {
         errors.push(`Goal at row ${goal.row_number}: Missing title`);
       }

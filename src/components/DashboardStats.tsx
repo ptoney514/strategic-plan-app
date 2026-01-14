@@ -1,4 +1,3 @@
-import React from 'react';
 import { Target, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import type { HierarchicalGoal } from '../lib/types';
 import { calculateGoalProgress, getGoalStatus } from '../lib/types';

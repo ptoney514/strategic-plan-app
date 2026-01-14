@@ -12,7 +12,6 @@ import {
   ChevronDown,
   ChevronRight,
 } from 'lucide-react';
-import { NavSection } from './NavSection';
 import { SchoolNavItem } from './SchoolNavItem';
 import type { District, School } from '../../../lib/types';
 
@@ -214,7 +213,7 @@ interface SidebarFooterProps {
 /**
  * Sidebar footer with View Public button
  */
-export function SidebarFooter({ publicUrl, onNavigate }: SidebarFooterProps) {
+export function SidebarFooter({ publicUrl: _publicUrl, onNavigate }: SidebarFooterProps) {
   return (
     <div className="p-3 border-t border-slate-200">
       <button
@@ -237,7 +236,7 @@ interface SidebarHeaderProps {
 /**
  * Sidebar header with district logo and name
  */
-export function SidebarHeader({ district, userEmail, userRole }: SidebarHeaderProps) {
+export function SidebarHeader({ district, userEmail: _userEmail, userRole: _userRole }: SidebarHeaderProps) {
   return (
     <div className="p-4 border-b border-slate-200">
       <div className="flex items-center gap-3">

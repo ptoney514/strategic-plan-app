@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, Link, useNavigate } from 'react-router-dom';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import {
   Bell,
@@ -25,7 +25,6 @@ import { AddSchoolModal } from '../components/admin/schools/AddSchoolModal';
 export function ClientAdminEditorialLayout() {
   const { slug } = useSubdomain();
   const navigate = useNavigate();
-  const location = useLocation();
   const { data: district, isLoading } = useDistrict(slug || '');
   const { data: schools = [] } = useSchools(slug || '');
   const { user, logout } = useAuth();
@@ -34,8 +33,6 @@ export function ClientAdminEditorialLayout() {
   const [isAddSchoolModalOpen, setIsAddSchoolModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  const basePath = '/admin';
 
   // Close dropdown when clicking outside
   useEffect(() => {

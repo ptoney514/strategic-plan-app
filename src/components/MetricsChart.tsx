@@ -1,4 +1,3 @@
-import React from 'react';
 import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { Metric, TimeSeriesDataPoint } from '../lib/types';
 

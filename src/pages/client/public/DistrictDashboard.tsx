@@ -334,7 +334,7 @@ export function DistrictDashboard() {
               {/* Goals List */}
               {flattenedGoals.length > 0 ? (
                 <div className="space-y-4">
-                  {flattenedGoals.map((child: Goal, index: number) => {
+                  {flattenedGoals.map((child: Goal, _index: number) => {
                     const childProgress = child.overall_progress_override ?? child.overall_progress ?? 0;
 
                     // Get real metrics for this goal - prefer metrics with visualization_config

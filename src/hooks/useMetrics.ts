@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { MetricsService, MetricTimeSeriesService } from '../lib/services';
-import type { Metric, MetricTimeSeries } from '../lib/types';
+import type { Metric } from '../lib/types';
 
 export function useMetrics(goalId: string) {
   return useQuery({

@@ -1,7 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { 
-  FileText, 
+import {
   User, 
   Calendar,
   Filter,
@@ -78,7 +77,7 @@ const mockAuditData: AuditEntry[] = [
 
 export function AdminAudit() {
   const { slug } = useParams();
-  const { data: district } = useDistrict(slug!);
+  const { data: _district } = useDistrict(slug!);
   const [auditEntries] = useState<AuditEntry[]>(mockAuditData);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const [filterUser, setFilterUser] = useState<string>('all');

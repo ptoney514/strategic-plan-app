@@ -23,7 +23,6 @@ export interface AdminContext {
  */
 export function useAdminContext(): AdminContext {
   const { slug: districtSlug = '', schoolSlug } = useParams<{ slug: string; schoolSlug?: string }>();
-  const location = useLocation();
 
   // Fetch district data
   const { data: district, isLoading: districtLoading } = useDistrict(districtSlug);

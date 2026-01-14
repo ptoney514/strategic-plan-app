@@ -15,7 +15,7 @@ interface HomepageFooterProps {
 export function HomepageFooter({
   districtName,
   districtSlug,
-  primaryColor = '#C03537',
+  primaryColor: _primaryColor = '#C03537',
   contact = {}
 }: HomepageFooterProps) {
   return (

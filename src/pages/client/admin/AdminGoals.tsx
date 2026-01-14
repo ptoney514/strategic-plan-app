@@ -24,10 +24,7 @@ import { useMetrics, useCreateMetric } from '../../../hooks/useMetrics';
 import { GoalsService } from '../../../lib/services/goals.service';
 import { SlidePanel } from '../../../components/SlidePanel';
 import { PerformanceIndicator } from '../../../components/PerformanceIndicator';
-import { AnnualProgressChart } from '../../../components/AnnualProgressChart';
-import { GoalNarrativeDetail } from '../../../components/GoalNarrativeDetail';
 import type { Goal, HierarchicalGoal } from '../../../lib/types';
-import { getProgressColor } from '../../../lib/types';
 
 export function AdminGoals() {
   const { slug } = useParams();
@@ -115,17 +112,7 @@ export function AdminGoals() {
   const renderGoalRow = (goal: HierarchicalGoal, level: number = 0) => {
     const hasChildren = goal.children && goal.children.length > 0;
     const isExpanded = expandedGoals.has(goal.id);
-    const goalMetrics = metrics?.filter(m => m.goal_id === goal.id) || [];
     const isObjective = level === 0;
-
-    // Calculate metrics summary
-    const metricsWithValues = goalMetrics.filter(m => m.current_value && m.target_value);
-    const avgProgress = metricsWithValues.length > 0
-      ? metricsWithValues.reduce((sum, m) => {
-          const progress = m.current_value! / m.target_value! * 100;
-          return sum + progress;
-        }, 0) / metricsWithValues.length
-      : null;
 
     return (
       <React.Fragment key={goal.id}>
@@ -567,7 +554,7 @@ export function AdminGoals() {
                 {/* Goals List */}
                 {previewGoal.children && previewGoal.children.length > 0 ? (
                   <div className="space-y-4">
-                    {previewGoal.children.map((child: any, index: number) => {
+                    {previewGoal.children.map((child: any, _index: number) => {
                       const childProgress = child.overall_progress_override ?? child.overall_progress ?? 0;
                       const isExpanded = expandedPreviewGoalId === child.id;
 

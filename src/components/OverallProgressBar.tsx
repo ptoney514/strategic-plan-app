@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Goal } from '../lib/types';
 import {
   getProgressQualitativeLabel,

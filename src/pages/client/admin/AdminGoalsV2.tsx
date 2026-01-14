@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useGoals, useDistrict } from '../../../hooks';
-import { Plus, ChevronLeft, Eye, Info, ArrowLeft, X } from 'lucide-react';
+import { ChevronLeft, Info, ArrowLeft } from 'lucide-react';
 import { GoalsTreePanel } from '../../../components/goals-v2/GoalsTreePanel';
 import { GoalDetailPanel } from '../../../components/goals-v2/GoalDetailPanel';
 import type { Goal } from '../../../lib/types';

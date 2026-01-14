@@ -1,5 +1,4 @@
 import {
-  getProgressQualitativeLabel,
   getProgressColor,
   getProgressScoreOutOf5
 } from '../lib/types';
@@ -22,7 +21,6 @@ export function PerformanceIndicator({
   if (displayMode === 'hidden') return null;
 
   const color = getProgressColor(progress);
-  const qualitativeLabel = getProgressQualitativeLabel(progress);
 
   // Labels for the progress bar (Below, Good, Great, Excellent)
   const labels = [
@@ -88,7 +86,7 @@ export function PerformanceIndicator({
         {/* Background track */}
         <div className="w-full bg-neutral-100 rounded-full h-3 overflow-hidden shadow-inner relative">
           {/* Labels positioned along the bar - only show dividers for qualitative */}
-          {displayMode === 'qualitative' && showLabels && labels.map((item, idx) => (
+          {displayMode === 'qualitative' && showLabels && labels.map((item, _idx) => (
             <div
               key={item.label}
               className="absolute top-0 bottom-0 flex items-center"

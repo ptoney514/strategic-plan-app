@@ -1,4 +1,3 @@
-import React from 'react';
 import type { NarrativeConfig } from '../lib/metric-visualizations';
 
 interface NarrativeDisplayProps {

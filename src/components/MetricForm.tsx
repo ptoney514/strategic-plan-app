@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { MetricsService } from '../lib/services';
-import type { Metric, TimeSeriesDataPoint, ChartType, DataSourceType } from '../lib/types';
+import type { Metric, TimeSeriesDataPoint, ChartType } from '../lib/types';
 import { Loader2, HelpCircle } from 'lucide-react';
 import { TimeSeriesDataEntry } from './TimeSeriesDataEntry';
 import { ChartTypePicker } from './ChartTypePicker';

@@ -16,7 +16,8 @@ import {
   FileText,
   FileSpreadsheet,
   Package,
-  CheckCircle
+  CheckCircle,
+  type LucideIcon
 } from 'lucide-react';
 import { 
   useDashboardData, 
@@ -390,7 +391,7 @@ export function MetricsDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-card rounded-lg border border-border p-6">
               <h3 className="text-lg font-semibold mb-4">Metrics by Category</h3>
-              <GoalProgressChart goals={goals as any || []} variant="pie" />
+              <GoalProgressChart goals={goals || []} variant="pie" />
             </div>
             <div className="bg-card rounded-lg border border-border p-6">
               <h3 className="text-lg font-semibold mb-4">Category Performance</h3>
@@ -431,7 +432,7 @@ function StatCard({
 }: {
   label: string;
   value: string | number;
-  icon: any;
+  icon: LucideIcon;
   trend?: number;
   color?: string;
   bgColor?: string;

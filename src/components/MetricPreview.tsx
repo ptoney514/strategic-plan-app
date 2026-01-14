@@ -338,6 +338,7 @@ export function MetricPreview({ type, data }: MetricPreviewProps) {
                     <LabelList
                       dataKey="value"
                       position="top"
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       formatter={(value: any) => value > 0 ? value.toFixed(2) : ''}
                       style={{
                         fill: '#111827',

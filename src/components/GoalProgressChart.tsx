@@ -1,10 +1,10 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import type { HierarchicalGoal } from '../lib/types';
+import type { Goal } from '../lib/types';
 import { calculateGoalProgress, getGoalStatus } from '../lib/types';
 
 interface GoalProgressChartProps {
-  goals: HierarchicalGoal[];
+  goals: Goal[];
   variant?: 'bar' | 'pie';
 }
 
@@ -24,9 +24,8 @@ export function GoalProgressChart({ goals, variant = 'bar' }: GoalProgressChartP
   };
 
   const RADIAN = Math.PI / 180;
-  const renderCustomizedLabel = ({
-    cx, cy, midAngle, innerRadius, outerRadius, percent
-  }: any) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }: any) => {
     const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
     const x = cx + radius * Math.cos(-midAngle * RADIAN);
     const y = cy + radius * Math.sin(-midAngle * RADIAN);
@@ -79,8 +78,8 @@ export function GoalProgressChart({ goals, variant = 'bar' }: GoalProgressChartP
                 <Cell key={`cell-${index}`} fill={statusColors[entry.name as keyof typeof statusColors]} />
               ))}
             </Pie>
-            <Tooltip 
-              formatter={(value: any) => [`${value} goals`, '']}
+            <Tooltip
+              formatter={(value: number) => [`${value} goals`, '']}
               contentStyle={{ 
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
@@ -120,7 +119,7 @@ export function GoalProgressChart({ goals, variant = 'bar' }: GoalProgressChartP
               borderRadius: '0.5rem'
             }}
             labelStyle={{ color: 'hsl(var(--card-foreground))' }}
-            formatter={(value: any) => [`${value}%`, 'Progress']}
+            formatter={(value: number) => [`${value}%`, 'Progress']}
             labelFormatter={(label) => {
               const goal = chartData.find(d => d.name === label);
               return goal?.title || label;

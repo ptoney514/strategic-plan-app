@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import {
   Plus,
@@ -25,6 +25,7 @@ import { useGoals } from '../../../hooks/useGoals';
  */
 export function AdminDashboard2() {
   const { slug } = useSubdomain();
+  const location = useLocation();
   const { data: district } = useDistrict(slug || '');
   const { data: goals, isLoading: goalsLoading } = useGoals(district?.id || '');
 
@@ -126,7 +127,7 @@ export function AdminDashboard2() {
           </div>
           <div className="flex items-center gap-3">
             <Link
-              to="/admin/objectives/create"
+              to={`/admin/objectives/create${location.search}`}
               className="bg-[#b85c38] text-white px-4 sm:px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors flex-1 sm:flex-none text-center"
             >
               <span className="hidden sm:inline">Create new strategic objective</span>
@@ -312,7 +313,7 @@ export function AdminDashboard2() {
             <h3 className="text-lg font-semibold text-[#1a1a1a] mb-2">No objectives yet</h3>
             <p className="text-[#8a8a8a] mb-4">Create your first strategic objective to get started.</p>
             <Link
-              to={`/${slug}/admin/objectives/new`}
+              to={`/admin/objectives/create${location.search}`}
               className="inline-flex items-center gap-2 bg-[#b85c38] text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#a04d2d] transition-colors"
             >
               <Plus className="h-4 w-4" />
@@ -366,7 +367,7 @@ export function AdminDashboard2() {
                     {/* Title and Description - stacked vertically */}
                     <div className="flex-1 min-w-0 flex flex-col gap-1">
                       <Link
-                        to={`/admin/objectives/${objective.id}`}
+                        to={`/admin/objectives/${objective.id}${location.search}`}
                         className="text-[15px] font-bold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                         data-testid="objective-title"
                       >
@@ -435,7 +436,7 @@ export function AdminDashboard2() {
                               {/* Title and Description */}
                               <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                                 <Link
-                                  to={`/admin/objectives/${child.id}`}
+                                  to={`/admin/objectives/${child.id}${location.search}`}
                                   className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                                   data-testid="child-goal-title"
                                 >
@@ -486,7 +487,7 @@ export function AdminDashboard2() {
                                     {/* Title and Description */}
                                     <div className="flex-1 min-w-0 flex flex-col gap-0.5">
                                       <Link
-                                        to={`/admin/objectives/${grandchild.id}`}
+                                        to={`/admin/objectives/${grandchild.id}${location.search}`}
                                         className="text-[14px] font-semibold text-[#1a1a1a] leading-snug hover:text-[#b85c38] hover:underline transition-colors"
                                         data-testid="grandchild-goal-title"
                                       >

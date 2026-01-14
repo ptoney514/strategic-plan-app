@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import {
   ChevronRight,
@@ -44,6 +44,7 @@ export function EditObjective() {
   const { objectiveId } = useParams();
   const { slug } = useSubdomain();
   const navigate = useNavigate();
+  const location = useLocation();
   const { data: district } = useDistrict(slug || '');
   const { data: existingGoals } = useGoals(district?.id || '');
   const { data: objective, isLoading: objectiveLoading, error: objectiveError } = useGoal(objectiveId || '');
@@ -215,8 +216,8 @@ export function EditObjective() {
       // For now, child goals would need to be updated individually
       // This could be enhanced to handle creates/updates/deletes of children
 
-      // Navigate back to the objective detail view
-      navigate(`/admin/objectives/${objectiveId}`);
+      // Navigate back to the objective detail view (preserves subdomain query param on localhost)
+      navigate(`/admin/objectives/${objectiveId}${location.search}`);
     } catch (error) {
       console.error('Failed to update objective:', error);
     } finally {
@@ -254,7 +255,7 @@ export function EditObjective() {
             <h2 className="text-lg font-semibold text-[#1a1a1a] mb-2">Objective not found</h2>
             <p className="text-[#8a8a8a] mb-4">The objective you're looking for doesn't exist or you don't have access to it.</p>
             <Link
-              to="/admin/objectives"
+              to={`/admin/objectives${location.search}`}
               className="inline-flex items-center gap-2 text-[#4a6fa5] hover:underline"
             >
               <ChevronRight className="h-4 w-4 rotate-180" />
@@ -271,7 +272,7 @@ export function EditObjective() {
       <div className="px-10 py-8 max-w-[1100px]">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-2 text-[13px] text-[#8a8a8a] mb-6">
-          <Link to="/admin/objectives" className="hover:text-[#4a4a4a] transition-colors">
+          <Link to={`/admin/objectives${location.search}`} className="hover:text-[#4a4a4a] transition-colors">
             All objectives
           </Link>
           <ChevronRight className="h-3.5 w-3.5" />
@@ -621,7 +622,7 @@ export function EditObjective() {
             {/* Action Buttons */}
             <div className="flex items-center gap-3 pt-4">
               <button
-                onClick={() => navigate(`/${slug}/admin/objectives`)}
+                onClick={() => navigate('/admin/objectives' + location.search)}
                 className="px-6 py-2.5 text-[14px] font-medium text-[#4a4a4a] bg-[#f5f3ef] rounded-lg hover:bg-[#e8e6e1] transition-colors"
               >
                 Cancel

@@ -6,6 +6,7 @@ import { calculateStatus } from './StatusBadge';
 import type { StatusType } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
 import { NarrativeDisplay } from '../NarrativeDisplay';
+import { formatMetricValue as formatMetricValueUtil } from '../../lib/utils/formatMetricValue';
 
 // Filled status badge for expanded panel (pill style for non-narrative)
 function FilledStatusBadge({ status }: { status: StatusType }) {
@@ -91,20 +92,16 @@ function formatMetricValue(metric: Metric): { value: string; unit: string } {
   const current = getCurrentValue(metric);
   const target = getTargetValue(metric);
 
-  if (metric.metric_type === 'percent' || metric.is_percentage) {
-    return { value: current.toFixed(1), unit: '%' };
-  }
-  if (metric.metric_type === 'rating') {
-    const targetDisplay = target ?? 5.0;
-    return { value: current.toFixed(2), unit: `/ ${targetDisplay.toFixed(1)}` };
-  }
-  if (metric.metric_type === 'currency') {
-    return { value: `$${current.toLocaleString()}`, unit: '' };
-  }
-  if (Number.isInteger(current)) {
-    return { value: current.toString(), unit: metric.unit || 'score' };
-  }
-  return { value: current.toFixed(2), unit: metric.unit || '' };
+  const result = formatMetricValueUtil({
+    value: current,
+    isPercentage: metric.is_percentage,
+    decimalPlaces: metric.decimal_places ?? 2,
+    metricType: metric.metric_type,
+    unit: metric.unit || 'score',
+    targetValue: target ?? undefined,
+  });
+
+  return { value: result.value, unit: result.unit };
 }
 
 function getMetricTypeLabel(metric: Metric): string {
@@ -159,6 +156,18 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
   const vizDataPoints = vizConfig?.dataPoints || [];
   const targetValue = getTargetValue(metric);
   const chartType = vizConfig?.chartType || 'bar';
+
+  // Format chart values using the centralized utility
+  const formatChartValue = (value: number): string => {
+    const result = formatMetricValueUtil({
+      value,
+      isPercentage: metric.is_percentage,
+      decimalPlaces: metric.decimal_places ?? 0,
+      metricType: metric.metric_type,
+      unit: metric.unit || '',
+    });
+    return result.display;
+  };
 
   // Wait for parent layout animation to complete before rendering
   useEffect(() => {
@@ -284,7 +293,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
         ctx.fillStyle = '#059669';
         ctx.font = '11px Inter, sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(`Target: ${targetValue}`, rect.width - padding.right, 14);
+        ctx.fillText(`Target: ${formatChartValue(targetValue)}`, rect.width - padding.right, 14);
       }
 
       // Target line (dashed green)
@@ -345,7 +354,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
           ctx.fillStyle = '#374151';
           ctx.font = 'bold 11px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(p.value.toFixed(p.value % 1 === 0 ? 0 : 2), p.x, p.y - 10);
+          ctx.fillText(formatChartValue(p.value), p.x, p.y - 10);
 
           ctx.fillStyle = '#6B7280';
           ctx.font = '11px Inter, sans-serif';
@@ -367,7 +376,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
           ctx.fillStyle = '#374151';
           ctx.font = 'bold 11px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(d.value.toFixed(d.value % 1 === 0 ? 0 : 2), x + barWidth / 2, y - 6);
+          ctx.fillText(formatChartValue(d.value), x + barWidth / 2, y - 6);
 
           ctx.fillStyle = '#6B7280';
           ctx.font = '11px Inter, sans-serif';
@@ -441,6 +450,13 @@ export function ExpandedGoalPanel({
   const metricTypeLabel = primaryMetric ? getMetricTypeLabel(primaryMetric) : null;
   const metricStatus = primaryMetric ? getMetricStatus(primaryMetric) : status;
   const target = primaryMetric ? getTargetValue(primaryMetric) : null;
+  const formattedTarget = target !== null && primaryMetric ? formatMetricValueUtil({
+    value: target,
+    isPercentage: primaryMetric.is_percentage,
+    decimalPlaces: primaryMetric.decimal_places ?? 0,
+    metricType: primaryMetric.metric_type,
+    unit: primaryMetric.unit || '',
+  }).display : null;
 
   // Determine status to display
   const displayStatus: StatusType = primaryMetric?.indicator_text
@@ -556,9 +572,9 @@ export function ExpandedGoalPanel({
                   </div>
 
                   {/* Target */}
-                  {target !== null && (
+                  {formattedTarget !== null && (
                     <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Target: {target}
+                      Target: {formattedTarget}
                     </p>
                   )}
                 </div>

@@ -3,6 +3,7 @@ import { StatusBadge } from '../public/StatusBadge';
 import type { ChartType } from '../../lib/types';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import type { NarrativeConfig } from '../../lib/metric-visualizations';
+import { formatMetricValue } from '../../lib/utils/formatMetricValue';
 
 /** Default color palette for multi-segment charts (donut, pie) */
 export const DEFAULT_CHART_COLORS = [
@@ -41,6 +42,10 @@ interface MetricChartPreviewProps {
   displayValue?: string;
   /** Narrative config for 'narrative' visualization type */
   narrativeConfig?: NarrativeConfig;
+  /** Whether to display value as percentage */
+  isPercentage?: boolean;
+  /** Number of decimal places to show */
+  decimalPlaces?: number;
 }
 
 /**
@@ -80,24 +85,21 @@ export function MetricChartPreview({
   chartColors = DEFAULT_CHART_COLORS,
   displayValue,
   narrativeConfig,
+  isPercentage = false,
+  decimalPlaces = 2,
 }: MetricChartPreviewProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Format the metric value for display
+  // Format a value using centralized utility
   const formatValue = (value: number): { value: string; unit: string } => {
-    if (metricType === 'percent') {
-      return { value: value.toFixed(1), unit: '%' };
-    }
-    if (metricType === 'rating') {
-      return { value: value.toFixed(2), unit: `/ ${targetValue || 5.0}` };
-    }
-    if (metricType === 'currency') {
-      return { value: `$${value.toLocaleString()}`, unit: '' };
-    }
-    if (Number.isInteger(value)) {
-      return { value: value.toString(), unit: '' };
-    }
-    return { value: value.toFixed(2), unit: '' };
+    const formatted = formatMetricValue({
+      value,
+      isPercentage,
+      decimalPlaces,
+      metricType,
+      targetValue,
+    });
+    return { value: formatted.value, unit: formatted.unit };
   };
 
   // Calculate target comparison text
@@ -195,7 +197,8 @@ export function MetricChartPreview({
         ctx.fillStyle = '#374151';
         ctx.font = '10px Inter, sans-serif';
         ctx.textAlign = midAngle > Math.PI / 2 && midAngle < 3 * Math.PI / 2 ? 'right' : 'left';
-        ctx.fillText(`${d.label}: ${d.value.toFixed(1)}`, labelX, labelY);
+        const donutFormatted = formatValue(d.value);
+        ctx.fillText(`${d.label}: ${donutFormatted.value}${donutFormatted.unit}`, labelX, labelY);
 
         startAngle = endAngle;
       });
@@ -204,7 +207,8 @@ export function MetricChartPreview({
       ctx.fillStyle = '#1a1a1a';
       ctx.font = 'bold 16px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(total.toFixed(1), centerX, centerY + 6);
+      const centerFormatted = formatValue(total);
+      ctx.fillText(centerFormatted.value + centerFormatted.unit, centerX, centerY + 6);
       return;
     }
 
@@ -298,7 +302,8 @@ export function MetricChartPreview({
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 11px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(p.value.toFixed(2), p.x, p.y - 10);
+        const pointFormatted = formatValue(p.value);
+        ctx.fillText(pointFormatted.value + pointFormatted.unit, p.x, p.y - 10);
 
         // X-axis label
         ctx.fillStyle = '#6B7280';
@@ -323,7 +328,8 @@ export function MetricChartPreview({
         ctx.fillStyle = '#374151';
         ctx.font = 'bold 11px Inter, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText(d.value.toFixed(2), x + barWidth / 2, y - 6);
+        const barFormatted = formatValue(d.value);
+        ctx.fillText(barFormatted.value + barFormatted.unit, x + barWidth / 2, y - 6);
 
         // Label below bar
         ctx.fillStyle = '#6B7280';
@@ -339,9 +345,10 @@ export function MetricChartPreview({
     for (let i = 0; i <= gridLines; i++) {
       const gridValue = maxValue - ((maxValue - minValue) / gridLines) * i;
       const y = padding.top + (chartHeight / gridLines) * i + 4;
-      ctx.fillText(gridValue.toFixed(1), padding.left - 8, y);
+      const yAxisFormatted = formatValue(gridValue);
+      ctx.fillText(yAxisFormatted.value, padding.left - 8, y);
     }
-  }, [dataPoints, targetValue, chartColor, chartType, chartColors]);
+  }, [dataPoints, targetValue, chartColor, chartType, chartColors, isPercentage, decimalPlaces, metricType]);
 
   // Handle 'value' visualization type
   if (chartType === 'value') {
@@ -437,8 +444,8 @@ export function MetricChartPreview({
         <div className="text-sm font-medium text-[#6a6a6a] mb-4">
           Target:{' '}
           <span className="text-[#1a1a1a]">
-            {targetValue}
-            {metricType === 'percent' ? '%' : ''}
+            {formatValue(targetValue).value}
+            {formatValue(targetValue).unit}
           </span>
           {targetComparison && (
             <>

@@ -149,9 +149,8 @@ describe('ExpandedGoalPanel', () => {
       />
     );
 
-    // Value appears multiple times (current value and target value)
-    const valueElements = screen.getAllByText('100');
-    expect(valueElements.length).toBeGreaterThanOrEqual(1);
+    // Value appears (current value formatted with 2 decimal places by default)
+    expect(screen.getByText('100.00')).toBeInTheDocument();
   });
 
   it('displays target value', () => {

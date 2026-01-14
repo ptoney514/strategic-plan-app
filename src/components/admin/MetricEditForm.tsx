@@ -6,6 +6,7 @@ import { useMetricChartData } from '../../hooks/useMetrics';
 import { DataPointsEditor, type DataPoint } from './DataPointsEditor';
 import { ChartTypeSelector } from './ChartTypeSelector';
 import { StatusIndicatorEditor } from './StatusIndicatorEditor';
+import { NumberFormatSelector } from './NumberFormatSelector';
 import { NarrativeEditor } from '../NarrativeEditor';
 import type { NarrativeConfig } from '../../lib/metric-visualizations';
 
@@ -80,6 +81,10 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     vizConfig?.chartType || 'bar'
   );
 
+  // State for number formatting
+  const [isPercentage, setIsPercentage] = useState(metric.is_percentage ?? false);
+  const [decimalPlaces, setDecimalPlaces] = useState(metric.decimal_places ?? 2);
+
   // State for 'value' visualization type
   const [displayValue, setDisplayValue] = useState(
     vizConfig?.displayValue || ''
@@ -125,6 +130,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
     chartType?: ChartType;
     displayValue?: string;
     narrativeConfig?: NarrativeConfig;
+    isPercentage?: boolean;
+    decimalPlaces?: number;
   } | null>(null);
 
   // Validation state
@@ -229,6 +236,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       chartType,
       displayValue,
       narrativeConfig,
+      isPercentage,
+      decimalPlaces,
     });
   };
 
@@ -271,6 +280,9 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
         current_value: currentValue ? parseFloat(currentValue) : undefined,
         target_value: targetValue ? parseFloat(targetValue) : undefined,
         baseline_value: baselineValue ? parseFloat(baselineValue) : undefined,
+        metric_type: isPercentage ? 'percent' : 'number', // Sync legacy field
+        is_percentage: isPercentage,
+        decimal_places: decimalPlaces,
         visualization_config: newVizConfig,
       });
     } catch (error) {
@@ -350,6 +362,16 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
       {/* Chart Type Selector */}
       <ChartTypeSelector value={chartType} onChange={setChartType} />
 
+      {/* Number Format Selector - hidden for narrative type */}
+      {chartType !== 'narrative' && (
+        <NumberFormatSelector
+          isPercentage={isPercentage}
+          decimalPlaces={decimalPlaces}
+          onIsPercentageChange={setIsPercentage}
+          onDecimalPlacesChange={setDecimalPlaces}
+        />
+      )}
+
       {/* Conditional fields based on chart type */}
       {chartType === 'value' ? (
         /* Value Type: Single text input for display value */
@@ -405,8 +427,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
 
             {/* Target Value */}
             <div>
-              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2">
-                Target Value <span className="text-[#6a6a6a] font-normal">(optional)</span>
+              <label className="block text-[13px] font-semibold text-[#1a1a1a] mb-2 whitespace-nowrap">
+                Target <span className="text-[#6a6a6a] font-normal">(optional)</span>
               </label>
               <input
                 type="number"
@@ -525,6 +547,8 @@ export function MetricEditForm({ metric, onSave, onCancel }: MetricEditFormProps
             chartType={previewData.chartType}
             displayValue={previewData.displayValue}
             narrativeConfig={previewData.narrativeConfig}
+            isPercentage={previewData.isPercentage}
+            decimalPlaces={previewData.decimalPlaces}
           />
         </div>
       )}

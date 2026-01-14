@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ChevronRight, ChevronLeft, Target, Users, TrendingUp, BookOpen, CheckCircle, Info, Plus, Trash2, Upload, Image, AlertCircle, Clock } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Target, TrendingUp, CheckCircle, Info, Plus, Trash2, Upload, AlertCircle, Clock } from 'lucide-react';
 
 interface ObjectiveWizardProps {
   isOpen: boolean;
@@ -35,7 +35,7 @@ export function ObjectiveWizard({ isOpen, onClose, onComplete, districtId, exist
     description: '',
     timeframe: '3-year',
     status: 'not-started',
-    coverPhotoUrl: null,
+    coverPhotoUrl: null as string | null,
     coverPhotoAlt: '',
   });
   const [goals, setGoals] = useState<Goal[]>([]);

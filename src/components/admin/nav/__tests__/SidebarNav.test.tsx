@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../../../test/setup';
 import { SidebarNav, SidebarHeader, SidebarFooter, SidebarUserFooter } from '../SidebarNav';
 import type { District, School } from '../../../../lib/types';

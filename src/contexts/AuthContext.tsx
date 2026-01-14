@@ -11,7 +11,7 @@ interface AuthState {
 
 interface AuthContextValue extends AuthState {
   hasDistrictAccess: (slug: string) => Promise<boolean>;
-  login: (email: string, password: string) => Promise<ReturnType<typeof supabase.auth.signInWithPassword>>;
+  login: (email: string, password: string) => ReturnType<typeof supabase.auth.signInWithPassword>;
   logout: () => Promise<void>;
 }
 

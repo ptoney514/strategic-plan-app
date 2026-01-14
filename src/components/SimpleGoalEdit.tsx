@@ -54,7 +54,7 @@ export function SimpleGoalEdit({ goal, isOpen, onClose, onSuccess }: SimpleGoalE
     try {
       await updateGoalMutation.mutateAsync({
         id: goal.id,
-        data: {
+        updates: {
           title: formData.title,
           description: formData.description,
           indicator_text: formData.indicator_text || undefined,

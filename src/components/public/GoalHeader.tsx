@@ -57,7 +57,7 @@ export function GoalHeader({ goal, parentObjective }: GoalHeaderProps) {
 
   breadcrumbs.push({
     label: `${goal.goal_number} ${goal.title}`,
-    href: undefined, // Current page
+    href: '', // Current page
   });
 
   return (

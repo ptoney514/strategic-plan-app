@@ -78,7 +78,7 @@ const mockAuditData: AuditEntry[] = [
 
 export function AdminAudit() {
   const { slug } = useParams();
-  const { district } = useDistrict(slug!);
+  const { data: district } = useDistrict(slug!);
   const [auditEntries] = useState<AuditEntry[]>(mockAuditData);
   const [expandedEntry, setExpandedEntry] = useState<string | null>(null);
   const [filterUser, setFilterUser] = useState<string>('all');

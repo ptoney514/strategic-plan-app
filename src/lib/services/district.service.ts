@@ -90,6 +90,42 @@ export class DistrictService {
     };
   }
 
+  static async getById(id: string): Promise<District> {
+    const { data: district, error } = await supabase
+      .from('spb_districts')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching district by id:', error);
+      throw error;
+    }
+
+    // Get counts using efficient count queries
+    const [goalsResult, metricsResult, adminsResult] = await Promise.all([
+      supabase
+        .from('spb_goals')
+        .select('id', { count: 'exact', head: true })
+        .eq('district_id', district.id),
+      supabase
+        .from('spb_metrics')
+        .select('id', { count: 'exact', head: true })
+        .eq('district_id', district.id),
+      supabase
+        .from('spb_district_admins')
+        .select('id', { count: 'exact', head: true })
+        .eq('district_id', district.id),
+    ]);
+
+    return {
+      ...district,
+      goals_count: goalsResult.count || 0,
+      metrics_count: metricsResult.count || 0,
+      admins_count: adminsResult.count || 0,
+    };
+  }
+
   static async create(district: Partial<District>): Promise<District> {
     const { data, error } = await supabase
       .from('spb_districts')

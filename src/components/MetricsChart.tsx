@@ -17,25 +17,32 @@ export function MetricsChart({ metrics, variant = 'line' }: MetricsChartProps) {
     // Use manual data points from the metric
     const metric = metrics[0]; // For now, support single metric visualization
     const dataPoints = metric.data_points as TimeSeriesDataPoint[];
+    const metricName = metric.name || metric.metric_name;
 
-    chartData = dataPoints.map(point => ({
-      period: point.date,
-      value: point.value,
-      target: point.target,
-      [metric.name]: point.value
-    }));
+    chartData = dataPoints.map(point => {
+      const data: Record<string, any> = {
+        period: point.date,
+        value: point.value,
+        target: point.target
+      };
+      if (metricName) {
+        data[metricName] = point.value;
+      }
+      return data;
+    });
   } else {
     // Fallback to synthetic data for backward compatibility
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     chartData = months.map(month => {
-      const monthData: any = { period: month };
+      const monthData: Record<string, any> = { period: month };
       metrics.forEach(metric => {
+        const metricName = metric.name || metric.metric_name;
         const baseValue = metric.baseline_value || 0;
         const currentValue = metric.current_value || 0;
         const monthIndex = months.indexOf(month);
         const progress = monthIndex / (months.length - 1);
-        monthData[metric.name] = Math.round(baseValue + (currentValue - baseValue) * progress);
-        monthData[`${metric.name}_target`] = metric.target_value;
+        monthData[metricName] = Math.round(baseValue + (currentValue - baseValue) * progress);
+        monthData[`${metricName}_target`] = metric.target_value;
       });
       return monthData;
     });
@@ -99,19 +106,22 @@ export function MetricsChart({ metrics, variant = 'line' }: MetricsChartProps) {
             wrapperStyle={{ paddingTop: '1rem' }}
             iconType={variant === 'area' ? 'rect' : variant === 'bar' ? 'rect' : 'line'}
           />
-          {metrics.slice(0, 6).map((metric, index) => (
-            <DataComponent
-              key={metric.id}
-              type={variant === 'bar' ? undefined : 'monotone'}
-              dataKey={metric.name}
-              stroke={colors[index % colors.length]}
-              fill={colors[index % colors.length]}
-              fillOpacity={variant === 'area' ? 0.3 : 1}
-              strokeWidth={variant === 'bar' ? 0 : 2}
-              dot={variant === 'bar' ? undefined : { r: 3 }}
-              activeDot={variant === 'bar' ? undefined : { r: 5 }}
-            />
-          ))}
+          {metrics.slice(0, 6).map((metric, index) => {
+            const metricName = metric.name || metric.metric_name;
+            return (
+              <DataComponent
+                key={metric.id}
+                type={variant === 'bar' ? undefined : 'monotone'}
+                dataKey={metricName}
+                stroke={colors[index % colors.length]}
+                fill={colors[index % colors.length]}
+                fillOpacity={variant === 'area' ? 0.3 : 1}
+                strokeWidth={variant === 'bar' ? 0 : 2}
+                dot={variant === 'bar' ? undefined : { r: 3 }}
+                activeDot={variant === 'bar' ? undefined : { r: 5 }}
+              />
+            );
+          })}
         </Chart>
       </ResponsiveContainer>
     </div>

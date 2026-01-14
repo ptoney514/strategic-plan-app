@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -17,7 +17,7 @@ const metricSchema = z.object({
   current_value: z.number().min(0, 'Current value must be positive'),
   target_value: z.number().min(0, 'Target must be positive'),
   frequency: z.enum(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']),
-  data_source: z.string().optional(),
+  data_source: z.enum(['manual', 'survey', 'map_data', 'state_testing', 'total_number', 'percent', 'narrative', 'link']).optional(),
 });
 
 type MetricFormData = z.infer<typeof metricSchema>;
@@ -75,7 +75,7 @@ export function MetricForm({
       current_value: metric?.current_value || 0,
       target_value: metric?.target_value || 100,
       frequency: metric?.frequency || 'monthly',
-      data_source: metric?.data_source || '',
+      data_source: metric?.data_source || undefined,
     },
   });
 

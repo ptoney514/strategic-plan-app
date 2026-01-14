@@ -179,13 +179,13 @@ export function GoalDetailPanel({ goal, districtSlug, onRefresh, mode = 'full' }
                     <StrategicObjectiveEditor
                       objective={{
                         ...goal,
-                        header_color: headerColor,
-                        image_url: imageUrl
+                        header_color: headerColor || undefined,
+                        image_url: imageUrl || undefined
                       }}
                       isEditing={isEditing}
                       onUpdate={(updates) => {
-                        if (updates.header_color !== undefined) setHeaderColor(updates.header_color);
-                        if (updates.image_url !== undefined) setImageUrl(updates.image_url);
+                        if (updates.header_color !== undefined) setHeaderColor(updates.header_color || null);
+                        if (updates.image_url !== undefined) setImageUrl(updates.image_url || null);
                       }}
                     />
                   )}

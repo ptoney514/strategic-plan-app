@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { X, AlertCircle, CheckCircle, XCircle, Clock, Info } from 'lucide-react';
 import type { Goal } from '../lib/types';
 
@@ -8,8 +8,10 @@ interface StatusManagerProps {
   onSave: (status: string, reason: string) => void;
 }
 
+type PerformanceStatus = 'on-target' | 'at-risk' | 'critical' | 'off-target' | 'not-started';
+
 export function StatusManager({ goal, onClose, onSave }: StatusManagerProps) {
-  const [selectedStatus, setSelectedStatus] = useState(goal.status || 'not-started');
+  const [selectedStatus, setSelectedStatus] = useState<PerformanceStatus>(goal.calculated_status || 'not-started');
   const [overrideReason, setOverrideReason] = useState('');
   const [reasonCategory, setReasonCategory] = useState('contextual');
   
@@ -137,7 +139,7 @@ export function StatusManager({ goal, onClose, onSave }: StatusManagerProps) {
                       type="radio"
                       value={option.value}
                       checked={isSelected}
-                      onChange={(e) => setSelectedStatus(e.target.value)}
+                      onChange={(e) => setSelectedStatus(e.target.value as PerformanceStatus)}
                       className="mt-1"
                     />
                     <div className="ml-3 flex-1">

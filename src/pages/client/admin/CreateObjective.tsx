@@ -134,16 +134,15 @@ export function CreateObjective() {
       const newObjective = await createGoal.mutateAsync({
         district_id: district.id,
         title: title.trim(),
-        description: description.trim() || null,
+        description: description.trim() || undefined,
         level: 0,
         parent_id: null,
         is_public: visibility === 'public',
-        sort_order: existingGoals?.length || 0,
         indicator_text: customBadgeText,
         indicator_color: badgeColor,
         show_progress_bar: showProgressBar,
-        start_date: startDate || null,
-        end_date: endDate || null,
+        start_date: startDate || undefined,
+        end_date: endDate || undefined,
       });
 
       // Create child goals (level 1) with their metrics
@@ -152,16 +151,15 @@ export function CreateObjective() {
         const childGoal = await createGoal.mutateAsync({
           district_id: district.id,
           title: goal.data.title,
-          description: goal.data.description || null,
+          description: goal.data.description || undefined,
           level: 1,
           parent_id: newObjective.id,
           is_public: goal.data.is_public,
-          sort_order: i,
           indicator_text: goal.data.indicator_text,
           indicator_color: goal.data.indicator_color,
           show_progress_bar: goal.data.show_progress_bar,
-          start_date: goal.data.start_date || null,
-          end_date: goal.data.end_date || null,
+          start_date: goal.data.start_date || undefined,
+          end_date: goal.data.end_date || undefined,
         });
 
         // TODO: Create metrics for this goal

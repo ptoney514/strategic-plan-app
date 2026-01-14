@@ -5,7 +5,7 @@ import { UserRoleBadge } from './UserRoleBadge';
 interface User {
   id: string;
   email: string;
-  role: 'district_admin' | 'school_admin' | 'editor' | 'viewer';
+  role: 'district_admin' | 'school_admin' | 'editor';
   name?: string;
   isPending?: boolean;
 }
@@ -82,7 +82,7 @@ export function UsersList({
                   )}
                 </div>
               </div>
-              <UserRoleBadge role={user.role} size="sm" />
+              <UserRoleBadge role={user.role} />
             </div>
           ))}
 

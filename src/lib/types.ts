@@ -106,11 +106,15 @@ export interface Goal {
   overall_progress_override_by?: string;
   overall_progress_override_at?: string;
   overall_progress_override_reason?: string;
+
+  // Calculated status fields (for StatusManager component)
+  calculated_status?: 'on-target' | 'at-risk' | 'critical' | 'off-target' | 'not-started';
+  status_calculation_confidence?: number;
 }
 
 export type MetricType = 'percent' | 'number' | 'rating' | 'currency' | 'status' | 'narrative' | 'link' | 'survey';
-export type DataSourceType = 'survey' | 'map_data' | 'state_testing' | 'total_number' | 'percent' | 'narrative' | 'link';
-export type ChartType = 'line' | 'bar' | 'donut' | 'area' | 'value' | 'narrative';
+export type DataSourceType = 'manual' | 'survey' | 'map_data' | 'state_testing' | 'total_number' | 'percent' | 'narrative' | 'link';
+export type ChartType = 'line' | 'bar' | 'donut' | 'area' | 'value' | 'narrative' | 'progress' | 'number' | 'gauge' | 'auto' | 'blog';
 export type MetricStatus = 'on-target' | 'off-target' | 'critical' | 'no-data';
 export type MetricCategory = 'enrollment' | 'achievement' | 'discipline' | 'attendance' | 'culture' | 'other';
 
@@ -145,6 +149,7 @@ export interface Metric {
   is_percentage?: boolean;
   is_higher_better?: boolean;
   ytd_value?: number;
+  ytd_change?: number;
   eoy_projection?: number;
   last_actual_period?: string;
 
@@ -180,7 +185,7 @@ export interface Metric {
 
 // Visualization configuration types
 export interface VisualizationConfig {
-  chartType?: 'line' | 'bar' | 'pie' | 'donut' | 'area' | 'scatter' | 'likert' | 'value' | 'narrative';
+  chartType?: ChartType | 'pie' | 'scatter' | 'likert';
   colors?: string[];
   showLegend?: boolean;
   showGrid?: boolean;

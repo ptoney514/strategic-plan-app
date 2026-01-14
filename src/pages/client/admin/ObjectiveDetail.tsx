@@ -12,7 +12,7 @@ import {
   Loader2,
   FolderOpen,
 } from 'lucide-react';
-import type { Goal } from '../../../lib/types';
+import type { Goal, Metric } from '../../../lib/types';
 import { toast } from '../../../components/Toast';
 
 /**
@@ -119,7 +119,7 @@ export function ObjectiveDetail() {
   };
 
   // Handle save metric
-  const handleSaveMetric = async (metricId: string, updates: Partial<Goal>) => {
+  const handleSaveMetric = async (metricId: string, updates: Partial<Metric>) => {
     try {
       await updateMetricMutation.mutateAsync({
         id: metricId,

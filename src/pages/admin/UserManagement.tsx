@@ -93,7 +93,7 @@ export function UserManagement() {
   }, {} as Record<string, DistrictAdmin[]>);
 
   // Filter by search term
-  const filteredUsers = Object.entries(adminsByUser).filter(([userId, admins]) => {
+  const filteredUsers = (Object.entries(adminsByUser) as [string, DistrictAdmin[]][]).filter(([userId, admins]) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       userId.toLowerCase().includes(searchLower) ||

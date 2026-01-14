@@ -138,7 +138,7 @@ export function ImportWizard() {
 
       // Fetch existing goals for validation
       console.log('Fetching existing goals for validation...');
-      let existingGoals = [];
+      let existingGoals: any[] = [];
       try {
         existingGoals = await GoalsService.getByDistrict(district.id);
         console.log('Existing goals:', existingGoals);

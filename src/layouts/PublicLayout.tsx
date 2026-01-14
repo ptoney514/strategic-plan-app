@@ -36,9 +36,9 @@ interface PublicLayoutProps {
 export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
   const params = useParams<{ slug: string }>();
   // Use prop if provided (subdomain routing), otherwise use URL param (path routing)
-  const slug = districtSlug || params.slug;
-  const { data: district, isLoading: districtLoading } = useDistrict(slug!);
-  const { data: goals, isLoading: goalsLoading } = useGoals(district?.id);
+  const slug = districtSlug || params.slug || '';
+  const { data: district, isLoading: districtLoading } = useDistrict(slug);
+  const { data: goals, isLoading: goalsLoading } = useGoals(district?.id || '');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (districtLoading) {

@@ -1,22 +1,20 @@
-import React from 'react';
 import { Target, AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-react';
 import type { Goal } from '../lib/types';
 
 interface StatusSummaryProps {
   goals: Goal[];
-  metrics?: any[];
+  metrics?: unknown[];
 }
 
-export function StatusSummary({ goals, metrics = [] }: StatusSummaryProps) {
+export function StatusSummary({ goals }: StatusSummaryProps) {
   // Count goals by status
   const statusCounts = goals.reduce((acc, goal) => {
-    const status = goal.status || 'not-started';
+    const status = goal.status_detail || 'not_started';
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   const totalGoals = goals.length;
-  const totalMetrics = metrics.length;
 
   const statusConfig = [
     { 
@@ -68,7 +66,7 @@ export function StatusSummary({ goals, metrics = [] }: StatusSummaryProps) {
       </div>
 
       {/* Status Cards */}
-      {statusConfig.map(({ key, label, lightColor, icon: Icon }) => {
+      {statusConfig.map(({ key, label, icon: Icon }) => {
         const count = statusCounts[key] || 0;
         if (count === 0 && key !== 'on-target') return null; // Hide empty statuses except on-target
         

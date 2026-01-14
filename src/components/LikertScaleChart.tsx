@@ -120,7 +120,8 @@ export function LikertScaleChart({
               <LabelList
                 dataKey="value"
                 position="top"
-                formatter={(value: number) => value > 0 ? value.toFixed(2) : ''}
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter={(value: any) => value > 0 ? value.toFixed(2) : ''}
                 style={{
                   fill: '#111827',
                   fontSize: '14px',

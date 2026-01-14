@@ -4,6 +4,7 @@ import { MetricTypeSelector } from './MetricTypeSelector';
 import { MetricDataForm } from './MetricDataForm';
 import { MetricPreview } from './MetricPreview';
 import { type VisualizationType, getDefaultConfig } from '../lib/metric-visualizations';
+import type { Metric, ChartType } from '../lib/types';
 
 interface MetricBuilderWizardProps {
   isOpen: boolean;
@@ -213,7 +214,7 @@ export function MetricBuilderWizard({
           ...metricData,
           _frontendType: selectedType // Preserve original type for editing
         },
-        chart_type: mapVisualizationType(selectedType),
+        chart_type: mapVisualizationType(selectedType) as ChartType,
         current_value: isNumericMetric ? (metricData.currentValue || null) : null,
         target_value: isNumericMetric ? (metricData.targetValue || null) : null,
         unit: metricData.unit || metricData.yAxisLabel || '',

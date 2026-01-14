@@ -24,11 +24,11 @@ export function ObjectiveCard({ objective }: ObjectiveCardProps) {
   const statusText = objective.indicator_text || objective.overall_progress_custom_value;
   const manualStatus = statusText?.toLowerCase().replace(/\s+/g, '-');
   const status = validStatuses.includes(manualStatus || '')
-    ? (manualStatus as 'on-target' | 'needs-attention' | 'off-track' | 'not-started')
+    ? (manualStatus as 'on-target' | 'needs-attention' | 'off-track' | 'not-started' | 'on-track' | 'complete')
     : 'on-target';
 
   // Hover color based on status - green for positive statuses, neutral for others
-  const isPositiveStatus = status === 'on-target' || status === 'on-track' || status === 'complete';
+  const isPositiveStatus = ['on-target', 'on-track', 'complete'].includes(status);
   const hoverColor = isPositiveStatus
     ? 'group-hover:text-emerald-600 dark:group-hover:text-emerald-400'
     : 'group-hover:text-slate-600 dark:group-hover:text-slate-300';

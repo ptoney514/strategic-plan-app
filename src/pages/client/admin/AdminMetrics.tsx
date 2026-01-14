@@ -16,9 +16,9 @@ import { useMetrics } from '../../../hooks/useMetrics';
 
 export function AdminMetrics() {
   const { slug } = useParams();
-  const { district } = useDistrict(slug!);
-  const { goals } = useGoals(district?.id);
-  const { metrics, loading } = useMetrics(district?.id);
+  const { data: district } = useDistrict(slug!);
+  const { data: goals } = useGoals(district?.id || '');
+  const { data: metrics, isLoading: loading } = useMetrics(district?.id || '');
   const [selectedGoal, setSelectedGoal] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('current');
   const [showBulkEntry, setShowBulkEntry] = useState(true);

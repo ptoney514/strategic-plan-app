@@ -177,6 +177,44 @@ describe('formatMetricValue', () => {
       expect(result.display).toBe('100 students');
     });
   });
+
+  describe('bar chart label formatting', () => {
+    it('provides value without unit for bar labels (rating type)', () => {
+      const result = formatMetricValue({
+        value: 3.75,
+        metricType: 'rating',
+        decimalPlaces: 2,
+        targetValue: 5.0,
+      });
+      // Bar labels should use only result.value, not value + unit
+      expect(result.value).toBe('3.75');
+      expect(result.value).not.toContain('rating');
+      expect(result.value).not.toContain('/');
+    });
+
+    it('provides value without unit for bar labels (percentage type)', () => {
+      const result = formatMetricValue({
+        value: 85,
+        isPercentage: true,
+        decimalPlaces: 0,
+      });
+      // Bar labels should use only result.value, not value + unit
+      expect(result.value).toBe('85');
+      expect(result.value).not.toContain('%');
+    });
+
+    it('provides value without unit for bar labels (custom unit)', () => {
+      const result = formatMetricValue({
+        value: 100,
+        isPercentage: false,
+        decimalPlaces: 0,
+        unit: 'score',
+      });
+      // Bar labels should use only result.value, not value + unit
+      expect(result.value).toBe('100');
+      expect(result.value).not.toContain('score');
+    });
+  });
 });
 
 describe('getNumberFormat', () => {

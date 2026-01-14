@@ -345,7 +345,7 @@ function CompactMetricCard({
         ctx.font = 'bold 10px Inter, sans-serif';
         ctx.textAlign = 'center';
         const barFormatted = formatValue(d.value);
-        ctx.fillText(barFormatted.value + barFormatted.unit, x + barWidth / 2, y - 4);
+        ctx.fillText(barFormatted.value, x + barWidth / 2, y - 4);
 
         ctx.fillStyle = '#6B7280';
         ctx.font = '9px Inter, sans-serif';

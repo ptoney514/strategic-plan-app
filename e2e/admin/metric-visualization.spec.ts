@@ -198,6 +198,30 @@ test.describe('Public Metric Visualization', () => {
   });
 });
 
+// Bar chart label tests - verify labels show value only, not concatenated units
+test.describe('Bar Chart Label Formatting', () => {
+  test('bar chart labels should display numeric values without unit concatenation', async ({ page }) => {
+    await page.goto('/westside/goals');
+    await page.waitForLoadState('networkidle');
+
+    // Wait for canvas charts to render
+    const canvasElements = page.locator('canvas');
+    const count = await canvasElements.count();
+
+    if (count > 0) {
+      // Take a screenshot for visual verification that labels show clean values
+      // Labels should show "3.75" not "3.75rating" or "100score"
+      const firstCanvas = canvasElements.first();
+      await expect(firstCanvas).toBeVisible();
+
+      // Visual regression test - update baseline after fix is applied
+      await expect(firstCanvas).toHaveScreenshot('bar-chart-labels.png', {
+        maxDiffPixels: 100,
+      });
+    }
+  });
+});
+
 // Visual regression tests (optional, requires baseline screenshots)
 test.describe.skip('Metric Chart Visual Tests', () => {
   test('donut chart should match visual snapshot', async ({ page }) => {

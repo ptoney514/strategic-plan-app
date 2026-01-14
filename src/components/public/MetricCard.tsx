@@ -422,7 +422,7 @@ export function MetricCard({ metric, index }: MetricCardProps) {
         ctx.font = 'bold 11px Inter, sans-serif';
         ctx.textAlign = 'center';
         const barFormatted = formatValue(d.value);
-        ctx.fillText(barFormatted.value + barFormatted.unit, x + barWidth / 2, y - 6);
+        ctx.fillText(barFormatted.value, x + barWidth / 2, y - 6);
 
         // Label below bar
         ctx.fillStyle = '#6B7280';

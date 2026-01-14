@@ -3,7 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import { supabase } from '../lib/supabase';
-import { getSubdomainUrl } from '../lib/subdomain';
+import { getSubdomainUrl, buildSubdomainUrlWithPath } from '../lib/subdomain';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 
 interface LocationState {
@@ -83,8 +83,10 @@ export function Login() {
         .maybeSingle();
 
       // If district admin, redirect to their district admin page
+      // Use window.location.href for cross-subdomain navigation (subdomain routing)
+      // This ensures proper subdomain context on localhost (?subdomain=x) and production (x.stratadash.org)
       if (districtAdmin?.district_slug) {
-        navigate(`/${districtAdmin.district_slug}/admin${location.search}`, { replace: true });
+        window.location.href = buildSubdomainUrlWithPath('district', '/admin', districtAdmin.district_slug);
         return;
       }
 

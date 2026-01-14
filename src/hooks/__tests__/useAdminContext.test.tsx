@@ -47,6 +47,10 @@ const mockSchools: School[] = [
 const mockSchool: School = mockSchools[0];
 
 // Create wrapper with router and query client
+// NOTE: These tests use subdomain-based routing where the slug comes from the subdomain,
+// NOT from the URL path. The routes are /admin (not /:slug/admin).
+// However, the hook still relies on useParams for backwards compatibility,
+// so we simulate this by using path-based routes in tests.
 function createWrapper(initialPath: string) {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -59,6 +63,10 @@ function createWrapper(initialPath: string) {
       <QueryClientProvider client={queryClient}>
         <MemoryRouter initialEntries={[initialPath]}>
           <Routes>
+            {/* Subdomain-based routes - slug is NOT in URL path */}
+            <Route path="/admin/*" element={children} />
+            <Route path="/schools/:schoolSlug/admin/*" element={children} />
+            {/* Legacy path-based routes - kept for backwards compatibility in tests */}
             <Route path="/:slug/admin/*" element={children} />
             <Route path="/:slug/schools/:schoolSlug/admin/*" element={children} />
           </Routes>
@@ -162,15 +170,18 @@ describe('useAdminContext', () => {
     expect(result.current.schools).toEqual(mockSchools);
   });
 
-  it('returns correct basePath for district context', () => {
+  // SUBDOMAIN ROUTING: basePath should NOT include the district slug
+  // because the slug is in the subdomain (e.g., westside.stratadash.org/admin)
+  it('returns correct basePath for district context (subdomain routing)', () => {
     const { result } = renderHook(() => useAdminContext(), {
       wrapper: createWrapper('/test-district/admin'),
     });
 
-    expect(result.current.basePath).toBe('/test-district/admin');
+    // With subdomain routing, basePath should be '/admin' not '/test-district/admin'
+    expect(result.current.basePath).toBe('/admin');
   });
 
-  it('returns correct basePath for school context', () => {
+  it('returns correct basePath for school context (subdomain routing)', () => {
     vi.mocked(useSchool).mockReturnValue({
       data: mockSchool,
       isLoading: false,
@@ -183,18 +194,20 @@ describe('useAdminContext', () => {
       wrapper: createWrapper('/test-district/schools/elementary/admin'),
     });
 
-    expect(result.current.basePath).toBe('/test-district/schools/elementary/admin');
+    // With subdomain routing, basePath should NOT include district slug
+    expect(result.current.basePath).toBe('/schools/elementary/admin');
   });
 
-  it('returns correct publicUrl for district context', () => {
+  it('returns correct publicUrl for district context (subdomain routing)', () => {
     const { result } = renderHook(() => useAdminContext(), {
       wrapper: createWrapper('/test-district/admin'),
     });
 
-    expect(result.current.publicUrl).toBe('/test-district');
+    // With subdomain routing, publicUrl should be '/' not '/test-district'
+    expect(result.current.publicUrl).toBe('/');
   });
 
-  it('returns correct publicUrl for school context', () => {
+  it('returns correct publicUrl for school context (subdomain routing)', () => {
     vi.mocked(useSchool).mockReturnValue({
       data: mockSchool,
       isLoading: false,
@@ -207,7 +220,8 @@ describe('useAdminContext', () => {
       wrapper: createWrapper('/test-district/schools/elementary/admin'),
     });
 
-    expect(result.current.publicUrl).toBe('/test-district/schools/elementary');
+    // With subdomain routing, publicUrl should NOT include district slug
+    expect(result.current.publicUrl).toBe('/schools/elementary');
   });
 
   it('returns isLoading true when district is loading', () => {
@@ -342,17 +356,18 @@ describe('useIsActiveSection', () => {
     } as any);
   });
 
-  it('returns true for overview section on base admin path', () => {
+  // With subdomain routing, basePath is '/admin', so we test with '/admin' path
+  it('returns true for overview section on base admin path (subdomain routing)', () => {
     const { result } = renderHook(() => useIsActiveSection('overview'), {
-      wrapper: createWrapper('/test-district/admin'),
+      wrapper: createWrapper('/admin'),
     });
 
     expect(result.current).toBe(true);
   });
 
-  it('returns true for dashboard section on base admin path', () => {
+  it('returns true for dashboard section on base admin path (subdomain routing)', () => {
     const { result } = renderHook(() => useIsActiveSection('dashboard'), {
-      wrapper: createWrapper('/test-district/admin'),
+      wrapper: createWrapper('/admin'),
     });
 
     expect(result.current).toBe(true);
@@ -360,7 +375,7 @@ describe('useIsActiveSection', () => {
 
   it('returns false for non-matching section', () => {
     const { result } = renderHook(() => useIsActiveSection('objectives'), {
-      wrapper: createWrapper('/test-district/admin'),
+      wrapper: createWrapper('/admin'),
     });
 
     expect(result.current).toBe(false);

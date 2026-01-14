@@ -23,7 +23,6 @@ export interface AdminContext {
  */
 export function useAdminContext(): AdminContext {
   const { slug: districtSlug = '', schoolSlug } = useParams<{ slug: string; schoolSlug?: string }>();
-  const location = useLocation();
 
   // Fetch district data
   const { data: district, isLoading: districtLoading } = useDistrict(districtSlug);
@@ -38,20 +37,23 @@ export function useAdminContext(): AdminContext {
   const type: AdminContextType = schoolSlug ? 'school' : 'district';
 
   // Compute base path for navigation
+  // With subdomain-based routing, the district slug is in the subdomain (e.g., westside.stratadash.org)
+  // so paths should NOT include the district slug
   const basePath = useMemo(() => {
     if (schoolSlug) {
-      return `/${districtSlug}/schools/${schoolSlug}/admin`;
+      return `/schools/${schoolSlug}/admin`;
     }
-    return `/${districtSlug}/admin`;
-  }, [districtSlug, schoolSlug]);
+    return '/admin';
+  }, [schoolSlug]);
 
   // Compute public URL
+  // With subdomain-based routing, public URLs don't need the district slug in the path
   const publicUrl = useMemo(() => {
     if (schoolSlug) {
-      return `/${districtSlug}/schools/${schoolSlug}`;
+      return `/schools/${schoolSlug}`;
     }
-    return `/${districtSlug}`;
-  }, [districtSlug, schoolSlug]);
+    return '/';
+  }, [schoolSlug]);
 
   const isLoading = districtLoading || schoolsLoading || (schoolSlug ? schoolLoading : false);
 

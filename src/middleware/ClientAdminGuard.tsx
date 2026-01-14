@@ -76,13 +76,15 @@ export function ClientAdminGuard({ children, districtSlug }: ClientAdminGuardPro
   }
 
   // Redirect to login if not authenticated
+  // With subdomain routing, the slug is in the subdomain, so the path should be '/admin' not '/${slug}/admin'
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: `/${slug}/admin` }} replace />;
+    return <Navigate to="/login" state={{ from: '/admin' }} replace />;
   }
 
   // Redirect to public view if no admin access
+  // With subdomain routing, the public view is at '/' (the slug is in the subdomain)
   if (hasAccess === false) {
-    return <Navigate to={`/${slug}`} replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;

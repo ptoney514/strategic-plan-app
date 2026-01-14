@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoal, useChildGoals, useUpdateGoal } from '../../../hooks/useGoals';
@@ -22,6 +22,7 @@ import { toast } from '../../../components/Toast';
 export function ObjectiveDetail() {
   const { objectiveId } = useParams<{ objectiveId: string }>();
   const { slug } = useSubdomain();
+  const location = useLocation();
   const { data: district } = useDistrict(slug || '');
   const { data: objective, isLoading: objectiveLoading, error: objectiveError } = useGoal(objectiveId || '');
   const { data: childGoals, isLoading: childrenLoading } = useChildGoals(objectiveId || '');
@@ -185,7 +186,7 @@ export function ObjectiveDetail() {
               The objective you're looking for doesn't exist or you don't have access to it.
             </p>
             <Link
-              to="/admin/objectives"
+              to={`/admin/objectives${location.search}`}
               className="inline-flex items-center gap-2 text-[#b85c38] hover:underline font-medium"
             >
               <ChevronLeft className="h-4 w-4" />
@@ -203,7 +204,7 @@ export function ObjectiveDetail() {
         {/* Breadcrumb Navigation */}
         <div className="mb-6">
           <Link
-            to="/admin/objectives"
+            to={`/admin/objectives${location.search}`}
             className="inline-flex items-center gap-1.5 text-[13px] text-[#8a8a8a] hover:text-[#1a1a1a] transition-colors"
           >
             <ChevronLeft className="h-3.5 w-3.5" />

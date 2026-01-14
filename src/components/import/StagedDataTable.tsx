@@ -85,7 +85,7 @@ export const StagedDataTable: React.FC<StagedDataTableProps> = ({
                 <CheckCircle className="h-4 w-4 mr-1" />
                 <span className="text-xs font-medium">Valid</span>
                 {row.is_auto_generated && (
-                  <Sparkles className="h-3 w-3 ml-1" title="Auto-generated" />
+                  <Sparkles className="h-3 w-3 ml-1" />
                 )}
               </div>
             );

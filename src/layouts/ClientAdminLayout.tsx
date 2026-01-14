@@ -101,7 +101,7 @@ export function ClientAdminLayout() {
         {/* Navigation */}
         <SidebarNav
           district={district}
-          schools={schools}
+          schools={schools || []}
           districtSlug={districtSlug}
           schoolSlug={schoolSlug}
           onAddSchool={() => setShowAddSchoolModal(true)}
@@ -231,7 +231,7 @@ export function ClientAdminLayout() {
             {/* Mobile Navigation */}
             <SidebarNav
               district={district}
-              schools={schools}
+              schools={schools || []}
               districtSlug={districtSlug}
               schoolSlug={schoolSlug}
               onAddSchool={() => {

@@ -29,12 +29,12 @@ export function StrategicObjectiveEditor({ objective, isEditing, onUpdate }: Str
 
   const handleColorSelect = (color: string) => {
     setSelectedColor(color);
-    onUpdate({ header_color: color, image_url: null });
+    onUpdate({ header_color: color, image_url: undefined });
   };
 
   const handleImageSelect = (imageUrl: string) => {
     setSelectedImage(imageUrl);
-    onUpdate({ image_url: imageUrl, header_color: null });
+    onUpdate({ image_url: imageUrl, header_color: undefined });
   };
 
   if (!isEditing) {
@@ -72,7 +72,7 @@ export function StrategicObjectiveEditor({ objective, isEditing, onUpdate }: Str
           <button
             onClick={() => {
               setHeaderMode('color');
-              onUpdate({ header_color: selectedColor, image_url: null });
+              onUpdate({ header_color: selectedColor, image_url: undefined });
             }}
             className={`flex-1 px-4 py-2 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${
               headerMode === 'color'
@@ -87,7 +87,7 @@ export function StrategicObjectiveEditor({ objective, isEditing, onUpdate }: Str
             onClick={() => {
               setHeaderMode('image');
               if (selectedImage) {
-                onUpdate({ image_url: selectedImage, header_color: null });
+                onUpdate({ image_url: selectedImage, header_color: undefined });
               }
             }}
             className={`flex-1 px-4 py-2 rounded-lg border-2 transition-all flex items-center justify-center gap-2 ${

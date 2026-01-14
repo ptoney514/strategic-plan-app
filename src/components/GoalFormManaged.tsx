@@ -1,4 +1,3 @@
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -9,8 +8,8 @@ import { Loader2 } from 'lucide-react';
 const goalSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200, 'Title must be less than 200 characters'),
   description: z.string().optional(),
-  target_date: z.string().optional(),
-  status: z.enum(['not-started', 'in-progress', 'completed', 'on-hold']),
+  end_date: z.string().optional(),
+  status_detail: z.enum(['not_started', 'planning', 'in_progress', 'completed', 'on_hold']),
   owner_name: z.string().optional(),
   department: z.string().optional(),
   priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
@@ -48,8 +47,8 @@ export function GoalFormManaged({
     defaultValues: {
       title: goal?.title || '',
       description: goal?.description || '',
-      target_date: goal?.target_date || '',
-      status: goal?.status || 'not-started',
+      end_date: goal?.end_date || '',
+      status_detail: goal?.status_detail || 'not_started',
       owner_name: goal?.owner_name || '',
       department: goal?.department || '',
       priority: goal?.priority || 'medium',
@@ -118,21 +117,22 @@ export function GoalFormManaged({
         </div>
 
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-foreground mb-1">
+          <label htmlFor="status_detail" className="block text-sm font-medium text-foreground mb-1">
             Status
           </label>
           <select
-            id="status"
-            {...register('status')}
+            id="status_detail"
+            {...register('status_detail')}
             className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <option value="not-started">Not Started</option>
-            <option value="in-progress">In Progress</option>
+            <option value="not_started">Not Started</option>
+            <option value="planning">Planning</option>
+            <option value="in_progress">In Progress</option>
             <option value="completed">Completed</option>
-            <option value="on-hold">On Hold</option>
+            <option value="on_hold">On Hold</option>
           </select>
-          {errors.status && (
-            <p className="mt-1 text-sm text-red-600">{errors.status.message}</p>
+          {errors.status_detail && (
+            <p className="mt-1 text-sm text-red-600">{errors.status_detail.message}</p>
           )}
         </div>
 
@@ -188,17 +188,17 @@ export function GoalFormManaged({
         </div>
 
         <div>
-          <label htmlFor="target_date" className="block text-sm font-medium text-foreground mb-1">
+          <label htmlFor="end_date" className="block text-sm font-medium text-foreground mb-1">
             Target Date
           </label>
           <input
             type="date"
-            id="target_date"
-            {...register('target_date')}
+            id="end_date"
+            {...register('end_date')}
             className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
           />
-          {errors.target_date && (
-            <p className="mt-1 text-sm text-red-600">{errors.target_date.message}</p>
+          {errors.end_date && (
+            <p className="mt-1 text-sm text-red-600">{errors.end_date.message}</p>
           )}
         </div>
       </div>

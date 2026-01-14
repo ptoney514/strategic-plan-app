@@ -331,13 +331,13 @@ export function AdminGoals() {
                         {goal.title}
                       </h3>
                     </div>
-                    {getStatusIcon(goal.status)}
+                    {getStatusIcon(goal.status_detail)}
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-muted-foreground">Status:</span>
-                      {getStatusBadge(goal.status)}
+                      {getStatusBadge(goal.status_detail)}
                     </div>
 
                     <div className="flex items-center justify-between text-xs">

@@ -317,6 +317,7 @@ export function ClientAdminEditorialLayout() {
         isOpen={isAddSchoolModalOpen}
         onClose={() => setIsAddSchoolModalOpen(false)}
         districtId={district.id}
+        districtSlug={slug || ''}
       />
     </div>
   );

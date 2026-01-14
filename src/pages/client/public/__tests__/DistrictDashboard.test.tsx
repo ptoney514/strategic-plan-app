@@ -16,8 +16,12 @@ function flattenGoalHierarchy(goals: Goal[]): Goal[] {
 }
 
 function getDisplayMode(goal: Goal): 'qualitative' | 'percentage' | 'custom' {
-  return goal.overall_progress_display_mode ||
-         (goal.level === 2 ? 'percentage' : 'qualitative');
+  const mode = goal.overall_progress_display_mode;
+  // Handle all possible modes, defaulting the additional modes to 'custom'
+  if (mode === 'hidden' || mode === 'score' || mode === 'color-only') {
+    return 'custom';
+  }
+  return mode || (goal.level === 2 ? 'percentage' : 'qualitative');
 }
 
 function getGoalStatus(indicatorText?: string): 'off-track' | 'on-target' {

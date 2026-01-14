@@ -4,7 +4,7 @@ import { Button, Input, Textarea, Label, Badge } from './ui';
 import { useUpdateGoal } from '../hooks/useGoals';
 import { useCreateMetric, useUpdateMetric, useDeleteMetric } from '../hooks/useMetrics';
 import { toast } from './Toast';
-import type { Goal, Metric, TimeSeriesDataPoint, ChartType } from '../lib/types';
+import type { Goal, Metric, TimeSeriesDataPoint, ChartType, DataSourceType, MetricType } from '../lib/types';
 import { ChartTypePicker } from './ChartTypePicker';
 import { TimeSeriesDataEntry } from './TimeSeriesDataEntry';
 
@@ -29,7 +29,13 @@ export function GoalEditWizard({
   const deleteMetricMutation = useDeleteMetric();
 
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    owner_name: string;
+    department: string;
+    priority: 'critical' | 'high' | 'medium' | 'low' | '';
+  }>({
     title: '',
     description: '',
     owner_name: '',
@@ -45,8 +51,8 @@ export function GoalEditWizard({
     target_value: '',
     current_value: '',
     unit: '%',
-    data_source: 'manual' as const,
-    metric_type: 'percentage' as const
+    data_source: 'manual' as DataSourceType,
+    metric_type: 'percent' as MetricType
   });
   const [localMetrics, setLocalMetrics] = useState<Metric[]>([]);
   const [metricChartType, setMetricChartType] = useState<ChartType | undefined>();
@@ -110,8 +116,8 @@ export function GoalEditWizard({
       target_value: '',
       current_value: '',
       unit: '%',
-      data_source: 'manual',
-      metric_type: 'percentage'
+      data_source: 'manual' as DataSourceType,
+      metric_type: 'percent' as MetricType
     });
   };
 
@@ -125,7 +131,7 @@ export function GoalEditWizard({
       current_value: metric.current_value?.toString() || '',
       unit: metric.unit || '%',
       data_source: metric.data_source || 'manual',
-      metric_type: metric.metric_type || 'percentage'
+      metric_type: metric.metric_type || 'percent'
     });
     setMetricChartType(metric.chart_type);
     setMetricDataPoints((metric.data_points as TimeSeriesDataPoint[]) || []);
@@ -135,8 +141,8 @@ export function GoalEditWizard({
     const newMetric: Partial<Metric> = {
       metric_name: metricForm.metric_name,
       description: metricForm.description,
-      target_value: parseFloat(metricForm.target_value) || null,
-      current_value: parseFloat(metricForm.current_value) || null,
+      target_value: parseFloat(metricForm.target_value) || undefined,
+      current_value: parseFloat(metricForm.current_value) || undefined,
       unit: metricForm.unit,
       data_source: metricForm.data_source,
       metric_type: metricForm.metric_type,
@@ -163,8 +169,8 @@ export function GoalEditWizard({
       target_value: '',
       current_value: '',
       unit: '%',
-      data_source: 'manual',
-      metric_type: 'percentage'
+      data_source: 'manual' as DataSourceType,
+      metric_type: 'percent' as MetricType
     });
     setMetricChartType(undefined);
     setMetricDataPoints([]);
@@ -181,7 +187,10 @@ export function GoalEditWizard({
       // Update goal information
       await updateGoalMutation.mutateAsync({
         id: goal.id,
-        updates: formData
+        updates: {
+          ...formData,
+          priority: formData.priority || undefined
+        }
       });
 
       // Handle metrics changes
@@ -571,8 +580,8 @@ export function GoalEditWizard({
                               target_value: '',
                               current_value: '',
                               unit: '%',
-                              data_source: 'manual',
-                              metric_type: 'percentage'
+                              data_source: 'manual' as DataSourceType,
+                              metric_type: 'percent' as MetricType
                             });
                           }}
                         >

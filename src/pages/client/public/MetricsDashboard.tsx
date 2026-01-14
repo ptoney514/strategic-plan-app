@@ -15,7 +15,8 @@ import {
   List,
   FileText,
   FileSpreadsheet,
-  Package
+  Package,
+  CheckCircle
 } from 'lucide-react';
 import { 
   useDashboardData, 
@@ -347,10 +348,9 @@ export function MetricsDashboard() {
                 </span>
               </div>
             </div>
-            <MetricsChart 
-              metrics={filteredMetrics} 
+            <MetricsChart
+              metrics={filteredMetrics}
               variant="area"
-              showTrend={true}
             />
           </div>
         )}
@@ -390,7 +390,7 @@ export function MetricsDashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-card rounded-lg border border-border p-6">
               <h3 className="text-lg font-semibold mb-4">Metrics by Category</h3>
-              <GoalProgressChart goals={goals} variant="pie" />
+              <GoalProgressChart goals={goals as any || []} variant="pie" />
             </div>
             <div className="bg-card rounded-lg border border-border p-6">
               <h3 className="text-lg font-semibold mb-4">Category Performance</h3>
@@ -412,7 +412,7 @@ export function MetricsDashboard() {
         {metricsWithTimeSeries && metricsWithTimeSeries.length > 0 && (
           <div className="bg-card rounded-lg border border-border p-6">
             <h2 className="text-xl font-semibold text-foreground mb-4">Detailed Metrics Analysis</h2>
-            <MetricOverview metrics={metricsWithTimeSeries.slice(0, 5)} />
+            <MetricOverview metric={metricsWithTimeSeries[0]} />
           </div>
         )}
       </main>

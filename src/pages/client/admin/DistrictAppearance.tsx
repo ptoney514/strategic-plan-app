@@ -30,11 +30,11 @@ export function DistrictAppearance() {
 
     try {
       await updateDistrict.mutateAsync({
-        slug: district.slug,
+        id: district.id,
         updates: {
           primary_color: primaryColor,
           secondary_color: secondaryColor,
-          logo_url: logoUrl || null,
+          logo_url: logoUrl || undefined,
         },
       });
     } catch (error) {

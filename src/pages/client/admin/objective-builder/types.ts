@@ -10,7 +10,7 @@ export interface ComponentItem {
   category: string;
 }
 
-export interface GoalWithChildren extends Partial<Goal> {
+export type GoalWithChildren = Partial<Goal> & {
   children?: GoalWithChildren[];
 }
 

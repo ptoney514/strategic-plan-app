@@ -130,7 +130,7 @@ export function DistrictDashboard() {
   };
 
   // Helper function to determine display mode based on goal level
-  const getDisplayMode = (goal: Goal): 'qualitative' | 'percentage' | 'custom' => {
+  const getDisplayMode = (goal: Goal): 'qualitative' | 'percentage' | 'score' | 'color-only' | 'hidden' | 'custom' => {
     return goal.overall_progress_display_mode ||
            (goal.level === 2 ? 'percentage' : 'qualitative');
   };
@@ -394,17 +394,17 @@ export function DistrictDashboard() {
                         {primaryMetric && (
                           <div className="border-t border-neutral-200 p-5 bg-neutral-50">
                             {primaryMetric.visualization_type === 'narrative' ? (
-                              <NarrativeDisplay config={primaryMetric.visualization_config} />
+                              <NarrativeDisplay config={primaryMetric.visualization_config as any} />
                             ) : (primaryMetric.visualization_type === 'bar' && primaryMetric.visualization_config?.scaleMin) ? (
                               chartData && chartData.length > 0 && (
                                 <LikertScaleChart
                                   data={chartData}
                                   title={primaryMetric.name || "Survey Results"}
                                   description={primaryMetric.description}
-                                  scaleMin={primaryMetric.visualization_config?.scaleMin || 1}
-                                  scaleMax={primaryMetric.visualization_config?.scaleMax || 5}
-                                  scaleLabel={primaryMetric.visualization_config?.scaleLabel || '(5 high)'}
-                                  targetValue={primaryMetric.target_value || primaryMetric.visualization_config?.targetValue}
+                                  scaleMin={typeof primaryMetric.visualization_config?.scaleMin === 'number' ? primaryMetric.visualization_config.scaleMin : 1}
+                                  scaleMax={typeof primaryMetric.visualization_config?.scaleMax === 'number' ? primaryMetric.visualization_config.scaleMax : 5}
+                                  scaleLabel={typeof primaryMetric.visualization_config?.scaleLabel === 'string' ? primaryMetric.visualization_config.scaleLabel : '(5 high)'}
+                                  targetValue={primaryMetric.target_value || (typeof primaryMetric.visualization_config?.targetValue === 'number' ? primaryMetric.visualization_config.targetValue : undefined)}
                                   showAverage={true}
                                 />
                               )
@@ -413,11 +413,15 @@ export function DistrictDashboard() {
                                 <div className="text-center">
                                   <div className="text-sm font-medium text-neutral-600 mb-2">{primaryMetric.name}</div>
                                   <div className="text-3xl font-bold text-neutral-900">
-                                    {primaryMetric.visualization_config?.label || ''}{primaryMetric.visualization_config?.ratioValue || '1.0:1'}
+                                    {String(typeof primaryMetric.visualization_config?.label === 'string' ? primaryMetric.visualization_config.label : '')}{String(typeof primaryMetric.visualization_config?.ratioValue === 'string' ? primaryMetric.visualization_config.ratioValue : '1.0:1')}
                                   </div>
-                                  {primaryMetric.visualization_config?.showTarget && primaryMetric.visualization_config?.targetValue && (
+                                  {(primaryMetric.visualization_config as any)?.showTarget && primaryMetric.visualization_config?.targetValue && (
                                     <div className="text-sm text-neutral-500 mt-2">
-                                      Target: {primaryMetric.visualization_config.label}{primaryMetric.visualization_config.targetValue}
+                                      Target: {(() => {
+                                        const label = primaryMetric.visualization_config?.label;
+                                        const targetValue = primaryMetric.visualization_config?.targetValue;
+                                        return String(typeof label === 'string' ? label : '') + String(typeof targetValue === 'string' ? targetValue : String(targetValue));
+                                      })()}
                                     </div>
                                   )}
                                 </div>
@@ -428,23 +432,31 @@ export function DistrictDashboard() {
                                   <div className="text-sm font-medium text-neutral-600 mb-2">{primaryMetric.name}</div>
                                   <div className="text-4xl font-bold text-neutral-900 mb-1">
                                     {(() => {
-                                      const decimals = primaryMetric.visualization_config?.decimals ?? 2;
-                                      const value = typeof primaryMetric.visualization_config?.currentValue === 'number'
-                                        ? primaryMetric.visualization_config.currentValue.toFixed(decimals)
-                                        : primaryMetric.visualization_config?.currentValue || '0';
-                                      return primaryMetric.visualization_config?.unit ? `${value}${primaryMetric.visualization_config.unit}` : value;
+                                      const decimals = typeof primaryMetric.visualization_config?.decimals === 'number' ? primaryMetric.visualization_config.decimals : 2;
+                                      const currentValue = primaryMetric.visualization_config?.currentValue;
+                                      const value = typeof currentValue === 'number'
+                                        ? currentValue.toFixed(decimals)
+                                        : String(currentValue || '0');
+                                      const unit = typeof primaryMetric.visualization_config?.unit === 'string' ? primaryMetric.visualization_config.unit : '';
+                                      return unit ? `${value}${unit}` : value;
                                     })()}
                                   </div>
-                                  {primaryMetric.visualization_config?.targetValue && (
+                                  {(primaryMetric.visualization_config as any)?.targetValue && (
                                     <div className="text-sm text-neutral-500 mt-2">
-                                      Target: {primaryMetric.visualization_config.targetValue.toFixed(primaryMetric.visualization_config?.decimals ?? 2)}{primaryMetric.visualization_config?.unit || ''}
+                                      Target: {(() => {
+                                        const targetValue = (primaryMetric.visualization_config as any)?.targetValue;
+                                        const decimals = typeof primaryMetric.visualization_config?.decimals === 'number' ? primaryMetric.visualization_config.decimals : 2;
+                                        const unit = typeof primaryMetric.visualization_config?.unit === 'string' ? primaryMetric.visualization_config.unit : '';
+                                        const formattedValue = typeof targetValue === 'number' ? targetValue.toFixed(decimals) : String(targetValue);
+                                        return formattedValue + unit;
+                                      })()}
                                     </div>
                                   )}
                                 </div>
                               </div>
                             ) : (primaryMetric.visualization_type === 'blog' && primaryMetric.visualization_config?._frontendType === 'narrative') ? (
                               <div className="p-6 bg-white rounded-lg">
-                                <NarrativeDisplay config={primaryMetric.visualization_config} />
+                                <NarrativeDisplay config={primaryMetric.visualization_config as any} />
                               </div>
                             ) : (
                               chartData && chartData.length > 0 && (

@@ -120,7 +120,7 @@ export function LikertScaleChart({
               <LabelList
                 dataKey="value"
                 position="top"
-                formatter={(value: number) => value > 0 ? value.toFixed(2) : ''}
+                formatter={(value: any) => value > 0 ? value.toFixed(2) : ''}
                 style={{
                   fill: '#111827',
                   fontSize: '14px',

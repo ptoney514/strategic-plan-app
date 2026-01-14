@@ -32,8 +32,8 @@ export function useDashboardData(districtId: string) {
       ]);
 
       // Fetch time series data for all metrics
-      const timeSeriesPromises = metrics.map(m => 
-        MetricTimeSeriesService.getByMetric(m.id).catch(() => [])
+      const timeSeriesPromises = metrics.map((m: Metric) =>
+        MetricTimeSeriesService.getByMetricId(m.id).catch(() => [])
       );
       const timeSeriesResults = await Promise.all(timeSeriesPromises);
       const timeSeries = timeSeriesResults.flat();
@@ -51,7 +51,7 @@ export function useDashboardData(districtId: string) {
     },
     enabled: !!districtId,
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 10, // 10 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
   });
 }
 
@@ -65,7 +65,7 @@ export function useMetricsWithTimeSeries(districtId: string) {
       // Fetch time series for each metric
       const metricsWithTimeSeries = await Promise.all(
         metrics.map(async (metric) => {
-          const timeSeries = await MetricTimeSeriesService.getByMetric(metric.id).catch(() => []);
+          const timeSeries = await MetricTimeSeriesService.getByMetricId(metric.id).catch(() => []);
           return {
             ...metric,
             timeSeries,

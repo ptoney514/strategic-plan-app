@@ -1169,11 +1169,11 @@ export function DataManager() {
                     Status
                   </label>
                   <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                    selectedGoal.status === 'on-target' ? 'bg-green-100 text-green-800' :
-                    selectedGoal.status === 'off-target' ? 'bg-red-100 text-red-800' :
+                    selectedGoal.status_detail === 'completed' ? 'bg-green-100 text-green-800' :
+                    selectedGoal.status_detail === 'in_progress' ? 'bg-blue-100 text-blue-800' :
                     'bg-gray-100 text-gray-800'
                   }`}>
-                    {selectedGoal.status || 'not-started'}
+                    {selectedGoal.status_detail || 'not_started'}
                   </span>
                 </div>
 

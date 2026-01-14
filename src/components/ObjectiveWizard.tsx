@@ -35,7 +35,7 @@ export function ObjectiveWizard({ isOpen, onClose, onComplete, districtId, exist
     description: '',
     timeframe: '3-year',
     status: 'not-started',
-    coverPhotoUrl: null,
+    coverPhotoUrl: null as string | null,
     coverPhotoAlt: '',
   });
   const [goals, setGoals] = useState<Goal[]>([]);

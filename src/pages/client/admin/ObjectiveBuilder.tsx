@@ -33,9 +33,11 @@ interface ComponentItem {
   category: string;
 }
 
-interface GoalWithChildren extends Partial<Goal> {
+type GoalWithChildren = Partial<Goal> & {
+  title: string;
+  level: 0 | 1 | 2;
   children?: GoalWithChildren[];
-}
+};
 
 interface BuilderState {
   objective: Partial<Goal>;
@@ -331,7 +333,7 @@ export function ObjectiveBuilder() {
       indicator_color: goal.indicator_color || '#10b981',
       metrics: (goal as any).metrics || [],
       show_progress_bar: goal.show_progress_bar !== false,
-      overall_progress_display_mode: goal.overall_progress_display_mode || 'percentage',
+      overall_progress_display_mode: (goal.overall_progress_display_mode || 'percentage') as 'percentage' | 'qualitative' | 'custom',
       overall_progress_custom_value: goal.overall_progress_custom_value || '',
       overall_progress_override: goal.overall_progress_override
     });
@@ -383,16 +385,16 @@ export function ObjectiveBuilder() {
                     description: goalForm.description,
                     indicator_text: goalForm.indicator_text,
                     indicator_color: goalForm.indicator_color,
-                    level: 2,
+                    level: 2 as const,
                     parent_id: g.id,
                     goal_number: `${g.goal_number}.${subGoalNumber}`,
                     show_progress_bar: goalForm.show_progress_bar,
                     overall_progress_display_mode: goalForm.overall_progress_display_mode,
                     overall_progress_custom_value: goalForm.overall_progress_custom_value,
                     overall_progress_override: goalForm.overall_progress_override
-                  }
+                  } as GoalWithChildren
                 ]
-              };
+              } as GoalWithChildren;
             }
             return g;
           })
@@ -425,7 +427,7 @@ export function ObjectiveBuilder() {
           description: goalForm.description,
           indicator_text: goalForm.indicator_text,
           indicator_color: goalForm.indicator_color,
-          level: 1,
+          level: 1 as const,
           parent_id: prev.objective.id,
           goal_number: prev.objective.goal_number
             ? `${prev.objective.goal_number}.${prev.goals.length + 1}`
@@ -435,7 +437,7 @@ export function ObjectiveBuilder() {
           overall_progress_custom_value: goalForm.overall_progress_custom_value,
           overall_progress_override: goalForm.overall_progress_override,
           children: []
-        }]
+        } as GoalWithChildren]
       }));
     }
 
@@ -485,7 +487,7 @@ export function ObjectiveBuilder() {
       indicator_color: subGoal.indicator_color || '#10b981',
       metrics: (subGoal as any).metrics || [],
       show_progress_bar: subGoal.show_progress_bar !== false,
-      overall_progress_display_mode: subGoal.overall_progress_display_mode || 'percentage',
+      overall_progress_display_mode: (subGoal.overall_progress_display_mode || 'percentage') as 'percentage' | 'qualitative' | 'custom',
       overall_progress_custom_value: subGoal.overall_progress_custom_value || '',
       overall_progress_override: subGoal.overall_progress_override
     });
@@ -571,23 +573,23 @@ export function ObjectiveBuilder() {
       const objectiveData: Partial<Goal> = {
         district_id: district.id,
         title: builderState.objective.title.trim(),
-        description: builderState.objective.description?.trim() || null,
+        description: builderState.objective.description?.trim() || undefined,
         level: editingLevel, // Dynamic level based on what we're editing
-        parent_id: editingLevel === 0 ? null : builderState.objective.parent_id, // Preserve parent for non-objectives
-        image_url: builderState.objective.image_url || null,
-        header_color: builderState.objective.header_color || null,
+        parent_id: editingLevel === 0 ? undefined : builderState.objective.parent_id, // Preserve parent for non-objectives
+        image_url: builderState.objective.image_url || undefined,
+        header_color: builderState.objective.header_color || undefined,
         show_progress_bar: builderState.visibleComponents.progressBar,
-        indicator_text: builderState.visibleComponents.visualBadge ? (builderState.objective.indicator_text?.trim() || null) : null,
-        indicator_color: builderState.visibleComponents.visualBadge ? (builderState.objective.indicator_color || '#10b981') : null,
+        indicator_text: builderState.visibleComponents.visualBadge ? (builderState.objective.indicator_text?.trim() || undefined) : undefined,
+        indicator_color: builderState.visibleComponents.visualBadge ? (builderState.objective.indicator_color || '#10b981') : undefined,
         overall_progress: builderState.objective.overall_progress || 0,
         overall_progress_display_mode: builderState.objective.overall_progress_display_mode || 'percentage',
-        overall_progress_custom_value: builderState.objective.overall_progress_custom_value || null,
-        owner_name: builderState.objective.owner_name || null,
-        department: builderState.objective.department || null,
-        start_date: builderState.objective.start_date || null,
-        end_date: builderState.objective.end_date || null,
-        priority: builderState.objective.priority || null,
-        executive_summary: builderState.objective.executive_summary || null,
+        overall_progress_custom_value: builderState.objective.overall_progress_custom_value || undefined,
+        owner_name: builderState.objective.owner_name || undefined,
+        department: builderState.objective.department || undefined,
+        start_date: builderState.objective.start_date || undefined,
+        end_date: builderState.objective.end_date || undefined,
+        priority: builderState.objective.priority || undefined,
+        executive_summary: builderState.objective.executive_summary || undefined,
       };
 
       if (isEditMode && editingId) {
@@ -618,14 +620,14 @@ export function ObjectiveBuilder() {
         const goalData: Partial<Goal> = {
           district_id: district.id,
           title: goal.title!.trim(),
-          description: goal.description?.trim() || null,
-          indicator_text: goal.indicator_text || null,
-          indicator_color: goal.indicator_color || null,
+          description: goal.description?.trim() || undefined,
+          indicator_text: goal.indicator_text || undefined,
+          indicator_color: goal.indicator_color || undefined,
           show_progress_bar: goal.show_progress_bar !== false,
           overall_progress: goal.overall_progress_override || goal.overall_progress || 0,
           overall_progress_override: goal.overall_progress_override,
           overall_progress_display_mode: goal.overall_progress_display_mode || 'percentage',
-          overall_progress_custom_value: goal.overall_progress_custom_value || null,
+          overall_progress_custom_value: goal.overall_progress_custom_value || undefined,
           level: childLevel, // Dynamic based on parent level
           parent_id: savedObjective.id,
         };
@@ -660,14 +662,14 @@ export function ObjectiveBuilder() {
             const subGoalData: Partial<Goal> = {
               district_id: district.id,
               title: subGoal.title!.trim(),
-              description: subGoal.description?.trim() || null,
-              indicator_text: subGoal.indicator_text || null,
-              indicator_color: subGoal.indicator_color || null,
+              description: subGoal.description?.trim() || undefined,
+              indicator_text: subGoal.indicator_text || undefined,
+              indicator_color: subGoal.indicator_color || undefined,
               show_progress_bar: subGoal.show_progress_bar !== false,
               overall_progress: subGoal.overall_progress_override || subGoal.overall_progress || 0,
               overall_progress_override: subGoal.overall_progress_override,
               overall_progress_display_mode: subGoal.overall_progress_display_mode || 'percentage',
-              overall_progress_custom_value: subGoal.overall_progress_custom_value || null,
+              overall_progress_custom_value: subGoal.overall_progress_custom_value || undefined,
               level: 2,
               parent_id: savedGoal.id,
             };

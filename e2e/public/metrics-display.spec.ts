@@ -137,6 +137,49 @@ test.describe('Narrative Visualization Layout', () => {
   });
 });
 
+test.describe('Bar Chart Label Formatting - Public Site', () => {
+  test('expanded goal panel bar chart labels should display value only (no unit concatenation)', async ({ page }) => {
+    // Navigate to objective detail page which shows Goals Overview with expandable cards
+    await page.goto('/westside');
+    await page.waitForSelector('[data-testid^="objective-"]', { state: 'visible', timeout: 15000 });
+
+    // Click on Objective 1 to go to objective detail
+    const objective1 = page.locator('[data-testid="objective-1"]').first();
+    await objective1.click();
+    await page.waitForTimeout(500);
+
+    // Should be on objective detail page with Goals Overview
+    await expect(page).toHaveURL(/\/westside\/objective\//);
+
+    // Wait for goal cards to load
+    await page.waitForSelector('.rounded-xl.border', { state: 'visible', timeout: 10000 });
+
+    // Find and click on a goal card to expand it
+    const goalCards = page.locator('button.rounded-xl.border');
+    const cardCount = await goalCards.count();
+
+    if (cardCount > 0) {
+      await goalCards.first().click();
+      await page.waitForTimeout(500);
+
+      // Wait for canvas to render in expanded panel
+      const expandedPanel = page.locator('.border-2.shadow-lg').first();
+      if (await expandedPanel.isVisible()) {
+        const canvas = expandedPanel.locator('canvas');
+        if (await canvas.count() > 0) {
+          // Wait for chart to render
+          await page.waitForTimeout(300);
+
+          // Take screenshot for visual verification - labels should show "3.75" not "3.75rating"
+          await expect(canvas.first()).toHaveScreenshot('public-bar-chart-labels.png', {
+            maxDiffPixels: 100,
+          });
+        }
+      }
+    }
+  });
+});
+
 test.describe('Metrics Display', () => {
   test.beforeEach(async ({ page }) => {
     // Enable console logging for debugging

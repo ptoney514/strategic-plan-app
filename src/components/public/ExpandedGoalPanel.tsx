@@ -158,7 +158,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
   const chartType = vizConfig?.chartType || 'bar';
 
   // Format chart values using the centralized utility
-  const formatChartValue = (value: number): string => {
+  const formatChartValue = (value: number): { value: string; display: string } => {
     const result = formatMetricValueUtil({
       value,
       isPercentage: metric.is_percentage,
@@ -166,7 +166,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
       metricType: metric.metric_type,
       unit: metric.unit || '',
     });
-    return result.display;
+    return { value: result.value, display: result.display };
   };
 
   // Wait for parent layout animation to complete before rendering
@@ -293,7 +293,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
         ctx.fillStyle = '#059669';
         ctx.font = '11px Inter, sans-serif';
         ctx.textAlign = 'right';
-        ctx.fillText(`Target: ${formatChartValue(targetValue)}`, rect.width - padding.right, 14);
+        ctx.fillText(`Target: ${formatChartValue(targetValue).value}`, rect.width - padding.right, 14);
       }
 
       // Target line (dashed green)
@@ -354,7 +354,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
           ctx.fillStyle = '#374151';
           ctx.font = 'bold 11px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(formatChartValue(p.value), p.x, p.y - 10);
+          ctx.fillText(formatChartValue(p.value).value, p.x, p.y - 10);
 
           ctx.fillStyle = '#6B7280';
           ctx.font = '11px Inter, sans-serif';
@@ -376,7 +376,7 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
           ctx.fillStyle = '#374151';
           ctx.font = 'bold 11px Inter, sans-serif';
           ctx.textAlign = 'center';
-          ctx.fillText(formatChartValue(d.value), x + barWidth / 2, y - 6);
+          ctx.fillText(formatChartValue(d.value).value, x + barWidth / 2, y - 6);
 
           ctx.fillStyle = '#6B7280';
           ctx.font = '11px Inter, sans-serif';

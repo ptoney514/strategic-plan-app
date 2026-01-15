@@ -23,6 +23,7 @@
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
+    "db:reset:dev": "supabase db reset && ./scripts/create-test-users.sh",
     "db:status": "supabase status",
     "db:diff": "supabase db diff --local",
     "db:push": "supabase db push",

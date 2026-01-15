@@ -85,6 +85,7 @@ npm run type-check       # TypeScript type checking
 npm run db:start         # Start local Supabase containers
 npm run db:stop          # Stop local Supabase
 npm run db:reset         # Reset DB with migrations + seed data
+npm run db:reset:dev     # Reset DB + create test users (recommended for dev)
 npm run db:status        # Show connection info and keys
 npm run db:studio        # Open Supabase Studio UI
 npm run db:diff          # Show uncommitted schema changes
@@ -134,6 +135,25 @@ npm run test:run
 npm run dev:local        # Start everything (Supabase + Vite)
 npm run db:studio        # Open Supabase Studio at localhost:54323
 ```
+
+### Local Test Credentials
+
+Local development uses test users that are **different from production**.
+
+| Account        | Email                  | Password       |
+| -------------- | ---------------------- | -------------- |
+| Westside Admin | `admin@westside66.org` | `Westside123!` |
+| Eastside Admin | `admin@eastside.edu`   | `Eastside123!` |
+
+**Create test users:**
+
+```bash
+npm run db:reset:dev     # Reset DB + create test users
+# OR
+./scripts/create-test-users.sh  # Create users only
+```
+
+**Login at:** http://localhost:5173/login
 
 ## Database Migration Workflow
 

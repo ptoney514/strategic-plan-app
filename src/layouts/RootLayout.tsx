@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router-dom';
+import EnvironmentBadge from '../components/EnvironmentBadge';
 
 /**
  * RootLayout - Base layout for entire application
@@ -8,6 +9,7 @@ export function RootLayout() {
   return (
     <div className="min-h-screen bg-background">
       <Outlet />
+      <EnvironmentBadge />
     </div>
   );
 }

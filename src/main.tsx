@@ -5,6 +5,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { AuthProvider } from './contexts/AuthContext'
 import { SubdomainProvider } from './contexts/SubdomainContext'
 import { ThemeProvider } from './contexts/ThemeContext'
+import { UserjotWidget } from './components/feedback/UserjotWidget'
 import '../app.css'
 import './theme.css'
 import App from './App.tsx'
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')!).render(
         <SubdomainProvider>
           <AuthProvider>
             <App />
+            <UserjotWidget />
           </AuthProvider>
         </SubdomainProvider>
       </ThemeProvider>

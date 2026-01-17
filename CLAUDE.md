@@ -140,10 +140,11 @@ npm run db:studio        # Open Supabase Studio at localhost:54323
 
 Local development uses test users that are **different from production**.
 
-| Account        | Email                  | Password       |
-| -------------- | ---------------------- | -------------- |
-| Westside Admin | `admin@westside66.org` | `Westside123!` |
-| Eastside Admin | `admin@eastside.edu`   | `Eastside123!` |
+| Account        | Email                     | Password         | Access Level  |
+| -------------- | ------------------------- | ---------------- | ------------- |
+| System Admin   | `sysadmin@stratadash.com` | `Stratadash123!` | All districts |
+| Westside Admin | `admin@westside66.org`    | `Westside123!`   | Westside only |
+| Eastside Admin | `admin@eastside.edu`      | `Eastside123!`   | Eastside only |
 
 **Create test users:**
 

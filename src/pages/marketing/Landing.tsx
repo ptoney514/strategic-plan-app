@@ -298,6 +298,17 @@ export function MarketingLanding() {
             </div>
             <span className="text-lg font-semibold text-gray-900">StrataDash</span>
           </div>
+          <div className="flex items-center gap-6 text-sm">
+            <Link to="/about" className="text-gray-500 hover:text-gray-700 transition-colors">
+              About
+            </Link>
+            <Link to="/privacy" className="text-gray-500 hover:text-gray-700 transition-colors">
+              Privacy Policy
+            </Link>
+            <Link to="/terms" className="text-gray-500 hover:text-gray-700 transition-colors">
+              Terms of Service
+            </Link>
+          </div>
           <p className="text-gray-400 text-sm">
             &copy; {new Date().getFullYear()} StrataDash. All rights reserved.
           </p>

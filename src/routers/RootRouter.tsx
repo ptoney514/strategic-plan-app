@@ -3,7 +3,7 @@ import { MarketingLanding } from '../pages/marketing/Landing';
 import { Login } from '../pages/Login';
 import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
-import { PrivacyPage, TermsPage } from '../pages/legal';
+import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { useAuth } from '../contexts/AuthContext';
 
 /**
@@ -39,6 +39,7 @@ export function RootRouter() {
       <Route path="/login" element={<Login />} />
 
       {/* Legal pages */}
+      <Route path="/about" element={<AboutPage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />
 

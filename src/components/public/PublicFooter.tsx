@@ -1,4 +1,5 @@
 import type { District } from '../../lib/types';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 
 interface PublicFooterProps {
   district: District;
@@ -15,7 +16,7 @@ export function PublicFooter({ district }: PublicFooterProps) {
 
         {/* Links */}
         <div className="flex flex-wrap items-center gap-4 sm:gap-6 text-xs">
-          <a href="#" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
+          <a href={buildSubdomainUrlWithPath('root', '/privacy')} className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
             Privacy Policy
           </a>
           <a href="#" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">

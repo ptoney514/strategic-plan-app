@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Youtube } from 'lucide-react';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 
 interface HomepageFooterProps {
   districtName: string;
@@ -155,11 +156,11 @@ export function HomepageFooter({
               © {new Date().getFullYear()} {districtName}. All rights reserved.
             </p>
             <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
+              <a href={buildSubdomainUrlWithPath('root', '/privacy')} className="text-gray-400 hover:text-white text-sm transition-colors">
                 Privacy Policy
               </a>
-              <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
-                Terms of Use
+              <a href={buildSubdomainUrlWithPath('root', '/terms')} className="text-gray-400 hover:text-white text-sm transition-colors">
+                Terms of Service
               </a>
               <a href="#" className="text-gray-400 hover:text-white text-sm transition-colors">
                 Accessibility

@@ -64,9 +64,10 @@ export function MetricBuilderWizard({
       console.log('[MetricBuilderWizard] Loading existing metric for editing:', existingMetric);
       console.log('[MetricBuilderWizard] Visualization config:', existingMetric.visualization_config);
 
-      // Try to load the original frontend type from the config, fallback to visualization_type
-      const frontendType = existingMetric.visualization_config?._frontendType || existingMetric.visualization_type || 'bar-chart';
-      setSelectedType(frontendType as VisualizationType);
+      // Try to load the original frontend type from the config, fallback to reverse mapping from DB type
+      const frontendType = existingMetric.visualization_config?._frontendType
+        || mapDbTypeToFrontendType(existingMetric.visualization_type, existingMetric.visualization_config);
+      setSelectedType(frontendType);
       setMetricData(existingMetric.visualization_config || getDefaultConfig('bar-chart'));
       setMetricDetails({
         name: existingMetric.metric_name || existingMetric.name || '',
@@ -183,6 +184,37 @@ export function MetricBuilderWizard({
       'narrative': 'blog'
     };
     return mapping[frontendType] || 'auto';
+  };
+
+  // Map database visualization types back to frontend types (reverse of mapVisualizationType)
+  const mapDbTypeToFrontendType = (dbType: string, config?: Record<string, unknown>): VisualizationType => {
+    // Check for Likert scale (bar + scaleMin in config)
+    if (dbType === 'bar' && config?.scaleMin !== undefined) {
+      return 'likert-scale';
+    }
+
+    // Check for ratio (number + numerator in config)
+    if (dbType === 'number' && config?.numerator !== undefined) {
+      return 'ratio';
+    }
+
+    // Check for status (progress + statusLabel in config)
+    if (dbType === 'progress' && config?.statusLabel !== undefined) {
+      return 'status';
+    }
+
+    const mapping: Record<string, VisualizationType> = {
+      'progress': 'percentage',
+      'number': 'number',
+      'bar': 'bar-chart',
+      'line': 'line-chart',
+      'donut': 'donut-chart',
+      'gauge': 'gauge',
+      'auto': 'survey',
+      'blog': 'narrative'
+    };
+
+    return mapping[dbType] || 'bar-chart';
   };
 
   const handleSave = async () => {

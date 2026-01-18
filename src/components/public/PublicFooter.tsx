@@ -19,11 +19,8 @@ export function PublicFooter({ district }: PublicFooterProps) {
           <a href={buildSubdomainUrlWithPath('root', '/privacy')} className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
             Privacy Policy
           </a>
-          <a href="#" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
-            Accessibility
-          </a>
-          <a href="#" className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
-            Contact
+          <a href={buildSubdomainUrlWithPath('root', '/terms')} className="text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200 transition-colors">
+            Terms of Service
           </a>
           <div className="flex items-center gap-2 text-gray-400 dark:text-slate-500">
             <span>Powered by</span>

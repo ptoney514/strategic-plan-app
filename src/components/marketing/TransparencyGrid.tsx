@@ -40,13 +40,13 @@ export function TransparencyGrid() {
             Give families and taxpayers a clear, accessible view of district priorities, progress,
             and outcomes — without creating extra reporting work for staff.
           </p>
-          <a
-            href="#"
+          <button
+            type="button"
             className="inline-flex items-center justify-center px-8 py-3.5 text-sm font-medium text-white transition-all bg-indigo-600 rounded-full hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600"
           >
             Explore Public Portals
             <Icon icon="solar:arrow-right-linear" className="ml-2" width="18" />
-          </a>
+          </button>
         </div>
 
         {/* Features Grid - 3 columns on md+ */}

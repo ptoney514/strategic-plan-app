@@ -86,73 +86,81 @@ export function MarketingLanding() {
       <HeroSection onDemoClick={handleDemoClick} />
 
       {/* Goals Overview */}
-      <GoalsOverviewSection />
+      <section id="goals" className="scroll-mt-24">
+        <GoalsOverviewSection />
+      </section>
 
       {/* Feature 1: Build Your District Strategy */}
-      <FeatureSection
-        title="Build Your District Strategy — The Right Way"
-        description="Use StrataDash's flexible planning model to support state accountability frameworks, district scorecards, or custom board priorities — without forcing you into rigid templates."
-        features={[
-          {
-            title: 'District-Wide Goal Hierarchy',
-            description:
-              'Organize strategic priorities across district goals, initiatives, schools, and departments with full visibility and alignment.',
-            highlighted: true,
-          },
-          {
-            title: 'Custom Metrics & Accountability Fields',
-            description:
-              'Track what matters most — academic performance, attendance, graduation rates, engagement, or operational KPIs.',
-          },
-        ]}
-        visual={<FeatureVisualHierarchy />}
-      />
+      <section id="initiatives" className="scroll-mt-24">
+        <FeatureSection
+          title="Build Your District Strategy — The Right Way"
+          description="Use StrataDash's flexible planning model to support state accountability frameworks, district scorecards, or custom board priorities — without forcing you into rigid templates."
+          features={[
+            {
+              title: 'District-Wide Goal Hierarchy',
+              description:
+                'Organize strategic priorities across district goals, initiatives, schools, and departments with full visibility and alignment.',
+              highlighted: true,
+            },
+            {
+              title: 'Custom Metrics & Accountability Fields',
+              description:
+                'Track what matters most — academic performance, attendance, graduation rates, engagement, or operational KPIs.',
+            },
+          ]}
+          visual={<FeatureVisualHierarchy />}
+        />
 
-      {/* Feature 2: Accelerate Planning */}
-      <FeatureSection
-        title="Accelerate Planning And Execution Cycles"
-        description="Import existing strategic plans or build new ones in minutes. Keep leadership, principals, and department heads aligned — without endless meetings and spreadsheets."
-        features={[
-          {
-            title: 'District → School Alignment',
-            description:
-              'Ensure every school and department understands how their work connects to district priorities.',
-            icon: 'solar:sitemap-linear',
-          },
-          {
-            title: 'Initiative Ownership & Timelines',
-            description: 'Assign accountability, track milestones, and prevent strategic drift.',
-            icon: 'solar:user-check-linear',
-            highlighted: true,
-          },
-        ]}
-        visual={<FeatureVisualProgress />}
-        reversed
-        variant="alternate"
-      />
+        {/* Feature 2: Accelerate Planning */}
+        <FeatureSection
+          title="Accelerate Planning And Execution Cycles"
+          description="Import existing strategic plans or build new ones in minutes. Keep leadership, principals, and department heads aligned — without endless meetings and spreadsheets."
+          features={[
+            {
+              title: 'District → School Alignment',
+              description:
+                'Ensure every school and department understands how their work connects to district priorities.',
+              icon: 'solar:sitemap-linear',
+            },
+            {
+              title: 'Initiative Ownership & Timelines',
+              description: 'Assign accountability, track milestones, and prevent strategic drift.',
+              icon: 'solar:user-check-linear',
+              highlighted: true,
+            },
+          ]}
+          visual={<FeatureVisualProgress />}
+          reversed
+          variant="alternate"
+        />
+      </section>
 
       {/* Feature 3: Monitor Progress */}
-      <FeatureSection
-        title="Monitor Progress And Course-Correct Early"
-        description="See what's on track, what needs attention, and where leadership should intervene — before small issues become major setbacks."
-        features={[
-          {
-            title: 'Real-Time Status Indicators',
-            description:
-              'Instantly visualize progress across goals, initiatives, and performance measures.',
-            highlighted: true,
-          },
-          {
-            title: 'Executive-Ready Performance Views',
-            description:
-              'Give superintendents and cabinet leaders fast insight without manual reporting.',
-          },
-        ]}
-        visual={<FeatureVisualChart />}
-      />
+      <section id="progress" className="scroll-mt-24">
+        <FeatureSection
+          title="Monitor Progress And Course-Correct Early"
+          description="See what's on track, what needs attention, and where leadership should intervene — before small issues become major setbacks."
+          features={[
+            {
+              title: 'Real-Time Status Indicators',
+              description:
+                'Instantly visualize progress across goals, initiatives, and performance measures.',
+              highlighted: true,
+            },
+            {
+              title: 'Executive-Ready Performance Views',
+              description:
+                'Give superintendents and cabinet leaders fast insight without manual reporting.',
+            },
+          ]}
+          visual={<FeatureVisualChart />}
+        />
+      </section>
 
       {/* Transparency Grid */}
-      <TransparencyGrid />
+      <section id="resources" className="scroll-mt-24">
+        <TransparencyGrid />
+      </section>
 
       {/* Social Proof */}
       <SocialProofSection />

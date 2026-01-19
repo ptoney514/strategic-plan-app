@@ -97,7 +97,7 @@ export function Login() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/login',
+          redirectTo: window.location.origin + '/login' + window.location.search,
         },
       });
       if (error) throw error;
@@ -279,9 +279,9 @@ export function Login() {
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
                 Don't have an account?{' '}
-                <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors">
-                  Sign up for free
-                </a>
+                <span className="font-medium text-indigo-600 cursor-default">
+                  Contact us to get started
+                </span>
               </p>
             </div>
           </div>

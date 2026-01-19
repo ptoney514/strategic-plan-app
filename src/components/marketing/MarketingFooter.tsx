@@ -24,24 +24,24 @@ export function MarketingFooter() {
             <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Our Plan</h4>
             <ul className="space-y-2 text-sm text-indigo-500">
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
+                <a href="/#goals" className="hover:text-blue-600 transition-colors">
                   Plan Overview
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
+                <a href="/#initiatives" className="hover:text-blue-600 transition-colors">
                   Our Initiatives
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
+                <a href="/#goals" className="hover:text-blue-600 transition-colors">
                   Strategic Goals
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
+                <a href="/#progress" className="hover:text-blue-600 transition-colors">
                   Metrics
-                </Link>
+                </a>
               </li>
             </ul>
           </div>
@@ -51,24 +51,16 @@ export function MarketingFooter() {
             <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Stakeholders</h4>
             <ul className="space-y-2 text-sm text-indigo-500">
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Enterprise
-                </Link>
+                <span className="cursor-default">Enterprise</span>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Educators
-                </Link>
+                <span className="cursor-default">Educators</span>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Community
-                </Link>
+                <span className="cursor-default">Community</span>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Parents
-                </Link>
+                <span className="cursor-default">Parents</span>
               </li>
             </ul>
           </div>
@@ -78,24 +70,16 @@ export function MarketingFooter() {
             <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Resources</h4>
             <ul className="space-y-2 text-sm text-indigo-500">
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Strategy Factory
-                </Link>
+                <span className="cursor-default">Strategy Factory</span>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Templates
-                </Link>
+                <span className="cursor-default">Templates</span>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Blog
-                </Link>
+                <span className="cursor-default">Blog</span>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Events
-                </Link>
+                <span className="cursor-default">Events</span>
               </li>
             </ul>
           </div>
@@ -110,9 +94,7 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Careers
-                </Link>
+                <span className="cursor-default">Careers</span>
               </li>
               <li>
                 <Link to="/privacy" className="hover:text-blue-600 transition-colors">
@@ -120,9 +102,7 @@ export function MarketingFooter() {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="hover:text-blue-600 transition-colors">
-                  Contact
-                </Link>
+                <span className="cursor-default">Contact</span>
               </li>
             </ul>
           </div>
@@ -134,12 +114,12 @@ export function MarketingFooter() {
             &copy; {new Date().getFullYear()} StrataDash. All rights reserved.
           </p>
           <div className="flex gap-4 text-indigo-400">
-            <a href="#" className="hover:text-indigo-900 transition-colors">
+            <span className="cursor-default hover:text-indigo-900 transition-colors">
               <Icon icon="solar:camera-linear" width="18" />
-            </a>
-            <a href="#" className="hover:text-indigo-900 transition-colors">
+            </span>
+            <span className="cursor-default hover:text-indigo-900 transition-colors">
               <Icon icon="solar:plain-linear" width="18" />
-            </a>
+            </span>
           </div>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { Settings, LogOut, User, LayoutDashboard, ChevronDown } from 'lucide-rea
 import { useAuth } from '../../contexts/AuthContext';
 import { Avatar } from '../ui/Avatar';
 import { cn } from '../../lib/utils';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 
 interface UserAvatarMenuProps {
   className?: string;
@@ -102,13 +103,13 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
             </DropdownMenu.Item>
 
             <DropdownMenu.Item asChild>
-              <Link
-                to="/admin"
+              <a
+                href={buildSubdomainUrlWithPath('admin')}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
               >
                 <LayoutDashboard className="w-4 h-4 text-amber-600" />
                 Admin
-              </Link>
+              </a>
             </DropdownMenu.Item>
           </div>
 

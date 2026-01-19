@@ -12,6 +12,14 @@ vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
+// Mock subdomain utility
+vi.mock('../../../lib/subdomain', () => ({
+  buildSubdomainUrlWithPath: (type: string) => {
+    if (type === 'admin') return 'http://localhost:5173?subdomain=admin';
+    return 'http://localhost:5173';
+  },
+}));
+
 // Wrapper component with Router
 function renderWithRouter(ui: React.ReactElement) {
   return render(<BrowserRouter>{ui}</BrowserRouter>);
@@ -95,6 +103,18 @@ describe('UserAvatarMenu', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Admin')).toBeInTheDocument();
+      });
+    });
+
+    it('Admin link uses subdomain-aware URL', async () => {
+      const user = userEvent.setup();
+      renderWithRouter(<UserAvatarMenu />);
+
+      await user.click(screen.getByRole('button', { name: /user menu/i }));
+
+      await waitFor(() => {
+        const adminLink = screen.getByText('Admin').closest('a');
+        expect(adminLink).toHaveAttribute('href', 'http://localhost:5173?subdomain=admin');
       });
     });
 

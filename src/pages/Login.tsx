@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import { supabase } from '../lib/supabase';
 import { getSubdomainUrl } from '../lib/subdomain';
-import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 interface LocationState {
   from?: string;
@@ -22,7 +22,6 @@ export function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Redirect if already authenticated
-  // Preserve query params for subdomain context in local dev
   useEffect(() => {
     if (isAuthenticated) {
       const from = (location.state as LocationState)?.from || '/';
@@ -41,7 +40,6 @@ export function Login() {
     setError('');
     setIsLoading(true);
 
-    // Basic validation
     if (!email || !password) {
       setError('Please enter both email and password');
       setIsLoading(false);
@@ -57,38 +55,30 @@ export function Login() {
         return;
       }
 
-      // Check user roles
       const isSystemAdmin =
         user.user_metadata?.role === 'system_admin' ||
         user.app_metadata?.role === 'system_admin';
 
-      // Handle admin subdomain login
       if (subdomainType === 'admin') {
         if (isSystemAdmin) {
-          // System admin on admin subdomain - go to admin dashboard
           navigate(`/${location.search}`, { replace: true });
         } else {
-          // Non-system-admin on admin subdomain - redirect to root domain
-          // They shouldn't be here!
           window.location.href = getSubdomainUrl('root');
         }
         return;
       }
 
-      // For district subdomain or root domain, check district admin access
       const { data: districtAdmin } = await supabase
         .from('spb_district_admins')
         .select('district_slug')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      // If district admin, redirect to their district admin page
       if (districtAdmin?.district_slug) {
         navigate(`/${districtAdmin.district_slug}/admin${location.search}`, { replace: true });
         return;
       }
 
-      // Otherwise use the page they tried to access, or home
       const from = (location.state as LocationState)?.from || '/';
       const redirectUrl = from + location.search;
       navigate(redirectUrl, { replace: true });
@@ -100,169 +90,255 @@ export function Login() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/login' + window.location.search,
+        },
+      });
+      if (error) throw error;
+    } catch (err) {
+      console.error('[Login] Google OAuth Error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      {/* Left side - Branding - HIDDEN FOR NOW */}
-      <div className="hidden bg-gradient-to-br from-primary/90 via-primary to-primary/80 p-12 flex-col justify-between relative overflow-hidden">
-        {/* Background pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-        </div>
+    <div className="flex min-h-screen w-full bg-white text-slate-900 antialiased">
+      <style>{`
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
+        @keyframes fadeIn { to { opacity: 1; } }
+      `}</style>
 
-        <div className="relative z-10">
-          <h1 className="text-4xl font-bold text-white mb-2">Strategic Plan Builder</h1>
-          <p className="text-white/90 text-lg">Plan, track, and achieve your district's strategic goals</p>
-        </div>
-
-        <div className="relative z-10 space-y-6">
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-2">Data-Driven Decision Making</h3>
-            <p className="text-white/80 text-sm">Track metrics, monitor progress, and make informed decisions based on real-time data.</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-2">Hierarchical Goal Alignment</h3>
-            <p className="text-white/80 text-sm">Align district objectives with goals and metrics at every level of your organization.</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-            <h3 className="text-white font-semibold mb-2">Multi-District Support</h3>
-            <p className="text-white/80 text-sm">Manage multiple districts with secure, isolated data and role-based access control.</p>
-          </div>
-        </div>
-
-        <div className="relative z-10 text-white/60 text-sm">
-          &copy; 2025 Strategic Plan Builder. All rights reserved.
-        </div>
-      </div>
-
-      {/* Login Form - Centered */}
-      <div className="w-full max-w-md p-8">
-        <div className="w-full">
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-4">
-              <Lock className="w-8 h-8 text-primary" />
+      {/* Left Side: Login Form */}
+      <div className="flex flex-1 flex-col px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-white z-10 pt-12 pb-12 relative justify-center">
+        <div className="mx-auto w-full max-w-sm lg:w-96 fade-in">
+          {/* Logo */}
+          <div className="flex items-center gap-3 mb-10">
+            <div className="h-10 w-10 overflow-hidden rounded-lg shadow-sm">
+              <img
+                src="/assets/stratadash-logo.png"
+                alt="StrataDash"
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h2 className="text-3xl font-bold text-foreground mb-2">Welcome back</h2>
-            <p className="text-muted-foreground">Sign in to your account to continue</p>
+            <span className="text-xl font-semibold tracking-tight text-slate-900">StrataDash</span>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+              Log in to StrataDash
+            </h2>
+            <p className="mt-2 text-sm text-slate-500">Welcome back! Please enter your details.</p>
+          </div>
+
+          <div className="mt-10">
             {/* Error Alert */}
             {error && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="text-sm text-destructive font-medium">Authentication Error</p>
-                  <p className="text-sm text-destructive/80 mt-1">{error}</p>
+                  <p className="text-sm text-red-600 font-medium">Authentication Error</p>
+                  <p className="text-sm text-red-500 mt-1">{error}</p>
                 </div>
               </div>
             )}
 
-            {/* Email Field */}
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-medium text-foreground">
-                Email Address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-muted-foreground" />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email Field */}
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium leading-6 text-slate-700">
+                  Email address
+                </label>
+                <div className="mt-2">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={isLoading}
+                    className="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50"
+                  />
                 </div>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                  placeholder="you@example.com"
-                  disabled={isLoading}
-                />
               </div>
-            </div>
 
-            {/* Password Field */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="block text-sm font-medium text-foreground">
+              {/* Password Field */}
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium leading-6 text-slate-700">
                   Password
                 </label>
-                <Link
-                  to="/forgot-password"
-                  className="text-sm text-primary hover:text-primary/80 transition-colors"
-                  tabIndex={-1}
-                >
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-muted-foreground" />
+                <div className="mt-2">
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    className="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50"
+                  />
                 </div>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-input rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-                  placeholder="Enter your password"
+              </div>
+
+              {/* Remember Me + Forgot Password */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <input
+                    id="remember-me"
+                    name="remember-me"
+                    type="checkbox"
+                    disabled={isLoading}
+                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
+                  />
+                  <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
+                    Remember me
+                  </label>
+                </div>
+                <div className="text-sm">
+                  <Link
+                    to="/forgot-password"
+                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div>
+                <button
+                  type="submit"
                   disabled={isLoading}
+                  className="flex w-full justify-center items-center gap-2 rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Signing in...
+                    </>
+                  ) : (
+                    'Sign in'
+                  )}
+                </button>
+              </div>
+            </form>
+
+            {/* Divider */}
+            <div className="relative mt-8">
+              <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                <div className="w-full border-t border-slate-200" />
+              </div>
+              <div className="relative flex justify-center text-sm font-medium leading-6">
+                <span className="bg-white px-6 text-slate-400">Or continue with</span>
+              </div>
+            </div>
+
+            {/* Google OAuth Button */}
+            <div className="mt-8">
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading}
+                className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-200 hover:bg-slate-50 focus-visible:ring-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
+                  <path
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                    fill="#4285F4"
+                  />
+                  <path
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                    fill="#34A853"
+                  />
+                  <path
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                    fill="#FBBC05"
+                  />
+                  <path
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                    fill="#EA4335"
+                  />
+                </svg>
+                Google
+              </button>
+            </div>
+
+            {/* Sign Up Link */}
+            <div className="mt-6 text-center">
+              <p className="text-sm text-slate-500">
+                Don't have an account?{' '}
+                <span className="font-medium text-indigo-600 cursor-default">
+                  Contact us to get started
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Footer */}
+        <div className="mt-16 lg:hidden text-center text-xs text-slate-400">
+          © {new Date().getFullYear()} StrataDash.
+        </div>
+      </div>
+
+      {/* Right Side: Branding */}
+      <div className="relative hidden w-0 flex-1 lg:block bg-slate-950 overflow-hidden">
+        {/* Grid Background with Vignette Mask */}
+        <div className="absolute inset-0 h-full w-full bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
+
+        {/* Subtle Purple/Indigo Glow */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none" />
+
+        <div
+          className="flex flex-col fade-in text-center h-full p-12 relative items-center justify-center z-10"
+          style={{ animationDelay: '0.1s' }}
+        >
+          <div className="flex flex-col items-center gap-8 max-w-lg">
+            {/* Logo Container with Glow */}
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+              <div className="relative h-28 w-28 overflow-hidden rounded-2xl bg-indigo-950 ring-1 ring-white/10 shadow-2xl">
+                <img
+                  src="/assets/stratadash-logo.png"
+                  alt="StrataDash Logo"
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>
 
-            {/* Remember Me */}
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-primary focus:ring-primary border-input rounded"
-                disabled={isLoading}
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-foreground">
-                Remember me for 30 days
-              </label>
+            <div className="space-y-4">
+              <h1 className="text-5xl font-semibold tracking-tight text-white">StrataDash</h1>
+              <p className="text-lg text-slate-400 font-medium leading-relaxed">
+                The intelligent strategic planning platform designed for K-12 Districts.
+              </p>
             </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-transparent rounded-lg text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                'Sign in'
-              )}
-            </button>
-          </form>
-
-          {/* Divider */}
-          <div className="mt-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-background text-muted-foreground">New to Strategic Plan Builder?</span>
+            {/* Decorative Dots */}
+            <div className="flex gap-2 mt-4">
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/50" />
+              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/20" />
             </div>
           </div>
+        </div>
 
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Contact your district administrator to request access
-            </p>
-          </div>
+        {/* Bottom Legal Text */}
+        <div className="absolute bottom-10 left-0 right-0 text-center">
+          <p className="text-xs text-slate-500 font-medium tracking-wide uppercase opacity-60">
+            Empowering Education Leadership
+          </p>
         </div>
       </div>
     </div>

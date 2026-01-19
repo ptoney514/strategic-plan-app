@@ -33,6 +33,10 @@ import { EditObjective } from '../pages/client/admin/EditObjective';
 import { ObjectiveDetail as AdminObjectiveDetail } from '../pages/client/admin/ObjectiveDetail';
 import { DistrictUsers } from '../pages/client/admin/DistrictUsers';
 import { DistrictAppearance } from '../pages/client/admin/DistrictAppearance';
+import { PlansList } from '../pages/client/admin/PlansList';
+import { CreatePlan } from '../pages/client/admin/CreatePlan';
+import { EditPlan } from '../pages/client/admin/EditPlan';
+import { PlanDetail } from '../pages/client/admin/PlanDetail';
 
 // School Admin Pages
 import {
@@ -125,6 +129,11 @@ export function DistrictRouter() {
         <Route path="objectives/create" element={<CreateObjective />} />
         <Route path="objectives/:objectiveId" element={<AdminObjectiveDetail />} />
         <Route path="objectives/:objectiveId/edit" element={<EditObjective />} />
+        {/* Plans routes */}
+        <Route path="plans" element={<PlansList />} />
+        <Route path="plans/create" element={<CreatePlan />} />
+        <Route path="plans/:planId" element={<PlanDetail />} />
+        <Route path="plans/:planId/edit" element={<EditPlan />} />
         {/* District-level pages */}
         <Route path="users" element={<DistrictUsers />} />
         <Route path="appearance" element={<DistrictAppearance />} />

@@ -66,6 +66,79 @@ export class GoalsService {
     return hierarchy;
   }
 
+  /**
+   * Get goals (objectives) for a specific plan
+   * @param planId - The plan ID to fetch objectives for
+   * @returns Hierarchical array of objectives belonging to the plan (with their children)
+   */
+  static async getByPlan(planId: string): Promise<HierarchicalGoal[]> {
+    log.debug('Fetching goals for plan:', planId);
+
+    // First get the level 0 goals (objectives) for this plan
+    const { data: objectives, error: objError } = await supabase
+      .from('spb_goals')
+      .select(`
+        *,
+        metrics:spb_metrics(*)
+      `)
+      .eq('plan_id', planId)
+      .eq('level', 0)
+      .order('goal_number');
+
+    if (objError) {
+      log.error('Error fetching plan objectives:', objError);
+      throw objError;
+    }
+
+    if (!objectives || objectives.length === 0) {
+      return [];
+    }
+
+    // Get all child goals for these objectives
+    const objectiveIds = objectives.map(o => o.id);
+    const { data: childGoals, error: childError } = await supabase
+      .from('spb_goals')
+      .select(`
+        *,
+        metrics:spb_metrics(*)
+      `)
+      .in('parent_id', objectiveIds)
+      .order('goal_number');
+
+    if (childError) {
+      log.error('Error fetching child goals:', childError);
+      throw childError;
+    }
+
+    // Combine objectives and children
+    const allGoals = [...objectives, ...(childGoals || [])];
+
+    // If there are level 1 goals, fetch level 2 as well
+    const level1Ids = (childGoals || []).filter(g => g.level === 1).map(g => g.id);
+    if (level1Ids.length > 0) {
+      const { data: grandchildren, error: grandchildError } = await supabase
+        .from('spb_goals')
+        .select(`
+          *,
+          metrics:spb_metrics(*)
+        `)
+        .in('parent_id', level1Ids)
+        .order('goal_number');
+
+      if (!grandchildError && grandchildren) {
+        allGoals.push(...grandchildren);
+      }
+    }
+
+    log.debug('Total goals for plan:', allGoals.length);
+
+    const hierarchy = buildGoalHierarchy(allGoals);
+
+    log.debug('After buildGoalHierarchy:', hierarchy.length, 'top-level plan objectives');
+
+    return hierarchy;
+  }
+
   static async getById(id: string): Promise<Goal | null> {
     const { data, error } = await supabase
       .from('spb_goals')

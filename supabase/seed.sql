@@ -17,6 +17,14 @@ INSERT INTO public.spb_districts (id, name, slug, logo_url, primary_color, secon
   ('a0000000-0000-0000-0000-000000000002', 'Westside Community Schools', 'westside', 'https://www.westside66.org/cms/lib/NE50000555/Centricity/Template/GlobalAssets/images//logos/Westside District STAR BOX.png', '#C03537', '#000000', 'admin@westside.edu', true, 'Community. Innovation. Excellence.', NOW(), NOW());
 
 -- ============================================================================
+-- STEP 1B: Create Plans (Strategic Plans container for objectives)
+-- ============================================================================
+
+INSERT INTO public.spb_plans (id, district_id, name, slug, type_label, description, is_public, is_active, created_at, updated_at) VALUES
+  ('c0000000-0000-0000-0000-000000000001', 'a0000000-0000-0000-0000-000000000001', 'Eastside Strategic Plan 2025', 'strategic-plan-2025', 'Strategic', 'Eastside School District 2025 Strategic Plan', true, true, NOW(), NOW()),
+  ('c0000000-0000-0000-0000-000000000002', 'a0000000-0000-0000-0000-000000000002', 'Westside Strategic Plan 2025-2027', 'strategic-plan-2025-2027', 'Strategic', 'Westside Community Schools Strategic Plan for 2025-2027', true, true, NOW(), NOW());
+
+-- ============================================================================
 -- STEP 2: Create Stock Photos Library
 -- ============================================================================
 
@@ -39,12 +47,13 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Strategic Objective 1: Student Achievement & Well-being
 INSERT INTO public.spb_goals (
-  id, district_id, parent_id, goal_number, title, description, level, order_position,
+  id, district_id, parent_id, plan_id, goal_number, title, description, level, order_position,
   status, cover_photo_url, cover_photo_alt, created_at, updated_at
 ) VALUES (
   'b0000001-0000-0000-0000-000000000000',
   'a0000000-0000-0000-0000-000000000002',
   NULL,
+  'c0000000-0000-0000-0000-000000000002',
   '1',
   'Student Achievement & Well-being',
   'Ensure all students achieve academic excellence and develop social-emotional well-being',
@@ -85,12 +94,13 @@ INSERT INTO public.spb_goals (
 
 -- Strategic Objective 2: Educational Excellence
 INSERT INTO public.spb_goals (
-  id, district_id, parent_id, goal_number, title, description, level, order_position,
+  id, district_id, parent_id, plan_id, goal_number, title, description, level, order_position,
   status, cover_photo_url, cover_photo_alt, created_at, updated_at
 ) VALUES (
   'b0000002-0000-0000-0000-000000000000',
   'a0000000-0000-0000-0000-000000000002',
   NULL,
+  'c0000000-0000-0000-0000-000000000002',
   '2',
   'Educational Excellence & Innovation',
   'Provide high-quality instruction and innovative learning experiences for all students',
@@ -117,12 +127,13 @@ INSERT INTO public.spb_goals (
 
 -- Strategic Objective 1: College & Career Readiness
 INSERT INTO public.spb_goals (
-  id, district_id, parent_id, goal_number, title, description, level, order_position,
+  id, district_id, parent_id, plan_id, goal_number, title, description, level, order_position,
   status, cover_photo_url, cover_photo_alt, created_at, updated_at
 ) VALUES (
   'b0001001-0000-0000-0000-000000000000',
   'a0000000-0000-0000-0000-000000000001',
   NULL,
+  'c0000000-0000-0000-0000-000000000001',
   '1',
   'College & Career Readiness',
   'Prepare all students for success in college, career, and life',

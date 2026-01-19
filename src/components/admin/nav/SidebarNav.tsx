@@ -11,6 +11,7 @@ import {
   Eye,
   ChevronDown,
   ChevronRight,
+  FileText,
 } from 'lucide-react';
 import { SchoolNavItem } from './SchoolNavItem';
 import type { District, School } from '../../../lib/types';
@@ -77,6 +78,19 @@ export function SidebarNav({
       >
         <Home size={16} />
         <span>Dashboard</span>
+      </button>
+
+      {/* Plans */}
+      <button
+        onClick={() => handleNavigate(`${districtBasePath}/plans`)}
+        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+          isActive(`${districtBasePath}/plans`)
+            ? 'bg-amber-50 text-amber-700'
+            : 'text-slate-600 hover:bg-slate-100'
+        }`}
+      >
+        <FileText size={16} />
+        <span>Plans</span>
       </button>
 
       {/* District Section */}

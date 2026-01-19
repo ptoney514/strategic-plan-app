@@ -24,6 +24,19 @@ export function useSchoolGoals(schoolId: string) {
   });
 }
 
+/**
+ * Hook to fetch goals (objectives) for a specific plan
+ * @param planId - The plan ID to fetch objectives for
+ */
+export function usePlanGoals(planId: string) {
+  return useQuery({
+    queryKey: ['goals', 'plan', planId],
+    queryFn: () => GoalsService.getByPlan(planId),
+    enabled: !!planId && planId.length > 0,
+    retry: false,
+  });
+}
+
 export function useGoal(id: string) {
   return useQuery({
     queryKey: ['goals', 'single', id],
@@ -54,6 +67,12 @@ export function useCreateGoal() {
       }
       if (data.parent_id) {
         queryClient.invalidateQueries({ queryKey: ['goals', 'children', data.parent_id] });
+      }
+      // Invalidate plan goals if this goal belongs to a plan
+      if (data.plan_id) {
+        queryClient.invalidateQueries({ queryKey: ['goals', 'plan', data.plan_id] });
+        // Also invalidate plan summaries (objective counts)
+        queryClient.invalidateQueries({ queryKey: ['plans'] });
       }
     },
   });

@@ -61,10 +61,36 @@ export interface SchoolAdmin {
   created_by?: string;
 }
 
+export interface Plan {
+  id: string;
+  district_id: string | null;  // Nullable: plan belongs to either district OR school
+  school_id?: string | null;    // Optional: plan belongs to either district OR school
+  name: string;
+  slug: string;
+  type_label?: string;          // Free-form: "Strategic", "Functional", "Annual", etc.
+  description?: string;
+  is_public: boolean;
+  is_active: boolean;
+  start_date?: string;
+  end_date?: string;
+  order_position: number;
+  cover_image_url?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PlanWithSummary extends Plan {
+  objectiveCount?: number;
+  goalCount?: number;
+  metricCount?: number;
+  overallProgress?: number;
+}
+
 export interface Goal {
   id: string;
   district_id: string | null;  // Nullable: goal belongs to either district OR school
   school_id?: string | null;    // Optional: goal belongs to either district OR school
+  plan_id?: string | null;      // Plan this objective belongs to (only for level 0 goals)
   parent_id: string | null;
   goal_number: string;
   title: string;

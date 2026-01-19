@@ -18,10 +18,12 @@ import {
   Check,
   Edit2,
   BarChart3,
-  Hash
+  Hash,
+  FileText,
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals, useCreateGoal } from '../../../hooks/useGoals';
+import { usePlansBySlug } from '../../../hooks/usePlans';
 import { GoalEditor, type GoalFormData, type MetricFormData } from '../../../components/admin/GoalEditor';
 import { SlideoverPanel } from '../../../components/ui/SlideoverPanel';
 import { Target } from 'lucide-react';
@@ -44,9 +46,15 @@ export function CreateObjective() {
   const location = useLocation();
   const { data: district } = useDistrict(slug || '');
   const { data: existingGoals } = useGoals(district?.id || '');
+  const { data: plans } = usePlansBySlug(slug || '');
   const createGoal = useCreateGoal();
 
+  // Get planId from URL query param if present (e.g., from PlanDetail "Add Objective" button)
+  const searchParams = new URLSearchParams(location.search);
+  const urlPlanId = searchParams.get('planId');
+
   // Form state
+  const [selectedPlanId, setSelectedPlanId] = useState<string>(urlPlanId || '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [goalsExpanded, setGoalsExpanded] = useState(true);
@@ -127,13 +135,14 @@ export function CreateObjective() {
   };
 
   const handleSubmit = async () => {
-    if (!title.trim() || !district?.id) return;
+    if (!title.trim() || !district?.id || !selectedPlanId) return;
 
     setIsSubmitting(true);
     try {
       // Create the main objective (level 0)
       const newObjective = await createGoal.mutateAsync({
         district_id: district.id,
+        plan_id: selectedPlanId,
         title: title.trim(),
         description: description.trim() || undefined,
         level: 0,
@@ -215,6 +224,36 @@ export function CreateObjective() {
         <div className="flex gap-8">
           {/* Main Form */}
           <div className="flex-1 flex flex-col gap-6">
+            {/* Plan Selector - Required */}
+            <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
+              <label className="block text-[15px] font-bold text-[#1a1a1a] mb-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="h-5 w-5 text-[#10b981]" />
+                  Which plan does this objective belong to?
+                  <span className="text-[12px] font-medium text-red-500">*</span>
+                </div>
+              </label>
+              <select
+                value={selectedPlanId}
+                onChange={(e) => setSelectedPlanId(e.target.value)}
+                className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors ${
+                  !selectedPlanId ? 'border-[#e8e6e1] text-[#8a8a8a]' : 'border-[#e8e6e1] text-[#1a1a1a]'
+                }`}
+              >
+                <option value="">Select a plan...</option>
+                {plans?.map((plan) => (
+                  <option key={plan.id} value={plan.id}>
+                    {plan.name} {plan.type_label ? `(${plan.type_label})` : ''}
+                  </option>
+                ))}
+              </select>
+              {plans && plans.length === 0 && (
+                <p className="text-[12px] text-[#f59e0b] mt-2">
+                  No plans found. <Link to="/admin/plans/create" className="text-[#10b981] hover:underline">Create a plan</Link> first.
+                </p>
+              )}
+            </div>
+
             {/* Title Field */}
             <div className="bg-white border border-[#e8e6e1] rounded-xl p-6">
               <label className="block text-[15px] font-bold text-[#1a1a1a] mb-3">
@@ -547,7 +586,7 @@ export function CreateObjective() {
               </button>
               <button
                 onClick={handleSubmit}
-                disabled={!title.trim() || isSubmitting}
+                disabled={!title.trim() || !selectedPlanId || isSubmitting}
                 className="flex items-center gap-2 px-6 py-2.5 text-[14px] font-semibold text-white bg-[#10b981] rounded-lg hover:bg-[#059669] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="h-4 w-4" />

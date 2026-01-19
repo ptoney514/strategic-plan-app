@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Outlet, Link } from 'react-router-dom';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import {
   Bell,
-  LogOut,
   Grid,
   Settings,
   Eye,
@@ -13,10 +12,10 @@ import {
 } from 'lucide-react';
 import { useDistrict } from '../hooks/useDistricts';
 import { useSchools } from '../hooks/useSchools';
-import { useAuth } from '../contexts/AuthContext';
 import { buildSubdomainUrlWithPath } from '../lib/subdomain';
-import { SidebarNav, SidebarHeader, SidebarUserFooter } from '../components/admin/nav/SidebarNav';
+import { SidebarNav, SidebarHeader } from '../components/admin/nav/SidebarNav';
 import { AddSchoolModal } from '../components/admin/schools/AddSchoolModal';
+import { UserAvatarMenu } from '../components/common/UserAvatarMenu';
 
 /**
  * ClientAdminEditorialLayout - Editorial-style admin layout with dark sidebar
@@ -24,35 +23,11 @@ import { AddSchoolModal } from '../components/admin/schools/AddSchoolModal';
  */
 export function ClientAdminEditorialLayout() {
   const { slug } = useSubdomain();
-  const navigate = useNavigate();
   const { data: district, isLoading } = useDistrict(slug || '');
   const { data: schools = [] } = useSchools(slug || '');
-  const { user, logout } = useAuth();
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isAddSchoolModalOpen, setIsAddSchoolModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setIsUserMenuOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -123,14 +98,6 @@ export function ClientAdminEditorialLayout() {
           </div>
         )}
 
-        {/* User Footer */}
-        {!isSidebarCollapsed && (
-          <SidebarUserFooter
-            userName={user?.email?.split('@')[0] || 'Admin'}
-            userRole="District Admin"
-          />
-        )}
-
         {/* Collapse Button */}
         <div className="p-3 border-t border-slate-200">
           <button
@@ -175,37 +142,7 @@ export function ClientAdminEditorialLayout() {
             </button>
 
             {/* User Profile */}
-            <div className="relative ml-2" ref={userMenuRef}>
-              <button
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-2 px-2.5 py-1 rounded-lg hover:bg-[#f5f3ef] transition-colors"
-              >
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#e8d5e8] to-[#d4b8d4] flex items-center justify-center text-xs font-semibold text-[#6b4c6b]">
-                  {user?.email?.slice(0, 2).toUpperCase() || 'AD'}
-                </div>
-                <span className="text-sm font-medium text-[#1a1a1a]">
-                  {user?.email?.split('@')[0] || 'Admin'}
-                </span>
-              </button>
-
-              {isUserMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-[#e8e6e1] py-2 z-50">
-                  <div className="px-4 py-2 border-b border-[#e8e6e1]">
-                    <p className="text-xs text-[#8a8a8a]">Signed in as</p>
-                    <p className="text-sm font-medium text-[#1a1a1a] truncate">{user?.email}</p>
-                  </div>
-                  <div className="py-1">
-                    <button
-                      onClick={handleLogout}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-[#4a4a4a] hover:bg-[#f5f3ef] transition-colors"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Sign out</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+            <UserAvatarMenu className="ml-2" />
           </div>
         </header>
 
@@ -291,11 +228,6 @@ export function ClientAdminEditorialLayout() {
               </a>
             </div>
 
-            {/* Mobile User Footer */}
-            <SidebarUserFooter
-              userName={user?.email?.split('@')[0] || 'Admin'}
-              userRole="District Admin"
-            />
           </aside>
         </>
       )}

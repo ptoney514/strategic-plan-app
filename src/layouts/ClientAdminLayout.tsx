@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Outlet, Link, useNavigate } from 'react-router-dom';
-import { Menu, X, ChevronDown, LogOut } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useAdminContext } from '../hooks/useAdminContext';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -9,6 +9,7 @@ import {
   SidebarFooter,
   SidebarUserFooter,
 } from '../components/admin/nav';
+import { UserAvatarMenu } from '../components/common/UserAvatarMenu';
 
 /**
  * ClientAdminLayout - Redesigned admin layout with hierarchical sidebar
@@ -25,33 +26,9 @@ export function ClientAdminLayout() {
     publicUrl,
     isLoading,
   } = useAdminContext();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [showAddSchoolModal, setShowAddSchoolModal] = useState(false);
-  const userMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setIsUserMenuOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Handle logout
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate('/login');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   // Handle view public site
   const handleViewPublic = () => {
@@ -137,51 +114,7 @@ export function ClientAdminLayout() {
 
             {/* Right: User Menu with Dropdown */}
             <div className="flex items-center gap-3">
-              <div className="relative" ref={userMenuRef}>
-                <button
-                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md hover:bg-slate-50 transition-colors"
-                >
-                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                    <span className="text-amber-700 font-medium text-sm">
-                      {userName.substring(0, 2).toUpperCase()}
-                    </span>
-                  </div>
-                  <span className="text-sm font-medium text-slate-700 hidden sm:inline">
-                    {userName}
-                  </span>
-                  <ChevronDown
-                    className={`h-3 w-3 text-slate-400 hidden sm:inline transition-transform ${
-                      isUserMenuOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
-
-                {/* Dropdown Menu */}
-                {isUserMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-2 z-50">
-                    {/* User Info */}
-                    <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-xs text-slate-500">Signed in as</p>
-                      <p className="text-sm font-medium text-slate-900 truncate">
-                        {user?.email || 'admin@example.com'}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-0.5">{userRole}</p>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="py-1">
-                      <button
-                        onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors"
-                      >
-                        <LogOut className="h-4 w-4" />
-                        <span>Sign out</span>
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <UserAvatarMenu />
             </div>
           </div>
         </header>

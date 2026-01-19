@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { useGoals, useCreateGoal } from '../../../hooks/useGoals';
-import { useActivePlansBySlug } from '../../../hooks/usePlans';
+import { usePlansBySlug } from '../../../hooks/usePlans';
 import { GoalEditor, type GoalFormData, type MetricFormData } from '../../../components/admin/GoalEditor';
 import { SlideoverPanel } from '../../../components/ui/SlideoverPanel';
 import { Target } from 'lucide-react';
@@ -46,7 +46,7 @@ export function CreateObjective() {
   const location = useLocation();
   const { data: district } = useDistrict(slug || '');
   const { data: existingGoals } = useGoals(district?.id || '');
-  const { data: plans } = useActivePlansBySlug(slug || '');
+  const { data: plans } = usePlansBySlug(slug || '');
   const createGoal = useCreateGoal();
 
   // Get planId from URL query param if present (e.g., from PlanDetail "Add Objective" button)

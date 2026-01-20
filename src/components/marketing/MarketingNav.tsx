@@ -1,11 +1,15 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { useAuth } from '../../contexts/AuthContext';
+import { UserAvatarMenu } from '../common/UserAvatarMenu';
 
 interface MarketingNavProps {
   onDemoClick: () => void;
 }
 
 export function MarketingNav({ onDemoClick }: MarketingNavProps) {
+  const { isAuthenticated, loading } = useAuth();
+
   return (
     <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-indigo-100">
       <div className="flex h-20 max-w-7xl mx-auto px-6 items-center justify-between">
@@ -53,18 +57,34 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <Link
-            to="/login"
-            className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
-          >
-            Log in
-          </Link>
-          <button
-            onClick={onDemoClick}
-            className="bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-all hover:shadow-md hover:shadow-indigo-200"
-          >
-            View District Plan Demo
-          </button>
+          {loading ? (
+            <div className="w-8 h-8 rounded-full bg-indigo-100 animate-pulse" />
+          ) : isAuthenticated ? (
+            <>
+              <Link
+                to="/dashboard"
+                className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <UserAvatarMenu />
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
+              >
+                Log in
+              </Link>
+              <button
+                onClick={onDemoClick}
+                className="bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-all hover:shadow-md hover:shadow-indigo-200"
+              >
+                View District Plan Demo
+              </button>
+            </>
+          )}
         </div>
       </div>
     </nav>

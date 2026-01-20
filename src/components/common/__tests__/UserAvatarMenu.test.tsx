@@ -14,9 +14,21 @@ vi.mock('../../../contexts/AuthContext', () => ({
 
 // Mock subdomain utility
 vi.mock('../../../lib/subdomain', () => ({
-  buildSubdomainUrlWithPath: (type: string) => {
+  buildSubdomainUrlWithPath: (type: string, path?: string, slug?: string) => {
     if (type === 'admin') return 'http://localhost:5173?subdomain=admin';
+    if (type === 'district' && slug) return `http://localhost:5173?subdomain=${slug}${path || ''}`;
     return 'http://localhost:5173';
+  },
+}));
+
+// Mock Supabase
+vi.mock('../../../lib/supabase', () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => Promise.resolve({ data: [], error: null }),
+      }),
+    }),
   },
 }));
 
@@ -36,6 +48,7 @@ describe('UserAvatarMenu', () => {
       mockUseAuth.mockReturnValue({
         user: null,
         logout: mockLogout,
+        isSystemAdmin: false,
       });
 
       const { container } = renderWithRouter(<UserAvatarMenu />);
@@ -56,6 +69,7 @@ describe('UserAvatarMenu', () => {
       mockUseAuth.mockReturnValue({
         user: mockUser,
         logout: mockLogout,
+        isSystemAdmin: false,
       });
     });
 
@@ -77,9 +91,9 @@ describe('UserAvatarMenu', () => {
       await user.click(triggerButton);
 
       await waitFor(() => {
+        expect(screen.getByText('Dashboard')).toBeInTheDocument();
         expect(screen.getByText('My Profile')).toBeInTheDocument();
         expect(screen.getByText('Settings')).toBeInTheDocument();
-        expect(screen.getByText('Admin')).toBeInTheDocument();
         expect(screen.getByText('Sign Out')).toBeInTheDocument();
       });
     });
@@ -95,25 +109,37 @@ describe('UserAvatarMenu', () => {
       });
     });
 
-    it('shows Admin link for all authenticated users', async () => {
+    it('shows System Admin link for system admins', async () => {
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+        isSystemAdmin: true,
+      });
+
       const user = userEvent.setup();
       renderWithRouter(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('Admin')).toBeInTheDocument();
+        expect(screen.getByText('System Admin')).toBeInTheDocument();
       });
     });
 
-    it('Admin link uses subdomain-aware URL', async () => {
+    it('System Admin link uses subdomain-aware URL', async () => {
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+        isSystemAdmin: true,
+      });
+
       const user = userEvent.setup();
       renderWithRouter(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
       await waitFor(() => {
-        const adminLink = screen.getByText('Admin').closest('a');
+        const adminLink = screen.getByText('System Admin').closest('a');
         expect(adminLink).toHaveAttribute('href', 'http://localhost:5173?subdomain=admin');
       });
     });
@@ -143,6 +169,7 @@ describe('UserAvatarMenu', () => {
           user_metadata: {},
         },
         logout: mockLogout,
+        isSystemAdmin: false,
       });
 
       renderWithRouter(<UserAvatarMenu />);
@@ -159,6 +186,7 @@ describe('UserAvatarMenu', () => {
           user_metadata: { display_name: 'Test User' },
         },
         logout: mockLogout,
+        isSystemAdmin: false,
       });
     });
 
@@ -209,6 +237,7 @@ describe('UserAvatarMenu', () => {
           user_metadata: { display_name: 'Test' },
         },
         logout: mockLogout,
+        isSystemAdmin: false,
       });
     });
 

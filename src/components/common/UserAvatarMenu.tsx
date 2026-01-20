@@ -1,10 +1,17 @@
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Settings, LogOut, User, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { Settings, LogOut, User, LayoutDashboard, ChevronDown, Building2, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Avatar } from '../ui/Avatar';
 import { cn } from '../../lib/utils';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
+import { supabase } from '../../lib/supabase';
+
+interface AdminDistrict {
+  district_slug: string;
+  district_name: string;
+}
 
 interface UserAvatarMenuProps {
   className?: string;
@@ -22,8 +29,43 @@ interface UserAvatarMenuProps {
  * - Mobile responsive (hides username on small screens)
  */
 export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, isSystemAdmin } = useAuth();
   const navigate = useNavigate();
+  const [adminDistricts, setAdminDistricts] = useState<AdminDistrict[]>([]);
+
+  // Fetch user's admin districts
+  useEffect(() => {
+    async function fetchAdminDistricts() {
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('spb_district_admins')
+        .select(`
+          district_slug,
+          spb_districts!inner(name)
+        `)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Failed to fetch admin districts:', error);
+        return;
+      }
+
+      if (data) {
+        const districts = data.map((d) => {
+          // The join returns spb_districts as an object with name property
+          const districtData = d.spb_districts as unknown as { name: string } | null;
+          return {
+            district_slug: d.district_slug,
+            district_name: districtData?.name || d.district_slug,
+          };
+        });
+        setAdminDistricts(districts);
+      }
+    }
+
+    fetchAdminDistricts();
+  }, [user]);
 
   // Get display name from user metadata or fall back to email
   const displayName =
@@ -39,6 +81,9 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
       console.error('Logout failed:', error);
     }
   };
+
+  // Determine if user has any admin access
+  const hasAdminAccess = isSystemAdmin || adminDistricts.length > 0;
 
   return (
     <DropdownMenu.Root>
@@ -84,6 +129,16 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
           <div className="py-1">
             <DropdownMenu.Item asChild>
               <Link
+                to="/dashboard"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
+              >
+                <LayoutDashboard className="w-4 h-4 text-indigo-500" />
+                Dashboard
+              </Link>
+            </DropdownMenu.Item>
+
+            <DropdownMenu.Item asChild>
+              <Link
                 to="/account"
                 className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
               >
@@ -101,17 +156,45 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
                 Settings
               </Link>
             </DropdownMenu.Item>
-
-            <DropdownMenu.Item asChild>
-              <a
-                href={buildSubdomainUrlWithPath('admin')}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
-              >
-                <LayoutDashboard className="w-4 h-4 text-amber-600" />
-                Admin
-              </a>
-            </DropdownMenu.Item>
           </div>
+
+          {/* Admin Section - Only shown if user has admin access */}
+          {hasAdminAccess && (
+            <>
+              <DropdownMenu.Separator className="h-px bg-slate-100 my-1" />
+              <div className="py-1">
+                <div className="px-4 py-1.5 text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                  Admin
+                </div>
+
+                {/* System Admin link - only for system admins */}
+                {isSystemAdmin && (
+                  <DropdownMenu.Item asChild>
+                    <a
+                      href={buildSubdomainUrlWithPath('admin')}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
+                    >
+                      <Shield className="w-4 h-4 text-amber-600" />
+                      System Admin
+                    </a>
+                  </DropdownMenu.Item>
+                )}
+
+                {/* District admin links */}
+                {adminDistricts.map((district) => (
+                  <DropdownMenu.Item key={district.district_slug} asChild>
+                    <a
+                      href={buildSubdomainUrlWithPath('district', '/admin', district.district_slug)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
+                    >
+                      <Building2 className="w-4 h-4 text-indigo-500" />
+                      {district.district_name}
+                    </a>
+                  </DropdownMenu.Item>
+                ))}
+              </div>
+            </>
+          )}
 
           {/* Sign Out */}
           <DropdownMenu.Separator className="h-px bg-slate-100 my-1" />

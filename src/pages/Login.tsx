@@ -24,8 +24,8 @@ export function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = (location.state as LocationState)?.from || '/';
-      const redirectUrl = from + location.search;
+      const from = (location.state as LocationState)?.from;
+      const redirectUrl = from ? from + location.search : '/dashboard';
       navigate(redirectUrl, { replace: true });
     }
   }, [isAuthenticated, location.state, location.search, navigate]);
@@ -59,6 +59,7 @@ export function Login() {
         user.user_metadata?.role === 'system_admin' ||
         user.app_metadata?.role === 'system_admin';
 
+      // On admin subdomain, system admins stay, others go to root
       if (subdomainType === 'admin') {
         if (isSystemAdmin) {
           navigate(`/${location.search}`, { replace: true });
@@ -68,19 +69,10 @@ export function Login() {
         return;
       }
 
-      const { data: districtAdmin } = await supabase
-        .from('spb_district_admins')
-        .select('district_slug')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (districtAdmin?.district_slug) {
-        navigate(`/${districtAdmin.district_slug}/admin${location.search}`, { replace: true });
-        return;
-      }
-
-      const from = (location.state as LocationState)?.from || '/';
-      const redirectUrl = from + location.search;
+      // Redirect to the intended destination or /dashboard
+      // Users can access admin pages from the avatar menu
+      const from = (location.state as LocationState)?.from;
+      const redirectUrl = from ? from + location.search : '/dashboard';
       navigate(redirectUrl, { replace: true });
     } catch (err) {
       console.error('[Login] Error:', err);

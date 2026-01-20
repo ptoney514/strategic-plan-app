@@ -30,35 +30,26 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * HomeRoute - Shows dashboard for authenticated users, marketing page for visitors
- */
-function HomeRoute() {
-  const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F8FAFC]">
-        <div className="animate-spin w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (isAuthenticated) {
-    return <DashboardLayout />;
-  }
-
-  return <MarketingLanding />;
-}
-
-/**
  * Router for the root domain (stratadash.org)
- * Handles marketing pages, authenticated dashboard, and redirects legacy district paths to subdomains.
+ * - Marketing landing page at / (always visible, logged in or not)
+ * - User dashboard at /dashboard (requires authentication)
+ * - Redirects legacy district paths to subdomains
  */
 export function RootRouter() {
   return (
     <Routes>
-      {/* Home - Dashboard for authenticated users, Marketing for visitors */}
-      <Route path="/" element={<HomeRoute />}>
+      {/* Marketing landing page - always visible */}
+      <Route path="/" element={<MarketingLanding />} />
+
+      {/* Dashboard - requires authentication */}
+      <Route
+        path="/dashboard"
+        element={
+          <RequireAuth>
+            <DashboardLayout basePath="/dashboard" />
+          </RequireAuth>
+        }
+      >
         <Route index element={<UserDashboard />} />
         <Route path="plans" element={<PlaceholderPage title="Strategic Plans" description="View and manage all your strategic plans in one place." />} />
         <Route path="plans/new" element={<PlaceholderPage title="Create New Plan" description="Create a new strategic plan for your organization." />} />

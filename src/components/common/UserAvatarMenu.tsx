@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Settings, LogOut, User, LayoutDashboard, ChevronDown, Building2, Shield } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSubdomain } from '../../contexts/SubdomainContext';
 import { Avatar } from '../ui/Avatar';
 import { cn } from '../../lib/utils';
-import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
+import { buildSubdomainUrlWithPath, getSubdomainUrl } from '../../lib/subdomain';
 import { supabase } from '../../lib/supabase';
 
 interface AdminDistrict {
@@ -30,37 +31,51 @@ interface UserAvatarMenuProps {
  */
 export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuProps) {
   const { user, logout, isSystemAdmin } = useAuth();
+  const { type: subdomainType } = useSubdomain();
   const navigate = useNavigate();
   const [adminDistricts, setAdminDistricts] = useState<AdminDistrict[]>([]);
+  const [loadingDistricts, setLoadingDistricts] = useState(true);
+
+  // Build dashboard URL - use absolute URL on non-root subdomains
+  const dashboardUrl = subdomainType === 'root'
+    ? '/dashboard'
+    : getSubdomainUrl('root') + '/dashboard';
 
   // Fetch user's admin districts
   useEffect(() => {
     async function fetchAdminDistricts() {
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('spb_district_admins')
-        .select(`
-          district_slug,
-          spb_districts!inner(name)
-        `)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Failed to fetch admin districts:', error);
+      if (!user) {
+        setLoadingDistricts(false);
         return;
       }
 
-      if (data) {
-        const districts = data.map((d) => {
-          // The join returns spb_districts as an object with name property
-          const districtData = d.spb_districts as unknown as { name: string } | null;
-          return {
-            district_slug: d.district_slug,
-            district_name: districtData?.name || d.district_slug,
-          };
-        });
-        setAdminDistricts(districts);
+      try {
+        const { data, error } = await supabase
+          .from('spb_district_admins')
+          .select(`
+            district_slug,
+            spb_districts!inner(name)
+          `)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Failed to fetch admin districts:', error);
+          return;
+        }
+
+        if (data) {
+          const districts = data.map((d) => {
+            // The join returns spb_districts as an object with name property
+            const districtData = d.spb_districts as unknown as { name: string } | null;
+            return {
+              district_slug: d.district_slug,
+              district_name: districtData?.name || d.district_slug,
+            };
+          });
+          setAdminDistricts(districts);
+        }
+      } finally {
+        setLoadingDistricts(false);
       }
     }
 
@@ -128,13 +143,13 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
           {/* Navigation Items */}
           <div className="py-1">
             <DropdownMenu.Item asChild>
-              <Link
-                to="/dashboard"
+              <a
+                href={dashboardUrl}
                 className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
               >
                 <LayoutDashboard className="w-4 h-4 text-indigo-500" />
                 Dashboard
-              </Link>
+              </a>
             </DropdownMenu.Item>
 
             <DropdownMenu.Item asChild>
@@ -158,8 +173,8 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
             </DropdownMenu.Item>
           </div>
 
-          {/* Admin Section - Only shown if user has admin access */}
-          {hasAdminAccess && (
+          {/* Admin Section - Only shown if user has admin access and districts loaded */}
+          {!loadingDistricts && hasAdminAccess && (
             <>
               <DropdownMenu.Separator className="h-px bg-slate-100 my-1" />
               <div className="py-1">

@@ -12,6 +12,11 @@ vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
+// Mock SubdomainContext - default to root subdomain
+vi.mock('../../../contexts/SubdomainContext', () => ({
+  useSubdomain: () => ({ type: 'root', slug: null }),
+}));
+
 // Mock subdomain utility
 vi.mock('../../../lib/subdomain', () => ({
   buildSubdomainUrlWithPath: (type: string, path?: string, slug?: string) => {
@@ -19,14 +24,20 @@ vi.mock('../../../lib/subdomain', () => ({
     if (type === 'district' && slug) return `http://localhost:5173?subdomain=${slug}${path || ''}`;
     return 'http://localhost:5173';
   },
+  getSubdomainUrl: (type: string) => {
+    if (type === 'root') return 'http://localhost:5173';
+    if (type === 'admin') return 'http://localhost:5173?subdomain=admin';
+    return 'http://localhost:5173';
+  },
 }));
 
-// Mock Supabase
+// Mock Supabase - default returns empty districts
+const mockSupabaseResponse = vi.fn().mockResolvedValue({ data: [], error: null });
 vi.mock('../../../lib/supabase', () => ({
   supabase: {
     from: () => ({
       select: () => ({
-        eq: () => Promise.resolve({ data: [], error: null }),
+        eq: () => mockSupabaseResponse(),
       }),
     }),
   },
@@ -41,6 +52,7 @@ describe('UserAvatarMenu', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogout.mockResolvedValue(undefined);
+    mockSupabaseResponse.mockResolvedValue({ data: [], error: null });
   });
 
   describe('when user is not authenticated', () => {
@@ -142,6 +154,40 @@ describe('UserAvatarMenu', () => {
         const adminLink = screen.getByText('System Admin').closest('a');
         expect(adminLink).toHaveAttribute('href', 'http://localhost:5173?subdomain=admin');
       });
+    });
+
+    it('shows district admin links when user has district access', async () => {
+      mockSupabaseResponse.mockResolvedValue({
+        data: [
+          {
+            district_slug: 'westside',
+            spb_districts: { name: 'Westside District' },
+          },
+        ],
+        error: null,
+      });
+
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+        isSystemAdmin: false,
+      });
+
+      const user = userEvent.setup();
+      renderWithRouter(<UserAvatarMenu />);
+
+      await user.click(screen.getByRole('button', { name: /user menu/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Westside District')).toBeInTheDocument();
+      });
+
+      // Verify the link uses subdomain-aware URL
+      const districtLink = screen.getByText('Westside District').closest('a');
+      expect(districtLink).toHaveAttribute(
+        'href',
+        'http://localhost:5173?subdomain=westside/admin'
+      );
     });
 
     it('calls logout when Sign Out is clicked', async () => {

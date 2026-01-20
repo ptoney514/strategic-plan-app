@@ -5,7 +5,7 @@ import { useSubdomain } from '../contexts/SubdomainContext';
 import { PublicLayout } from '../layouts/PublicLayout';
 import { ClientPublicLayout } from '../layouts/ClientPublicLayout';
 import { ClientAdminLayout } from '../layouts/ClientAdminLayout';
-import { ClientAdminEditorialLayout } from '../layouts/ClientAdminEditorialLayout';
+import { DashboardLayout } from '../layouts/DashboardLayout';
 
 // Guards
 import { ClientAdminGuard } from '../middleware/ClientAdminGuard';
@@ -48,6 +48,9 @@ import {
 
 // Auth
 import { Login } from '../pages/Login';
+
+// Dashboard Pages
+import { UserDashboard, PlaceholderPage } from '../pages/dashboard';
 
 /**
  * Router for district subdomains (e.g., westside.stratadash.org)
@@ -115,16 +118,17 @@ export function DistrictRouter() {
         <Route path="goals" element={<AdminGoals />} />
       </Route>
 
-      {/* District Admin Routes (Editorial Design) */}
+      {/* District Admin Routes (New Dashboard Design) */}
       <Route
         path="/admin"
         element={
           <ClientAdminGuard districtSlug={slug}>
-            <ClientAdminEditorialLayout />
+            <DashboardLayout basePath="/admin" />
           </ClientAdminGuard>
         }
       >
-        <Route index element={<AdminDashboard2 />} />
+        <Route index element={<UserDashboard />} />
+        {/* Objectives/Goals routes */}
         <Route path="objectives" element={<AdminDashboard2 />} />
         <Route path="objectives/create" element={<CreateObjective />} />
         <Route path="objectives/:objectiveId" element={<AdminObjectiveDetail />} />
@@ -138,6 +142,12 @@ export function DistrictRouter() {
         <Route path="users" element={<DistrictUsers />} />
         <Route path="appearance" element={<DistrictAppearance />} />
         <Route path="settings" element={<AdminSettings />} />
+        {/* Placeholder routes for new nav items */}
+        <Route path="metrics" element={<PlaceholderPage title="Metrics" description="Monitor key performance metrics across your plans." />} />
+        <Route path="dashboards" element={<PlaceholderPage title="Dashboards" description="View customizable dashboards with your key data." />} />
+        <Route path="reports" element={<PlaceholderPage title="Reports" description="Generate and export reports on your strategic progress." />} />
+        <Route path="invite" element={<PlaceholderPage title="Invite Teammates" description="Invite team members to collaborate on your strategic plans." />} />
+        <Route path="help" element={<PlaceholderPage title="Help & Support" description="Get help with using StrataDASH and contact support." />} />
         {/* Backwards compatibility redirects */}
         <Route path="goals" element={<Navigate to="../objectives" replace />} />
         <Route path="objectives/new" element={<Navigate to="../objectives/create" replace />} />

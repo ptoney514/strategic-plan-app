@@ -143,13 +143,23 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
           {/* Navigation Items */}
           <div className="py-1">
             <DropdownMenu.Item asChild>
-              <a
-                href={dashboardUrl}
-                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
-              >
-                <LayoutDashboard className="w-4 h-4 text-indigo-500" />
-                Dashboard
-              </a>
+              {subdomainType === 'root' ? (
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-indigo-500" />
+                  Dashboard
+                </Link>
+              ) : (
+                <a
+                  href={dashboardUrl}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-indigo-500" />
+                  Dashboard
+                </a>
+              )}
             </DropdownMenu.Item>
 
             <DropdownMenu.Item asChild>

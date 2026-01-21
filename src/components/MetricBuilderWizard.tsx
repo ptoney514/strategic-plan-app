@@ -296,10 +296,8 @@ export function MetricBuilderWizard({
   const renderStepContent = () => {
     switch (currentStep) {
       case 'visualization':
-        if (existingMetric) {
-          setCurrentStep('title');
-          return null;
-        }
+        // Note: For existing metrics, the useEffect already sets step to 'title'
+        // so this case should only render for new metrics
         return (
           <div className="space-y-4">
             <div className="text-center">

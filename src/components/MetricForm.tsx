@@ -63,6 +63,7 @@ export function MetricForm({
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
     setError,
   } = useForm<MetricFormData>({
@@ -249,13 +250,21 @@ export function MetricForm({
           <label htmlFor="data_source" className="block text-sm font-medium text-foreground mb-1">
             Data Source
           </label>
-          <input
-            type="text"
+          <select
             id="data_source"
             {...register('data_source')}
             className="w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Where this data comes from"
-          />
+          >
+            <option value="">Select data source</option>
+            <option value="manual">Manual Entry</option>
+            <option value="survey">Survey</option>
+            <option value="map_data">MAP Data</option>
+            <option value="state_testing">State Testing</option>
+            <option value="total_number">Total Number</option>
+            <option value="percent">Percent</option>
+            <option value="narrative">Narrative</option>
+            <option value="link">Link</option>
+          </select>
         </div>
       </div>
 
@@ -282,14 +291,11 @@ export function MetricForm({
             <span className="text-muted-foreground">Progress</span>
             <span className="font-medium">
               {(() => {
-                const values = handleSubmit((data) => data)();
-                if (values && typeof values === 'object' && 'target_value' in values) {
-                  const target = (values as any).target_value;
-                  const current = (values as any).current_value;
-                  const baseline = (values as any).baseline_value;
-                  if (target && target !== baseline) {
-                    return Math.round(((current - baseline) / (target - baseline)) * 100) + '%';
-                  }
+                const current = watch('current_value');
+                const target = watch('target_value');
+                const baseline = watch('baseline_value');
+                if (target && target !== baseline) {
+                  return Math.round(((current - baseline) / (target - baseline)) * 100) + '%';
                 }
                 return '0%';
               })()}

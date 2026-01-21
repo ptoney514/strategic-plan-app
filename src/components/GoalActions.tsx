@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pencil, Trash2, Plus, MoreVertical } from 'lucide-react';
 import { useDeleteGoal } from '../hooks/useGoals';
 import { ConfirmDialog } from './Modal';
+import { toast } from './Toast';
 import type { Goal } from '../lib/types';
 
 interface GoalActionsProps {
@@ -22,6 +23,7 @@ export function GoalActions({ goal, onEdit, onAddChild, canAddChild = false }: G
       setShowConfirmDelete(false);
     } catch (error) {
       console.error('Failed to delete goal:', error);
+      toast.error('Failed to delete goal. Please try again.');
     }
   };
 

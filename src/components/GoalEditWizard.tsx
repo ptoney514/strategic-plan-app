@@ -196,11 +196,11 @@ export function GoalEditWizard({
       // Handle metrics changes
       const existingMetrics = goal.metrics || [];
 
-      // Update/create metrics
-      for (const metric of localMetrics) {
+      // Update/create metrics in parallel
+      await Promise.all(localMetrics.map(metric => {
         if (metric.id.startsWith('temp-')) {
           // Create new metric
-          await createMetricMutation.mutateAsync({
+          return createMetricMutation.mutateAsync({
             goal_id: goal.id,
             metric_name: metric.metric_name,
             description: metric.description,
@@ -208,11 +208,14 @@ export function GoalEditWizard({
             current_value: metric.current_value,
             unit: metric.unit,
             data_source: metric.data_source,
-            metric_type: metric.metric_type
+            metric_type: metric.metric_type,
+            chart_type: metric.chart_type,
+            visualization_config: metric.visualization_config,
+            data_points: metric.data_points
           });
         } else {
           // Update existing metric
-          await updateMetricMutation.mutateAsync({
+          return updateMetricMutation.mutateAsync({
             id: metric.id,
             updates: {
               metric_name: metric.metric_name,
@@ -221,18 +224,21 @@ export function GoalEditWizard({
               current_value: metric.current_value,
               unit: metric.unit,
               data_source: metric.data_source,
-              metric_type: metric.metric_type
+              metric_type: metric.metric_type,
+              chart_type: metric.chart_type,
+              visualization_config: metric.visualization_config,
+              data_points: metric.data_points
             }
           });
         }
-      }
+      }));
 
-      // Delete removed metrics
+      // Delete removed metrics in parallel
       const localMetricIds = localMetrics.map(m => m.id).filter(id => !id.startsWith('temp-'));
       const deletedMetrics = existingMetrics.filter(m => !localMetricIds.includes(m.id));
-      for (const metric of deletedMetrics) {
-        await deleteMetricMutation.mutateAsync(metric.id);
-      }
+      await Promise.all(deletedMetrics.map(metric =>
+        deleteMetricMutation.mutateAsync(metric.id)
+      ));
 
       toast.success('Goal updated successfully');
       onSuccess?.();

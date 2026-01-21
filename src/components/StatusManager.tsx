@@ -5,7 +5,7 @@ import type { Goal } from '../lib/types';
 interface StatusManagerProps {
   goal: Goal;
   onClose: () => void;
-  onSave: (status: string, reason: string) => void;
+  onSave: (status: string, reason: string, category: string) => void;
 }
 
 type PerformanceStatus = 'on-target' | 'at-risk' | 'critical' | 'off-target' | 'not-started';
@@ -66,7 +66,7 @@ export function StatusManager({ goal, onClose, onSave }: StatusManagerProps) {
       alert('Please provide a reason for the status override');
       return;
     }
-    onSave(selectedStatus, overrideReason);
+    onSave(selectedStatus, overrideReason, reasonCategory);
   };
   
   const isOverride = selectedStatus !== goal.calculated_status;

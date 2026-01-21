@@ -1,41 +1,8 @@
+import DOMPurify from 'dompurify';
 import type { NarrativeConfig } from '../lib/metric-visualizations';
 
 interface NarrativeDisplayProps {
   config: NarrativeConfig;
-}
-
-// Simple HTML sanitizer (allows only safe tags)
-function sanitizeHTML(html: string, allowedTags: string[]): string {
-  const div = document.createElement('div');
-  div.innerHTML = html;
-
-  // Remove all elements not in allowed list
-  const allElements = div.getElementsByTagName('*');
-  for (let i = allElements.length - 1; i >= 0; i--) {
-    const element = allElements[i];
-    if (!allowedTags.includes(element.tagName.toLowerCase())) {
-      element.remove();
-    }
-  }
-
-  // Remove all event handlers and dangerous attributes
-  const safeElements = div.getElementsByTagName('*');
-  for (let i = 0; i < safeElements.length; i++) {
-    const element = safeElements[i];
-    const attributes = Array.from(element.attributes);
-    attributes.forEach(attr => {
-      // Remove event handlers (on*)
-      if (attr.name.startsWith('on')) {
-        element.removeAttribute(attr.name);
-      }
-      // Remove javascript: links
-      if (attr.name === 'href' && attr.value.toLowerCase().startsWith('javascript:')) {
-        element.setAttribute('href', '#');
-      }
-    });
-  }
-
-  return div.innerHTML;
 }
 
 export function NarrativeDisplay({ config }: NarrativeDisplayProps) {
@@ -46,8 +13,12 @@ export function NarrativeDisplay({ config }: NarrativeDisplayProps) {
     allowedTags = ['p', 'h1', 'h2', 'h3', 'a', 'ul', 'li', 'strong', 'em', 'u', 'br']
   } = config;
 
-  // Sanitize the HTML content
-  const sanitizedContent = sanitizeHTML(content, allowedTags);
+  // Sanitize the HTML content using DOMPurify
+  const sanitizedContent = DOMPurify.sanitize(content, {
+    ALLOWED_TAGS: allowedTags,
+    ALLOWED_ATTR: ['href', 'target', 'rel'],
+    ALLOW_DATA_ATTR: false
+  });
 
   return (
     <div className="narrative-display bg-white dark:bg-transparent rounded-lg p-6 border border-neutral-200 dark:border-transparent">

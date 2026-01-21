@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Save, 
-  AlertTriangle, 
-  CheckCircle, 
-  TrendingUp, 
+import {
+  Save,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
   TrendingDown,
   Minus
 } from 'lucide-react';
 import type { Metric, Goal } from '../lib/types';
+import { MetricsService } from '../lib/services';
+import { toast } from './Toast';
 
 interface BulkDataEntryProps {
   metrics: Metric[];
@@ -116,9 +118,37 @@ export function BulkDataEntry({ metrics, goals, period }: BulkDataEntryProps) {
   };
   
   const handleSaveAll = async () => {
-    // TODO: Implement actual save logic
-    console.log('Saving all changes:', Array.from(dataEntries.values()).filter(e => e.hasChanges));
-    setUnsavedChanges(false);
+    const changedEntries = Array.from(dataEntries.values()).filter(e => e.hasChanges);
+    if (changedEntries.length === 0) {
+      toast.info('No changes to save');
+      return;
+    }
+
+    try {
+      await Promise.all(changedEntries.map(entry =>
+        MetricsService.update(entry.metricId, {
+          current_value: entry.currentValue ?? undefined,
+          target_value: entry.targetValue ?? undefined
+        })
+      ));
+      toast.success(`Saved ${changedEntries.length} metric${changedEntries.length > 1 ? 's' : ''}`);
+      setUnsavedChanges(false);
+
+      // Reset hasChanges for saved entries
+      setDataEntries(prev => {
+        const newEntries = new Map(prev);
+        changedEntries.forEach(entry => {
+          const current = newEntries.get(entry.metricId);
+          if (current) {
+            newEntries.set(entry.metricId, { ...current, hasChanges: false });
+          }
+        });
+        return newEntries;
+      });
+    } catch (error) {
+      console.error('Failed to save changes:', error);
+      toast.error('Failed to save changes. Please try again.');
+    }
   };
   
   // Group metrics by goal

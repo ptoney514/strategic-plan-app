@@ -60,17 +60,20 @@ export function HeroSection({ onDemoClick }: HeroSectionProps) {
         </p>
       </div>
 
-      {/* Product Image Mockup */}
+      {/* Product Video Showcase */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 fade-in-up fade-in-delay-1">
         <div className="shadow-indigo-200/50 md:p-4 bg-indigo-50/50 border-indigo-200 border rounded-xl p-2 relative shadow-2xl">
           <div className="rounded-lg overflow-hidden border border-indigo-200 bg-white relative shadow-sm group">
-            {/* Placeholder for product screenshot */}
-            <div className="aspect-video bg-gradient-to-br from-indigo-100 via-indigo-50 to-white flex items-center justify-center transition-transform duration-700 group-hover:scale-[1.01]">
-              <div className="text-center">
-                <Icon icon="solar:chart-2-linear" className="w-16 h-16 text-indigo-300 mx-auto mb-4" />
-                <span className="text-indigo-400 text-sm font-medium">Product Screenshot</span>
-              </div>
-            </div>
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full aspect-video object-cover"
+            >
+              <source src="/showreel.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
             {/* Subtle inner border */}
             <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-lg pointer-events-none" />
           </div>

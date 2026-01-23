@@ -25,25 +25,25 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
         {/* Nav Links - Hidden on mobile */}
         <div className="hidden md:flex items-center space-x-8">
           <a
-            href="#goals"
+            href="/#goals"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
           >
             Goals
           </a>
           <a
-            href="#initiatives"
+            href="/#initiatives"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
           >
             Initiatives
           </a>
           <a
-            href="#progress"
+            href="/#progress"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
           >
             Progress
           </a>
           <a
-            href="#resources"
+            href="/#resources"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
           >
             Resources

@@ -69,10 +69,11 @@ export function HeroSection({ onDemoClick }: HeroSectionProps) {
               loop
               muted
               playsInline
+              preload="metadata"
+              aria-hidden="true"
               className="w-full aspect-video object-cover"
             >
               <source src="/showreel.mp4" type="video/mp4" />
-              Your browser does not support the video tag.
             </video>
             {/* Subtle inner border */}
             <div className="absolute inset-0 ring-1 ring-inset ring-black/5 rounded-lg pointer-events-none" />

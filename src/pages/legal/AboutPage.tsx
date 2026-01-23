@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { useAuth } from '../../contexts/AuthContext';
-import { UserAvatarMenu } from '../../components/common/UserAvatarMenu';
+import { MarketingNav } from '../../components/marketing/MarketingNav';
 import { MarketingFooter } from '../../components/marketing/MarketingFooter';
 
 /**
@@ -9,64 +8,14 @@ import { MarketingFooter } from '../../components/marketing/MarketingFooter';
  * Explains what StrataDash is and who it serves
  */
 export function AboutPage() {
-  const { isAuthenticated, loading } = useAuth();
+  const handleDemoClick = () => {
+    window.location.href = '/westside';
+  };
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Navigation - matches MarketingNav style */}
-      <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-indigo-100">
-        <div className="flex h-20 max-w-7xl mx-auto px-6 items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group cursor-pointer">
-            <img
-              src="/assets/stratadash-logo.png"
-              alt="StrataDash"
-              className="w-9 h-9 rounded-lg shadow-lg shadow-blue-900/20"
-            />
-            <span className="text-lg font-bold tracking-tight text-indigo-900">StrataDash</span>
-          </Link>
-
-          {/* Nav Links - Hidden on mobile */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              className="text-sm font-medium text-indigo-900 transition-colors"
-            >
-              About
-            </Link>
-          </div>
-
-          {/* Actions */}
-          <div className="flex items-center gap-4">
-            {loading ? (
-              <div className="w-8 h-8 rounded-full bg-indigo-100 animate-pulse" />
-            ) : isAuthenticated ? (
-              <>
-                <Link
-                  to="/dashboard"
-                  className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
-                >
-                  Dashboard
-                </Link>
-                <UserAvatarMenu />
-              </>
-            ) : (
-              <Link
-                to="/login"
-                className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
-              >
-                Sign In
-              </Link>
-            )}
-          </div>
-        </div>
-      </nav>
+      {/* Navigation */}
+      <MarketingNav onDemoClick={handleDemoClick} />
 
       {/* Hero Section */}
       <section className="pt-32 pb-16 relative">

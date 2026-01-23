@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Target, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 /**
  * Privacy Policy page for stratadash.org
@@ -12,9 +12,11 @@ export function PrivacyPage() {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-lg shadow-primary/20">
-                <Target className="w-6 h-6 text-white" />
-              </div>
+              <img
+                src="/assets/stratadash-logo.png"
+                alt="StrataDash"
+                className="w-10 h-10 rounded-xl shadow-lg shadow-primary/20"
+              />
               <span className="text-2xl font-bold text-gray-900">StrataDash</span>
             </Link>
             <Link
@@ -122,9 +124,11 @@ export function PrivacyPage() {
       <footer className="container mx-auto px-6 py-12 border-t border-gray-100">
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Target className="w-5 h-5 text-white" />
-            </div>
+            <img
+              src="/assets/stratadash-logo.png"
+              alt="StrataDash"
+              className="w-8 h-8 rounded-lg"
+            />
             <span className="text-lg font-semibold text-gray-900">StrataDash</span>
           </div>
           <div className="flex items-center gap-6 text-sm">

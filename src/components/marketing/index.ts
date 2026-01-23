@@ -1,6 +1,7 @@
 export { MarketingNav } from './MarketingNav';
 export { MarketingFooter } from './MarketingFooter';
 export { HeroSection } from './HeroSection';
+export { ProductDemo } from './ProductDemo';
 export { GoalsOverviewSection } from './GoalsOverviewSection';
 export {
   FeatureSection,

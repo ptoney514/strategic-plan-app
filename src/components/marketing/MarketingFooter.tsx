@@ -9,9 +9,11 @@ export function MarketingFooter() {
           {/* Logo & Tagline */}
           <div className="col-span-2 md:col-span-1">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-6 h-6 bg-indigo-900 rounded flex items-center justify-center text-white">
-                <Icon icon="solar:widget-bold" width="14" />
-              </div>
+              <img
+                src="/assets/stratadash-logo.png"
+                alt="StrataDash"
+                className="w-7 h-7 rounded-lg shadow-sm"
+              />
               <span className="font-bold text-indigo-900">StrataDash</span>
             </div>
             <p className="text-xs text-indigo-500 leading-relaxed mb-4">

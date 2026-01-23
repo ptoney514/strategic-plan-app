@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { Icon } from '@iconify/react';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserAvatarMenu } from '../common/UserAvatarMenu';
 
@@ -15,9 +14,11 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
       <div className="flex h-20 max-w-7xl mx-auto px-6 items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2 group cursor-pointer">
-          <div className="flex shadow-blue-900/20 text-white bg-indigo-900 w-8 h-8 rounded-lg shadow-lg items-center justify-center">
-            <Icon icon="solar:widget-bold" className="w-5 h-5" />
-          </div>
+          <img
+            src="/assets/stratadash-logo.png"
+            alt="StrataDash"
+            className="w-9 h-9 rounded-lg shadow-lg shadow-blue-900/20"
+          />
           <span className="text-lg font-bold tracking-tight text-indigo-900">StrataDash</span>
         </Link>
 

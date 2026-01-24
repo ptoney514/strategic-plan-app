@@ -12,7 +12,7 @@ export function UserDashboard() {
 
   // Detect if we're in district admin context
   const isDistrictAdmin = location.pathname.startsWith('/admin');
-  const basePath = isDistrictAdmin ? '/admin' : '';
+  const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
 
   // Fetch plans
   const { data: plans = [], isLoading: plansLoading } = useUserPlansWithCounts();

@@ -9,10 +9,10 @@ import {
   Users,
   HelpCircle,
 } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 // Logo path - can be moved to R2/CDN later
 const LOGO_URL = '/assets/stratadash-logo.png';
-import { cn } from '../../lib/utils';
 
 interface NavItem {
   label: string;

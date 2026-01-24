@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '../../../test/setup';
 import { ExpandedGoalPanel } from '../ExpandedGoalPanel';
-import type { Goal, Metric } from '../../../lib/types';
+import type { Goal, Metric, HierarchicalGoal } from '../../../lib/types';
 
 // Mock Supabase client to avoid env var errors
 vi.mock('../../../lib/supabase', () => ({
@@ -577,6 +577,129 @@ describe('ExpandedGoalPanel', () => {
         expect(narrativeContainer).not.toHaveClass('h-[180px]');
         expect(narrativeContainer).not.toHaveClass('overflow-y-auto');
       }
+    });
+  });
+
+  describe('Sub-Goals Section', () => {
+    const mockSubGoals: HierarchicalGoal[] = [
+      {
+        id: 'subgoal-1',
+        district_id: 'district-1',
+        title: 'K-2 Reading Foundation',
+        description: 'Build strong phonics skills',
+        goal_number: '1.2.1',
+        level: 2,
+        parent_id: 'goal-1',
+        indicator_text: 'on-target',
+        order_position: 0,
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+        children: [],
+      },
+      {
+        id: 'subgoal-2',
+        district_id: 'district-1',
+        title: 'Grade 3-5 Comprehension',
+        description: 'Improve reading comprehension',
+        goal_number: '1.2.2',
+        level: 2,
+        parent_id: 'goal-1',
+        indicator_text: 'needs-attention',
+        order_position: 1,
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+        children: [],
+      },
+    ];
+
+    it('renders sub-goals section when subGoals prop is provided', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+          subGoals={mockSubGoals}
+        />
+      );
+
+      expect(screen.getByText('Sub-Goals (2)')).toBeInTheDocument();
+    });
+
+    it('renders each sub-goal with title and number', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+          subGoals={mockSubGoals}
+        />
+      );
+
+      expect(screen.getByText('K-2 Reading Foundation')).toBeInTheDocument();
+      expect(screen.getByText('Grade 3-5 Comprehension')).toBeInTheDocument();
+      expect(screen.getByText('1.2.1')).toBeInTheDocument();
+      expect(screen.getByText('1.2.2')).toBeInTheDocument();
+    });
+
+    it('renders sub-goal descriptions', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+          subGoals={mockSubGoals}
+        />
+      );
+
+      expect(screen.getByText('Build strong phonics skills')).toBeInTheDocument();
+      expect(screen.getByText('Improve reading comprehension')).toBeInTheDocument();
+    });
+
+    it('renders status badges for each sub-goal', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+          subGoals={mockSubGoals}
+        />
+      );
+
+      // Two "On Target" badges: one for the goal metric, one for the sub-goal
+      const onTargetBadges = screen.getAllByText('On Target');
+      expect(onTargetBadges.length).toBeGreaterThanOrEqual(2);
+      expect(screen.getByText('Needs Attention')).toBeInTheDocument();
+    });
+
+    it('does not render sub-goals section when subGoals is empty', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+          subGoals={[]}
+        />
+      );
+
+      expect(screen.queryByText(/Sub-Goals/)).not.toBeInTheDocument();
+    });
+
+    it('does not render sub-goals section when subGoals is undefined', () => {
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[mockMetric]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      expect(screen.queryByText(/Sub-Goals/)).not.toBeInTheDocument();
     });
   });
 });

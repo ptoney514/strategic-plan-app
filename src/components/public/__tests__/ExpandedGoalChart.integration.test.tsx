@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '../../../test/setup';
 import { GoalsOverviewGrid } from '../GoalsOverviewGrid';
-import type { Goal, Metric } from '../../../lib/types';
+import type { HierarchicalGoal, Metric } from '../../../lib/types';
 
 // Mock Supabase client to avoid env var errors
 vi.mock('../../../lib/supabase', () => ({
@@ -62,7 +62,7 @@ HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
 Element.prototype.scrollIntoView = vi.fn();
 
 // Mock goals
-const mockGoals: Goal[] = [
+const mockGoals: HierarchicalGoal[] = [
   {
     id: 'goal-1',
     district_id: 'district-1',
@@ -76,6 +76,7 @@ const mockGoals: Goal[] = [
     order_position: 0,
     created_at: '2024-01-01',
     updated_at: '2024-01-01',
+    children: [],
   },
   {
     id: 'goal-2',
@@ -90,6 +91,7 @@ const mockGoals: Goal[] = [
     order_position: 1,
     created_at: '2024-01-01',
     updated_at: '2024-01-01',
+    children: [],
   },
   {
     id: 'goal-3',
@@ -104,6 +106,7 @@ const mockGoals: Goal[] = [
     order_position: 2,
     created_at: '2024-01-01',
     updated_at: '2024-01-01',
+    children: [],
   },
 ];
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
-import { useGoal, useChildGoals, useUpdateGoal } from '../../../hooks/useGoals';
+import { useGoal, useGoals, useUpdateGoal } from '../../../hooks/useGoals';
 import { useMetricsByDistrict, useUpdateMetric } from '../../../hooks/useMetrics';
 import { HeaderSection } from '../../../components/admin/HeaderSection';
 import { GoalCardEditable } from '../../../components/admin/GoalCardEditable';
@@ -12,7 +12,7 @@ import {
   Loader2,
   FolderOpen,
 } from 'lucide-react';
-import type { Goal, Metric } from '../../../lib/types';
+import type { Goal, Metric, HierarchicalGoal } from '../../../lib/types';
 import { toast } from '../../../components/Toast';
 
 /**
@@ -22,13 +22,16 @@ import { toast } from '../../../components/Toast';
 export function ObjectiveDetail() {
   const { objectiveId } = useParams<{ objectiveId: string }>();
   const { slug } = useSubdomain();
-  const { data: district } = useDistrict(slug || '');
+  const { data: district, isLoading: districtLoading } = useDistrict(slug || '');
   const { data: objective, isLoading: objectiveLoading, error: objectiveError } = useGoal(objectiveId || '');
-  const { data: childGoals, isLoading: childrenLoading } = useChildGoals(objectiveId || '');
+  const { data: allGoals, isLoading: goalsLoading } = useGoals(district?.id || '');
   const { data: allMetrics } = useMetricsByDistrict(district?.id || '');
 
-  // Filter Level 1 goals
-  const level1Goals = (childGoals?.filter(g => g.level === 1) || []).sort((a, b) => {
+  // Find the objective in hierarchical data to get nested children
+  const objectiveWithChildren = allGoals?.find(g => g.id === objectiveId) as HierarchicalGoal | undefined;
+
+  // Extract level 1 goals with their level 2 children nested
+  const level1Goals = (objectiveWithChildren?.children || []).sort((a, b) => {
     const aNum = parseFloat(a.goal_number?.replace(/[^\d.]/g, '') || '0');
     const bNum = parseFloat(b.goal_number?.replace(/[^\d.]/g, '') || '0');
     return aNum - bNum;
@@ -44,12 +47,20 @@ export function ObjectiveDetail() {
   const updateGoalMutation = useUpdateGoal();
   const updateMetricMutation = useUpdateMetric();
 
-  const isLoading = objectiveLoading || childrenLoading;
+  // Only show loading if district is loading, or if we have a district and goals are loading
+  const isLoading = objectiveLoading || districtLoading || (!!district?.id && goalsLoading);
 
-  // Auto-expand all goals when they load
+  // Auto-expand all goals when they load (include level 2 goals)
   useEffect(() => {
     if (level1Goals.length > 0) {
-      setExpandedGoalIds(new Set(level1Goals.map(g => g.id)));
+      const allIds: string[] = [];
+      level1Goals.forEach(g => {
+        allIds.push(g.id);
+        // Also include level 2 goal IDs
+        const children = (g as HierarchicalGoal).children || [];
+        children.forEach(child => allIds.push(child.id));
+      });
+      setExpandedGoalIds(new Set(allIds));
     }
   }, [level1Goals]);
 
@@ -226,7 +237,7 @@ export function ObjectiveDetail() {
             Goals
           </h2>
 
-          {(!childGoals || childGoals.length === 0) ? (
+          {level1Goals.length === 0 ? (
             // Empty State
             <div className="bg-white border border-[#e8e6e1] rounded-xl p-8 text-center">
               <div className="w-12 h-12 bg-[#f5f3ef] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -246,31 +257,64 @@ export function ObjectiveDetail() {
               </Link>
             </div>
           ) : (
-            // Goal Cards with Inline Editing - Grid Layout
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            // Goal Cards with Inline Editing - Flex Layout for nested sub-goals
+            <div className="flex flex-col gap-4">
               {level1Goals.map((goal) => {
                 // Get metrics for this goal
                 const goalMetrics = allMetrics?.filter(m => m.goal_id === goal.id) || [];
                 const isExpanded = expandedGoalIds.has(goal.id);
                 const isEditing = editingGoalId === goal.id;
+                // Get level 2 sub-goals (nested in hierarchical data)
+                const level2Goals = (goal as HierarchicalGoal).children || [];
 
                 return (
-                  <GoalCardEditable
-                    key={goal.id}
-                    goal={goal}
-                    metrics={goalMetrics}
-                    isExpanded={isExpanded}
-                    isEditing={isEditing}
-                    isDimmed={isDimmed(goal.id)}
-                    onToggleExpand={() => toggleGoalExpanded(goal.id)}
-                    onEdit={() => handleEditGoal(goal.id)}
-                    onSave={(updates) => handleSaveGoal(goal.id, updates)}
-                    onCancel={() => setEditingGoalId(null)}
-                    editingMetricId={editingMetricId}
-                    onEditMetric={handleEditMetric}
-                    onSaveMetric={handleSaveMetric}
-                    onCancelEditMetric={handleCancelEditMetric}
-                  />
+                  <div key={goal.id}>
+                    <GoalCardEditable
+                      goal={goal}
+                      metrics={goalMetrics}
+                      isExpanded={isExpanded}
+                      isEditing={isEditing}
+                      isDimmed={isDimmed(goal.id)}
+                      onToggleExpand={() => toggleGoalExpanded(goal.id)}
+                      onEdit={() => handleEditGoal(goal.id)}
+                      onSave={(updates) => handleSaveGoal(goal.id, updates)}
+                      onCancel={() => setEditingGoalId(null)}
+                      editingMetricId={editingMetricId}
+                      onEditMetric={handleEditMetric}
+                      onSaveMetric={handleSaveMetric}
+                      onCancelEditMetric={handleCancelEditMetric}
+                    />
+
+                    {/* Level 2 Sub-goals (nested below level 1 when expanded) */}
+                    {isExpanded && level2Goals.length > 0 && (
+                      <div className="ml-6 mt-2 space-y-2">
+                        {level2Goals.map((subGoal) => {
+                          const subGoalMetrics = allMetrics?.filter(m => m.goal_id === subGoal.id) || [];
+                          const isSubGoalExpanded = expandedGoalIds.has(subGoal.id);
+                          const isSubGoalEditing = editingGoalId === subGoal.id;
+
+                          return (
+                            <GoalCardEditable
+                              key={subGoal.id}
+                              goal={subGoal}
+                              metrics={subGoalMetrics}
+                              isExpanded={isSubGoalExpanded}
+                              isEditing={isSubGoalEditing}
+                              isDimmed={isDimmed(subGoal.id)}
+                              onToggleExpand={() => toggleGoalExpanded(subGoal.id)}
+                              onEdit={() => handleEditGoal(subGoal.id)}
+                              onSave={(updates) => handleSaveGoal(subGoal.id, updates)}
+                              onCancel={() => setEditingGoalId(null)}
+                              editingMetricId={editingMetricId}
+                              onEditMetric={handleEditMetric}
+                              onSaveMetric={handleSaveMetric}
+                              onCancelEditMetric={handleCancelEditMetric}
+                            />
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 );
               })}
             </div>
@@ -280,7 +324,19 @@ export function ObjectiveDetail() {
 
       {/* Metrics Management Modal */}
       {metricsModalGoalId && (() => {
-        const modalGoal = level1Goals.find(g => g.id === metricsModalGoalId);
+        // Search for goal in level 1 or level 2
+        let modalGoal = level1Goals.find(g => g.id === metricsModalGoalId);
+        if (!modalGoal) {
+          // Search in level 2 goals
+          for (const level1Goal of level1Goals) {
+            const level2Goals = (level1Goal as HierarchicalGoal).children || [];
+            const found = level2Goals.find(g => g.id === metricsModalGoalId);
+            if (found) {
+              modalGoal = found;
+              break;
+            }
+          }
+        }
         const modalMetrics = allMetrics?.filter(m => m.goal_id === metricsModalGoalId) || [];
 
         if (!modalGoal) return null;

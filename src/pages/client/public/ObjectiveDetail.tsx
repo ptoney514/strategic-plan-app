@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useParams, useOutletContext, Link, useLocation } from 'react-router-dom';
-import { useGoal, useChildGoals } from '../../../hooks/useGoals';
+import { useGoal, useGoals } from '../../../hooks/useGoals';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
 import { StatusBadge, MobileGoalBottomSheet, GoalsOverviewGrid } from '../../../components/public';
 import type { StatusType } from '../../../components/public/StatusBadge';
 import { FolderOpen } from 'lucide-react';
-import type { District, Goal, Metric } from '../../../lib/types';
+import type { District, Goal, Metric, HierarchicalGoal } from '../../../lib/types';
 
 interface ObjectiveDetailContext {
   district: District;
@@ -55,10 +55,12 @@ export function ObjectiveDetail() {
   const location = useLocation();
 
   const { data: objective, isLoading: objectiveLoading } = useGoal(goalId!);
-  const { data: childGoals, isLoading: childrenLoading } = useChildGoals(goalId!);
+  const { data: allGoals, isLoading: goalsLoading } = useGoals(context?.district?.id || '');
   const { data: allMetrics, isLoading: metricsLoading } = useMetricsByDistrict(context?.district?.id || '');
 
-  const isLoading = objectiveLoading || childrenLoading || metricsLoading;
+  // Only show loading when we have a district and data is being fetched
+  // If context?.district is missing, let it fall through to "not found" state
+  const isLoading = objectiveLoading || (!!context?.district?.id && (goalsLoading || metricsLoading));
 
   // Mobile carousel state
   const [focusedGoalId, setFocusedGoalId] = useState<string | null>(null);
@@ -168,8 +170,11 @@ export function ObjectiveDetail() {
   const color = getColor(objective, objectiveIndex);
   const colors = colorConfig[color];
 
-  // Get child goals (Level 1) and sort by goal_number
-  const level1Goals = (childGoals?.filter(g => g.level === 1) || []).sort((a, b) => {
+  // Find objective in hierarchical data to get nested children
+  const objectiveWithChildren = allGoals?.find(g => g.id === goalId) as HierarchicalGoal | undefined;
+
+  // Get child goals (Level 1) with their level 2 children nested
+  const level1Goals = (objectiveWithChildren?.children || []).sort((a, b) => {
     const aNum = parseFloat(a.goal_number?.replace(/[^\d.]/g, '') || '0');
     const bNum = parseFloat(b.goal_number?.replace(/[^\d.]/g, '') || '0');
     return aNum - bNum;

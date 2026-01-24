@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Minimize2 } from 'lucide-react';
-import type { Goal, Metric } from '../../lib/types';
+import type { Goal, Metric, HierarchicalGoal } from '../../lib/types';
 import { calculateStatus } from './StatusBadge';
 import type { StatusType } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
@@ -32,6 +32,7 @@ interface ExpandedGoalPanelProps {
   metrics: Metric[];
   colorClass: string;
   onClose: () => void;
+  subGoals?: HierarchicalGoal[];
 }
 
 // Chart colors matching the design
@@ -441,6 +442,7 @@ export function ExpandedGoalPanel({
   metrics,
   colorClass,
   onClose,
+  subGoals,
 }: ExpandedGoalPanelProps) {
   const status = getManualStatus(goal);
   const primaryMetric = getPrimaryMetric(metrics, goal.id);
@@ -591,6 +593,41 @@ export function ExpandedGoalPanel({
             )}
           </div>
         </>
+      )}
+
+      {/* Sub-Goals Section */}
+      {subGoals && subGoals.length > 0 && (
+        <div className="px-6 pb-6 pt-2 border-t border-gray-100 dark:border-slate-800">
+          <h4 className="text-xs font-medium tracking-wider text-gray-400 dark:text-gray-500 uppercase mb-3">
+            Sub-Goals ({subGoals.length})
+          </h4>
+          <div className="space-y-2">
+            {subGoals.map((subGoal) => {
+              const subGoalStatus = getManualStatus(subGoal);
+              return (
+                <div
+                  key={subGoal.id}
+                  className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-slate-800 rounded-lg"
+                >
+                  <div className={`w-8 h-8 flex-shrink-0 rounded-lg ${colorClass} text-white flex items-center justify-center text-xs font-bold`}>
+                    {subGoal.goal_number}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                      {subGoal.title}
+                    </p>
+                    {subGoal.description && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {subGoal.description}
+                      </p>
+                    )}
+                  </div>
+                  <FilledStatusBadge status={subGoalStatus} />
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
     </motion.div>
   );

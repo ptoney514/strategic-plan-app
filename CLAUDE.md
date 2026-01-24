@@ -72,6 +72,8 @@ npm run preview          # Preview production build
 ```
 
 > **Note for AI agents:** Use `npm run test:run` (single run) instead of `npm test` (watch mode) to avoid spawning multiple background processes.
+>
+> **CRITICAL:** Never pipe test commands through `head`, `tail`, or other truncating commands (e.g., `npm run test:run | head -100`). This kills the parent process while leaving vitest worker processes orphaned, causing memory exhaustion that can crash the system. Always let test commands run to completion.
 
 ### Quality checks
 

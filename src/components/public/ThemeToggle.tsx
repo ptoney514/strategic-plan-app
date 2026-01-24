@@ -6,7 +6,7 @@ interface ThemeToggleProps {
 }
 
 export function ThemeToggle({ variant = 'header' }: ThemeToggleProps) {
-  const { isDark, toggle } = useTheme();
+  const { isDark, setTheme } = useTheme();
 
   const baseClasses = 'p-2 rounded-lg transition-colors';
   const variantClasses = variant === 'header'
@@ -15,7 +15,7 @@ export function ThemeToggle({ variant = 'header' }: ThemeToggleProps) {
 
   return (
     <button
-      onClick={toggle}
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
       className={`${baseClasses} ${variantClasses}`}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >

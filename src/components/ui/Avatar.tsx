@@ -1,48 +1,37 @@
+import { User } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface AvatarProps {
-  name: string;
+  name?: string;
   size?: 'sm' | 'md' | 'lg';
   src?: string;
   className?: string;
 }
 
 const sizeClasses = {
-  sm: 'w-7 h-7 text-xs',
-  md: 'w-9 h-9 text-sm',
-  lg: 'w-12 h-12 text-base',
+  sm: 'w-7 h-7',
+  md: 'w-9 h-9',
+  lg: 'w-12 h-12',
+};
+
+const iconSizeClasses = {
+  sm: 'w-4 h-4',
+  md: 'w-5 h-5',
+  lg: 'w-6 h-6',
 };
 
 /**
- * Generates initials from a name string.
- * - If name has multiple words, uses first letter of first and last word
- * - Otherwise uses first two characters
- */
-function getInitials(name: string): string {
-  const trimmed = name.trim();
-  if (!trimmed) return 'U';
-
-  const words = trimmed.split(/\s+/).filter(Boolean);
-  if (words.length >= 2) {
-    return (words[0][0] + words[words.length - 1][0]).toUpperCase();
-  }
-  return trimmed.substring(0, 2).toUpperCase();
-}
-
-/**
- * Avatar - Displays a user avatar with image or initials fallback
+ * Avatar - Displays a user avatar with image or generic user icon fallback
  *
  * Used throughout the app for user representation in headers,
- * menus, and profile sections.
+ * menus, and profile sections. Supports dark mode.
  */
 export function Avatar({ name, size = 'md', src, className }: AvatarProps) {
-  const initials = getInitials(name);
-
   if (src) {
     return (
       <img
         src={src}
-        alt={name}
+        alt={name || 'User avatar'}
         className={cn(
           'rounded-full object-cover',
           sizeClasses[size],
@@ -55,13 +44,13 @@ export function Avatar({ name, size = 'md', src, className }: AvatarProps) {
   return (
     <div
       className={cn(
-        'rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-semibold',
+        'rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center',
         sizeClasses[size],
         className
       )}
-      aria-label={name}
+      aria-label={name || 'User avatar'}
     >
-      {initials}
+      <User className={cn('text-slate-600 dark:text-slate-300', iconSizeClasses[size])} />
     </div>
   );
 }

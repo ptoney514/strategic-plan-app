@@ -12,6 +12,18 @@ vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
+// Mock ThemeContext
+const mockSetTheme = vi.fn();
+vi.mock('../../../contexts/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'system',
+    resolvedTheme: 'light',
+    setTheme: mockSetTheme,
+    isDark: false,
+    toggle: vi.fn(),
+  }),
+}));
+
 // Mock SubdomainContext - default to root subdomain
 vi.mock('../../../contexts/SubdomainContext', () => ({
   useSubdomain: () => ({ type: 'root', slug: null }),
@@ -85,14 +97,9 @@ describe('UserAvatarMenu', () => {
       });
     });
 
-    it('renders avatar button with user initials', () => {
+    it('renders avatar button', () => {
       renderWithRouter(<UserAvatarMenu />);
-      expect(screen.getByText('JD')).toBeInTheDocument();
-    });
-
-    it('shows username on desktop when showName is true', () => {
-      renderWithRouter(<UserAvatarMenu showName={true} />);
-      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
     });
 
     it('opens dropdown menu when avatar is clicked', async () => {
@@ -103,21 +110,35 @@ describe('UserAvatarMenu', () => {
       await user.click(triggerButton);
 
       await waitFor(() => {
-        expect(screen.getByText('Dashboard')).toBeInTheDocument();
-        expect(screen.getByText('My Profile')).toBeInTheDocument();
-        expect(screen.getByText('Settings')).toBeInTheDocument();
-        expect(screen.getByText('Sign Out')).toBeInTheDocument();
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByText('District Admin')).toBeInTheDocument();
+        expect(screen.getByText('Log out')).toBeInTheDocument();
       });
     });
 
-    it('displays user email in dropdown', async () => {
+    it('displays user name and role in dropdown header', async () => {
       const user = userEvent.setup();
       renderWithRouter(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('john.doe@example.com')).toBeInTheDocument();
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByText('District Admin')).toBeInTheDocument();
+      });
+    });
+
+    it('shows theme selector options', async () => {
+      const user = userEvent.setup();
+      renderWithRouter(<UserAvatarMenu />);
+
+      await user.click(screen.getByRole('button', { name: /user menu/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Theme')).toBeInTheDocument();
+        expect(screen.getByText('Dark')).toBeInTheDocument();
+        expect(screen.getByText('Light')).toBeInTheDocument();
+        expect(screen.getByText('System')).toBeInTheDocument();
       });
     });
 
@@ -134,7 +155,31 @@ describe('UserAvatarMenu', () => {
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('System Admin')).toBeInTheDocument();
+        // There should be at least one System Admin text (role label and/or link)
+        const systemAdminElements = screen.getAllByText('System Admin');
+        expect(systemAdminElements.length).toBeGreaterThanOrEqual(1);
+        // Verify the link exists by checking for an anchor element
+        const hasLink = systemAdminElements.some(el => el.closest('a'));
+        expect(hasLink).toBe(true);
+      });
+    });
+
+    it('shows System Admin role label for system admins', async () => {
+      mockUseAuth.mockReturnValue({
+        user: mockUser,
+        logout: mockLogout,
+        isSystemAdmin: true,
+      });
+
+      const user = userEvent.setup();
+      renderWithRouter(<UserAvatarMenu />);
+
+      await user.click(screen.getByRole('button', { name: /user menu/i }));
+
+      await waitFor(() => {
+        // The role label in the header should say "System Admin"
+        const roleElements = screen.getAllByText('System Admin');
+        expect(roleElements.length).toBeGreaterThanOrEqual(1);
       });
     });
 
@@ -151,8 +196,10 @@ describe('UserAvatarMenu', () => {
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
       await waitFor(() => {
-        const adminLink = screen.getByText('System Admin').closest('a');
-        expect(adminLink).toHaveAttribute('href', 'http://localhost:5173?subdomain=admin');
+        // Get the link by finding the anchor element within the menu
+        const menuItems = screen.getAllByText('System Admin');
+        const adminLink = menuItems.find(el => el.closest('a'));
+        expect(adminLink?.closest('a')).toHaveAttribute('href', 'http://localhost:5173?subdomain=admin');
       });
     });
 
@@ -190,24 +237,24 @@ describe('UserAvatarMenu', () => {
       );
     });
 
-    it('calls logout when Sign Out is clicked', async () => {
+    it('calls logout when Log out is clicked', async () => {
       const user = userEvent.setup();
       renderWithRouter(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
       await waitFor(() => {
-        expect(screen.getByText('Sign Out')).toBeInTheDocument();
+        expect(screen.getByText('Log out')).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText('Sign Out'));
+      await user.click(screen.getByText('Log out'));
 
       await waitFor(() => {
         expect(mockLogout).toHaveBeenCalledTimes(1);
       });
     });
 
-    it('uses email prefix as fallback when display_name is not set', () => {
+    it('uses email prefix as fallback when display_name is not set', async () => {
       mockUseAuth.mockReturnValue({
         user: {
           id: 'user-123',
@@ -218,8 +265,14 @@ describe('UserAvatarMenu', () => {
         isSystemAdmin: false,
       });
 
+      const user = userEvent.setup();
       renderWithRouter(<UserAvatarMenu />);
-      expect(screen.getByText('AD')).toBeInTheDocument();
+
+      await user.click(screen.getByRole('button', { name: /user menu/i }));
+
+      await waitFor(() => {
+        expect(screen.getByText('admin')).toBeInTheDocument();
+      });
     });
   });
 
@@ -248,14 +301,14 @@ describe('UserAvatarMenu', () => {
       // Open menu
       await user.click(screen.getByRole('button', { name: /user menu/i }));
       await waitFor(() => {
-        expect(screen.getByText('My Profile')).toBeInTheDocument();
+        expect(screen.getByText('Log out')).toBeInTheDocument();
       });
 
       // Press Escape
       await user.keyboard('{Escape}');
 
       await waitFor(() => {
-        expect(screen.queryByText('My Profile')).not.toBeInTheDocument();
+        expect(screen.queryByText('Log out')).not.toBeInTheDocument();
       });
     });
 
@@ -269,7 +322,7 @@ describe('UserAvatarMenu', () => {
       await user.keyboard('{Enter}');
 
       await waitFor(() => {
-        expect(screen.getByText('My Profile')).toBeInTheDocument();
+        expect(screen.getByText('Log out')).toBeInTheDocument();
       });
     });
   });

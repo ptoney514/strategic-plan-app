@@ -9,6 +9,9 @@ import {
   Users,
   HelpCircle,
 } from 'lucide-react';
+
+// Logo path - can be moved to R2/CDN later
+const LOGO_URL = '/assets/stratadash-logo.png';
 import { cn } from '../../lib/utils';
 
 interface NavItem {
@@ -54,20 +57,25 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
   };
 
   return (
-    <aside className="flex flex-col w-[270px] bg-[#1E1B4B] text-slate-300 flex-shrink-0 fixed top-0 left-0 bottom-0 z-20 border-r border-indigo-900/50">
+    <aside
+      className="flex flex-col w-[270px] text-slate-300 flex-shrink-0 fixed top-0 left-0 bottom-0 z-20 border-r border-slate-700/50"
+      style={{ backgroundColor: '#0F172A' }}
+    >
       {/* Logo Area */}
-      <div className="h-[72px] flex items-center px-6 border-b border-indigo-900/50">
+      <div className="h-[72px] flex items-center px-6 border-b border-slate-700/50">
         <Link to={basePath} className="flex items-center gap-3 group">
-          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-600/30 group-hover:bg-indigo-500 transition-colors">
-            <BarChart3 className="text-white" size={20} />
-          </div>
+          <img
+            src={LOGO_URL}
+            alt="StrataDASH"
+            className="w-9 h-9 object-contain"
+          />
           <span className="text-lg font-semibold text-white tracking-tight">StrataDASH</span>
         </Link>
       </div>
 
       {/* Navigation */}
       <nav className="flex-grow px-3 py-6 overflow-y-auto">
-        <div className="mb-3 text-[11px] font-semibold text-indigo-300/60 uppercase tracking-widest px-3">
+        <div className="mb-3 text-[11px] font-semibold text-slate-500 uppercase tracking-widest px-3">
           Menu
         </div>
         <ul className="space-y-1">
@@ -76,13 +84,16 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
               <Link
                 to={getHref(item.path)}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-md transition-all duration-200',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
                   isActive(item.path)
-                    ? 'bg-white/10 text-white shadow-sm ring-1 ring-white/10'
-                    : 'text-indigo-200/80 hover:text-white hover:bg-white/5'
+                    ? 'bg-brand-teal/20 text-white shadow-sm border border-brand-teal/30'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5'
                 )}
               >
-                <span className={cn(isActive(item.path) ? 'text-white' : 'text-current')}>
+                <span className={cn(
+                  'flex-shrink-0',
+                  isActive(item.path) ? 'text-brand-mint' : 'text-slate-400'
+                )}>
                   {item.icon}
                 </span>
                 <span className="text-sm font-medium">{item.label}</span>
@@ -93,15 +104,15 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
       </nav>
 
       {/* Sidebar Footer */}
-      <div className="px-3 py-4 border-t border-indigo-900/50 bg-[#1E1B4B] mb-2">
+      <div className="px-3 py-4 border-t border-slate-700/50 mb-2" style={{ backgroundColor: '#0F172A' }}>
         <ul className="space-y-1">
           {footerNavItems.map((item) => (
             <li key={item.path}>
               <Link
                 to={getHref(item.path)}
-                className="flex items-center gap-3 px-3 py-2 text-indigo-300 hover:text-white hover:bg-white/5 rounded-md transition-all duration-200"
+                className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
               >
-                {item.icon}
+                <span className="flex-shrink-0">{item.icon}</span>
                 <span className="text-sm font-medium">{item.label}</span>
               </Link>
             </li>

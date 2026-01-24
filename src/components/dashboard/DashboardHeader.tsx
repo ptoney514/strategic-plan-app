@@ -30,7 +30,7 @@ export function DashboardHeader() {
     <header className="flex items-center justify-between h-[72px] px-8 border-b border-slate-200/60 bg-[#F8FAFC]/80 backdrop-blur-md sticky top-0 z-30">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-slate-500">
-        <div className="p-1.5 rounded-md bg-white border border-slate-200 shadow-sm text-indigo-600 flex items-center justify-center">
+        <div className="p-1.5 rounded-md bg-white border border-slate-200 shadow-sm text-brand-teal flex items-center justify-center">
           <Home size={16} />
         </div>
         <span className="text-slate-300 text-sm">/</span>
@@ -43,21 +43,21 @@ export function DashboardHeader() {
         <div className="relative group">
           <Search
             size={18}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-teal transition-colors"
           />
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full text-sm w-64 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all outline-none text-slate-600 placeholder-slate-400 shadow-sm group-hover:shadow-md"
+            className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-full text-sm w-64 focus:ring-2 focus:ring-brand-teal/20 focus:border-brand-teal transition-all outline-none text-slate-600 placeholder-slate-400 shadow-sm group-hover:shadow-md"
           />
         </div>
 
         <div className="h-6 w-px bg-slate-200 mx-1" />
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-full text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors">
+        <button className="relative p-2 rounded-full text-slate-400 hover:text-brand-teal hover:bg-brand-teal/10 transition-colors">
           <Bell size={20} />
           <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full ring-2 ring-white" />
         </button>

@@ -43,6 +43,16 @@ export default {
           'green-light': '#D1FAE5',
           amber: '#D97706',
           'amber-light': '#FEF3C7',
+        },
+        // StrataDASH brand colors
+        brand: {
+          bg: '#0b0b12',
+          ink: '#061427',
+          navy: '#0B1F3A',
+          slate: '#0F172A',      // Dark slate for sidebar
+          deepTeal: '#1A6F73',
+          teal: '#22B8AE',
+          mint: '#36D7C3',
         }
       },
       borderRadius: {

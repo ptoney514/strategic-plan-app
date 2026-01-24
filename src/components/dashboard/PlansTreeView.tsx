@@ -83,9 +83,9 @@ function ObjectiveItem({
       {/* Connector Line */}
       <div className="absolute left-[11px] top-4 w-4 h-px bg-slate-200" />
 
-      <div className="bg-white border border-slate-200 rounded-md p-3 flex items-start justify-between group hover:border-indigo-300 transition-colors">
+      <div className="bg-white border border-slate-200 rounded-md p-3 flex items-start justify-between group hover:border-brand-teal/50 transition-colors">
         <div className="flex gap-3 w-full">
-          <div className="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+          <div className="w-6 h-6 rounded-full bg-brand-teal/10 border border-brand-teal/20 text-brand-teal flex items-center justify-center shrink-0">
             {status === 'on-track' ? (
               <Target size={12} />
             ) : (
@@ -96,14 +96,14 @@ function ObjectiveItem({
             <div className="flex items-start justify-between gap-4">
               <Link
                 to={`/objectives/${goal.id}`}
-                className="text-sm font-medium text-slate-900 leading-snug hover:text-indigo-600 transition-colors"
+                className="text-sm font-medium text-slate-900 leading-snug hover:text-brand-teal transition-colors"
               >
                 {goal.title}
               </Link>
               <StatusBadge status={status} />
             </div>
             <div className="mt-2 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-medium bg-indigo-50 text-indigo-600">
+              <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-medium bg-brand-teal/10 text-brand-teal">
                 <ChevronRight size={10} />
                 {childCount} {childCount === 1 ? 'goal' : 'goals'}
               </span>
@@ -140,7 +140,7 @@ function PlanCard({
         className="w-full flex items-center justify-between p-4 border-b border-transparent hover:bg-slate-50/50 transition-colors cursor-pointer text-left"
       >
         <div className="flex items-center gap-3">
-          <div className="text-indigo-600">
+          <div className="text-brand-teal">
             <MessageSquareText size={20} />
           </div>
           <h4 className="text-sm font-semibold text-slate-900">{plan.name}</h4>
@@ -185,7 +185,7 @@ function PlanCard({
               )}
               <button
                 onClick={() => onAddObjective(plan.id)}
-                className="flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors py-1.5 px-3 rounded-md border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 bg-white w-max"
+                className="flex items-center gap-2 text-sm font-medium text-brand-teal hover:text-brand-deepTeal transition-colors py-1.5 px-3 rounded-md border border-slate-200 hover:border-brand-teal/50 hover:bg-brand-teal/5 bg-white w-max"
               >
                 <Plus size={16} />
                 Add new objective

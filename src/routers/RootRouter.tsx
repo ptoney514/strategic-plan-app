@@ -53,8 +53,11 @@ export function RootRouter() {
         <Route index element={<UserDashboard />} />
         <Route path="plans" element={<PlaceholderPage title="Strategic Plans" description="View and manage all your strategic plans in one place." />} />
         <Route path="plans/new" element={<PlaceholderPage title="Create New Plan" description="Create a new strategic plan for your organization." />} />
+        <Route path="plans/create" element={<PlaceholderPage title="Create New Plan" description="Create a new strategic plan for your organization." />} />
+        <Route path="plans/:planId" element={<PlaceholderPage title="Plan Details" description="View and manage your strategic plan details." />} />
         <Route path="plans/:planId/objectives/new" element={<PlaceholderPage title="Add New Objective" description="Add a new objective to your strategic plan." />} />
         <Route path="objectives" element={<PlaceholderPage title="Objectives & Goals" description="Track and manage your strategic objectives and goals." />} />
+        <Route path="objectives/create" element={<PlaceholderPage title="Create Objective" description="Create a new objective for your strategic plan." />} />
         <Route path="objectives/:objectiveId" element={<PlaceholderPage title="Objective Details" description="View and edit objective details." />} />
         <Route path="metrics" element={<PlaceholderPage title="Metrics" description="Monitor key performance metrics across your plans." />} />
         <Route path="dashboards" element={<PlaceholderPage title="Dashboards" description="View customizable dashboards with your key data." />} />

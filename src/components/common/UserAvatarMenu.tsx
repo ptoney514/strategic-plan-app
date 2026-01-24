@@ -148,7 +148,7 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
                   to="/dashboard"
                   className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
                 >
-                  <LayoutDashboard className="w-4 h-4 text-indigo-500" />
+                  <LayoutDashboard className="w-4 h-4 text-brand-teal" />
                   Dashboard
                 </Link>
               ) : (
@@ -156,7 +156,7 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
                   href={dashboardUrl}
                   className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
                 >
-                  <LayoutDashboard className="w-4 h-4 text-indigo-500" />
+                  <LayoutDashboard className="w-4 h-4 text-brand-teal" />
                   Dashboard
                 </a>
               )}
@@ -212,7 +212,7 @@ export function UserAvatarMenu({ className, showName = true }: UserAvatarMenuPro
                       href={buildSubdomainUrlWithPath('district', '/admin', district.district_slug)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 focus:bg-slate-50 outline-none cursor-pointer transition-colors"
                     >
-                      <Building2 className="w-4 h-4 text-indigo-500" />
+                      <Building2 className="w-4 h-4 text-brand-teal" />
                       {district.district_name}
                     </a>
                   </DropdownMenu.Item>

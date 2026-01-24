@@ -71,6 +71,8 @@ npm run build            # Production build
 npm run preview          # Preview production build
 ```
 
+> **Note for AI agents:** Use `npm run test:run` (single run) instead of `npm test` (watch mode) to avoid spawning multiple background processes.
+
 ### Quality checks
 
 ```bash

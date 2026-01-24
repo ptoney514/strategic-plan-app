@@ -58,7 +58,7 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
 
   return (
     <aside
-      className="flex flex-col w-[270px] text-slate-300 flex-shrink-0 fixed top-0 left-0 bottom-0 z-20 border-r border-slate-700/50"
+      className="flex flex-col w-[270px] text-slate-300 flex-shrink-0 fixed top-0 left-0 bottom-0 z-40 border-r border-slate-700/50"
       style={{ backgroundColor: '#0F172A' }}
     >
       {/* Logo Area */}

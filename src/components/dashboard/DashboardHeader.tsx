@@ -27,7 +27,7 @@ export function DashboardHeader() {
   const userRole = user?.user_metadata?.role === 'system_admin' ? 'System Admin' : 'District Admin';
 
   return (
-    <header className="flex items-center justify-between h-[72px] px-8 border-b border-slate-200/60 bg-[#F8FAFC]/80 backdrop-blur-md sticky top-0 z-30">
+    <header className="flex items-center justify-between h-[72px] px-8 border-b border-slate-200/60 bg-[#F8FAFC]/80 backdrop-blur-md sticky top-0 z-40">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-slate-500">
         <div className="p-1.5 rounded-md bg-white border border-slate-200 shadow-sm text-brand-teal flex items-center justify-center">

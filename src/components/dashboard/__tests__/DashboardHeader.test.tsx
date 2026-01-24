@@ -8,6 +8,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useLocation: () => ({ pathname: '/' }),
+    useNavigate: () => vi.fn(),
   };
 });
 
@@ -15,13 +16,49 @@ vi.mock('react-router-dom', async () => {
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({
     user: {
+      id: 'user-123',
       email: 'test@example.com',
       user_metadata: {
         display_name: 'Test User',
         role: 'district_admin',
       },
     },
+    logout: vi.fn(),
+    isSystemAdmin: false,
   }),
+}));
+
+// Mock ThemeContext
+vi.mock('../../../contexts/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'system',
+    resolvedTheme: 'light',
+    setTheme: vi.fn(),
+    isDark: false,
+    toggle: vi.fn(),
+  }),
+}));
+
+// Mock SubdomainContext
+vi.mock('../../../contexts/SubdomainContext', () => ({
+  useSubdomain: () => ({ type: 'root', slug: null }),
+}));
+
+// Mock subdomain utility
+vi.mock('../../../lib/subdomain', () => ({
+  buildSubdomainUrlWithPath: () => 'http://localhost:5173',
+  getSubdomainUrl: () => 'http://localhost:5173',
+}));
+
+// Mock Supabase
+vi.mock('../../../lib/supabase', () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => Promise.resolve({ data: [], error: null }),
+      }),
+    }),
+  },
 }));
 
 describe('DashboardHeader', () => {
@@ -58,16 +95,11 @@ describe('DashboardHeader', () => {
     expect(buttons.length).toBeGreaterThan(0);
   });
 
-  it('renders user display name', () => {
+  it('renders user avatar menu button', () => {
     render(<DashboardHeader />);
 
-    expect(screen.getByText('Test User')).toBeInTheDocument();
-  });
-
-  it('renders user role', () => {
-    render(<DashboardHeader />);
-
-    expect(screen.getByText('District Admin')).toBeInTheDocument();
+    // User menu button should be present
+    expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
   });
 
   it('renders breadcrumb with page title', () => {
@@ -75,6 +107,14 @@ describe('DashboardHeader', () => {
 
     // Default pathname '/' should show 'Home'
     expect(screen.getByText('Home')).toBeInTheDocument();
+  });
+
+  it('has dark mode classes for header background', () => {
+    render(<DashboardHeader />);
+
+    const header = screen.getByRole('banner');
+    expect(header.className).toContain('dark:bg-slate-900/80');
+    expect(header.className).toContain('dark:border-slate-700/60');
   });
 });
 

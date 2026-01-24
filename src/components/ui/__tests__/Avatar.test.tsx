@@ -3,35 +3,28 @@ import { render, screen } from '@testing-library/react';
 import { Avatar } from '../Avatar';
 
 describe('Avatar', () => {
-  describe('initials generation', () => {
-    it('generates two-letter initials from first and last name', () => {
+  describe('default icon display', () => {
+    it('renders User icon when no src is provided', () => {
       render(<Avatar name="John Doe" />);
-      expect(screen.getByText('JD')).toBeInTheDocument();
+      // The avatar should have a User icon from Lucide
+      const avatar = screen.getByLabelText('John Doe');
+      expect(avatar).toBeInTheDocument();
+      // Check for the svg element (User icon)
+      expect(avatar.querySelector('svg')).toBeInTheDocument();
     });
 
-    it('generates initials from single word name', () => {
-      render(<Avatar name="Admin" />);
-      expect(screen.getByText('AD')).toBeInTheDocument();
-    });
-
-    it('handles names with multiple words by using first and last', () => {
-      render(<Avatar name="Mary Jane Watson" />);
-      expect(screen.getByText('MW')).toBeInTheDocument();
-    });
-
-    it('handles empty string name with fallback', () => {
+    it('renders User icon even with empty name', () => {
       render(<Avatar name="" />);
-      expect(screen.getByText('U')).toBeInTheDocument();
+      const avatar = screen.getByLabelText('User avatar');
+      expect(avatar).toBeInTheDocument();
+      expect(avatar.querySelector('svg')).toBeInTheDocument();
     });
 
-    it('handles whitespace-only name with fallback', () => {
-      render(<Avatar name="   " />);
-      expect(screen.getByText('U')).toBeInTheDocument();
-    });
-
-    it('converts initials to uppercase', () => {
-      render(<Avatar name="john doe" />);
-      expect(screen.getByText('JD')).toBeInTheDocument();
+    it('renders User icon with no name prop', () => {
+      render(<Avatar />);
+      const avatar = screen.getByLabelText('User avatar');
+      expect(avatar).toBeInTheDocument();
+      expect(avatar.querySelector('svg')).toBeInTheDocument();
     });
   });
 
@@ -39,27 +32,27 @@ describe('Avatar', () => {
     it('renders small size with correct classes', () => {
       render(<Avatar name="Test User" size="sm" />);
       const avatar = screen.getByLabelText('Test User');
-      expect(avatar).toHaveClass('w-7', 'h-7', 'text-xs');
+      expect(avatar).toHaveClass('w-7', 'h-7');
     });
 
     it('renders medium size by default', () => {
       render(<Avatar name="Test User" />);
       const avatar = screen.getByLabelText('Test User');
-      expect(avatar).toHaveClass('w-9', 'h-9', 'text-sm');
+      expect(avatar).toHaveClass('w-9', 'h-9');
     });
 
     it('renders large size with correct classes', () => {
       render(<Avatar name="Test User" size="lg" />);
       const avatar = screen.getByLabelText('Test User');
-      expect(avatar).toHaveClass('w-12', 'h-12', 'text-base');
+      expect(avatar).toHaveClass('w-12', 'h-12');
     });
   });
 
   describe('styling', () => {
-    it('applies amber color scheme', () => {
+    it('applies slate color scheme for light and dark mode', () => {
       render(<Avatar name="Test" />);
       const avatar = screen.getByLabelText('Test');
-      expect(avatar).toHaveClass('bg-amber-100', 'text-amber-700');
+      expect(avatar).toHaveClass('bg-slate-200', 'dark:bg-slate-700');
     });
 
     it('applies rounded-full for circular shape', () => {
@@ -83,9 +76,12 @@ describe('Avatar', () => {
       expect(img).toHaveAttribute('src', 'https://example.com/avatar.jpg');
     });
 
-    it('does not show initials when image src is provided', () => {
+    it('does not show User icon when image src is provided', () => {
       render(<Avatar name="Test User" src="https://example.com/avatar.jpg" />);
-      expect(screen.queryByText('TU')).not.toBeInTheDocument();
+      // Should not find the div with User icon
+      expect(screen.queryByLabelText('Test User')).not.toBeInTheDocument();
+      // Should find the image instead
+      expect(screen.getByRole('img')).toBeInTheDocument();
     });
 
     it('applies correct image classes', () => {
@@ -96,9 +92,14 @@ describe('Avatar', () => {
   });
 
   describe('accessibility', () => {
-    it('has aria-label with name for initials avatar', () => {
+    it('has aria-label with name for icon avatar', () => {
       render(<Avatar name="John Doe" />);
       expect(screen.getByLabelText('John Doe')).toBeInTheDocument();
+    });
+
+    it('has fallback aria-label when no name provided', () => {
+      render(<Avatar />);
+      expect(screen.getByLabelText('User avatar')).toBeInTheDocument();
     });
 
     it('has alt text for image avatar', () => {

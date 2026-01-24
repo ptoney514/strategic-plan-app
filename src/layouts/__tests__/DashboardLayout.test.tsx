@@ -8,6 +8,7 @@ vi.mock('react-router-dom', async () => {
   return {
     ...actual,
     useLocation: () => ({ pathname: '/' }),
+    useNavigate: () => vi.fn(),
     Outlet: () => <div data-testid="outlet">Page Content</div>,
   };
 });
@@ -16,13 +17,49 @@ vi.mock('react-router-dom', async () => {
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
     user: {
+      id: 'user-123',
       email: 'test@example.com',
       user_metadata: {
         display_name: 'Test User',
         role: 'district_admin',
       },
     },
+    logout: vi.fn(),
+    isSystemAdmin: false,
   }),
+}));
+
+// Mock ThemeContext
+vi.mock('../../contexts/ThemeContext', () => ({
+  useTheme: () => ({
+    theme: 'system',
+    resolvedTheme: 'light',
+    setTheme: vi.fn(),
+    isDark: false,
+    toggle: vi.fn(),
+  }),
+}));
+
+// Mock SubdomainContext
+vi.mock('../../contexts/SubdomainContext', () => ({
+  useSubdomain: () => ({ type: 'root', slug: null }),
+}));
+
+// Mock subdomain utility
+vi.mock('../../lib/subdomain', () => ({
+  buildSubdomainUrlWithPath: () => 'http://localhost:5173',
+  getSubdomainUrl: () => 'http://localhost:5173',
+}));
+
+// Mock Supabase
+vi.mock('../../lib/supabase', () => ({
+  supabase: {
+    from: () => ({
+      select: () => ({
+        eq: () => Promise.resolve({ data: [], error: null }),
+      }),
+    }),
+  },
 }));
 
 describe('DashboardLayout', () => {

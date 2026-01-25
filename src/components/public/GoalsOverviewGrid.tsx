@@ -1,11 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import type { Goal, Metric } from '../../lib/types';
+import type { Metric, HierarchicalGoal } from '../../lib/types';
 import { CompactGoalSummaryCard } from './CompactGoalSummaryCard';
 import { ExpandedGoalPanel } from './ExpandedGoalPanel';
 
 interface GoalsOverviewGridProps {
-  goals: Goal[];
+  goals: HierarchicalGoal[];
   metrics: Metric[];
   colorClass: string;
   isMobile: boolean;
@@ -80,6 +80,7 @@ export function GoalsOverviewGrid({
                     metrics={metrics}
                     colorClass={colorClass}
                     onClose={handleClose}
+                    subGoals={goal.children || []}
                   />
                 ) : (
                   <CompactGoalSummaryCard

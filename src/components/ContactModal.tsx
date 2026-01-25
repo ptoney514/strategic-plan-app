@@ -56,8 +56,10 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
 
   // Reset form when modal closes
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
     if (!isOpen) {
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         setFormData({
           email: '',
           firstName: '',
@@ -71,6 +73,12 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
         setError(null);
       }, 300);
     }
+
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [isOpen]);
 
   const handleChange = (

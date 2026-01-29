@@ -65,6 +65,12 @@ export function getSubdomainInfo(): SubdomainInfo {
     return { type: 'root', slug: null, hostname };
   }
 
+  // Vercel preview URLs should be treated as root
+  // e.g., "strategic-plan-xyz123-pernells-projects.vercel.app"
+  if (hostname.endsWith('.vercel.app')) {
+    return { type: 'root', slug: null, hostname };
+  }
+
   // Extract subdomain from hostname
   // e.g., "westside.stratadash.org" -> subdomain = "westside"
   const parts = hostname.split('.');
@@ -97,6 +103,14 @@ export function isLocalDev(): boolean {
 }
 
 /**
+ * Check if running on a Vercel preview deployment
+ */
+export function isVercelPreview(): boolean {
+  const hostname = window.location.hostname;
+  return hostname.includes('vercel.app') && !hostname.includes('strategic-plan-app.vercel.app');
+}
+
+/**
  * Get the base URL for a given subdomain type
  */
 export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
@@ -115,6 +129,12 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
     if (type === 'admin') return `${protocol}//localhost${port}?subdomain=admin`;
     if (type === 'district' && slug) return `${protocol}//localhost${port}?subdomain=${slug}`;
     return `${protocol}//localhost${port}`;
+  }
+
+  // Vercel preview deployments - stay on the same origin
+  // Preview URLs don't support subdomains, so we use the current origin
+  if (isVercelPreview()) {
+    return window.location.origin;
   }
 
   // Production URLs
@@ -166,6 +186,11 @@ export function buildSubdomainUrlWithPath(type: SubdomainType, path: string = ''
     if (type === 'admin') return `${protocol}//localhost${port}${normalizedPath}?subdomain=admin`;
     if (type === 'district' && slug) return `${protocol}//localhost${port}${normalizedPath}?subdomain=${slug}`;
     return `${protocol}//localhost${port}${normalizedPath}`;
+  }
+
+  // Vercel preview deployments - stay on the same origin
+  if (isVercelPreview()) {
+    return `${window.location.origin}${normalizedPath}`;
   }
 
   // Production URLs - simple concatenation works

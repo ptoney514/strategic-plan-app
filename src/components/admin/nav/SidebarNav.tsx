@@ -14,6 +14,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { SchoolNavItem } from './SchoolNavItem';
+import { DistrictSwitcher } from '../../common/DistrictSwitcher';
 import type { District, School } from '../../../lib/types';
 
 interface SidebarNavProps {
@@ -248,33 +249,13 @@ interface SidebarHeaderProps {
 }
 
 /**
- * Sidebar header with district logo and name
+ * Sidebar header with district switcher
+ *
+ * For users with multiple districts, shows a dropdown to switch between them.
+ * For users with a single district, shows a static display.
  */
 export function SidebarHeader({ district, userEmail: _userEmail, userRole: _userRole }: SidebarHeaderProps) {
-  return (
-    <div className="p-4 border-b border-slate-200">
-      <div className="flex items-center gap-3">
-        {district.logo_url ? (
-          <img
-            src={district.logo_url}
-            alt=""
-            className="w-10 h-10 rounded-lg object-cover"
-          />
-        ) : (
-          <div
-            className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
-            style={{ backgroundColor: district.primary_color || '#D97706' }}
-          >
-            {district.name.substring(0, 2).toUpperCase()}
-          </div>
-        )}
-        <div className="min-w-0 flex-1">
-          <div className="font-semibold text-slate-900 text-sm truncate">{district.name}</div>
-          <div className="text-xs text-slate-500">Strategic Planning</div>
-        </div>
-      </div>
-    </div>
-  );
+  return <DistrictSwitcher currentDistrict={district} />;
 }
 
 interface SidebarUserFooterProps {

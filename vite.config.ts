@@ -28,6 +28,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 5174,
       strictPort: true,
+      // Allow lvh.me for local subdomain testing (resolves to 127.0.0.1)
+      allowedHosts: ['.lvh.me'],
     },
   }
 })

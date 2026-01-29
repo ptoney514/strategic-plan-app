@@ -14,6 +14,34 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Mock AuthContext for DistrictSwitcher (used by SidebarHeader)
+vi.mock('../../../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: { id: 'user-1', email: 'admin@test.com' },
+    isAuthenticated: true,
+    isSystemAdmin: false,
+  }),
+}));
+
+// Mock SubdomainContext for DistrictSwitcher
+vi.mock('../../../../contexts/SubdomainContext', () => ({
+  useSubdomain: () => ({ type: 'district', slug: 'test-district' }),
+}));
+
+// Mock useUserDistricts hook - return single district so DistrictSwitcher renders static header
+vi.mock('../../../../hooks/useUserDistricts', () => ({
+  useUserDistricts: () => ({
+    data: [{ id: 'dist-1', slug: 'test-district', name: 'Test District' }],
+    isLoading: false,
+    error: null,
+  }),
+}));
+
+// Mock subdomain utility
+vi.mock('../../../../lib/subdomain', () => ({
+  buildSubdomainUrlWithPath: () => 'http://localhost:5173',
+}));
+
 // Mock district data
 const mockDistrict: District = {
   id: 'dist-1',

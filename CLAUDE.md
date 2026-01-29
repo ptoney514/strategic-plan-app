@@ -140,6 +140,36 @@ npm run dev:local        # Start everything (Supabase + Vite)
 npm run db:studio        # Open Supabase Studio at localhost:54323
 ```
 
+### Cross-Subdomain Testing with lvh.me
+
+For testing multi-district features (district switching, cross-subdomain authentication), use `lvh.me` which resolves to `127.0.0.1`:
+
+| URL | Purpose |
+|-----|---------|
+| `http://lvh.me:5173` | Root domain (marketing, user dashboard) |
+| `http://westside.lvh.me:5173` | Westside district |
+| `http://eastside.lvh.me:5173` | Eastside district |
+| `http://admin.lvh.me:5173` | System admin console |
+
+**Key benefits:**
+- Cookies with `.lvh.me` domain are shared across all subdomains
+- Authentication sessions persist when switching between districts
+- Mirrors production subdomain behavior exactly
+
+**How it works:**
+1. Start dev server: `npm run dev`
+2. Navigate to `http://lvh.me:5173/login`
+3. Login with test credentials
+4. Navigate to `http://westside.lvh.me:5173/admin` - session persists!
+5. Use district switcher to navigate between districts
+
+**Fallback for localhost:**
+If lvh.me doesn't work (some corporate networks block it), use query params:
+- `http://localhost:5173?subdomain=westside`
+- `http://localhost:5173?subdomain=admin`
+
+Note: Query param mode doesn't support cross-subdomain cookie sharing.
+
 ### Local Test Credentials
 
 Local development uses test users that are **different from production**.

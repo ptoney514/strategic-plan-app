@@ -11,6 +11,32 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Mock useUserDistricts hook
+vi.mock('../../../hooks/useUserDistricts', () => ({
+  useUserDistricts: () => ({
+    data: [],
+    isLoading: false,
+    error: null,
+  }),
+}));
+
+// Mock useDistrict hook
+vi.mock('../../../hooks/useDistricts', () => ({
+  useDistrict: () => ({
+    data: null,
+    isLoading: false,
+    error: null,
+  }),
+}));
+
+// Mock SubdomainContext
+vi.mock('../../../contexts/SubdomainContext', () => ({
+  useSubdomain: () => ({
+    type: 'root',
+    slug: null,
+  }),
+}));
+
 describe('DashboardSidebar', () => {
   it('renders the sidebar with correct z-index class', () => {
     render(<DashboardSidebar basePath="/" />);

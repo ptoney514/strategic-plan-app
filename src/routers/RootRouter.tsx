@@ -8,6 +8,12 @@ import { DashboardLayout } from '../layouts/DashboardLayout';
 import { UserDashboard, PlaceholderPage } from '../pages/dashboard';
 import { useAuth } from '../contexts/AuthContext';
 
+// Public District Layout and Pages
+import { PublicDistrictLayout } from '../layouts/PublicDistrictLayout';
+import { Dashboard } from '../pages/client/public/Dashboard';
+import { ObjectiveDetail } from '../pages/client/public/ObjectiveDetail';
+import { GoalDetailNew } from '../pages/client/public/GoalDetailNew';
+
 /**
  * RequireAuth - Wrapper to protect routes that require authentication
  */
@@ -83,6 +89,15 @@ export function RootRouter() {
           </RequireAuth>
         }
       />
+
+      {/* Public District Views - path-based access (no auth required) */}
+      {/* URL pattern: stratadash.org/district/:slug */}
+      <Route path="/district/:slug" element={<PublicDistrictLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="overview" element={<Dashboard />} />
+        <Route path="objective/:goalId" element={<ObjectiveDetail />} />
+        <Route path="goal/:goalId" element={<GoalDetailNew />} />
+      </Route>
 
       {/* Redirect legacy district paths to subdomains */}
       <Route path="/:slug/*" element={<DistrictRedirect />} />

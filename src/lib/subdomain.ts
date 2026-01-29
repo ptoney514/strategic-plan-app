@@ -65,9 +65,18 @@ export function getSubdomainInfo(): SubdomainInfo {
     return { type: 'root', slug: null, hostname };
   }
 
-  // Vercel preview URLs should be treated as root
-  // e.g., "strategic-plan-xyz123-pernells-projects.vercel.app"
-  if (hostname.endsWith('.vercel.app')) {
+  // Vercel preview URLs - use query params like localhost
+  // e.g., "strategic-plan-xyz123-pernells-projects.vercel.app?subdomain=admin"
+  if (hostname.endsWith('.vercel.app') && !ROOT_DOMAINS.includes(hostname)) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const previewSubdomain = urlParams.get('subdomain')?.trim().replace(/\/+$/, '') || null;
+
+    if (previewSubdomain === 'admin') {
+      return { type: 'admin', slug: null, hostname };
+    }
+    if (previewSubdomain) {
+      return { type: 'district', slug: previewSubdomain, hostname };
+    }
     return { type: 'root', slug: null, hostname };
   }
 
@@ -131,10 +140,12 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
     return `${protocol}//localhost${port}`;
   }
 
-  // Vercel preview deployments - stay on the same origin
-  // Preview URLs don't support subdomains, so we use the current origin
+  // Vercel preview deployments - use query params like localhost
   if (isVercelPreview()) {
-    return window.location.origin;
+    const origin = window.location.origin;
+    if (type === 'admin') return `${origin}?subdomain=admin`;
+    if (type === 'district' && slug) return `${origin}?subdomain=${slug}`;
+    return origin;
   }
 
   // Production URLs
@@ -188,9 +199,12 @@ export function buildSubdomainUrlWithPath(type: SubdomainType, path: string = ''
     return `${protocol}//localhost${port}${normalizedPath}`;
   }
 
-  // Vercel preview deployments - stay on the same origin
+  // Vercel preview deployments - use query params like localhost (path before query)
   if (isVercelPreview()) {
-    return `${window.location.origin}${normalizedPath}`;
+    const origin = window.location.origin;
+    if (type === 'admin') return `${origin}${normalizedPath}?subdomain=admin`;
+    if (type === 'district' && slug) return `${origin}${normalizedPath}?subdomain=${slug}`;
+    return `${origin}${normalizedPath}`;
   }
 
   // Production URLs - simple concatenation works

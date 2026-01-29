@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDistrict } from '../../../hooks/useDistricts';
+import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { HomepageHeader } from '../../../components/homepage/HomepageHeader';
 import { HeroSection } from '../../../components/homepage/HeroSection';
 import { StrategicPlanOverview } from '../../../components/homepage/StrategicPlanOverview';
@@ -8,7 +9,10 @@ import { MissionVisionValues } from '../../../components/homepage/MissionVisionV
 import { HomepageFooter } from '../../../components/homepage/HomepageFooter';
 
 export function DistrictLandingPage() {
-  const { slug } = useParams();
+  const { slug: subdomainSlug } = useSubdomain();
+  const { slug: paramSlug } = useParams();
+  // Prefer subdomain slug, fall back to URL param (path-based routing)
+  const slug = subdomainSlug || paramSlug;
   const { data: district, isLoading } = useDistrict(slug!);
 
   // Default configuration - this can be customized per district

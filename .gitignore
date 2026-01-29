@@ -8,6 +8,7 @@
 # Environment variables
 **/.env
 **/.env.local
+**/.env.staging
 **/.env.production
 **/.env.*.local
 
@@ -68,3 +69,4 @@ Desktop.ini
 !TECHNICAL_STANDARDS.md
 !TESTING_STRATEGY.md
 .vercel
+.env*.local

@@ -8,6 +8,8 @@ import {
   FileBarChart,
   Users,
   HelpCircle,
+  Palette,
+  Shapes,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -27,6 +29,8 @@ const mainNavItems: NavItem[] = [
   { label: 'Metrics', icon: <BarChart3 size={20} />, path: 'metrics' },
   { label: 'Dashboards', icon: <LayoutDashboard size={20} />, path: 'dashboards' },
   { label: 'Reports', icon: <FileBarChart size={20} />, path: 'reports' },
+  { label: 'Appearance', icon: <Palette size={20} />, path: 'appearance' },
+  { label: 'Visual Library', icon: <Shapes size={20} />, path: 'visuals' },
 ];
 
 const footerNavItems: NavItem[] = [

@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Outlet, Link, useParams } from 'react-router-dom';
 import { useDistrict } from '../hooks/useDistricts';
 import { useGoals } from '../hooks/useGoals';
 import { Sidebar } from '../components/public/Sidebar';
 import { MobileHeader } from '../components/public/MobileHeader';
 import { PublicFooter } from '../components/public/PublicFooter';
-import type { Goal } from '../lib/types';
+import { getMergedConfig } from '../components/public/templates/TemplateRegistry';
+import type { Goal, DashboardConfig } from '../lib/types';
 
 /**
  * Flatten hierarchical goals into a single array
@@ -41,6 +42,15 @@ export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
   const { data: goals, isLoading: goalsLoading } = useGoals(district?.id || '');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Get merged template configuration - must be before early returns for React hooks rules
+  const templateConfig: DashboardConfig = useMemo(() => {
+    const template = district?.dashboard_template || 'hierarchical';
+    return getMergedConfig(template, district?.dashboard_config);
+  }, [district?.dashboard_template, district?.dashboard_config]);
+
+  // Determine if sidebar should be shown based on template config
+  const showSidebar = templateConfig.showSidebar !== false;
+
   if (districtLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-slate-950 flex items-center justify-center">
@@ -73,35 +83,38 @@ export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
 
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-slate-950 font-sans">
-      {/* Mobile backdrop overlay */}
-      {sidebarOpen && (
+      {/* Mobile backdrop overlay - only show when sidebar is enabled */}
+      {showSidebar && sidebarOpen && (
         <div
           className="fixed inset-0 bg-gray-900/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
-      <Sidebar
-        district={district}
-        objectives={objectives}
-        goals={allGoals}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        isLoading={goalsLoading}
-      />
+      {/* Sidebar - conditionally rendered based on template config */}
+      {showSidebar && (
+        <Sidebar
+          district={district}
+          objectives={objectives}
+          goals={allGoals}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          isLoading={goalsLoading}
+        />
+      )}
 
       {/* Main content area */}
       <main className="flex-1 min-w-0 pb-10">
-        {/* Mobile header */}
+        {/* Mobile header - only show menu toggle when sidebar is enabled */}
         <MobileHeader
           district={district}
-          onMenuToggle={() => setSidebarOpen(true)}
+          districtSlug={slug}
+          onMenuToggle={showSidebar ? () => setSidebarOpen(true) : undefined}
         />
 
-        {/* Content */}
-        <div className="lg:px-10 lg:py-6 max-w-6xl mx-auto px-4 pt-6">
-          <Outlet context={{ district, objectives, goals: allGoals }} />
+        {/* Content - wider when no sidebar */}
+        <div className={`${showSidebar ? 'lg:px-10' : 'lg:px-16'} lg:py-6 ${showSidebar ? 'max-w-6xl' : 'max-w-7xl'} mx-auto px-4 pt-6`}>
+          <Outlet context={{ district, objectives, goals: allGoals, templateConfig }} />
 
           {/* Footer */}
           <PublicFooter district={district} />

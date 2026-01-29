@@ -1,6 +1,7 @@
 import { Menu } from 'lucide-react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import type { District } from '../../lib/types';
+import { useDistrictLink } from '../../contexts/SubdomainContext';
 
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
@@ -17,11 +18,12 @@ function getLogoUrl(district: District, slug: string): string | null {
 
 interface MobileHeaderProps {
   district: District;
-  onMenuToggle: () => void;
+  districtSlug: string;
+  onMenuToggle?: () => void;
 }
 
-export function MobileHeader({ district, onMenuToggle }: MobileHeaderProps) {
-  const { slug } = useParams();
+export function MobileHeader({ district, districtSlug, onMenuToggle }: MobileHeaderProps) {
+  const buildPath = useDistrictLink(districtSlug);
   const location = useLocation();
 
   // Determine context indicator based on route
@@ -35,19 +37,21 @@ export function MobileHeader({ district, onMenuToggle }: MobileHeaderProps) {
   return (
     <header className="sticky top-0 z-30 lg:hidden bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-gray-200 dark:border-slate-800 h-14 px-4 flex items-center justify-between">
       <div className="flex items-center">
-        {/* Hamburger Menu */}
-        <button
-          onClick={onMenuToggle}
-          className="mr-3 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 p-1 -ml-1"
-          aria-label="Open menu"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+        {/* Hamburger Menu - only show when onMenuToggle is provided */}
+        {onMenuToggle && (
+          <button
+            onClick={onMenuToggle}
+            className="mr-3 text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-slate-100 p-1 -ml-1"
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        )}
 
         {/* Logo */}
-        <Link to={`/${slug}`} className="flex items-center gap-2">
+        <Link to={buildPath('/')} className="flex items-center gap-2">
           {(() => {
-            const logoUrl = getLogoUrl(district, slug || '');
+            const logoUrl = getLogoUrl(district, districtSlug);
             return logoUrl ? (
               <img src={logoUrl} alt={district.name} className="w-6 h-6 object-contain" />
             ) : (

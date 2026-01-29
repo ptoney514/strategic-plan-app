@@ -1,3 +1,14 @@
+// Dashboard Template Types
+export type DashboardTemplate = 'hierarchical' | 'metrics-grid' | 'launch-traction';
+
+export interface DashboardConfig {
+  showSidebar?: boolean;
+  showNarrativeHero?: boolean;
+  gridColumns?: 2 | 3 | 4;
+  enableAnimations?: boolean;
+  cardVariant?: 'default' | 'compact' | 'rich';
+}
+
 export interface District {
   id: string;
   name: string;
@@ -10,6 +21,9 @@ export interface District {
   is_public: boolean;
   created_at: string;
   updated_at: string;
+  // Dashboard template configuration
+  dashboard_template?: DashboardTemplate;
+  dashboard_config?: DashboardConfig;
   // Computed fields (populated by service layer)
   goals_count?: number;
   metrics_count?: number;
@@ -226,6 +240,11 @@ export interface VisualizationConfig {
   content?: string;
   title?: string;
   showTitle?: boolean;
+  // Donut chart style options
+  donutStyle?: 'classic' | 'achievement';
+  donutAccentColor?: string;
+  donutCenterLabel?: string;
+  donutIcon?: string; // icon name from lucide-react
   [key: string]: unknown; // Allow additional properties for extensibility
 }
 
@@ -233,6 +252,7 @@ export interface DataPoint {
   label: string;
   value: number;
   color?: string;
+  description?: string; // Optional description for legend display
 }
 
 export interface TimeSeriesDataPoint {

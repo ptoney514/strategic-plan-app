@@ -33,6 +33,7 @@ import { EditObjective } from '../pages/client/admin/EditObjective';
 import { ObjectiveDetail as AdminObjectiveDetail } from '../pages/client/admin/ObjectiveDetail';
 import { DistrictUsers } from '../pages/client/admin/DistrictUsers';
 import { DistrictAppearance } from '../pages/client/admin/DistrictAppearance';
+import { VisualLibrary } from '../pages/client/admin/VisualLibrary';
 import { PlansList } from '../pages/client/admin/PlansList';
 import { CreatePlan } from '../pages/client/admin/CreatePlan';
 import { EditPlan } from '../pages/client/admin/EditPlan';
@@ -141,6 +142,7 @@ export function DistrictRouter() {
         {/* District-level pages */}
         <Route path="users" element={<DistrictUsers />} />
         <Route path="appearance" element={<DistrictAppearance />} />
+        <Route path="visuals" element={<VisualLibrary />} />
         <Route path="settings" element={<AdminSettings />} />
         {/* Placeholder routes for new nav items */}
         <Route path="metrics" element={<PlaceholderPage title="Metrics" description="Monitor key performance metrics across your plans." />} />

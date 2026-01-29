@@ -1,18 +1,23 @@
 import { useOutletContext } from 'react-router-dom';
 import { useMetricsByDistrict } from '../../../hooks/useMetrics';
-import { NarrativeHero } from '../../../components/public/NarrativeHero';
-import { ObjectivesGrid } from '../../../components/public/ObjectivesGrid';
-import type { District, Goal } from '../../../lib/types';
+import {
+  HierarchicalTemplate,
+  MetricsGridTemplate,
+  LaunchTractionTemplate,
+} from '../../../components/public/templates';
+import { getMergedConfig } from '../../../components/public/templates/TemplateRegistry';
+import type { District, Goal, DashboardConfig } from '../../../lib/types';
 
 interface DashboardContext {
   district: District;
   objectives: Goal[];
   goals: Goal[];
+  templateConfig?: DashboardConfig;
 }
 
 export function Dashboard() {
   // Get context from PublicLayout
-  const { district, objectives, goals } = useOutletContext<DashboardContext>();
+  const { district, objectives, goals, templateConfig: layoutConfig } = useOutletContext<DashboardContext>();
 
   // Fetch metrics for the district
   const { data: metrics, isLoading: metricsLoading } = useMetricsByDistrict(district?.id || '');
@@ -20,35 +25,52 @@ export function Dashboard() {
   if (!district) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Loading district information...</p>
+        <p className="text-gray-500 dark:text-slate-400">Loading district information...</p>
       </div>
     );
   }
 
-  return (
-    <div>
-      {/* Narrative Hero Section */}
-      <NarrativeHero />
+  // Get template and config
+  const template = district.dashboard_template || 'hierarchical';
+  const config = layoutConfig || getMergedConfig(template, district.dashboard_config);
 
-      {/* Objectives Grid */}
-      {metricsLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="animate-pulse bg-white rounded-xl border border-gray-100 p-6 h-64">
-              <div className="h-4 bg-gray-100 rounded w-1/3 mb-4" />
-              <div className="h-6 bg-gray-100 rounded w-2/3 mb-2" />
-              <div className="h-4 bg-gray-100 rounded w-full mb-4" />
-              <div className="h-4 bg-gray-100 rounded w-1/2" />
-            </div>
-          ))}
-        </div>
-      ) : (
-        <ObjectivesGrid
-          objectives={objectives}
-          goals={goals}
-          metrics={metrics || []}
-        />
-      )}
-    </div>
-  );
+  // Render the appropriate template based on configuration
+  const renderTemplate = () => {
+    switch (template) {
+      case 'launch-traction':
+        return (
+          <LaunchTractionTemplate
+            district={district}
+            metrics={metrics || []}
+            config={config}
+            isLoading={metricsLoading}
+          />
+        );
+
+      case 'metrics-grid':
+        return (
+          <MetricsGridTemplate
+            district={district}
+            metrics={metrics || []}
+            config={config}
+            isLoading={metricsLoading}
+          />
+        );
+
+      case 'hierarchical':
+      default:
+        return (
+          <HierarchicalTemplate
+            district={district}
+            objectives={objectives}
+            goals={goals}
+            metrics={metrics || []}
+            config={config}
+            isLoading={metricsLoading}
+          />
+        );
+    }
+  };
+
+  return <div>{renderTemplate()}</div>;
 }

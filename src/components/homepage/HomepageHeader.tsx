@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X, ChevronDown, User, Globe, GraduationCap, Settings } from 'lucide-react';
 import { ImageWithFallback } from './ImageWithFallback';
+import { useDistrictLink } from '../../contexts/SubdomainContext';
 
 interface HomepageHeaderProps {
   districtName: string;
   districtSlug: string;
+  /** @deprecated No longer needed - routing context is determined from SubdomainContext */
+  isSubdomain?: boolean;
   primaryColor?: string;
   tagline?: string;
   logoUrl?: string;
@@ -14,11 +17,14 @@ interface HomepageHeaderProps {
 export function HomepageHeader({
   districtName,
   districtSlug,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  isSubdomain: _isSubdomain,
   primaryColor = '#C03537',
   tagline = 'Community. Innovation. Excellence.',
   logoUrl
 }: HomepageHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const buildPath = useDistrictLink(districtSlug);
 
   return (
     <header className="sticky top-0 z-50">
@@ -34,14 +40,14 @@ export function HomepageHeader({
             <a href="#" className="text-white hover:opacity-80 transition-colors text-sm font-medium tracking-wide">COMMUNITY</a>
             <a href="#" className="text-white hover:opacity-80 transition-colors text-sm font-medium tracking-wide">RESOURCES</a>
             <Link
-              to={`/${districtSlug}/goals`}
+              to={buildPath('/goals')}
               className="text-white hover:opacity-80 transition-colors text-sm font-medium tracking-wide px-3 py-1 rounded"
               style={{ backgroundColor: primaryColor }}
             >
               STRATEGIC PLAN
             </Link>
             <Link
-              to={`/${districtSlug}/admin`}
+              to={buildPath('/admin')}
               className="text-white hover:opacity-80 transition-colors text-sm font-medium tracking-wide flex items-center gap-1"
             >
               <Settings className="w-4 h-4" />
@@ -109,7 +115,7 @@ export function HomepageHeader({
           <nav className="flex items-center py-2 text-sm">
             <Link to="/" className="text-[#808080] hover:opacity-80 transition-colors">Home</Link>
             <span className="mx-2 text-[#808080]">›</span>
-            <Link to={`/${districtSlug}`} className="text-[#808080] hover:opacity-80 transition-colors">District Home</Link>
+            <Link to={buildPath('/')} className="text-[#808080] hover:opacity-80 transition-colors">District Home</Link>
             <span className="mx-2 text-[#808080]">›</span>
             <span className="text-[#2C2C2C] font-medium">Strategic Plan</span>
           </nav>
@@ -130,14 +136,14 @@ export function HomepageHeader({
               <a href="#" className="block text-[#2C2C2C] hover:opacity-80 transition-colors py-2 font-medium">COMMUNITY</a>
               <a href="#" className="block text-[#2C2C2C] hover:opacity-80 transition-colors py-2 font-medium">RESOURCES</a>
               <Link
-                to={`/${districtSlug}/goals`}
+                to={buildPath('/goals')}
                 className="block hover:opacity-80 transition-colors py-2 font-medium"
                 style={{ color: primaryColor }}
               >
                 STRATEGIC PLAN
               </Link>
               <Link
-                to={`/${districtSlug}/admin`}
+                to={buildPath('/admin')}
                 className="block text-[#2C2C2C] hover:opacity-80 transition-colors py-2 font-medium flex items-center gap-2"
               >
                 <Settings className="w-4 h-4" />

@@ -142,9 +142,10 @@ export function LogoUpload({
 
       {/* Current logo or upload zone */}
       {displayUrl && !isUploading ? (
-        <div className="relative inline-block">
+        <div data-testid="logo-preview-container" className="relative inline-block">
           <div className="relative w-32 h-32 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden">
             <img
+              data-testid="logo-preview"
               src={displayUrl}
               alt="Logo preview"
               className="w-full h-full object-contain p-2"
@@ -155,6 +156,7 @@ export function LogoUpload({
           </div>
           <button
             type="button"
+            data-testid="logo-remove-btn"
             onClick={handleRemove}
             className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors shadow-md"
             aria-label="Remove logo"
@@ -163,6 +165,7 @@ export function LogoUpload({
           </button>
           <button
             type="button"
+            data-testid="logo-replace-btn"
             onClick={handleClick}
             className="mt-2 text-sm text-amber-600 hover:text-amber-700 font-medium"
           >
@@ -171,6 +174,7 @@ export function LogoUpload({
         </div>
       ) : (
         <div
+          data-testid="logo-upload-dropzone"
           onClick={!isUploading ? handleClick : undefined}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -182,7 +186,7 @@ export function LogoUpload({
           `}
         >
           {isUploading ? (
-            <div className="flex flex-col items-center">
+            <div data-testid="logo-upload-progress" className="flex flex-col items-center">
               <Loader2 className="h-10 w-10 text-amber-600 animate-spin mb-3" />
               <p className="text-sm text-slate-600 font-medium">Uploading...</p>
               {progress && (
@@ -193,7 +197,7 @@ export function LogoUpload({
                       style={{ width: `${progress.percentage}%` }}
                     />
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">{progress.percentage}%</p>
+                  <p data-testid="logo-upload-percentage" className="text-xs text-slate-500 mt-1">{progress.percentage}%</p>
                 </div>
               )}
             </div>
@@ -215,7 +219,7 @@ export function LogoUpload({
 
       {/* Error message */}
       {uploadError && (
-        <div className="flex items-center gap-2 text-red-600 text-sm">
+        <div data-testid="logo-upload-error" className="flex items-center gap-2 text-red-600 text-sm">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           <span>{uploadError}</span>
         </div>
@@ -225,6 +229,7 @@ export function LogoUpload({
       <input
         ref={fileInputRef}
         type="file"
+        data-testid="logo-file-input"
         accept="image/png,image/jpeg,image/jpg,image/svg+xml,image/webp"
         onChange={handleFileSelect}
         className="hidden"

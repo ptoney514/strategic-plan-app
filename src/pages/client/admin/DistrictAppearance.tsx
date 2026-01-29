@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Palette, ImageIcon, Save, Loader2 } from 'lucide-react';
+import { Palette, ImageIcon, Save, Loader2, LayoutTemplate } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict, useUpdateDistrict } from '../../../hooks/useDistricts';
 import { LogoUpload } from '../../../components/admin/LogoUpload';
+import { TemplateSelector } from '../../../components/admin/TemplateSelector';
+import { TemplateConfigEditor } from '../../../components/admin/TemplateConfigEditor';
+import type { DashboardTemplate, DashboardConfig } from '../../../lib/types';
 
 /**
  * DistrictAppearance - Customize district branding and appearance
@@ -15,6 +18,8 @@ export function DistrictAppearance() {
   const [primaryColor, setPrimaryColor] = useState('#0099CC');
   const [secondaryColor, setSecondaryColor] = useState('#FFB800');
   const [logoUrl, setLogoUrl] = useState('');
+  const [dashboardTemplate, setDashboardTemplate] = useState<DashboardTemplate>('hierarchical');
+  const [dashboardConfig, setDashboardConfig] = useState<DashboardConfig>({});
 
   // Initialize form with district data
   useEffect(() => {
@@ -22,6 +27,8 @@ export function DistrictAppearance() {
       setPrimaryColor(district.primary_color || '#0099CC');
       setSecondaryColor(district.secondary_color || '#FFB800');
       setLogoUrl(district.logo_url || '');
+      setDashboardTemplate(district.dashboard_template || 'hierarchical');
+      setDashboardConfig(district.dashboard_config || {});
     }
   }, [district]);
 
@@ -35,6 +42,8 @@ export function DistrictAppearance() {
           primary_color: primaryColor,
           secondary_color: secondaryColor,
           logo_url: logoUrl || undefined,
+          dashboard_template: dashboardTemplate,
+          dashboard_config: dashboardConfig,
         },
       });
     } catch (error) {
@@ -64,6 +73,7 @@ export function DistrictAppearance() {
           </p>
         </div>
         <button
+          data-testid="appearance-save-btn"
           onClick={handleSave}
           disabled={updateDistrict.isPending}
           className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50"
@@ -101,12 +111,14 @@ export function DistrictAppearance() {
               <div className="flex items-center gap-3">
                 <input
                   type="color"
+                  data-testid="color-primary-picker"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
                   className="w-12 h-12 rounded-lg border border-slate-200 cursor-pointer"
                 />
                 <input
                   type="text"
+                  data-testid="color-primary-input"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
                   className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -122,12 +134,14 @@ export function DistrictAppearance() {
               <div className="flex items-center gap-3">
                 <input
                   type="color"
+                  data-testid="color-secondary-picker"
                   value={secondaryColor}
                   onChange={(e) => setSecondaryColor(e.target.value)}
                   className="w-12 h-12 rounded-lg border border-slate-200 cursor-pointer"
                 />
                 <input
                   type="text"
+                  data-testid="color-secondary-input"
                   value={secondaryColor}
                   onChange={(e) => setSecondaryColor(e.target.value)}
                   className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -158,22 +172,55 @@ export function DistrictAppearance() {
         </div>
       </div>
 
-      {/* Preview */}
+      {/* Dashboard Template */}
       <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 bg-amber-100 rounded-lg">
+            <LayoutTemplate className="h-5 w-5 text-amber-600" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Dashboard Template</h2>
+            <p className="text-sm text-slate-500">
+              Choose how your public dashboard looks
+            </p>
+          </div>
+        </div>
+
+        <TemplateSelector
+          value={dashboardTemplate}
+          onChange={setDashboardTemplate}
+          disabled={updateDistrict.isPending}
+        />
+
+        <div className="mt-6 pt-6 border-t border-slate-100">
+          <TemplateConfigEditor
+            template={dashboardTemplate}
+            config={dashboardConfig}
+            onChange={setDashboardConfig}
+            disabled={updateDistrict.isPending}
+          />
+        </div>
+      </div>
+
+      {/* Preview */}
+      <div data-testid="appearance-preview" className="bg-white rounded-xl border border-slate-200 p-6">
         <h2 className="text-lg font-semibold text-slate-900 mb-4">Preview</h2>
         <div
+          data-testid="preview-background"
           className="rounded-lg p-6"
           style={{ backgroundColor: `${primaryColor}15` }}
         >
           <div className="flex items-center gap-4">
             {logoUrl ? (
               <img
+                data-testid="preview-logo"
                 src={logoUrl}
                 alt="District logo"
                 className="h-12 w-12 object-contain rounded-lg"
               />
             ) : (
               <div
+                data-testid="preview-initials"
                 className="h-12 w-12 rounded-lg flex items-center justify-center text-white font-bold"
                 style={{ backgroundColor: primaryColor }}
               >
@@ -182,6 +229,7 @@ export function DistrictAppearance() {
             )}
             <div>
               <h3
+                data-testid="preview-title"
                 className="text-lg font-bold"
                 style={{ color: primaryColor }}
               >

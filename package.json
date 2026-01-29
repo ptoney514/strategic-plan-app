@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:staging": "vite build --mode staging",
     "build:check": "tsc -b && vite build",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -27,6 +28,7 @@
     "db:status": "supabase status",
     "db:diff": "supabase db diff --local",
     "db:push": "supabase db push",
+    "db:push:staging": "supabase db push --linked",
     "db:studio": "open http://localhost:54323",
     "db:test": "npm run db:reset && ./scripts/test-migrations.sh",
     "dev:local": "npm run db:start && npm run dev",

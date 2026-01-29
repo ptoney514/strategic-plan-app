@@ -65,6 +65,21 @@ export function getSubdomainInfo(): SubdomainInfo {
     return { type: 'root', slug: null, hostname };
   }
 
+  // Vercel preview URLs - use query params like localhost
+  // e.g., "strategic-plan-xyz123-pernells-projects.vercel.app?subdomain=admin"
+  if (hostname.endsWith('.vercel.app') && !ROOT_DOMAINS.includes(hostname)) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const previewSubdomain = urlParams.get('subdomain')?.trim().replace(/\/+$/, '') || null;
+
+    if (previewSubdomain === 'admin') {
+      return { type: 'admin', slug: null, hostname };
+    }
+    if (previewSubdomain) {
+      return { type: 'district', slug: previewSubdomain, hostname };
+    }
+    return { type: 'root', slug: null, hostname };
+  }
+
   // Extract subdomain from hostname
   // e.g., "westside.stratadash.org" -> subdomain = "westside"
   const parts = hostname.split('.');
@@ -97,6 +112,14 @@ export function isLocalDev(): boolean {
 }
 
 /**
+ * Check if running on a Vercel preview deployment
+ */
+export function isVercelPreview(): boolean {
+  const hostname = window.location.hostname;
+  return hostname.includes('vercel.app') && !hostname.includes('strategic-plan-app.vercel.app');
+}
+
+/**
  * Get the base URL for a given subdomain type
  */
 export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
@@ -117,6 +140,14 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
     return `${protocol}//localhost${port}`;
   }
 
+  // Vercel preview deployments - use query params like localhost
+  if (isVercelPreview()) {
+    const origin = window.location.origin;
+    if (type === 'admin') return `${origin}?subdomain=admin`;
+    if (type === 'district' && slug) return `${origin}?subdomain=${slug}`;
+    return origin;
+  }
+
   // Production URLs
   if (type === 'admin') return 'https://admin.stratadash.org';
   if (type === 'district' && slug) return `https://${slug}.stratadash.org`;
@@ -124,14 +155,60 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
 }
 
 /**
+ * Check if subdomain is simulated via query param (localhost or Vercel preview)
+ */
+export function isQueryParamSubdomain(): boolean {
+  const hostname = window.location.hostname;
+  // localhost/127.0.0.1 (not lvh.me which uses real subdomains)
+  if ((hostname === 'localhost' || hostname === '127.0.0.1') && !hostname.includes('lvh.me')) {
+    return true;
+  }
+  // Vercel preview (not production vercel app)
+  if (isVercelPreview()) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Build a path that works for both subdomain and path-based routing.
  *
  * On subdomain (westside.stratadash.org): returns "/objective/123"
  * On root domain (stratadash.org/westside): returns "/westside/objective/123"
+ *
+ * Note: This does NOT preserve query params for localhost/Vercel preview.
+ * For components using React Router <Link>, use the useDistrictLink hook instead.
  */
 export function buildDistrictPath(basePath: string, slug: string, isSubdomain: boolean): string {
   // On subdomain, paths don't need slug prefix
   if (isSubdomain) {
+    return basePath;
+  }
+  // On root domain, include slug in path
+  return `/${slug}${basePath}`;
+}
+
+/**
+ * Build a path that works for both subdomain and path-based routing,
+ * preserving ?subdomain= query param on localhost/Vercel preview.
+ *
+ * On real subdomain (westside.stratadash.org): returns "/goals"
+ * On localhost with ?subdomain=westside: returns "/goals?subdomain=westside"
+ * On Vercel preview with ?subdomain=westside: returns "/goals?subdomain=westside"
+ * On path-based (stratadash.org/westside): returns "/westside/goals"
+ */
+export function buildDistrictPathWithQueryParam(
+  basePath: string,
+  slug: string,
+  isSubdomain: boolean
+): string {
+  // On subdomain routing
+  if (isSubdomain) {
+    // If using query param simulation (localhost/Vercel preview), preserve it
+    if (isQueryParamSubdomain()) {
+      return `${basePath}?subdomain=${slug}`;
+    }
+    // Real subdomain (westside.stratadash.org) - no query param needed
     return basePath;
   }
   // On root domain, include slug in path
@@ -166,6 +243,14 @@ export function buildSubdomainUrlWithPath(type: SubdomainType, path: string = ''
     if (type === 'admin') return `${protocol}//localhost${port}${normalizedPath}?subdomain=admin`;
     if (type === 'district' && slug) return `${protocol}//localhost${port}${normalizedPath}?subdomain=${slug}`;
     return `${protocol}//localhost${port}${normalizedPath}`;
+  }
+
+  // Vercel preview deployments - use query params like localhost (path before query)
+  if (isVercelPreview()) {
+    const origin = window.location.origin;
+    if (type === 'admin') return `${origin}${normalizedPath}?subdomain=admin`;
+    if (type === 'district' && slug) return `${origin}${normalizedPath}?subdomain=${slug}`;
+    return `${origin}${normalizedPath}`;
   }
 
   // Production URLs - simple concatenation works

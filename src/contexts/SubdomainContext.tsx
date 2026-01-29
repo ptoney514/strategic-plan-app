@@ -1,5 +1,5 @@
-import { createContext, useContext, useMemo, type ReactNode } from 'react';
-import { getSubdomainInfo, type SubdomainInfo } from '../lib/subdomain';
+import { createContext, useContext, useMemo, useCallback, type ReactNode } from 'react';
+import { getSubdomainInfo, buildDistrictPathWithQueryParam, type SubdomainInfo } from '../lib/subdomain';
 
 const SubdomainContext = createContext<SubdomainInfo | null>(null);
 
@@ -31,4 +31,25 @@ export function useSubdomain(): SubdomainInfo {
     throw new Error('useSubdomain must be used within SubdomainProvider');
   }
   return context;
+}
+
+/**
+ * Hook that returns a function to build district-aware paths.
+ * Automatically handles:
+ * - Real subdomains (westside.stratadash.org): /goals
+ * - Query param subdomains (localhost?subdomain=westside): /goals?subdomain=westside
+ * - Path-based routing (stratadash.org/westside): /westside/goals
+ *
+ * @param districtSlug - The district slug (can be passed or will use context)
+ * @returns A function that takes a base path and returns the correct full path
+ */
+export function useDistrictLink(districtSlug?: string) {
+  const { slug: contextSlug, type } = useSubdomain();
+  const slug = districtSlug || contextSlug || '';
+  const isSubdomain = type === 'district';
+
+  return useCallback(
+    (basePath: string) => buildDistrictPathWithQueryParam(basePath, slug, isSubdomain),
+    [slug, isSubdomain]
+  );
 }

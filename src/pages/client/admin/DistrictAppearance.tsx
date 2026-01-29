@@ -5,6 +5,7 @@ import { useDistrict, useUpdateDistrict } from '../../../hooks/useDistricts';
 import { LogoUpload } from '../../../components/admin/LogoUpload';
 import { TemplateSelector } from '../../../components/admin/TemplateSelector';
 import { TemplateConfigEditor } from '../../../components/admin/TemplateConfigEditor';
+import { AppearancePreview } from '../../../components/admin/preview';
 import type { DashboardTemplate, DashboardConfig } from '../../../lib/types';
 
 /**
@@ -203,45 +204,13 @@ export function DistrictAppearance() {
       </div>
 
       {/* Preview */}
-      <div data-testid="appearance-preview" className="bg-white rounded-xl border border-slate-200 p-6">
-        <h2 className="text-lg font-semibold text-slate-900 mb-4">Preview</h2>
-        <div
-          data-testid="preview-background"
-          className="rounded-lg p-6"
-          style={{ backgroundColor: `${primaryColor}15` }}
-        >
-          <div className="flex items-center gap-4">
-            {logoUrl ? (
-              <img
-                data-testid="preview-logo"
-                src={logoUrl}
-                alt="District logo"
-                className="h-12 w-12 object-contain rounded-lg"
-              />
-            ) : (
-              <div
-                data-testid="preview-initials"
-                className="h-12 w-12 rounded-lg flex items-center justify-center text-white font-bold"
-                style={{ backgroundColor: primaryColor }}
-              >
-                {district?.name?.substring(0, 2).toUpperCase() || 'DI'}
-              </div>
-            )}
-            <div>
-              <h3
-                data-testid="preview-title"
-                className="text-lg font-bold"
-                style={{ color: primaryColor }}
-              >
-                {district?.name || 'District Name'}
-              </h3>
-              <p className="text-sm text-slate-600">
-                Strategic Plan 2021-2026
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <AppearancePreview
+        primaryColor={primaryColor}
+        secondaryColor={secondaryColor}
+        logoUrl={logoUrl}
+        districtName={district?.name || 'District Name'}
+        tagline={district?.tagline}
+      />
     </div>
   );
 }

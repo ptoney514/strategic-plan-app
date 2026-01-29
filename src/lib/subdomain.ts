@@ -45,13 +45,18 @@ export function getSubdomainInfo(): SubdomainInfo {
   }
 
   // Handle lvh.me for local subdomain testing (resolves to 127.0.0.1)
-  if (hostname.endsWith('.lvh.me') || hostname === 'lvh.me') {
+  if (hostname === 'lvh.me') {
+    // Exact match for root domain - no subdomain
+    return { type: 'root', slug: null, hostname };
+  }
+  if (hostname.endsWith('.lvh.me')) {
+    // Extract subdomain: westside.lvh.me -> westside
     const subdomain = hostname.replace('.lvh.me', '');
 
     if (subdomain === 'admin') {
       return { type: 'admin', slug: null, hostname };
     }
-    if (subdomain && subdomain !== 'lvh') {
+    if (subdomain) {
       return { type: 'district', slug: subdomain, hostname };
     }
     return { type: 'root', slug: null, hostname };

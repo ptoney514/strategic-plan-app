@@ -10,8 +10,16 @@ import {
   HelpCircle,
   Palette,
   Shapes,
+  ChevronDown,
+  Check,
 } from 'lucide-react';
+import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { cn } from '../../lib/utils';
+import { useUserDistricts } from '../../hooks/useUserDistricts';
+import { useSubdomain } from '../../contexts/SubdomainContext';
+import { useDistrict } from '../../hooks/useDistricts';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
+import type { District } from '../../lib/types';
 
 // Logo path - can be moved to R2/CDN later
 const LOGO_URL = '/assets/stratadash-logo.png';
@@ -44,6 +52,14 @@ interface DashboardSidebarProps {
 
 export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
   const location = useLocation();
+  const { type: subdomainType, slug: currentSlug } = useSubdomain();
+  const { data: currentDistrict, isLoading: isDistrictLoading } = useDistrict(currentSlug || '');
+  const { data: districts, isLoading: isDistrictsLoading } = useUserDistricts();
+
+  // Check if we're on a district subdomain (not root or admin)
+  const isDistrictContext = subdomainType === 'district' && currentSlug;
+  const hasMultipleDistricts = (districts?.length ?? 0) > 1;
+  const isLoading = isDistrictLoading || isDistrictsLoading;
 
   // Build full href from basePath and relative path
   const getHref = (path: string) => {
@@ -65,17 +81,34 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
       className="flex flex-col w-[270px] text-slate-300 flex-shrink-0 fixed top-0 left-0 bottom-0 z-40 border-r border-slate-700/50"
       style={{ backgroundColor: '#0F172A' }}
     >
-      {/* Logo Area */}
-      <div className="h-[72px] flex items-center px-6 border-b border-slate-700/50">
-        <Link to={basePath} className="flex items-center gap-3 group">
-          <img
-            src={LOGO_URL}
-            alt="StrataDASH"
-            className="w-9 h-9 object-contain"
+      {/* Header Area - District Switcher or Logo */}
+      {isDistrictContext ? (
+        isLoading ? (
+          <DistrictHeaderSkeleton />
+        ) : currentDistrict && hasMultipleDistricts ? (
+          <DistrictSwitcherHeader
+            currentDistrict={currentDistrict}
+            districts={districts || []}
+            currentSlug={currentSlug}
+            basePath={basePath}
           />
-          <span className="text-lg font-semibold text-white tracking-tight">StrataDASH</span>
-        </Link>
-      </div>
+        ) : currentDistrict ? (
+          <StaticDistrictHeader district={currentDistrict} basePath={basePath} />
+        ) : (
+          <FallbackDistrictHeader slug={currentSlug} basePath={basePath} />
+        )
+      ) : (
+        <div className="h-[72px] flex items-center px-6 border-b border-slate-700/50">
+          <Link to={basePath} className="flex items-center gap-3 group">
+            <img
+              src={LOGO_URL}
+              alt="StrataDASH"
+              className="w-9 h-9 object-contain"
+            />
+            <span className="text-lg font-semibold text-white tracking-tight">StrataDASH</span>
+          </Link>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-grow px-3 py-6 overflow-y-auto">
@@ -124,5 +157,180 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
         </ul>
       </div>
     </aside>
+  );
+}
+
+/**
+ * District avatar component for dark sidebar
+ */
+function DistrictAvatar({ district, size = 'md' }: { district: District; size?: 'sm' | 'md' }) {
+  const sizeClasses = size === 'sm' ? 'w-8 h-8 text-xs' : 'w-10 h-10 text-sm';
+
+  if (district.logo_url) {
+    return (
+      <img
+        src={district.logo_url}
+        alt=""
+        className={cn(sizeClasses, 'rounded-lg object-cover flex-shrink-0')}
+      />
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        sizeClasses,
+        'rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0'
+      )}
+      style={{ backgroundColor: district.primary_color || '#D97706' }}
+    >
+      {district.name.substring(0, 2).toUpperCase()}
+    </div>
+  );
+}
+
+/**
+ * Loading skeleton for district header
+ */
+function DistrictHeaderSkeleton() {
+  return (
+    <div className="h-[72px] flex items-center gap-3 px-4 border-b border-slate-700/50">
+      {/* Avatar skeleton */}
+      <div className="w-10 h-10 rounded-lg bg-slate-700 animate-pulse flex-shrink-0" />
+      <div className="min-w-0 flex-1">
+        {/* Name skeleton */}
+        <div className="h-4 w-32 bg-slate-700 rounded animate-pulse mb-1.5" />
+        {/* Subtitle skeleton */}
+        <div className="h-3 w-24 bg-slate-700/60 rounded animate-pulse" />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Fallback header when district data fails to load
+ */
+function FallbackDistrictHeader({ slug, basePath }: { slug: string; basePath: string }) {
+  // Format slug for display (e.g., "westside" -> "Westside")
+  const displayName = slug.charAt(0).toUpperCase() + slug.slice(1);
+
+  return (
+    <div className="h-[72px] flex items-center px-4 border-b border-slate-700/50">
+      <Link to={basePath} className="flex items-center gap-3 group min-w-0">
+        <div
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0 bg-slate-600"
+        >
+          {displayName.substring(0, 2).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-white text-sm truncate">{displayName}</div>
+          <div className="text-xs text-slate-400">Strategic Planning</div>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * Static district header - shown when user has only one district
+ */
+function StaticDistrictHeader({ district, basePath }: { district: District; basePath: string }) {
+  return (
+    <div className="h-[72px] flex items-center px-4 border-b border-slate-700/50">
+      <Link to={basePath} className="flex items-center gap-3 group min-w-0">
+        <DistrictAvatar district={district} />
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-white text-sm truncate">{district.name}</div>
+          <div className="text-xs text-slate-400">Strategic Planning</div>
+        </div>
+      </Link>
+    </div>
+  );
+}
+
+/**
+ * District switcher header - shown when user has multiple districts
+ */
+function DistrictSwitcherHeader({
+  currentDistrict,
+  districts,
+  currentSlug,
+  basePath,
+}: {
+  currentDistrict: District;
+  districts: District[];
+  currentSlug: string;
+  basePath: string;
+}) {
+  return (
+    <DropdownMenu.Root>
+      <DropdownMenu.Trigger asChild>
+        <button
+          className="h-[72px] w-full flex items-center gap-3 px-4 border-b border-slate-700/50 hover:bg-white/5 transition-colors focus:outline-none"
+          data-testid="district-switcher"
+        >
+          <DistrictAvatar district={currentDistrict} />
+          <div className="min-w-0 flex-1 text-left">
+            <div className="font-semibold text-white text-sm truncate">{currentDistrict.name}</div>
+            <div className="text-xs text-slate-400">Strategic Planning</div>
+          </div>
+          <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0" />
+        </button>
+      </DropdownMenu.Trigger>
+
+      <DropdownMenu.Portal>
+        <DropdownMenu.Content
+          align="start"
+          sideOffset={4}
+          className={cn(
+            'z-50 min-w-[240px] bg-slate-800 rounded-lg shadow-lg border border-slate-700 py-1',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95'
+          )}
+        >
+          <div className="px-3 py-1.5 text-xs font-medium text-slate-400">
+            Your Districts
+          </div>
+
+          {districts.map((district) => {
+            const isCurrent = district.slug === currentSlug;
+            return (
+              <DropdownMenu.Item key={district.id} asChild>
+                <a
+                  href={buildSubdomainUrlWithPath('district', basePath, district.slug)}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2 text-sm outline-none cursor-pointer transition-colors',
+                    isCurrent
+                      ? 'bg-slate-700/50 text-white'
+                      : 'text-slate-300 hover:bg-slate-700/50 hover:text-white'
+                  )}
+                  data-testid="district-option"
+                  data-current={isCurrent}
+                >
+                  <DistrictAvatar district={district} size="sm" />
+                  <span className="flex-1 truncate">{district.name}</span>
+                  {isCurrent && (
+                    <Check className="w-4 h-4 text-brand-mint flex-shrink-0" />
+                  )}
+                </a>
+              </DropdownMenu.Item>
+            );
+          })}
+
+          <DropdownMenu.Separator className="h-px bg-slate-700 my-1" />
+
+          <DropdownMenu.Item asChild>
+            <a
+              href={buildSubdomainUrlWithPath('root', '/dashboard')}
+              className="flex items-center gap-3 px-3 py-2 text-sm text-slate-300 hover:bg-slate-700/50 hover:text-white outline-none cursor-pointer transition-colors"
+            >
+              <LayoutDashboard className="w-4 h-4 text-slate-400" />
+              <span>View All Districts</span>
+            </a>
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Portal>
+    </DropdownMenu.Root>
   );
 }

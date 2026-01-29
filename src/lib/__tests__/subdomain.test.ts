@@ -264,18 +264,13 @@ describe('getSubdomainInfo', () => {
   });
 
   describe('lvh.me environment', () => {
-    // Note: Plain lvh.me has a quirk in the code - the replace pattern doesn't match
-    // so it's treated as a district. This is existing behavior, not ideal but not broken
-    // for typical usage where you'd use admin.lvh.me or westside.lvh.me
-    it('handles lvh.me (existing behavior quirk)', () => {
+    it('returns root type for plain lvh.me', () => {
       cleanup = mockWindowLocation({
         hostname: 'lvh.me',
       });
       const info = getSubdomainInfo();
-      // The replace('.lvh.me', '') doesn't match 'lvh.me' exactly
-      // so subdomain = 'lvh.me' which triggers district type
-      // This is a known quirk but rarely affects usage
-      expect(info.type).toBe('district');
+      expect(info.type).toBe('root');
+      expect(info.slug).toBeNull();
     });
 
     it('returns admin type for admin.lvh.me', () => {

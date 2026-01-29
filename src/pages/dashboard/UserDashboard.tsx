@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { WelcomeBanner, StrategicPlansSection, PlansTreeView } from '../../components/dashboard';
+import { WelcomeBanner, StrategicPlansSection, PlansTreeView, DistrictCards } from '../../components/dashboard';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
 import { usePlanGoals } from '../../hooks/useGoals';
 import { buildGoalHierarchy, type HierarchicalGoal } from '../../lib/types';
@@ -13,6 +13,7 @@ export function UserDashboard() {
   // Detect if we're in district admin context
   const isDistrictAdmin = location.pathname.startsWith('/admin');
   const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
+
 
   // Fetch plans
   const { data: plans = [], isLoading: plansLoading } = useUserPlansWithCounts();
@@ -59,6 +60,13 @@ export function UserDashboard() {
     <>
       {/* Welcome Banner */}
       <WelcomeBanner />
+
+      {/* District Cards - shown on root dashboard (component handles empty/single district states) */}
+      {!isDistrictAdmin && (
+        <div className="mt-8">
+          <DistrictCards />
+        </div>
+      )}
 
       {/* Strategic Plans Section */}
       <StrategicPlansSection

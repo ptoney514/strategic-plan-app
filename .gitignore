@@ -70,3 +70,4 @@ Desktop.ini
 !TESTING_STRATEGY.md
 .vercel
 .env*.local
+.env.local.production

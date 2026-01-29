@@ -24,8 +24,10 @@ export function DistrictCards() {
     );
   }
 
-  if (!districts || districts.length === 0) {
-    return <DistrictCardsEmpty />;
+  // Hide component when user has no districts or only one district
+  // Single-district users don't need to see district cards
+  if (!districts || districts.length <= 1) {
+    return null;
   }
 
   return (
@@ -163,27 +165,3 @@ function DistrictCardsLoading() {
   );
 }
 
-/**
- * Empty state when user has no districts
- */
-function DistrictCardsEmpty() {
-  return (
-    <section>
-      <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-4">
-        Your Districts
-      </h2>
-      <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-8 text-center">
-        <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Settings className="w-8 h-8 text-slate-400 dark:text-slate-500" />
-        </div>
-        <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100 mb-2">
-          No Districts Yet
-        </h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-          You don't have admin access to any districts yet. Contact your system administrator
-          to get access to a district.
-        </p>
-      </div>
-    </section>
-  );
-}

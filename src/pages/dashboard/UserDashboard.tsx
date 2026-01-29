@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { WelcomeBanner, StrategicPlansSection, PlansTreeView, DistrictCards } from '../../components/dashboard';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
 import { usePlanGoals } from '../../hooks/useGoals';
-import { useUserDistricts } from '../../hooks/useUserDistricts';
 import { buildGoalHierarchy, type HierarchicalGoal } from '../../lib/types';
 
 export function UserDashboard() {
@@ -15,9 +14,6 @@ export function UserDashboard() {
   const isDistrictAdmin = location.pathname.startsWith('/admin');
   const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
 
-  // Fetch user's districts for showing DistrictCards on root dashboard
-  const { data: districts } = useUserDistricts();
-  const hasMultipleDistricts = (districts?.length ?? 0) > 1;
 
   // Fetch plans
   const { data: plans = [], isLoading: plansLoading } = useUserPlansWithCounts();
@@ -65,8 +61,8 @@ export function UserDashboard() {
       {/* Welcome Banner */}
       <WelcomeBanner />
 
-      {/* District Cards - shown on root dashboard for users with multiple districts */}
-      {!isDistrictAdmin && hasMultipleDistricts && (
+      {/* District Cards - shown on root dashboard (component handles empty/single district states) */}
+      {!isDistrictAdmin && (
         <div className="mt-8">
           <DistrictCards />
         </div>

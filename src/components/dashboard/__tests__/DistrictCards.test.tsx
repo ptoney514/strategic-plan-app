@@ -65,32 +65,44 @@ describe('DistrictCards', () => {
     });
   });
 
-  describe('empty state', () => {
-    it('renders empty state when user has no districts', () => {
+  describe('empty/single district state', () => {
+    it('renders nothing when user has no districts', () => {
       mockUseUserDistricts.mockReturnValue({
         data: [],
         isLoading: false,
         error: null,
       });
 
-      render(<DistrictCards />);
+      const { container } = render(<DistrictCards />);
 
-      expect(screen.getByText('No Districts Yet')).toBeInTheDocument();
-      expect(
-        screen.getByText(/You don't have admin access to any districts yet/i)
-      ).toBeInTheDocument();
+      // Should render nothing (return null)
+      expect(container.firstChild).toBeNull();
     });
 
-    it('renders empty state when districts is null', () => {
+    it('renders nothing when districts is null', () => {
       mockUseUserDistricts.mockReturnValue({
         data: null,
         isLoading: false,
         error: null,
       });
 
-      render(<DistrictCards />);
+      const { container } = render(<DistrictCards />);
 
-      expect(screen.getByText('No Districts Yet')).toBeInTheDocument();
+      // Should render nothing (return null)
+      expect(container.firstChild).toBeNull();
+    });
+
+    it('renders nothing when user has only one district', () => {
+      mockUseUserDistricts.mockReturnValue({
+        data: [mockDistricts[0]],
+        isLoading: false,
+        error: null,
+      });
+
+      const { container } = render(<DistrictCards />);
+
+      // Should render nothing (return null) for single district users
+      expect(container.firstChild).toBeNull();
     });
   });
 
@@ -209,21 +221,6 @@ describe('DistrictCards', () => {
     });
   });
 
-  describe('with single district', () => {
-    it('renders single card correctly', () => {
-      mockUseUserDistricts.mockReturnValue({
-        data: [mockDistricts[0]],
-        isLoading: false,
-        error: null,
-      });
-
-      render(<DistrictCards />);
-
-      const cards = screen.getAllByTestId('district-card');
-      expect(cards).toHaveLength(1);
-      expect(screen.getByText('Westside Community Schools')).toBeInTheDocument();
-    });
-  });
 
   describe('district without tagline', () => {
     it('renders card without tagline section', () => {
@@ -231,9 +228,13 @@ describe('DistrictCards', () => {
         ...mockDistricts[0],
         tagline: undefined,
       };
+      const districtsWithOneNoTagline: District[] = [
+        districtWithoutTagline,
+        mockDistricts[1], // Include second district so component renders
+      ];
 
       mockUseUserDistricts.mockReturnValue({
-        data: [districtWithoutTagline],
+        data: districtsWithOneNoTagline,
         isLoading: false,
         error: null,
       });
@@ -241,7 +242,10 @@ describe('DistrictCards', () => {
       render(<DistrictCards />);
 
       expect(screen.getByText('Westside Community Schools')).toBeInTheDocument();
+      // First district has no tagline
       expect(screen.queryByText('Excellence in Education')).not.toBeInTheDocument();
+      // Second district still has its tagline
+      expect(screen.getByText('Preparing for Tomorrow')).toBeInTheDocument();
     });
   });
 });

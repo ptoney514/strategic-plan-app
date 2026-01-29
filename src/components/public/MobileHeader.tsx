@@ -1,6 +1,7 @@
 import { Menu } from 'lucide-react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import type { District } from '../../lib/types';
+import { useDistrictLink } from '../../contexts/SubdomainContext';
 
 // Local logo mapping for districts (can be moved to R2/CDN later)
 const districtLogos: Record<string, string> = {
@@ -17,11 +18,12 @@ function getLogoUrl(district: District, slug: string): string | null {
 
 interface MobileHeaderProps {
   district: District;
+  districtSlug: string;
   onMenuToggle?: () => void;
 }
 
-export function MobileHeader({ district, onMenuToggle }: MobileHeaderProps) {
-  const { slug } = useParams();
+export function MobileHeader({ district, districtSlug, onMenuToggle }: MobileHeaderProps) {
+  const buildPath = useDistrictLink(districtSlug);
   const location = useLocation();
 
   // Determine context indicator based on route
@@ -47,9 +49,9 @@ export function MobileHeader({ district, onMenuToggle }: MobileHeaderProps) {
         )}
 
         {/* Logo */}
-        <Link to={`/${slug}`} className="flex items-center gap-2">
+        <Link to={buildPath('/')} className="flex items-center gap-2">
           {(() => {
-            const logoUrl = getLogoUrl(district, slug || '');
+            const logoUrl = getLogoUrl(district, districtSlug);
             return logoUrl ? (
               <img src={logoUrl} alt={district.name} className="w-6 h-6 object-contain" />
             ) : (

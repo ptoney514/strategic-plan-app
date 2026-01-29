@@ -155,14 +155,60 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
 }
 
 /**
+ * Check if subdomain is simulated via query param (localhost or Vercel preview)
+ */
+export function isQueryParamSubdomain(): boolean {
+  const hostname = window.location.hostname;
+  // localhost/127.0.0.1 (not lvh.me which uses real subdomains)
+  if ((hostname === 'localhost' || hostname === '127.0.0.1') && !hostname.includes('lvh.me')) {
+    return true;
+  }
+  // Vercel preview (not production vercel app)
+  if (isVercelPreview()) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Build a path that works for both subdomain and path-based routing.
  *
  * On subdomain (westside.stratadash.org): returns "/objective/123"
  * On root domain (stratadash.org/westside): returns "/westside/objective/123"
+ *
+ * Note: This does NOT preserve query params for localhost/Vercel preview.
+ * For components using React Router <Link>, use the useDistrictLink hook instead.
  */
 export function buildDistrictPath(basePath: string, slug: string, isSubdomain: boolean): string {
   // On subdomain, paths don't need slug prefix
   if (isSubdomain) {
+    return basePath;
+  }
+  // On root domain, include slug in path
+  return `/${slug}${basePath}`;
+}
+
+/**
+ * Build a path that works for both subdomain and path-based routing,
+ * preserving ?subdomain= query param on localhost/Vercel preview.
+ *
+ * On real subdomain (westside.stratadash.org): returns "/goals"
+ * On localhost with ?subdomain=westside: returns "/goals?subdomain=westside"
+ * On Vercel preview with ?subdomain=westside: returns "/goals?subdomain=westside"
+ * On path-based (stratadash.org/westside): returns "/westside/goals"
+ */
+export function buildDistrictPathWithQueryParam(
+  basePath: string,
+  slug: string,
+  isSubdomain: boolean
+): string {
+  // On subdomain routing
+  if (isSubdomain) {
+    // If using query param simulation (localhost/Vercel preview), preserve it
+    if (isQueryParamSubdomain()) {
+      return `${basePath}?subdomain=${slug}`;
+    }
+    // Real subdomain (westside.stratadash.org) - no query param needed
     return basePath;
   }
   // On root domain, include slug in path

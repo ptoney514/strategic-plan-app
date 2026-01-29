@@ -108,6 +108,7 @@ export function PublicLayout({ districtSlug }: PublicLayoutProps = {}) {
         {/* Mobile header - only show menu toggle when sidebar is enabled */}
         <MobileHeader
           district={district}
+          districtSlug={slug}
           onMenuToggle={showSidebar ? () => setSidebarOpen(true) : undefined}
         />
 

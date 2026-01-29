@@ -65,6 +65,12 @@ export function getSubdomainInfo(): SubdomainInfo {
     return { type: 'root', slug: null, hostname };
   }
 
+  // Vercel preview URLs should be treated as root
+  // e.g., "strategic-plan-xyz123-pernells-projects.vercel.app"
+  if (hostname.endsWith('.vercel.app')) {
+    return { type: 'root', slug: null, hostname };
+  }
+
   // Extract subdomain from hostname
   // e.g., "westside.stratadash.org" -> subdomain = "westside"
   const parts = hostname.split('.');

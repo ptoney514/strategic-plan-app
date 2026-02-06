@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
-  Landmark,
   Target,
   Users,
   Palette,
@@ -27,11 +26,13 @@ interface SidebarNavProps {
 }
 
 /**
- * Hierarchical sidebar navigation for district admin
- * Shows District section, Schools section with expandable school items
+ * Hierarchical sidebar navigation for district admin (Editorial dark theme)
+ * Shows Dashboard, Plans, Objectives & Goals under MAIN
+ * Shows Users, Appearance, Settings under MANAGE
+ * Shows Schools section with expandable school items
  */
 export function SidebarNav({
-  district,
+  district: _district,
   schools,
   districtSlug,
   schoolSlug,
@@ -40,7 +41,6 @@ export function SidebarNav({
 }: SidebarNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [districtExpanded, setDistrictExpanded] = useState(true);
   const [schoolsExpanded, setSchoolsExpanded] = useState(true);
 
   // With subdomain routing, admin path is just /admin (no district slug in path)
@@ -59,163 +59,204 @@ export function SidebarNav({
     return location.pathname.startsWith(path);
   };
 
-  const isDistrictSectionActive = (section: string) => {
-    if (section === 'overview') {
-      return location.pathname === districtBasePath && isDistrictContext;
-    }
-    return location.pathname === `${districtBasePath}/${section}` && isDistrictContext;
+  const navItemClass = (active: boolean) =>
+    `w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+      active
+        ? 'text-white'
+        : ''
+    }`;
+
+  const navItemStyle = (active: boolean) => ({
+    backgroundColor: active ? 'var(--editorial-sidebar-active)' : 'transparent',
+    color: active ? '#ffffff' : 'var(--editorial-sidebar-text)',
+  });
+
+  const sectionLabelStyle = {
+    color: 'var(--editorial-sidebar-text-muted)',
   };
 
   return (
     <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+      {/* MAIN Section */}
+      <div className="mb-1 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest" style={sectionLabelStyle}>
+        Main
+      </div>
+
       {/* Dashboard */}
       <button
         onClick={() => handleNavigate(districtBasePath)}
-        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-          isActive(districtBasePath, true) && isDistrictContext
-            ? 'bg-amber-50 text-amber-700'
-            : 'text-slate-600 hover:bg-slate-100'
-        }`}
+        className={navItemClass(isActive(districtBasePath, true) && isDistrictContext)}
+        style={navItemStyle(isActive(districtBasePath, true) && isDistrictContext)}
+        onMouseEnter={(e) => {
+          if (!(isActive(districtBasePath, true) && isDistrictContext)) {
+            e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!(isActive(districtBasePath, true) && isDistrictContext)) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }
+        }}
       >
-        <Home size={16} />
+        <Home size={18} />
         <span>Dashboard</span>
       </button>
 
       {/* Plans */}
       <button
         onClick={() => handleNavigate(`${districtBasePath}/plans`)}
-        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-          isActive(`${districtBasePath}/plans`)
-            ? 'bg-amber-50 text-amber-700'
-            : 'text-slate-600 hover:bg-slate-100'
-        }`}
+        className={navItemClass(isActive(`${districtBasePath}/plans`))}
+        style={navItemStyle(isActive(`${districtBasePath}/plans`))}
+        onMouseEnter={(e) => {
+          if (!isActive(`${districtBasePath}/plans`)) {
+            e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isActive(`${districtBasePath}/plans`)) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }
+        }}
       >
-        <FileText size={16} />
+        <FileText size={18} />
         <span>Plans</span>
       </button>
 
-      {/* District Section */}
-      <div className="pt-4">
+      {/* Objectives & Goals */}
+      <button
+        onClick={() => handleNavigate(`${districtBasePath}/objectives`)}
+        className={navItemClass(isActive(`${districtBasePath}/objectives`))}
+        style={navItemStyle(isActive(`${districtBasePath}/objectives`))}
+        onMouseEnter={(e) => {
+          if (!isActive(`${districtBasePath}/objectives`)) {
+            e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isActive(`${districtBasePath}/objectives`)) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }
+        }}
+      >
+        <Target size={18} />
+        <span>Objectives & Goals</span>
+      </button>
+
+      {/* MANAGE Section */}
+      <div className="pt-5">
+        <div className="mb-1 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest" style={sectionLabelStyle}>
+          Manage
+        </div>
+
+        {/* Users */}
         <button
-          onClick={() => setDistrictExpanded(!districtExpanded)}
-          className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 transition-colors"
+          onClick={() => handleNavigate(`${districtBasePath}/users`)}
+          className={navItemClass(isActive(`${districtBasePath}/users`))}
+          style={navItemStyle(isActive(`${districtBasePath}/users`))}
+          onMouseEnter={(e) => {
+            if (!isActive(`${districtBasePath}/users`)) {
+              e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive(`${districtBasePath}/users`)) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
         >
-          {districtExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-          District
+          <Users size={18} />
+          <span>Users</span>
         </button>
 
-        {districtExpanded && (
-          <div className="mt-1 space-y-0.5">
-            {/* District Overview */}
-            <button
-              onClick={() => handleNavigate(districtBasePath)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isDistrictSectionActive('overview')
-                  ? 'bg-amber-50 text-amber-700'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              <Landmark size={16} />
-              <span className="flex-1 text-left truncate">{district.name}</span>
-            </button>
+        {/* Appearance */}
+        <button
+          onClick={() => handleNavigate(`${districtBasePath}/appearance`)}
+          className={navItemClass(isActive(`${districtBasePath}/appearance`))}
+          style={navItemStyle(isActive(`${districtBasePath}/appearance`))}
+          onMouseEnter={(e) => {
+            if (!isActive(`${districtBasePath}/appearance`)) {
+              e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive(`${districtBasePath}/appearance`)) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <Palette size={18} />
+          <span>Appearance</span>
+        </button>
 
-            {/* District Sub-items */}
-            <button
-              onClick={() => handleNavigate(`${districtBasePath}/objectives`)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                isDistrictSectionActive('objectives')
-                  ? 'bg-amber-50 text-amber-700 font-medium'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-              style={{ paddingLeft: '24px' }}
-            >
-              <Target size={16} />
-              Objectives
-            </button>
-
-            <button
-              onClick={() => handleNavigate(`${districtBasePath}/users`)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                isDistrictSectionActive('users')
-                  ? 'bg-amber-50 text-amber-700 font-medium'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-              style={{ paddingLeft: '24px' }}
-            >
-              <Users size={16} />
-              Users
-            </button>
-
-            <button
-              onClick={() => handleNavigate(`${districtBasePath}/appearance`)}
-              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-                isDistrictSectionActive('appearance') || isDistrictSectionActive('settings')
-                  ? 'bg-amber-50 text-amber-700 font-medium'
-                  : 'text-slate-600 hover:bg-slate-100'
-              }`}
-              style={{ paddingLeft: '24px' }}
-            >
-              <Palette size={16} />
-              Appearance
-            </button>
-          </div>
-        )}
+        {/* Settings */}
+        <button
+          onClick={() => handleNavigate(`${districtBasePath}/settings`)}
+          className={navItemClass(isActive(`${districtBasePath}/settings`))}
+          style={navItemStyle(isActive(`${districtBasePath}/settings`))}
+          onMouseEnter={(e) => {
+            if (!isActive(`${districtBasePath}/settings`)) {
+              e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive(`${districtBasePath}/settings`)) {
+              e.currentTarget.style.backgroundColor = 'transparent';
+            }
+          }}
+        >
+          <Settings size={18} />
+          <span>Settings</span>
+        </button>
       </div>
 
       {/* Schools Section */}
-      <div className="pt-4">
-        <button
-          onClick={() => setSchoolsExpanded(!schoolsExpanded)}
-          className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider hover:text-slate-600 transition-colors"
-        >
-          {schoolsExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-          Schools
-          <span className="ml-auto text-xs font-normal bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
-            {schools.length}
-          </span>
-        </button>
+      {schools.length > 0 && (
+        <div className="pt-5">
+          <button
+            onClick={() => setSchoolsExpanded(!schoolsExpanded)}
+            className="w-full flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest transition-colors"
+            style={sectionLabelStyle}
+          >
+            {schoolsExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+            Schools
+            <span className="ml-auto text-[11px] font-normal px-1.5 py-0.5 rounded" style={{ backgroundColor: 'var(--editorial-sidebar-hover)', color: 'var(--editorial-sidebar-text-muted)' }}>
+              {schools.length}
+            </span>
+          </button>
 
-        {schoolsExpanded && (
-          <div className="mt-1 space-y-0.5">
-            {schools.map((school) => (
-              <SchoolNavItem
-                key={school.id}
-                school={school}
-                districtSlug={districtSlug}
-                onMobileClose={onMobileClose}
-              />
-            ))}
+          {schoolsExpanded && (
+            <div className="mt-1 space-y-0.5">
+              {schools.map((school) => (
+                <SchoolNavItem
+                  key={school.id}
+                  school={school}
+                  districtSlug={districtSlug}
+                  onMobileClose={onMobileClose}
+                />
+              ))}
 
-            {/* Add School Button */}
-            <button
-              onClick={() => {
-                onAddSchool?.();
-                onMobileClose?.();
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
-              style={{ paddingLeft: '24px' }}
-            >
-              <Plus size={16} />
-              Add School
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Settings - Bottom */}
-      <div className="pt-4 border-t border-slate-100 mt-4">
-        <button
-          onClick={() => handleNavigate(`${districtBasePath}/settings`)}
-          className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors ${
-            isActive(`${districtBasePath}/settings`)
-              ? 'bg-amber-50 text-amber-700 font-medium'
-              : 'text-slate-600 hover:bg-slate-100'
-          }`}
-        >
-          <Settings size={16} />
-          Settings
-        </button>
-      </div>
+              {/* Add School Button */}
+              <button
+                onClick={() => {
+                  onAddSchool?.();
+                  onMobileClose?.();
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition-colors"
+                style={{ paddingLeft: '24px', color: 'var(--editorial-accent-secondary)' }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }}
+              >
+                <Plus size={16} />
+                Add School
+              </button>
+            </div>
+          )}
+        </div>
+      )}
     </nav>
   );
 }
@@ -226,14 +267,21 @@ interface SidebarFooterProps {
 }
 
 /**
- * Sidebar footer with View Public button
+ * Sidebar footer with View Public button (Editorial dark theme)
  */
 export function SidebarFooter({ publicUrl: _publicUrl, onNavigate }: SidebarFooterProps) {
   return (
-    <div className="p-3 border-t border-slate-200">
+    <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
       <button
         onClick={onNavigate}
-        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+        className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+        style={{ color: 'var(--editorial-sidebar-text)' }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = 'transparent';
+        }}
       >
         <Eye size={16} />
         <span>View Public Site</span>
@@ -249,13 +297,10 @@ interface SidebarHeaderProps {
 }
 
 /**
- * Sidebar header with district switcher
- *
- * For users with multiple districts, shows a dropdown to switch between them.
- * For users with a single district, shows a static display.
+ * Sidebar header with district switcher (Editorial dark theme)
  */
 export function SidebarHeader({ district, userEmail: _userEmail, userRole: _userRole }: SidebarHeaderProps) {
-  return <DistrictSwitcher currentDistrict={district} />;
+  return <DistrictSwitcher currentDistrict={district} variant="dark" />;
 }
 
 interface SidebarUserFooterProps {
@@ -264,13 +309,16 @@ interface SidebarUserFooterProps {
 }
 
 /**
- * User info footer for sidebar
+ * User info footer for sidebar (Editorial dark theme)
  */
 export function SidebarUserFooter({ userName, userRole }: SidebarUserFooterProps) {
   return (
-    <div className="p-3 border-t border-slate-200">
+    <div className="p-3" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-700 font-medium text-sm">
+        <div
+          className="w-8 h-8 rounded-full flex items-center justify-center font-medium text-sm"
+          style={{ backgroundColor: 'var(--editorial-accent-primary)', color: '#ffffff' }}
+        >
           {userName
             .split(' ')
             .map((n) => n[0])
@@ -279,8 +327,8 @@ export function SidebarUserFooter({ userName, userRole }: SidebarUserFooterProps
             .substring(0, 2)}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium text-slate-900 truncate">{userName}</div>
-          <div className="text-xs text-slate-500">{userRole}</div>
+          <div className="text-sm font-medium truncate" style={{ color: 'var(--editorial-sidebar-text)' }}>{userName}</div>
+          <div className="text-xs" style={{ color: 'var(--editorial-sidebar-text-muted)' }}>{userRole}</div>
         </div>
       </div>
     </div>

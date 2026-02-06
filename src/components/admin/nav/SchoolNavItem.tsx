@@ -17,7 +17,7 @@ interface SchoolNavItemProps {
 }
 
 /**
- * School navigation item with expandable sub-navigation
+ * School navigation item with expandable sub-navigation (Editorial dark theme)
  * Shows: Overview, Objectives, Users, Appearance
  */
 export function SchoolNavItem({ school, districtSlug: _districtSlug, onMobileClose }: SchoolNavItemProps) {
@@ -54,62 +54,65 @@ export function SchoolNavItem({ school, districtSlug: _districtSlug, onMobileClo
             handleNavigate(schoolBasePath);
           }
         }}
-        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-          isActive && isSubItemActive('overview')
-            ? 'bg-amber-50 text-amber-700'
-            : 'text-slate-600 hover:bg-slate-100'
-        }`}
-        style={{ paddingLeft: '24px' }}
+        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+        style={{
+          paddingLeft: '24px',
+          backgroundColor: isActive && isSubItemActive('overview') ? 'var(--editorial-sidebar-active)' : 'transparent',
+          color: isActive && isSubItemActive('overview') ? '#ffffff' : 'var(--editorial-sidebar-text)',
+        }}
+        onMouseEnter={(e) => {
+          if (!(isActive && isSubItemActive('overview'))) {
+            e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!(isActive && isSubItemActive('overview'))) {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }
+        }}
       >
         {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         <Building2 size={16} />
         <span className="flex-1 text-left truncate">{school.name}</span>
         {!school.is_public && (
-          <span className="w-2 h-2 bg-amber-400 rounded-full" title="Draft" />
+          <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--editorial-accent-secondary)' }} title="Draft" />
         )}
       </button>
 
       {/* Sub-navigation */}
       {isExpanded && (
         <div className="ml-4 space-y-0.5 mt-0.5">
-          <button
-            onClick={() => handleNavigate(`${schoolBasePath}/objectives`)}
-            className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              isSubItemActive('objectives')
-                ? 'bg-amber-50 text-amber-700'
-                : 'text-slate-500 hover:bg-slate-100'
-            }`}
-            style={{ paddingLeft: '36px' }}
-          >
-            <Target size={14} />
-            Objectives
-          </button>
-
-          <button
-            onClick={() => handleNavigate(`${schoolBasePath}/users`)}
-            className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              isSubItemActive('users')
-                ? 'bg-amber-50 text-amber-700'
-                : 'text-slate-500 hover:bg-slate-100'
-            }`}
-            style={{ paddingLeft: '36px' }}
-          >
-            <Users size={14} />
-            Users
-          </button>
-
-          <button
-            onClick={() => handleNavigate(`${schoolBasePath}/appearance`)}
-            className={`w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-              isSubItemActive('appearance')
-                ? 'bg-amber-50 text-amber-700'
-                : 'text-slate-500 hover:bg-slate-100'
-            }`}
-            style={{ paddingLeft: '36px' }}
-          >
-            <Palette size={14} />
-            Appearance
-          </button>
+          {[
+            { section: 'objectives', icon: Target, label: 'Objectives' },
+            { section: 'users', icon: Users, label: 'Users' },
+            { section: 'appearance', icon: Palette, label: 'Appearance' },
+          ].map(({ section, icon: Icon, label }) => (
+            <button
+              key={section}
+              onClick={() => handleNavigate(`${schoolBasePath}/${section}`)}
+              className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors"
+              style={{
+                paddingLeft: '36px',
+                backgroundColor: isSubItemActive(section) ? 'var(--editorial-sidebar-active)' : 'transparent',
+                color: isSubItemActive(section) ? '#ffffff' : 'var(--editorial-sidebar-text-muted)',
+              }}
+              onMouseEnter={(e) => {
+                if (!isSubItemActive(section)) {
+                  e.currentTarget.style.backgroundColor = 'var(--editorial-sidebar-hover)';
+                  e.currentTarget.style.color = 'var(--editorial-sidebar-text)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isSubItemActive(section)) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.color = 'var(--editorial-sidebar-text-muted)';
+                }
+              }}
+            >
+              <Icon size={14} />
+              {label}
+            </button>
+          ))}
         </div>
       )}
     </div>

@@ -14,9 +14,30 @@
   --color-border: hsl(214.3 31.8% 91.4%);
   --color-input: hsl(214.3 31.8% 91.4%);
   --color-ring: hsl(222.2 84% 4.9%);
-  
+
   /* Radius variables */
   --radius: 0.5rem;
+
+  /* Editorial palette */
+  --editorial-bg: #faf9f7;
+  --editorial-surface: #ffffff;
+  --editorial-surface-alt: #f5f3ef;
+  --editorial-border: #e8e6e1;
+  --editorial-border-light: #f0eee9;
+  --editorial-text-primary: #1a1a1a;
+  --editorial-text-secondary: #4a4a4a;
+  --editorial-text-muted: #8a8a8a;
+  --editorial-text-light: #6a6a6a;
+  --editorial-accent-primary: #b85c38;
+  --editorial-accent-primary-hover: #a04d2d;
+  --editorial-accent-secondary: #c9a227;
+  --editorial-accent-success: #6b8f71;
+  --editorial-accent-link: #4a6fa5;
+  --editorial-sidebar-bg: #1a1a1a;
+  --editorial-sidebar-hover: #2a2a2a;
+  --editorial-sidebar-text: #e8e6e1;
+  --editorial-sidebar-text-muted: #8a8a8a;
+  --editorial-sidebar-active: #b85c38;
 }
 
 .dark {

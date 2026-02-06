@@ -2,16 +2,14 @@ import { test, expect } from '@playwright/test';
 import { LoginPage } from '../helpers/login-page';
 
 /**
- * Admin Sidebar Click Navigation Tests
+ * Admin Sidebar Click Navigation Tests (Editorial Redesign)
  *
- * Verifies that the sidebar navigation remains clickable after various
- * interactions on admin pages, specifically the Objective Detail page.
+ * Verifies that the redesigned editorial sidebar navigation works correctly.
+ * The sidebar now uses button elements with grouped sections:
+ *   MAIN: Dashboard, Plans, Objectives & Goals
+ *   MANAGE: Users, Appearance, Settings
  *
- * Issue: Sidebar navigation became unresponsive after interactions on
- * the Objective Detail page due to z-index stacking issues.
- *
- * Fix: Increased sidebar z-index from z-20 to z-40 to ensure it stays
- * above any dynamically created overlays.
+ * Uses subdomain query param for localhost testing.
  */
 
 test.describe('Admin Sidebar Click Navigation', () => {
@@ -21,258 +19,127 @@ test.describe('Admin Sidebar Click Navigation', () => {
     loginPage = new LoginPage(page);
     await page.context().clearCookies();
 
-    // Login as district admin
-    await loginPage.goto();
+    // Navigate to login with subdomain query param for localhost
+    await page.goto('/login?subdomain=westside');
     await loginPage.login('admin@westside66.org', 'Westside123!');
 
     // Wait for redirect to admin dashboard
     await page.waitForURL(/\/admin/, { timeout: 15000 });
   });
 
-  test.describe('Sidebar Visibility and Clickability', () => {
-    test('sidebar should be visible and clickable on admin dashboard', async ({ page }) => {
-      // Sidebar should be visible
+  test.describe('Sidebar Visibility and Structure', () => {
+    test('sidebar should be visible with editorial dark theme', async ({ page }) => {
       const sidebar = page.locator('aside').first();
       await expect(sidebar).toBeVisible();
 
-      // All navigation links should be clickable
-      const homeLink = sidebar.locator('a:has-text("Home")');
-      await expect(homeLink).toBeVisible();
-      await expect(homeLink).toBeEnabled();
-
-      const objectivesLink = sidebar.locator('a:has-text("Objectives & goals")');
-      await expect(objectivesLink).toBeVisible();
-      await expect(objectivesLink).toBeEnabled();
+      // Verify editorial dark background
+      const bgColor = await sidebar.evaluate(
+        (el) => getComputedStyle(el).backgroundColor
+      );
+      // Should be dark (#1a1a1a = rgb(26, 26, 26))
+      expect(bgColor).toContain('26');
     });
 
-    test('sidebar links should navigate correctly', async ({ page }) => {
+    test('sidebar should show MAIN section with correct nav items', async ({ page }) => {
       const sidebar = page.locator('aside').first();
 
-      // Click Objectives & goals
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await expect(page).toHaveURL(/\/objectives/);
+      // Section label
+      await expect(sidebar.locator('text=Main').first()).toBeVisible();
 
-      // Click Home to go back
-      await sidebar.locator('a:has-text("Home")').click();
+      // Nav items under MAIN
+      await expect(sidebar.locator('button:has-text("Dashboard")')).toBeVisible();
+      await expect(sidebar.locator('button:has-text("Plans")')).toBeVisible();
+      await expect(sidebar.locator('button:has-text("Objectives & Goals")')).toBeVisible();
+    });
+
+    test('sidebar should show MANAGE section with correct nav items', async ({ page }) => {
+      const sidebar = page.locator('aside').first();
+
+      // Section label
+      await expect(sidebar.locator('text=Manage').first()).toBeVisible();
+
+      // Nav items under MANAGE
+      await expect(sidebar.locator('button:has-text("Users")')).toBeVisible();
+      await expect(sidebar.locator('button:has-text("Appearance")')).toBeVisible();
+      await expect(sidebar.locator('button:has-text("Settings")')).toBeVisible();
+    });
+
+    test('sidebar should NOT show old placeholder nav items', async ({ page }) => {
+      const sidebar = page.locator('aside').first();
+
+      // These old items should no longer exist
+      await expect(sidebar.locator('text=Metrics')).toHaveCount(0);
+      await expect(sidebar.locator('text=Dashboards')).toHaveCount(0);
+      await expect(sidebar.locator('text=Reports')).toHaveCount(0);
+      await expect(sidebar.locator('text=Visual Library')).toHaveCount(0);
+    });
+  });
+
+  test.describe('Sidebar Navigation', () => {
+    test('Dashboard link navigates to /admin', async ({ page }) => {
+      const sidebar = page.locator('aside').first();
+      await sidebar.locator('button:has-text("Dashboard")').click();
       await expect(page).toHaveURL(/\/admin\/?$/);
     });
-  });
 
-  test.describe('Sidebar After Page Interactions', () => {
-    test('sidebar remains clickable after visiting objectives page', async ({ page }) => {
+    test('Plans link navigates to /admin/plans', async ({ page }) => {
       const sidebar = page.locator('aside').first();
-
-      // Navigate to objectives page
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await expect(page).toHaveURL(/\/objectives/);
-
-      // Wait for page to load
-      await page.waitForLoadState('networkidle');
-
-      // Sidebar should still be clickable
-      const homeLink = sidebar.locator('a:has-text("Home")');
-      await expect(homeLink).toBeVisible();
-
-      // Click and verify navigation works
-      await homeLink.click();
-      await expect(page).toHaveURL(/\/admin\/?$/);
+      await sidebar.locator('button:has-text("Plans")').click();
+      await expect(page).toHaveURL(/\/admin\/plans/);
     });
 
-    test('sidebar remains clickable after clicking on objective card', async ({ page }) => {
+    test('Objectives & Goals link navigates to /admin/objectives', async ({ page }) => {
       const sidebar = page.locator('aside').first();
-
-      // Navigate to objectives page
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await page.waitForLoadState('networkidle');
-
-      // Look for any clickable objective card or link
-      const objectiveCard = page.locator('[data-testid^="objective-"], a[href*="/objectives/"]').first();
-      const hasObjectiveCard = await objectiveCard.count() > 0;
-
-      if (hasObjectiveCard) {
-        // Click on the objective
-        await objectiveCard.click();
-        await page.waitForTimeout(500);
-
-        // Sidebar should still be clickable
-        const strategicPlansLink = sidebar.locator('a:has-text("Strategic plans")');
-        await expect(strategicPlansLink).toBeVisible();
-
-        // Test that click works
-        await strategicPlansLink.click();
-        await expect(page).toHaveURL(/\/plans/);
-      }
+      await sidebar.locator('button:has-text("Objectives & Goals")').click();
+      await expect(page).toHaveURL(/\/admin\/objectives/);
     });
 
-    test('sidebar remains clickable after scrolling the page', async ({ page }) => {
+    test('Users link navigates to /admin/users', async ({ page }) => {
       const sidebar = page.locator('aside').first();
+      await sidebar.locator('button:has-text("Users")').click();
+      await expect(page).toHaveURL(/\/admin\/users/);
+    });
 
-      // Navigate to objectives page
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await page.waitForLoadState('networkidle');
+    test('Appearance link navigates to /admin/appearance', async ({ page }) => {
+      const sidebar = page.locator('aside').first();
+      await sidebar.locator('button:has-text("Appearance")').click();
+      await expect(page).toHaveURL(/\/admin\/appearance/);
+    });
 
-      // Scroll the main content area
-      await page.evaluate(() => {
-        const mainContent = document.querySelector('main');
-        if (mainContent) {
-          mainContent.scrollTop = 500;
-        }
-      });
-
-      // Wait a moment for any scroll-triggered effects
-      await page.waitForTimeout(300);
-
-      // Sidebar should still be clickable
-      const metricsLink = sidebar.locator('a:has-text("Metrics")');
-      await expect(metricsLink).toBeVisible();
-
-      await metricsLink.click();
-      await expect(page).toHaveURL(/\/metrics/);
+    test('Settings link navigates to /admin/settings', async ({ page }) => {
+      const sidebar = page.locator('aside').first();
+      await sidebar.locator('button:has-text("Settings")').click();
+      await expect(page).toHaveURL(/\/admin\/settings/);
     });
   });
 
-  test.describe('Sidebar Z-Index Stacking', () => {
-    test('sidebar should be above main content', async ({ page }) => {
+  test.describe('Multi-page Navigation Cycle', () => {
+    test('sidebar works through complete navigation cycle', async ({ page }) => {
       const sidebar = page.locator('aside').first();
 
-      // Check that sidebar has z-40 class
-      await expect(sidebar).toHaveClass(/z-40/);
-
-      // Verify it's positioned as fixed
-      await expect(sidebar).toHaveClass(/fixed/);
-    });
-
-    test('sidebar should remain clickable when overlapping with absolute elements', async ({ page }) => {
-      const sidebar = page.locator('aside').first();
-
-      // Navigate to a page that has absolute positioned elements (gradient overlay)
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await page.waitForLoadState('networkidle');
-
-      // The page has a gradient overlay with absolute positioning
-      // Sidebar should still be above it
-
-      // Test clicking multiple sidebar links in sequence
-      const links = ['Home', 'Strategic plans', 'Metrics', 'Dashboards'];
-
-      for (const linkText of links) {
-        const link = sidebar.locator(`a:has-text("${linkText}")`);
-        await expect(link).toBeVisible();
-
-        // Verify the link receives click events (not blocked by overlay)
-        await link.click();
-        await page.waitForTimeout(200);
-      }
-    });
-  });
-
-  test.describe('Objective Detail Page Interactions', () => {
-    test('sidebar remains clickable after objective detail page loads', async ({ page }) => {
-      const sidebar = page.locator('aside').first();
-
-      // Navigate to objectives list
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await page.waitForLoadState('networkidle');
-
-      // Find and click on an objective to go to detail page
-      const objectiveLink = page.locator('a[href*="/objectives/"]').first();
-      const hasObjective = await objectiveLink.count() > 0;
-
-      if (hasObjective) {
-        await objectiveLink.click();
-        await page.waitForLoadState('networkidle');
-
-        // Verify we're on objective detail page
-        await expect(page).toHaveURL(/\/objectives\/[^/]+$/);
-
-        // Sidebar should still be visible and clickable
-        await expect(sidebar).toBeVisible();
-
-        // Test clicking Home link
-        const homeLink = sidebar.locator('a:has-text("Home")');
-        await expect(homeLink).toBeVisible();
-        await homeLink.click();
-
-        await expect(page).toHaveURL(/\/admin\/?$/);
-      }
-    });
-
-    test('sidebar remains clickable after interacting with goal cards', async ({ page }) => {
-      const sidebar = page.locator('aside').first();
-
-      // Navigate to objectives list
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await page.waitForLoadState('networkidle');
-
-      // Try to find expandable goal cards
-      const expandButton = page.locator('button:has-text("Expand"), [data-testid="expand-goal"]').first();
-      const hasExpandButton = await expandButton.count() > 0;
-
-      if (hasExpandButton) {
-        // Click expand button
-        await expandButton.click();
-        await page.waitForTimeout(300);
-
-        // Sidebar should still work
-        const reportsLink = sidebar.locator('a:has-text("Reports")');
-        await expect(reportsLink).toBeVisible();
-        await reportsLink.click();
-        await expect(page).toHaveURL(/\/reports/);
-      }
-    });
-
-    test('sidebar remains clickable after editing interactions', async ({ page }) => {
-      const sidebar = page.locator('aside').first();
-
-      // Navigate to objectives
-      await sidebar.locator('a:has-text("Objectives & goals")').click();
-      await page.waitForLoadState('networkidle');
-
-      // Look for edit buttons
-      const editButton = page.locator('button:has-text("Edit"), [data-testid="edit-button"]').first();
-      const hasEditButton = await editButton.count() > 0;
-
-      if (hasEditButton) {
-        // Click edit button to trigger inline editing
-        await editButton.click();
-        await page.waitForTimeout(300);
-
-        // Click somewhere else to potentially close edit mode
-        await page.keyboard.press('Escape');
-        await page.waitForTimeout(200);
-
-        // Sidebar should still work
-        const metricsLink = sidebar.locator('a:has-text("Metrics")');
-        await expect(metricsLink).toBeVisible();
-        await metricsLink.click();
-        await expect(page).toHaveURL(/\/metrics/);
-      }
-    });
-  });
-
-  test.describe('Multiple Navigation Cycles', () => {
-    test('sidebar works through multiple navigation cycles', async ({ page }) => {
-      const sidebar = page.locator('aside').first();
-
-      // Cycle through multiple pages
       const navigationCycle = [
-        { link: 'Objectives & goals', urlPattern: /\/objectives/ },
-        { link: 'Home', urlPattern: /\/admin\/?$/ },
-        { link: 'Strategic plans', urlPattern: /\/plans/ },
-        { link: 'Metrics', urlPattern: /\/metrics/ },
-        { link: 'Dashboards', urlPattern: /\/dashboards/ },
-        { link: 'Reports', urlPattern: /\/reports/ },
-        { link: 'Home', urlPattern: /\/admin\/?$/ },
+        { button: 'Plans', urlPattern: /\/admin\/plans/ },
+        { button: 'Objectives & Goals', urlPattern: /\/admin\/objectives/ },
+        { button: 'Users', urlPattern: /\/admin\/users/ },
+        { button: 'Appearance', urlPattern: /\/admin\/appearance/ },
+        { button: 'Settings', urlPattern: /\/admin\/settings/ },
+        { button: 'Dashboard', urlPattern: /\/admin\/?$/ },
       ];
 
-      for (const { link, urlPattern } of navigationCycle) {
-        const navLink = sidebar.locator(`a:has-text("${link}")`);
-        await expect(navLink).toBeVisible();
-        await navLink.click();
+      for (const { button, urlPattern } of navigationCycle) {
+        const navButton = sidebar.locator(`button:has-text("${button}")`);
+        await expect(navButton).toBeVisible();
+        await navButton.click();
         await expect(page).toHaveURL(urlPattern);
         await page.waitForTimeout(100);
       }
     });
   });
-});
 
+  test.describe('View Public Site', () => {
+    test('View Public Site button is visible in sidebar footer', async ({ page }) => {
+      const sidebar = page.locator('aside').first();
+      await expect(sidebar.locator('button:has-text("View Public Site")')).toBeVisible();
+    });
+  });
+});

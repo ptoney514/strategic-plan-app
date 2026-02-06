@@ -92,14 +92,24 @@ describe('SidebarNav', () => {
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
-  it('renders District section', () => {
+  it('renders Main section label', () => {
     render(<SidebarNav {...defaultProps} />);
-    expect(screen.getByText('District')).toBeInTheDocument();
+    expect(screen.getByText('Main')).toBeInTheDocument();
   });
 
-  it('renders district name in navigation', () => {
+  it('renders Manage section label', () => {
     render(<SidebarNav {...defaultProps} />);
-    expect(screen.getByText('Test District')).toBeInTheDocument();
+    expect(screen.getByText('Manage')).toBeInTheDocument();
+  });
+
+  it('renders Plans navigation item', () => {
+    render(<SidebarNav {...defaultProps} />);
+    expect(screen.getByText('Plans')).toBeInTheDocument();
+  });
+
+  it('renders Objectives & Goals navigation item', () => {
+    render(<SidebarNav {...defaultProps} />);
+    expect(screen.getByText('Objectives & Goals')).toBeInTheDocument();
   });
 
   it('renders Schools section', () => {
@@ -136,22 +146,10 @@ describe('SidebarNav', () => {
     expect(onAddSchool).toHaveBeenCalledTimes(1);
   });
 
-  it('renders district sub-navigation items', () => {
+  it('renders Users and Appearance navigation items', () => {
     render(<SidebarNav {...defaultProps} />);
-    expect(screen.getByText('Objectives')).toBeInTheDocument();
     expect(screen.getByText('Users')).toBeInTheDocument();
     expect(screen.getByText('Appearance')).toBeInTheDocument();
-  });
-
-  it('collapses District section when header is clicked', () => {
-    render(<SidebarNav {...defaultProps} />);
-
-    // Click District section header to collapse
-    const districtHeader = screen.getByText('District');
-    fireEvent.click(districtHeader);
-
-    // District sub-items should be hidden (except the count which may still show)
-    // Note: The section starts expanded by default
   });
 
   it('collapses Schools section when header is clicked', () => {
@@ -164,7 +162,8 @@ describe('SidebarNav', () => {
     const schoolsHeader = screen.getByText('Schools');
     fireEvent.click(schoolsHeader);
 
-    // Schools should still be in document (just visually hidden with state)
+    // Schools should be hidden after collapse
+    expect(screen.queryByText('Elementary School')).not.toBeInTheDocument();
   });
 
   it('shows draft indicator for non-public schools', () => {
@@ -175,10 +174,9 @@ describe('SidebarNav', () => {
     expect(draftIndicators.length).toBeGreaterThan(0);
   });
 
-  it('handles empty schools array', () => {
+  it('hides Schools section when schools array is empty', () => {
     render(<SidebarNav {...defaultProps} schools={[]} />);
-    expect(screen.getByText('0')).toBeInTheDocument();
-    expect(screen.getByText('Add School')).toBeInTheDocument();
+    expect(screen.queryByText('Schools')).not.toBeInTheDocument();
   });
 
   // Navigation path tests
@@ -189,10 +187,16 @@ describe('SidebarNav', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/admin');
     });
 
-    it('navigates to /admin/objectives when Objectives is clicked', () => {
+    it('navigates to /admin/objectives when Objectives & Goals is clicked', () => {
       render(<SidebarNav {...defaultProps} />);
-      fireEvent.click(screen.getByText('Objectives'));
+      fireEvent.click(screen.getByText('Objectives & Goals'));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/objectives');
+    });
+
+    it('navigates to /admin/plans when Plans is clicked', () => {
+      render(<SidebarNav {...defaultProps} />);
+      fireEvent.click(screen.getByText('Plans'));
+      expect(mockNavigate).toHaveBeenCalledWith('/admin/plans');
     });
 
     it('navigates to /admin/users when Users is clicked', () => {

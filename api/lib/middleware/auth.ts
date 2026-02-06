@@ -8,6 +8,18 @@ import type { OrgRole } from "./roles";
 export { hasMinimumRole } from "./roles";
 export type { OrgRole } from "./roles";
 
+/** User type with additionalFields from Better Auth config */
+export interface SessionUser {
+  id: string;
+  email: string;
+  name: string;
+  image: string | null;
+  emailVerified: boolean;
+  isSystemAdmin: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 /**
  * Validates the session from the request. Returns user + session or throws 401.
  */
@@ -23,7 +35,8 @@ export async function requireAuth(req: Request) {
     });
   }
 
-  return session; // { user, session }
+  // Cast user to include additionalFields (isSystemAdmin) from auth config
+  return session as typeof session & { user: SessionUser };
 }
 
 /**

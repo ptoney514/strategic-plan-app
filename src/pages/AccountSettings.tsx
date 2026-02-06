@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Lock, Mail, ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase';
+import { authClient } from '../lib/auth-client';
 
 /**
  * AccountSettings - User profile and password settings page
@@ -17,12 +17,13 @@ export function AccountSettings() {
   const { user } = useAuth();
 
   // Display name form state
-  const [displayName, setDisplayName] = useState(user?.user_metadata?.display_name || '');
+  const [displayName, setDisplayName] = useState(user?.name || user?.user_metadata?.display_name || '');
   const [savingName, setSavingName] = useState(false);
   const [nameSuccess, setNameSuccess] = useState(false);
   const [nameError, setNameError] = useState('');
 
   // Password form state
+  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
@@ -36,11 +37,9 @@ export function AccountSettings() {
     setSavingName(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        data: { display_name: displayName.trim() },
-      });
+      const result = await authClient.updateUser({ name: displayName.trim() });
 
-      if (error) throw error;
+      if (result.error) throw new Error(result.error.message || 'Failed to update display name');
       setNameSuccess(true);
       setTimeout(() => setNameSuccess(false), 3000);
     } catch (error) {
@@ -56,6 +55,11 @@ export function AccountSettings() {
     setPasswordSuccess(false);
 
     // Validation
+    if (!currentPassword) {
+      setPasswordError('Current password is required');
+      return;
+    }
+
     if (newPassword.length < 8) {
       setPasswordError('New password must be at least 8 characters');
       return;
@@ -69,13 +73,15 @@ export function AccountSettings() {
     setSavingPassword(true);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword,
+      const result = await authClient.changePassword({
+        currentPassword,
+        newPassword,
       });
 
-      if (error) throw error;
+      if (result.error) throw new Error(result.error.message || 'Failed to change password');
 
       setPasswordSuccess(true);
+      setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setTimeout(() => setPasswordSuccess(false), 3000);
@@ -199,6 +205,21 @@ export function AccountSettings() {
             )}
 
             <div className="space-y-4 mb-4">
+              <div>
+                <label htmlFor="current-password" className="block text-sm font-medium text-gray-700 mb-1">
+                  Current Password
+                </label>
+                <input
+                  id="current-password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  required
+                  autoComplete="current-password"
+                />
+              </div>
               <div>
                 <label htmlFor="new-password" className="block text-sm font-medium text-gray-700 mb-1">
                   New Password

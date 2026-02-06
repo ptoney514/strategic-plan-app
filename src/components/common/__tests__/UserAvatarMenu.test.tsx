@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
@@ -43,17 +43,8 @@ vi.mock('../../../lib/subdomain', () => ({
   },
 }));
 
-// Mock Supabase - default returns empty districts
-const mockSupabaseResponse = vi.fn().mockResolvedValue({ data: [], error: null });
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => mockSupabaseResponse(),
-      }),
-    }),
-  },
-}));
+// Mock fetch for memberships API
+const mockFetchResponse = vi.fn();
 
 // Wrapper component with Router
 function renderWithRouter(ui: React.ReactElement) {
@@ -64,7 +55,15 @@ describe('UserAvatarMenu', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockLogout.mockResolvedValue(undefined);
-    mockSupabaseResponse.mockResolvedValue({ data: [], error: null });
+    // Default: empty memberships
+    mockFetchResponse.mockResolvedValue(
+      new Response(JSON.stringify([]), { status: 200, headers: { 'Content-Type': 'application/json' } })
+    );
+    vi.stubGlobal('fetch', mockFetchResponse);
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
   });
 
   describe('when user is not authenticated', () => {
@@ -204,15 +203,14 @@ describe('UserAvatarMenu', () => {
     });
 
     it('shows district admin links when user has district access', async () => {
-      mockSupabaseResponse.mockResolvedValue({
-        data: [
-          {
-            district_slug: 'westside',
-            spb_districts: { name: 'Westside District' },
-          },
-        ],
-        error: null,
-      });
+      mockFetchResponse.mockResolvedValue(
+        new Response(
+          JSON.stringify([
+            { organizationId: 'org-1', slug: 'westside', name: 'Westside District', role: 'admin' },
+          ]),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        )
+      );
 
       mockUseAuth.mockReturnValue({
         user: mockUser,

@@ -31,11 +31,28 @@ export const auth = betterAuth({
       },
     },
   },
-  trustedOrigins: [
-    "http://localhost:5173",
-    "http://localhost:5174",
-    ...(process.env.VITE_APP_URL ? [process.env.VITE_APP_URL] : []),
-  ],
+  trustedOrigins: (request) => {
+    const origins = [
+      "http://localhost:5173",
+      "http://localhost:5174",
+      "http://lvh.me:5174",
+    ];
+    if (process.env.VITE_APP_URL) {
+      origins.push(process.env.VITE_APP_URL);
+    }
+    // Allow any subdomain of lvh.me for local dev
+    const origin = request?.headers.get("origin");
+    if (origin && /^https?:\/\/.*\.lvh\.me:5174$/.test(origin)) {
+      origins.push(origin);
+    }
+    return origins;
+  },
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: process.env.BETTER_AUTH_COOKIE_DOMAIN,
+    },
+  },
 });
 
 export type Auth = typeof auth;

@@ -23,7 +23,9 @@ test.describe('Admin Sidebar Click Navigation', () => {
 
     // Login as district admin
     await loginPage.goto();
-    await loginPage.login('admin@westside66.org', 'Westside123!');
+    const email = process.env.TEST_DISTRICT_ADMIN_EMAIL || 'admin@westside66.org';
+    const password = process.env.TEST_DISTRICT_ADMIN_PASSWORD || 'Westside123!';
+    await loginPage.login(email, password);
 
     // Wait for redirect to admin dashboard
     await page.waitForURL(/\/admin/, { timeout: 15000 });

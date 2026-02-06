@@ -75,5 +75,8 @@ Desktop.ini
 # TypeScript build info
 *.tsbuildinfo
 
+# Playwright auth state
+e2e/.auth/
+
 # Playwright MCP artifacts
 .playwright-mcp/

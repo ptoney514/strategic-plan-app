@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import { Page, Locator, expect } from '@playwright/test';
 
 /**
  * Page Object Model for Login Page
@@ -14,15 +14,15 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page;
-    // TODO: Update these selectors based on actual login form
     this.emailInput = page.locator('input[type="email"]');
     this.passwordInput = page.locator('input[type="password"]');
     this.submitButton = page.locator('button[type="submit"]');
     this.errorMessage = page.locator('[role="alert"]');
   }
 
-  async goto() {
-    await this.page.goto('/login');
+  async goto(params?: string) {
+    const url = params ? `/login${params}` : '/login';
+    await this.page.goto(url);
   }
 
   async login(email: string, password: string) {
@@ -31,12 +31,17 @@ export class LoginPage {
     await this.submitButton.click();
   }
 
+  /** Login and wait for navigation away from /login */
+  async loginAndWait(email: string, password: string, timeout = 15000) {
+    await this.login(email, password);
+    await this.page.waitForURL(/\/(?!login)/, { timeout });
+  }
+
   async expectLoginSuccess() {
-    // Wait for navigation away from login page
-    await this.page.waitForURL(/\/(?!login)/, { timeout: 5000 });
+    await this.page.waitForURL(/\/(?!login)/, { timeout: 15000 });
   }
 
   async expectLoginFailure() {
-    await this.errorMessage.isVisible();
+    await expect(this.errorMessage).toBeVisible({ timeout: 10000 });
   }
 }

@@ -1,4 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
+import path from 'path';
+
+const DISTRICT_ADMIN_STATE = path.join('e2e', '.auth', 'district-admin.json');
+const SYSTEM_ADMIN_STATE = path.join('e2e', '.auth', 'system-admin.json');
 
 /**
  * Playwright Configuration for Strategic Plan Builder
@@ -7,6 +11,9 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+
+  /* Global setup — authenticates test users and saves storageState */
+  globalSetup: './e2e/global-setup.ts',
 
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -26,7 +33,7 @@ export default defineConfig({
   /* Shared settings for all the projects below */
   use: {
     /* Base URL to use in actions like `await page.goto('/')` */
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5174',
 
     /* Collect trace when retrying the failed test */
     trace: 'on-first-retry',
@@ -40,6 +47,24 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+    },
+
+    // Pre-authenticated project for district admin tests
+    {
+      name: 'chromium-district-admin',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: DISTRICT_ADMIN_STATE,
+      },
+    },
+
+    // Pre-authenticated project for system admin tests
+    {
+      name: 'chromium-system-admin',
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: SYSTEM_ADMIN_STATE,
+      },
     },
 
     // Uncomment to test on more browsers
@@ -62,7 +87,7 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: 'npm run dev',
-    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5173',
+    url: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:5174',
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
   },

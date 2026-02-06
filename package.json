@@ -21,6 +21,8 @@
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report",
+    "test:smoke": "playwright test e2e/smoke.spec.ts",
+    "test:smoke:api": "./scripts/smoke-api.sh",
     "db:start": "supabase start",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",

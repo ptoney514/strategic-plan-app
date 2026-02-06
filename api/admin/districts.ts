@@ -47,6 +47,7 @@ export async function GET(req: Request) {
 
         return {
           id: org.id,
+          district_id: org.id,
           name: org.name,
           slug: org.slug,
           entity_type: org.entityType,

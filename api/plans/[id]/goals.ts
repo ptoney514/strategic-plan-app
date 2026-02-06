@@ -12,6 +12,7 @@ function goalToSnake(row: any) {
     id: row.id,
     plan_id: row.planId,
     organization_id: row.organizationId,
+    district_id: row.organizationId,
     school_id: row.schoolId,
     parent_id: row.parentId,
     goal_number: row.goalNumber,

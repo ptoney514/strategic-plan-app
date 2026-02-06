@@ -23,6 +23,7 @@ function orgToSnake(o: typeof organizations.$inferSelect) {
     tagline: o.tagline,
     dashboard_template: o.dashboardTemplate,
     dashboard_config: o.dashboardConfig,
+    district_id: o.id,
     created_at: o.createdAt,
     updated_at: o.updatedAt,
   };

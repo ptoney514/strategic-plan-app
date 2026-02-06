@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { apiGet, apiPost, apiPut, apiDelete } from '../api';
 
 export interface ContactFormData {
   email: string;
@@ -36,26 +36,26 @@ export class ContactService {
   static async submitContactForm(data: ContactFormData): Promise<ContactSubmissionResult> {
     console.log('[ContactService] Submitting contact form...');
 
-    const { error } = await supabase.from('spb_contact_submissions').insert({
-      email: data.email,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      organization: data.organization,
-      topic: data.topic,
-      phone: data.phone || null,
-      message: data.message || null,
-    });
+    try {
+      await apiPost('/contact', {
+        email: data.email,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        organization: data.organization,
+        topic: data.topic,
+        phone: data.phone || null,
+        message: data.message || null,
+      });
 
-    if (error) {
+      console.log('[ContactService] Contact form submitted successfully');
+      return { success: true };
+    } catch (error) {
       console.error('[ContactService] Error submitting contact form:', error);
       return {
         success: false,
         error: 'Failed to submit form. Please try again or email us directly.',
       };
     }
-
-    console.log('[ContactService] Contact form submitted successfully');
-    return { success: true };
   }
 
   /**
@@ -64,15 +64,7 @@ export class ContactService {
   static async getAll(): Promise<ContactSubmission[]> {
     console.log('[ContactService] Fetching all contact submissions...');
 
-    const { data, error } = await supabase
-      .from('spb_contact_submissions')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('[ContactService] Error fetching submissions:', error);
-      throw error;
-    }
+    const data = await apiGet<ContactSubmission[]>('/contact');
 
     console.log(`[ContactService] Fetched ${data?.length || 0} submissions`);
     return data || [];
@@ -84,15 +76,7 @@ export class ContactService {
   static async updateStatus(id: string, status: string): Promise<void> {
     console.log(`[ContactService] Updating submission ${id} status to ${status}...`);
 
-    const { error } = await supabase
-      .from('spb_contact_submissions')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', id);
-
-    if (error) {
-      console.error('[ContactService] Error updating submission:', error);
-      throw error;
-    }
+    await apiPut(`/contact/${id}`, { status });
 
     console.log('[ContactService] Submission status updated successfully');
   }
@@ -103,12 +87,7 @@ export class ContactService {
   static async delete(id: string): Promise<void> {
     console.log(`[ContactService] Deleting submission ${id}...`);
 
-    const { error } = await supabase.from('spb_contact_submissions').delete().eq('id', id);
-
-    if (error) {
-      console.error('[ContactService] Error deleting submission:', error);
-      throw error;
-    }
+    await apiDelete(`/contact/${id}`);
 
     console.log('[ContactService] Submission deleted successfully');
   }

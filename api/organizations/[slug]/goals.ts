@@ -15,6 +15,7 @@ function goalToSnakeCase(
     id: goal.id,
     plan_id: goal.planId,
     organization_id: goal.organizationId,
+    district_id: goal.organizationId,
     school_id: goal.schoolId,
     parent_id: goal.parentId,
     goal_number: goal.goalNumber,

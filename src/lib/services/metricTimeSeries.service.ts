@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { apiGet, apiPost, apiDelete } from '../api';
 import type { MetricTimeSeries, PeriodType, MetricStatus } from '../types';
 
 export class MetricTimeSeriesService {
@@ -6,18 +6,7 @@ export class MetricTimeSeriesService {
    * Get all time series data for a metric
    */
   static async getByMetricId(metricId: string): Promise<MetricTimeSeries[]> {
-    const { data, error } = await supabase
-      .from('spb_metric_time_series')
-      .select('*')
-      .eq('metric_id', metricId)
-      .order('period', { ascending: true });
-
-    if (error) {
-      console.error('Error fetching metric time series:', error);
-      throw error;
-    }
-
-    return data || [];
+    return apiGet<MetricTimeSeries[]>(`/metrics/${metricId}/time-series`);
   }
 
   /**
@@ -28,57 +17,28 @@ export class MetricTimeSeriesService {
     startPeriod: string,
     endPeriod: string
   ): Promise<MetricTimeSeries[]> {
-    const { data, error } = await supabase
-      .from('spb_metric_time_series')
-      .select('*')
-      .eq('metric_id', metricId)
-      .gte('period', startPeriod)
-      .lte('period', endPeriod)
-      .order('period', { ascending: true });
-
-    if (error) {
-      console.error('Error fetching metric time series by range:', error);
-      throw error;
-    }
-
-    return data || [];
+    return apiGet<MetricTimeSeries[]>(`/metrics/${metricId}/time-series`, {
+      startPeriod,
+      endPeriod,
+    });
   }
 
   /**
    * Create or update a time series entry
    */
   static async upsert(entry: Partial<MetricTimeSeries>): Promise<MetricTimeSeries> {
-    const { data, error } = await supabase
-      .from('spb_metric_time_series')
-      .upsert({
-        ...entry,
-        updated_at: new Date().toISOString(),
-      }, {
-        onConflict: 'metric_id,period'
-      })
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error upserting metric time series:', error);
-      throw error;
-    }
-
-    return data;
+    return apiPost<MetricTimeSeries>(`/metrics/${entry.metric_id}/time-series`, entry);
   }
 
   /**
    * Delete a time series entry
    */
-  static async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('spb_metric_time_series')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting metric time series:', error);
-      throw error;
+  static async delete(id: string, metricId?: string): Promise<void> {
+    // If metricId provided, use the nested route
+    if (metricId) {
+      await apiDelete(`/metrics/${metricId}/time-series?entryId=${id}`);
+    } else {
+      await apiDelete(`/metrics/time-series/${id}`);
     }
   }
 
@@ -86,24 +46,13 @@ export class MetricTimeSeriesService {
    * Calculate YTD average for a metric
    */
   static async calculateYTD(metricId: string, year: number = new Date().getFullYear()): Promise<number | null> {
-    const { data, error } = await supabase
-      .from('spb_metric_time_series')
-      .select('actual_value')
-      .eq('metric_id', metricId)
-      .like('period', `${year}%`)
-      .not('actual_value', 'is', null);
+    const data = await this.getByMetricId(metricId);
+    const yearData = data.filter(d => d.period.startsWith(String(year)) && d.actual_value != null);
 
-    if (error) {
-      console.error('Error calculating YTD:', error);
-      return null;
-    }
+    if (yearData.length === 0) return null;
 
-    if (!data || data.length === 0) {
-      return null;
-    }
-
-    const sum = data.reduce((acc, item) => acc + (item.actual_value || 0), 0);
-    return sum / data.length;
+    const sum = yearData.reduce((acc, item) => acc + (item.actual_value || 0), 0);
+    return sum / yearData.length;
   }
 
   /**
@@ -114,23 +63,14 @@ export class MetricTimeSeriesService {
     _frequency: 'monthly' | 'quarterly' | 'yearly',
     year: number = new Date().getFullYear()
   ): Promise<number | null> {
-    const { data, error } = await supabase
-      .from('spb_metric_time_series')
-      .select('actual_value, period')
-      .eq('metric_id', metricId)
-      .like('period', `${year}%`)
-      .not('actual_value', 'is', null)
-      .order('period', { ascending: true });
+    const data = await this.getByMetricId(metricId);
+    const yearData = data
+      .filter(d => d.period.startsWith(String(year)) && d.actual_value != null)
+      .sort((a, b) => a.period.localeCompare(b.period));
 
-    if (error || !data || data.length === 0) {
-      return null;
-    }
+    if (yearData.length === 0) return null;
 
-    // Calculate average of existing data
-    const average = data.reduce((acc, item) => acc + (item.actual_value || 0), 0) / data.length;
-
-    // For simple projection, assume the average continues
-    // More sophisticated projections could use trend analysis
+    const average = yearData.reduce((acc, item) => acc + (item.actual_value || 0), 0) / yearData.length;
     return average;
   }
 
@@ -138,22 +78,16 @@ export class MetricTimeSeriesService {
    * Get the latest actual value and period
    */
   static async getLatestActual(metricId: string): Promise<{ value: number; period: string } | null> {
-    const { data, error } = await supabase
-      .from('spb_metric_time_series')
-      .select('actual_value, period')
-      .eq('metric_id', metricId)
-      .not('actual_value', 'is', null)
-      .order('period', { ascending: false })
-      .limit(1)
-      .single();
+    const data = await this.getByMetricId(metricId);
+    const withActual = data
+      .filter(d => d.actual_value != null)
+      .sort((a, b) => b.period.localeCompare(a.period));
 
-    if (error || !data) {
-      return null;
-    }
+    if (withActual.length === 0) return null;
 
     return {
-      value: data.actual_value,
-      period: data.period
+      value: withActual[0].actual_value!,
+      period: withActual[0].period,
     };
   }
 
@@ -162,7 +96,7 @@ export class MetricTimeSeriesService {
    */
   static generatePeriod(date: Date, periodType: PeriodType): string {
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // 0-indexed
+    const month = date.getMonth() + 1;
     const quarter = Math.ceil(month / 3);
 
     switch (periodType) {
@@ -216,7 +150,6 @@ export class MetricTimeSeriesService {
       if (ratio >= 0.8) return 'off-target';
       return 'critical';
     } else {
-      // For metrics where lower is better
       if (ratio <= 1.05) return 'on-target';
       if (ratio <= 1.2) return 'off-target';
       return 'critical';
@@ -231,29 +164,23 @@ export class MetricTimeSeriesService {
     periodType?: PeriodType,
     limit: number = 12
   ): Promise<{ period: string; target: number | null; actual: number | null }[]> {
-    let query = supabase
-      .from('spb_metric_time_series')
-      .select('period, target_value, actual_value')
-      .eq('metric_id', metricId);
+    const data = await this.getByMetricId(metricId);
 
+    let filtered = data;
     if (periodType) {
-      query = query.eq('period_type', periodType);
+      filtered = data.filter(d => d.period_type === periodType);
     }
 
-    const { data, error } = await query
-      .order('period', { ascending: false })
-      .limit(limit);
+    // Sort descending, take limit, reverse for chronological
+    const sorted = filtered
+      .sort((a, b) => b.period.localeCompare(a.period))
+      .slice(0, limit)
+      .reverse();
 
-    if (error) {
-      console.error('Error fetching chart data:', error);
-      return [];
-    }
-
-    // Reverse to show chronological order
-    return (data || []).reverse().map(item => ({
+    return sorted.map(item => ({
       period: item.period,
-      target: item.target_value,
-      actual: item.actual_value
+      target: item.target_value ?? null,
+      actual: item.actual_value ?? null,
     }));
   }
 }

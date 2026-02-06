@@ -52,8 +52,8 @@ export function useCreateSchool() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (school: Omit<School, 'id' | 'created_at' | 'updated_at'>) =>
-      SchoolService.create(school),
+    mutationFn: ({ school, districtSlug }: { school: Omit<School, 'id' | 'created_at' | 'updated_at'>; districtSlug: string }) =>
+      SchoolService.create(school, districtSlug),
     onSuccess: (_data) => {
       // Invalidate the schools list for the district
       queryClient.invalidateQueries({ queryKey: ['schools'] });
@@ -108,11 +108,7 @@ export function useSchoolSummary(schoolId: string) {
 export function useMySchools() {
   return useQuery({
     queryKey: ['schools', 'my-schools'],
-    queryFn: async () => {
-      const { data: { user } } = await import('../lib/supabase').then(m => m.supabase.auth.getUser());
-      if (!user) return [];
-      return SchoolAdminService.getSchoolsForUser(user.id);
-    },
+    queryFn: () => SchoolAdminService.getMySchoolAssignments(),
   });
 }
 

@@ -15,6 +15,7 @@ function planToSnake(p: typeof plans.$inferSelect) {
   return {
     id: p.id,
     organization_id: p.organizationId,
+    district_id: p.organizationId,
     school_id: p.schoolId,
     name: p.name,
     slug: p.slug,

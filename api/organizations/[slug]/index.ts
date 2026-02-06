@@ -28,6 +28,7 @@ function toSnakeCase(org: typeof organizations.$inferSelect) {
     tagline: org.tagline,
     dashboard_template: org.dashboardTemplate,
     dashboard_config: org.dashboardConfig,
+    district_id: org.id,
     created_at: org.createdAt?.toISOString() ?? null,
     updated_at: org.updatedAt?.toISOString() ?? null,
   };
@@ -84,8 +85,9 @@ export async function GET(req: Request) {
 /**
  * PUT /api/organizations/[slug]
  * Update organization. Requires org admin role.
- * Updatable fields: name, entityLabel, logoUrl, primaryColor, secondaryColor,
- *   settings, isPublic, adminEmail, tagline, dashboardTemplate, dashboardConfig
+ * Accepts snake_case keys (preferred) with camelCase fallback for backward compat.
+ * Updatable fields: name, entity_label, logo_url, primary_color, secondary_color,
+ *   settings, is_public, admin_email, tagline, dashboard_template, dashboard_config
  */
 export async function PUT(req: Request) {
   try {
@@ -97,22 +99,44 @@ export async function PUT(req: Request) {
     const { organization } = await requireOrgMember(req, slug, "admin");
     const body = await req.json();
 
-    // Build an update object with only the fields that were provided
+    // Build an update object with only the fields that were provided.
+    // Prefer snake_case keys, fall back to camelCase for backward compatibility.
     const updates: Record<string, unknown> = {};
 
     if (body.name !== undefined) updates.name = body.name;
-    if (body.entityLabel !== undefined) updates.entityLabel = body.entityLabel;
-    if (body.logoUrl !== undefined) updates.logoUrl = body.logoUrl;
-    if (body.primaryColor !== undefined) updates.primaryColor = body.primaryColor;
-    if (body.secondaryColor !== undefined)
+
+    if (body.entity_label !== undefined) updates.entityLabel = body.entity_label;
+    else if (body.entityLabel !== undefined) updates.entityLabel = body.entityLabel;
+
+    if (body.logo_url !== undefined) updates.logoUrl = body.logo_url;
+    else if (body.logoUrl !== undefined) updates.logoUrl = body.logoUrl;
+
+    if (body.primary_color !== undefined) updates.primaryColor = body.primary_color;
+    else if (body.primaryColor !== undefined) updates.primaryColor = body.primaryColor;
+
+    if (body.secondary_color !== undefined)
+      updates.secondaryColor = body.secondary_color;
+    else if (body.secondaryColor !== undefined)
       updates.secondaryColor = body.secondaryColor;
+
     if (body.settings !== undefined) updates.settings = body.settings;
-    if (body.isPublic !== undefined) updates.isPublic = body.isPublic;
-    if (body.adminEmail !== undefined) updates.adminEmail = body.adminEmail;
+
+    if (body.is_public !== undefined) updates.isPublic = body.is_public;
+    else if (body.isPublic !== undefined) updates.isPublic = body.isPublic;
+
+    if (body.admin_email !== undefined) updates.adminEmail = body.admin_email;
+    else if (body.adminEmail !== undefined) updates.adminEmail = body.adminEmail;
+
     if (body.tagline !== undefined) updates.tagline = body.tagline;
-    if (body.dashboardTemplate !== undefined)
+
+    if (body.dashboard_template !== undefined)
+      updates.dashboardTemplate = body.dashboard_template;
+    else if (body.dashboardTemplate !== undefined)
       updates.dashboardTemplate = body.dashboardTemplate;
-    if (body.dashboardConfig !== undefined)
+
+    if (body.dashboard_config !== undefined)
+      updates.dashboardConfig = body.dashboard_config;
+    else if (body.dashboardConfig !== undefined)
       updates.dashboardConfig = body.dashboardConfig;
 
     if (Object.keys(updates).length === 0) {

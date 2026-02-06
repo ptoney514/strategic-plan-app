@@ -14,6 +14,7 @@ function goalToSnake(g: Record<string, unknown>) {
     id: g.id,
     plan_id: g.planId,
     organization_id: g.organizationId,
+    district_id: g.organizationId,
     school_id: g.schoolId,
     parent_id: g.parentId,
     goal_number: g.goalNumber,

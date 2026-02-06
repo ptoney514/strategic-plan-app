@@ -1,139 +1,73 @@
-import { supabase } from '../supabase';
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '../api';
 import type { Plan, PlanWithSummary } from '../types';
+import { DistrictService } from './district.service';
 
 export class PlansService {
   /**
    * Get all plans for a district by district ID
    */
   static async getByDistrictId(districtId: string): Promise<Plan[]> {
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .select('*')
-      .eq('district_id', districtId)
-      .order('order_position')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching district plans:', error);
-      throw error;
-    }
-
-    return data || [];
+    const district = await DistrictService.getById(districtId);
+    return apiGet<Plan[]>(`/organizations/${district.slug}/plans`);
   }
 
   /**
    * Get all plans for a district by district slug
    */
   static async getByDistrictSlug(districtSlug: string): Promise<Plan[]> {
-    // First get the district ID
-    const { data: district, error: districtError } = await supabase
-      .from('spb_districts')
-      .select('id')
-      .eq('slug', districtSlug)
-      .single();
-
-    if (districtError || !district) {
-      console.error('Error fetching district:', districtError);
-      return [];
-    }
-
-    return this.getByDistrictId(district.id);
+    return apiGet<Plan[]>(`/organizations/${districtSlug}/plans`);
   }
 
   /**
    * Get all plans for a school by school ID
    */
   static async getBySchoolId(schoolId: string): Promise<Plan[]> {
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .select('*')
-      .eq('school_id', schoolId)
-      .order('order_position')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching school plans:', error);
-      throw error;
-    }
-
-    return data || [];
+    // Use the school-specific plans endpoint
+    return apiGet<Plan[]>(`/schools/${schoolId}/plans`);
   }
 
   /**
    * Get a single plan by ID
    */
   static async getById(id: string): Promise<Plan | null> {
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
+    try {
+      return await apiGet<Plan>(`/plans/${id}`);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
       console.error('Error fetching plan:', error);
       return null;
     }
-
-    return data;
   }
 
   /**
    * Get a plan by slug within a district
    */
   static async getBySlug(districtId: string, slug: string): Promise<Plan | null> {
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .select('*')
-      .eq('district_id', districtId)
-      .eq('slug', slug)
-      .single();
-
-    if (error) {
+    try {
+      const district = await DistrictService.getById(districtId);
+      const plans = await apiGet<Plan[]>(`/organizations/${district.slug}/plans`);
+      return plans.find(p => p.slug === slug) || null;
+    } catch (error) {
       console.error('Error fetching plan by slug:', error);
       return null;
     }
-
-    return data;
   }
 
   /**
    * Get plan with summary statistics (objective count, goal count, etc.)
    */
   static async getWithSummary(planId: string): Promise<PlanWithSummary | null> {
-    const plan = await this.getById(planId);
-    if (!plan) return null;
-
-    // Get all goals for this plan
-    const { data: goals, error: goalsError } = await supabase
-      .from('spb_goals')
-      .select('id, level')
-      .eq('plan_id', planId);
-
-    if (goalsError) {
-      console.error('Error fetching plan goals:', goalsError);
+    try {
+      return await apiGet<PlanWithSummary>(`/plans/${planId}/summary`);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
+      console.error('Error fetching plan summary:', error);
+      return null;
     }
-
-    const objectives = goals?.filter(g => g.level === 0) || [];
-    const allGoals = goals || [];
-
-    // Get metrics count for all goals in this plan
-    const goalIds = allGoals.map(g => g.id);
-    let metricCount = 0;
-
-    if (goalIds.length > 0) {
-      const { count } = await supabase
-        .from('spb_metrics')
-        .select('id', { count: 'exact', head: true })
-        .in('goal_id', goalIds);
-      metricCount = count || 0;
-    }
-
-    return {
-      ...plan,
-      objectiveCount: objectives.length,
-      goalCount: allGoals.length,
-      metricCount,
-    };
   }
 
   /**
@@ -153,111 +87,56 @@ export class PlansService {
       plan.slug = this.generateSlug(plan.name);
     }
 
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .insert(plan)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating plan:', error);
-      throw error;
-    }
-
-    return data;
+    const district = await DistrictService.getById(plan.district_id!);
+    return apiPost<Plan>(`/organizations/${district.slug}/plans`, {
+      name: plan.name,
+      slug: plan.slug,
+      type_label: plan.type_label,
+      description: plan.description,
+      cover_image_url: plan.cover_image_url,
+      is_public: plan.is_public,
+      is_active: plan.is_active,
+      start_date: plan.start_date,
+      end_date: plan.end_date,
+      order_position: plan.order_position,
+      school_id: plan.school_id,
+    });
   }
 
   /**
    * Update a plan
    */
   static async update(id: string, updates: Partial<Plan>): Promise<Plan> {
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating plan:', error);
-      throw error;
-    }
-
-    return data;
+    return apiPut<Plan>(`/plans/${id}`, updates);
   }
 
   /**
    * Delete a plan (will cascade delete all objectives within)
    */
   static async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('spb_plans')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting plan:', error);
-      throw error;
-    }
+    await apiDelete(`/plans/${id}`);
   }
 
   /**
    * Reorder plans
    */
   static async reorder(plans: { id: string; order_position: number }[]): Promise<void> {
-    const updates = plans.map(({ id, order_position }) =>
-      supabase
-        .from('spb_plans')
-        .update({ order_position })
-        .eq('id', id)
-    );
-
-    const results = await Promise.all(updates);
-
-    const errors = results.filter(r => r.error);
-    if (errors.length > 0) {
-      console.error('Error reordering plans:', errors);
-      throw new Error('Failed to reorder plans');
-    }
+    await apiPut('/plans/reorder', { plans });
   }
 
   /**
    * Get active public plans for a district (for public display)
    */
   static async getActiveByDistrictId(districtId: string): Promise<Plan[]> {
-    const { data, error } = await supabase
-      .from('spb_plans')
-      .select('*')
-      .eq('district_id', districtId)
-      .eq('is_public', true)
-      .eq('is_active', true)
-      .order('order_position');
-
-    if (error) {
-      console.error('Error fetching active plans:', error);
-      return [];
-    }
-
-    return data || [];
+    const district = await DistrictService.getById(districtId);
+    return apiGet<Plan[]>(`/plans/active/${district.slug}`);
   }
 
   /**
    * Get active public plans for a district by slug
    */
   static async getActiveByDistrictSlug(districtSlug: string): Promise<Plan[]> {
-    // First get the district ID
-    const { data: district, error: districtError } = await supabase
-      .from('spb_districts')
-      .select('id')
-      .eq('slug', districtSlug)
-      .single();
-
-    if (districtError || !district) {
-      console.error('Error fetching district:', districtError);
-      return [];
-    }
-
-    return this.getActiveByDistrictId(district.id);
+    return apiGet<Plan[]>(`/plans/active/${districtSlug}`);
   }
 
   /**
@@ -274,26 +153,7 @@ export class PlansService {
    * Get plans with objective counts for list view
    */
   static async getPlansWithCounts(districtId: string): Promise<PlanWithSummary[]> {
-    const plans = await this.getByDistrictId(districtId);
-
-    // Get objective counts for all plans in one query
-    const { data: objectiveCounts } = await supabase
-      .from('spb_goals')
-      .select('plan_id')
-      .eq('level', 0)
-      .in('plan_id', plans.map(p => p.id));
-
-    // Count objectives per plan
-    const countMap = new Map<string, number>();
-    (objectiveCounts || []).forEach(obj => {
-      if (obj.plan_id) {
-        countMap.set(obj.plan_id, (countMap.get(obj.plan_id) || 0) + 1);
-      }
-    });
-
-    return plans.map(plan => ({
-      ...plan,
-      objectiveCount: countMap.get(plan.id) || 0,
-    }));
+    const district = await DistrictService.getById(districtId);
+    return apiGet<PlanWithSummary[]>(`/user/plans-with-counts`, { orgSlug: district.slug });
   }
 }

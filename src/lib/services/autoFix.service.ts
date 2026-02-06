@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { apiPost } from '../api';
 import type {
   StagedGoal,
   AutoFixSuggestion,
@@ -26,7 +26,6 @@ export class AutoFixService {
         const parentNumber = this.getParentGoalNumber(goal.goal_number);
 
         if (parentNumber && !missingParents.has(parentNumber)) {
-          // Check if parent exists in import or database
           const parentExists =
             goals.some(g => g.goal_number === parentNumber) ||
             existingGoals.some(g => g.goal_number === parentNumber);
@@ -62,7 +61,7 @@ export class AutoFixService {
   ): Partial<StagedGoal> {
     return {
       import_session_id: sessionId,
-      row_number: -1, // Special marker for auto-generated
+      row_number: -1,
       raw_data: { auto_generated: true },
       parsed_hierarchy: `|${suggestion.missingGoalNumber}|`,
       goal_number: suggestion.missingGoalNumber,
@@ -87,25 +86,12 @@ export class AutoFixService {
     customTitle?: string,
     customOwner?: string
   ): Promise<StagedGoal> {
-    const placeholderGoal = this.generatePlaceholderGoal(
+    return apiPost<StagedGoal>('/imports/autofix/apply', {
+      session_id: sessionId,
       suggestion,
-      sessionId,
-      customTitle,
-      customOwner
-    );
-
-    const { data, error } = await supabase
-      .from('spb_staged_goals')
-      .insert(placeholderGoal)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error inserting placeholder goal:', error);
-      throw error;
-    }
-
-    return data;
+      custom_title: customTitle,
+      custom_owner: customOwner,
+    });
   }
 
   /**
@@ -115,21 +101,10 @@ export class AutoFixService {
     sessionId: string,
     suggestions: AutoFixSuggestion[]
   ): Promise<StagedGoal[]> {
-    const placeholders = suggestions.map(suggestion =>
-      this.generatePlaceholderGoal(suggestion, sessionId)
-    );
-
-    const { data, error } = await supabase
-      .from('spb_staged_goals')
-      .insert(placeholders)
-      .select();
-
-    if (error) {
-      console.error('Error bulk inserting placeholder goals:', error);
-      throw error;
-    }
-
-    return data || [];
+    return apiPost<StagedGoal[]>('/imports/autofix/bulk', {
+      session_id: sessionId,
+      suggestions,
+    });
   }
 
   /**
@@ -142,7 +117,7 @@ export class AutoFixService {
   }
 
   /**
-   * Recursively detect missing parents (e.g., if 1.2.3 exists but neither 1.2 nor 1 exist)
+   * Recursively detect missing parents
    */
   static detectAllMissingParentsRecursive(
     goals: ParsedGoal[],
@@ -158,7 +133,6 @@ export class AutoFixService {
       const parentNumber = this.getParentGoalNumber(goalNumber);
       if (!parentNumber) return;
 
-      // Check if parent exists
       const parentExists =
         goals.some(g => g.goal_number === parentNumber) ||
         existingGoals.some(g => g.goal_number === parentNumber) ||
@@ -176,19 +150,16 @@ export class AutoFixService {
           action: `Create placeholder ${levelLabel.toLowerCase()} "${parentNumber}"`
         });
 
-        // Recursively check grandparent
         checkParent(parentNumber);
       }
     };
 
-    // Check all goals
     goals.forEach(goal => {
       if (goal.goal_number) {
         checkParent(goal.goal_number);
       }
     });
 
-    // Sort by goal number (parents first)
     return allSuggestions.sort((a, b) => {
       const aNum = a.missingGoalNumber || '';
       const bNum = b.missingGoalNumber || '';

@@ -30,6 +30,7 @@ function toSnakeCase(org: typeof organizations.$inferSelect) {
     tagline: org.tagline,
     dashboard_template: org.dashboardTemplate,
     dashboard_config: org.dashboardConfig,
+    district_id: org.id,
     created_at: org.createdAt?.toISOString() ?? null,
     updated_at: org.updatedAt?.toISOString() ?? null,
   };
@@ -48,14 +49,28 @@ function slugify(name: string): string {
 
 /**
  * GET /api/organizations
- * - ?public=true  -> return only public, active orgs (no auth required)
- * - otherwise     -> require auth; return user's orgs (or all for sysadmin)
+ * - ?id={uuid}     -> return single org by ID (requires auth)
+ * - ?public=true   -> return only public, active orgs (no auth required)
+ * - otherwise      -> require auth; return user's orgs (or all for sysadmin)
  */
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+    const idParam = url.searchParams.get("id");
     const publicOnly = url.searchParams.get("public") === "true";
     const { limit, offset } = parsePagination(url);
+
+    // Single org lookup by ID
+    if (idParam) {
+      await requireAuth(req);
+      const [org] = await db
+        .select()
+        .from(organizations)
+        .where(eq(organizations.id, idParam))
+        .limit(1);
+      if (!org) return jsonError("Organization not found", 404);
+      return jsonOk(toSnakeCase(org));
+    }
 
     if (publicOnly) {
       const rows = await db

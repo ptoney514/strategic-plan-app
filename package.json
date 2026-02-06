@@ -32,7 +32,7 @@
     "db:studio": "open http://localhost:54323",
     "db:test": "npm run db:reset && ./scripts/test-migrations.sh",
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
-    "db:seed:fresh": "drizzle-kit migrate && tsx --env-file=.env.local scripts/seed.ts",
+    "db:seed:fresh": "node --env-file=.env.local ./node_modules/.bin/drizzle-kit migrate && tsx --env-file=.env.local scripts/seed.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:drizzle-studio": "drizzle-kit studio",

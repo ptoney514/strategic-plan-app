@@ -37,6 +37,17 @@ if (!BETTER_AUTH_SECRET) {
   process.exit(1);
 }
 
+const dbUrl = new URL(DATABASE_URL);
+console.log(`Target database: ${dbUrl.hostname}${dbUrl.pathname}\n`);
+
+if (process.env.NODE_ENV === "production" && !process.argv.includes("--force")) {
+  console.error(
+    "ERROR: NODE_ENV is 'production'. Refusing to seed.\n" +
+    "       Use --force to override this safety check.",
+  );
+  process.exit(1);
+}
+
 const neonSql = neon(DATABASE_URL);
 const db = drizzle(neonSql, { schema });
 
@@ -675,8 +686,7 @@ async function seed() {
       body: { email: u.email, password: u.password, name: u.name },
     });
     if (!result?.user?.id) {
-      console.error(`   Failed to create user: ${u.email}`);
-      process.exit(1);
+      throw new Error(`Failed to create user: ${u.email}`);
     }
     createdUsers.push({ id: result.user.id, email: u.email });
     console.log(`   Created: ${u.email} (${result.user.id})`);

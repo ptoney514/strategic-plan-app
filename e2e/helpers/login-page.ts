@@ -22,7 +22,7 @@ export class LoginPage {
 
   async goto(params?: string) {
     const url = params ? `/login${params}` : '/login';
-    await this.page.goto(url);
+    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
   }
 
   async login(email: string, password: string) {
@@ -34,11 +34,11 @@ export class LoginPage {
   /** Login and wait for navigation away from /login */
   async loginAndWait(email: string, password: string, timeout = 15000) {
     await this.login(email, password);
-    await this.page.waitForURL(/\/(?!login)/, { timeout });
+    await this.page.waitForURL(url => !new URL(url).pathname.startsWith('/login'), { timeout });
   }
 
   async expectLoginSuccess() {
-    await this.page.waitForURL(/\/(?!login)/, { timeout: 15000 });
+    await this.page.waitForURL(url => !new URL(url).pathname.startsWith('/login'), { timeout: 15000 });
   }
 
   async expectLoginFailure() {

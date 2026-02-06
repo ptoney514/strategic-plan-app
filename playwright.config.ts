@@ -40,6 +40,9 @@ export default defineConfig({
 
     /* Screenshot on failure */
     screenshot: 'only-on-failure',
+
+    /* Use domcontentloaded instead of load — vercel dev can be slow with sub-resources */
+    navigationTimeout: 15000,
   },
 
   /* Configure projects for major browsers */

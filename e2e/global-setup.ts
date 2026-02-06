@@ -25,6 +25,8 @@ async function globalSetup(config: FullConfig) {
 
   const browser = await chromium.launch();
 
+  const EMPTY_STATE = JSON.stringify({ cookies: [], origins: [] });
+
   // --- District Admin ---
   try {
     const ctx = await browser.newContext({ baseURL });
@@ -38,12 +40,14 @@ async function globalSetup(config: FullConfig) {
       await ctx.storageState({ path: DISTRICT_ADMIN_STATE });
       console.log('  District admin auth state saved');
     } else {
-      console.warn(`  District admin login failed (${response.status()}). Tests requiring this role will be skipped.`);
+      console.warn(`  District admin login failed (${response.status()}). Writing empty state so tests can still run.`);
+      fs.writeFileSync(DISTRICT_ADMIN_STATE, EMPTY_STATE);
     }
 
     await ctx.close();
   } catch (err) {
     console.warn('  District admin login error:', (err as Error).message);
+    fs.writeFileSync(DISTRICT_ADMIN_STATE, EMPTY_STATE);
   }
 
   // --- System Admin ---
@@ -59,12 +63,14 @@ async function globalSetup(config: FullConfig) {
       await ctx.storageState({ path: SYSTEM_ADMIN_STATE });
       console.log('  System admin auth state saved');
     } else {
-      console.warn(`  System admin login failed (${response.status()}). Tests requiring this role will be skipped.`);
+      console.warn(`  System admin login failed (${response.status()}). Writing empty state so tests can still run.`);
+      fs.writeFileSync(SYSTEM_ADMIN_STATE, EMPTY_STATE);
     }
 
     await ctx.close();
   } catch (err) {
     console.warn('  System admin login error:', (err as Error).message);
+    fs.writeFileSync(SYSTEM_ADMIN_STATE, EMPTY_STATE);
   }
 
   await browser.close();

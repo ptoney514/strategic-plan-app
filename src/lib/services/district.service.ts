@@ -1,171 +1,58 @@
-import { supabase } from '../supabase';
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '../api';
 import type { District } from '../types';
 
 export class DistrictService {
   static async getAll(): Promise<District[]> {
     console.log('[DistrictService] Fetching all districts with counts...');
 
-    // Fetch all districts
-    const { data: districts, error } = await supabase
-      .from('spb_districts')
-      .select('*')
-      .order('name');
+    const districts = await apiGet<District[]>('/organizations');
 
-    if (error) {
-      console.error('[DistrictService] Error fetching districts:', error);
-      throw error;
-    }
-
-    if (!districts) return [];
-
-    // Fetch counts for all districts in parallel
-    const districtsWithCounts = await Promise.all(
-      districts.map(async (district) => {
-        const [goalsResult, metricsResult, adminsResult] = await Promise.all([
-          // Count all goals for this district
-          supabase
-            .from('spb_goals')
-            .select('id', { count: 'exact', head: true })
-            .eq('district_id', district.id),
-
-          // Count all metrics for this district
-          supabase
-            .from('spb_metrics')
-            .select('id', { count: 'exact', head: true })
-            .eq('district_id', district.id),
-
-          // Count district admins for this district
-          supabase
-            .from('spb_district_admins')
-            .select('id', { count: 'exact', head: true })
-            .eq('district_id', district.id),
-        ]);
-
-        return {
-          ...district,
-          goals_count: goalsResult.count || 0,
-          metrics_count: metricsResult.count || 0,
-          admins_count: adminsResult.count || 0,
-        };
-      })
-    );
-
-    console.log(`[DistrictService] Loaded ${districtsWithCounts.length} districts with counts`);
-    return districtsWithCounts;
+    console.log(`[DistrictService] Loaded ${districts?.length || 0} districts with counts`);
+    return districts || [];
   }
 
   static async getBySlug(slug: string): Promise<District | null> {
-    const { data: district, error } = await supabase
-      .from('spb_districts')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-
-    if (error) {
+    try {
+      return await apiGet<District>(`/organizations/${slug}`);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 404) {
+        return null;
+      }
       console.error('Error fetching district:', error);
       return null;
     }
-
-    // Get counts using efficient count queries
-    const [goalsResult, metricsResult, adminsResult] = await Promise.all([
-      supabase
-        .from('spb_goals')
-        .select('id', { count: 'exact', head: true })
-        .eq('district_id', district.id),
-      supabase
-        .from('spb_metrics')
-        .select('id', { count: 'exact', head: true })
-        .eq('district_id', district.id),
-      supabase
-        .from('spb_district_admins')
-        .select('id', { count: 'exact', head: true })
-        .eq('district_id', district.id),
-    ]);
-
-    return {
-      ...district,
-      goals_count: goalsResult.count || 0,
-      metrics_count: metricsResult.count || 0,
-      admins_count: adminsResult.count || 0,
-    };
   }
 
   static async getById(id: string): Promise<District> {
-    const { data: district, error } = await supabase
-      .from('spb_districts')
-      .select('*')
-      .eq('id', id)
-      .single();
-
-    if (error) {
-      console.error('Error fetching district by id:', error);
-      throw error;
-    }
-
-    // Get counts using efficient count queries
-    const [goalsResult, metricsResult, adminsResult] = await Promise.all([
-      supabase
-        .from('spb_goals')
-        .select('id', { count: 'exact', head: true })
-        .eq('district_id', district.id),
-      supabase
-        .from('spb_metrics')
-        .select('id', { count: 'exact', head: true })
-        .eq('district_id', district.id),
-      supabase
-        .from('spb_district_admins')
-        .select('id', { count: 'exact', head: true })
-        .eq('district_id', district.id),
-    ]);
-
-    return {
-      ...district,
-      goals_count: goalsResult.count || 0,
-      metrics_count: metricsResult.count || 0,
-      admins_count: adminsResult.count || 0,
-    };
+    const district = await apiGet<District>('/organizations', { id });
+    return district;
   }
 
   static async create(district: Partial<District>): Promise<District> {
-    const { data, error } = await supabase
-      .from('spb_districts')
-      .insert(district)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error creating district:', error);
-      throw error;
-    }
-
-    return data;
+    return apiPost<District>('/organizations', {
+      name: district.name,
+      slug: district.slug,
+      entity_type: district.entity_type || 'district',
+      entity_label: district.entity_label,
+      logo_url: district.logo_url,
+      primary_color: district.primary_color,
+      secondary_color: district.secondary_color,
+      admin_email: district.admin_email,
+      tagline: district.tagline,
+      is_public: district.is_public,
+      settings: district.settings,
+    });
   }
 
   static async update(id: string, updates: Partial<District>): Promise<District> {
-    const { data, error } = await supabase
-      .from('spb_districts')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating district:', error);
-      throw error;
-    }
-
-    return data;
+    // Need slug for the API route; look up by ID first
+    const existing = await this.getById(id);
+    return apiPut<District>(`/organizations/${existing.slug}`, updates);
   }
 
   static async delete(id: string): Promise<void> {
-    const { error } = await supabase
-      .from('spb_districts')
-      .delete()
-      .eq('id', id);
-
-    if (error) {
-      console.error('Error deleting district:', error);
-      throw error;
-    }
+    // Need slug for the API route; look up by ID first
+    const existing = await this.getById(id);
+    await apiDelete(`/organizations/${existing.slug}`);
   }
 }

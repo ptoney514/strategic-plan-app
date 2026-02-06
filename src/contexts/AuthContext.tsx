@@ -1,17 +1,14 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { supabase } from '../lib/supabase';
-import type { User } from '@supabase/supabase-js';
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { authClient } from '../lib/auth-client';
+import { mapBetterAuthUser, type AuthUser, type OrgMembership } from '../lib/types/auth';
 
-interface AuthState {
-  user: User | null;
+interface AuthContextValue {
+  user: AuthUser | null;
   isAuthenticated: boolean;
   isSystemAdmin: boolean;
   loading: boolean;
-}
-
-interface AuthContextValue extends AuthState {
   hasDistrictAccess: (slug: string) => Promise<boolean>;
-  login: (email: string, password: string) => ReturnType<typeof supabase.auth.signInWithPassword>;
+  login: (email: string, password: string) => Promise<{ data: { user: AuthUser | null } }>;
   logout: () => Promise<void>;
 }
 
@@ -24,103 +21,89 @@ interface AuthProviderProps {
 /**
  * AuthProvider - Provides authentication state to the entire app
  *
- * Single subscription to Supabase auth changes at the root level.
- * All components share the same auth state via useAuth hook.
+ * Uses Better Auth's useSession() hook for reactive session state.
+ * Maintains identical useAuth() return type for backward compatibility.
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [authState, setAuthState] = useState<AuthState>({
-    user: null,
-    isAuthenticated: false,
-    isSystemAdmin: false,
-    loading: true,
-  });
+  const { data: session, isPending } = authClient.useSession();
+  const [memberships, setMemberships] = useState<OrgMembership[] | null>(null);
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const user = session?.user ?? null;
-      setAuthState({
-        user,
-        isAuthenticated: !!session,
-        isSystemAdmin: user?.user_metadata?.role === 'system_admin' || user?.app_metadata?.role === 'system_admin',
-        loading: false,
-      });
-    });
+  // Map Better Auth session user to AuthUser
+  const user: AuthUser | null = session?.user
+    ? mapBetterAuthUser(session.user as Parameters<typeof mapBetterAuthUser>[0])
+    : null;
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const user = session?.user ?? null;
-      setAuthState({
-        user,
-        isAuthenticated: !!session,
-        isSystemAdmin: user?.user_metadata?.role === 'system_admin' || user?.app_metadata?.role === 'system_admin',
-        loading: false,
-      });
-    });
+  const isAuthenticated = !!session?.user;
+  const isSystemAdmin = !!user?.isSystemAdmin;
 
-    return () => subscription.unsubscribe();
-  }, []);
+  /**
+   * Fetch memberships lazily (on first hasDistrictAccess call)
+   */
+  const fetchMemberships = useCallback(async (): Promise<OrgMembership[]> => {
+    if (memberships !== null) return memberships;
+
+    try {
+      const res = await fetch('/api/user/memberships', { credentials: 'include' });
+      if (!res.ok) return [];
+      const data: OrgMembership[] = await res.json();
+      setMemberships(data);
+      return data;
+    } catch (error) {
+      console.error('[AuthContext] Error fetching memberships:', error);
+      return [];
+    }
+  }, [memberships]);
 
   /**
    * Check if user has admin access to a specific district
    */
-  const hasDistrictAccess = async (slug: string): Promise<boolean> => {
-    if (!authState.user) return false;
+  const hasDistrictAccess = useCallback(async (slug: string): Promise<boolean> => {
+    if (!user) return false;
+    if (isSystemAdmin) return true;
 
-    // System admins have access to all districts
-    if (authState.isSystemAdmin) return true;
-
-    try {
-      const { data, error } = await supabase
-        .from('spb_district_admins')
-        .select('id')
-        .eq('user_id', authState.user.id)
-        .eq('district_slug', slug)
-        .maybeSingle();
-
-      if (error) {
-        console.error('[AuthContext] Error checking district access:', error);
-        return false;
-      }
-
-      return !!data;
-    } catch (error) {
-      console.error('[AuthContext] Exception checking district access:', error);
-      return false;
-    }
-  };
+    const orgs = await fetchMemberships();
+    return orgs.some((m) => m.slug === slug);
+  }, [user, isSystemAdmin, fetchMemberships]);
 
   /**
    * Sign in with email and password
    */
-  const login = async (email: string, password: string) => {
-    const response = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+  const login = useCallback(async (email: string, password: string) => {
+    const result = await authClient.signIn.email({ email, password });
 
-    if (response.error) {
-      throw new Error(response.error.message);
+    if (result.error) {
+      throw new Error(result.error.message || 'Failed to sign in');
     }
 
-    return response;
-  };
+    // Reset cached memberships on login
+    setMemberships(null);
+
+    // Return Supabase-compatible shape so Login.tsx doesn't need changes
+    const mappedUser = result.data?.user
+      ? mapBetterAuthUser(result.data.user as Parameters<typeof mapBetterAuthUser>[0])
+      : null;
+
+    return { data: { user: mappedUser } };
+  }, []);
 
   /**
    * Sign out current user
    */
-  const logout = async () => {
-    const { error } = await supabase.auth.signOut();
+  const logout = useCallback(async () => {
+    const result = await authClient.signOut();
 
-    if (error) {
-      throw new Error(error.message);
+    if (result.error) {
+      throw new Error(result.error.message || 'Failed to sign out');
     }
-  };
+
+    setMemberships(null);
+  }, []);
 
   const value: AuthContextValue = {
-    ...authState,
+    user,
+    isAuthenticated,
+    isSystemAdmin,
+    loading: isPending,
     hasDistrictAccess,
     login,
     logout,

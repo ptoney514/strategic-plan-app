@@ -13,12 +13,16 @@ export interface District {
   id: string;
   name: string;
   slug: string;
+  entity_type?: string;
+  entity_label?: string;
   tagline?: string;
   primary_color: string;
   secondary_color?: string;
   logo_url?: string;
   admin_email: string;
   is_public: boolean;
+  is_active?: boolean;
+  settings?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
   // Dashboard template configuration
@@ -28,6 +32,7 @@ export interface District {
   goals_count?: number;
   metrics_count?: number;
   admins_count?: number;
+  district_id?: string;
 }
 
 export interface DistrictWithSummary extends District {

@@ -71,3 +71,9 @@ Desktop.ini
 .vercel
 .env*.local
 .env.local.production
+
+# TypeScript build info
+*.tsbuildinfo
+
+# Playwright MCP artifacts
+.playwright-mcp/

@@ -7,7 +7,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Avatar } from '../ui/Avatar';
 import { cn } from '../../lib/utils';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
-import { supabase } from '../../lib/supabase';
+import type { OrgMembership } from '../../lib/types/auth';
 
 interface AdminDistrict {
   district_slug: string;
@@ -36,7 +36,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
   const [adminDistricts, setAdminDistricts] = useState<AdminDistrict[]>([]);
   const [loadingDistricts, setLoadingDistricts] = useState(true);
 
-  // Fetch user's admin districts
+  // Fetch user's admin districts via Better Auth memberships API
   useEffect(() => {
     async function fetchAdminDistricts() {
       if (!user) {
@@ -45,29 +45,20 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('spb_district_admins')
-          .select(`
-            district_slug,
-            spb_districts!inner(name)
-          `)
-          .eq('user_id', user.id);
-
-        if (error) {
-          console.error('Failed to fetch admin districts:', error);
+        const res = await fetch('/api/user/memberships', { credentials: 'include' });
+        if (!res.ok) {
+          console.error('Failed to fetch memberships:', res.status);
           return;
         }
 
-        if (data) {
-          const districts = data.map((d) => {
-            const districtData = d.spb_districts as unknown as { name: string } | null;
-            return {
-              district_slug: d.district_slug,
-              district_name: districtData?.name || d.district_slug,
-            };
-          });
-          setAdminDistricts(districts);
-        }
+        const memberships: OrgMembership[] = await res.json();
+        const districts = memberships.map((m) => ({
+          district_slug: m.slug,
+          district_name: m.name,
+        }));
+        setAdminDistricts(districts);
+      } catch (error) {
+        console.error('Failed to fetch admin districts:', error);
       } finally {
         setLoadingDistricts(false);
       }

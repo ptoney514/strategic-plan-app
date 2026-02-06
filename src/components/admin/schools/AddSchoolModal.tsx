@@ -58,11 +58,14 @@ export function AddSchoolModal({
 
     try {
       await createSchool.mutateAsync({
-        district_id: districtId,
-        name: name.trim(),
-        slug: slug.trim(),
-        description: `${schoolType.charAt(0).toUpperCase() + schoolType.slice(1)} School`,
-        is_public: false,
+        school: {
+          district_id: districtId,
+          name: name.trim(),
+          slug: slug.trim(),
+          description: `${schoolType.charAt(0).toUpperCase() + schoolType.slice(1)} School`,
+          is_public: false,
+        },
+        districtSlug,
       });
 
       // Reset form

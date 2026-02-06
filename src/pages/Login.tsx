@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubdomain } from '../contexts/SubdomainContext';
-import { supabase } from '../lib/supabase';
 import { getSubdomainUrl } from '../lib/subdomain';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
@@ -62,13 +61,9 @@ export function Login() {
         return;
       }
 
-      const isSystemAdmin =
-        user.user_metadata?.role === 'system_admin' ||
-        user.app_metadata?.role === 'system_admin';
-
       // On admin subdomain, system admins stay, others go to root
       if (subdomainType === 'admin') {
-        if (isSystemAdmin) {
+        if (user.isSystemAdmin) {
           navigate(`/${location.search}`, { replace: true });
         } else {
           window.location.href = getSubdomainUrl('root');
@@ -96,22 +91,10 @@ export function Login() {
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setError('');
-    setIsLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin + '/login' + window.location.search,
-        },
-      });
-      if (error) throw error;
-    } catch (err) {
-      console.error('[Login] Google OAuth Error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign in with Google');
-      setIsLoading(false);
-    }
+  const handleGoogleSignIn = () => {
+    // Google OAuth temporarily disabled during Better Auth migration.
+    // Will be re-enabled with socialProviders.google server config.
+    setError('Google sign-in is temporarily unavailable. Please use email/password.');
   };
 
   return (

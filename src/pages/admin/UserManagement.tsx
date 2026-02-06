@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Users, Plus, Search, Loader2, X, Building2, Shield, AlertCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { supabase } from '../../lib/supabase';
+import { apiGet, apiPost, apiDelete } from '../../lib/api';
 import type { District } from '../../lib/types';
 
 interface DistrictAdmin {
@@ -31,19 +31,12 @@ export function UserManagement() {
   const { data: districtAdmins = [], isLoading, error } = useQuery({
     queryKey: ['district-admins'],
     queryFn: async () => {
-      // First get all district admin assignments
-      const { data: admins, error: adminsError } = await supabase
-        .from('spb_district_admins')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (adminsError) throw adminsError;
+      // Get all org members (admin route)
+      const admins = await apiGet<DistrictAdmin[]>('/admin/members');
       if (!admins || admins.length === 0) return [];
 
       // Get all districts for lookup
-      const { data: districts } = await supabase
-        .from('spb_districts')
-        .select('*');
+      const districts = await apiGet<District[]>('/organizations');
 
       const districtMap = new Map((districts || []).map(d => [d.id, d]));
 
@@ -59,23 +52,14 @@ export function UserManagement() {
   const { data: districts = [] } = useQuery({
     queryKey: ['districts'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('spb_districts')
-        .select('*')
-        .order('name');
-      if (error) throw error;
-      return data || [];
+      return apiGet<District[]>('/organizations');
     },
   });
 
   // Delete district admin mutation
   const deleteAdminMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
-        .from('spb_district_admins')
-        .delete()
-        .eq('id', id);
-      if (error) throw error;
+      await apiDelete(`/admin/members?id=${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['district-admins'] });
@@ -364,15 +348,12 @@ function AddAdminModal({ districts, existingAdmins, onClose, onSuccess }: AddAdm
 
     setIsLoading(true);
     try {
-      const { error: insertError } = await supabase
-        .from('spb_district_admins')
-        .insert({
-          user_id: userId.trim(),
-          district_id: selectedDistrict,
-          district_slug: district.slug,
-        });
+      await apiPost('/admin/members', {
+        user_id: userId.trim(),
+        organization_id: selectedDistrict,
+        role: 'admin',
+      });
 
-      if (insertError) throw insertError;
       onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add admin');

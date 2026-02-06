@@ -14,7 +14,8 @@ export const config = { runtime: "edge" };
 /**
  * GET /api/school-admins/check?district=slug&school=slug
  * Check if current user can access a school.
- * Returns: { hasAccess: boolean, accessLevel: 'system_admin' | 'district_admin' | 'school_admin' | 'none' }
+ * `district` param is optional — if omitted, checks school_admins directly.
+ * Returns: { hasAccess, allowed, accessLevel }
  */
 export async function GET(req: Request) {
   try {
@@ -24,12 +25,31 @@ export async function GET(req: Request) {
     const districtSlug = url.searchParams.get("district");
     const schoolSlug = url.searchParams.get("school");
 
-    if (!districtSlug) return jsonError("district query parameter is required", 400);
     if (!schoolSlug) return jsonError("school query parameter is required", 400);
 
     // System admins have full access
     if (user.isSystemAdmin) {
-      return jsonOk({ hasAccess: true, accessLevel: "system_admin" });
+      return jsonOk({ hasAccess: true, allowed: true, accessLevel: "system_admin" });
+    }
+
+    // If no district slug, do a direct school_admins lookup by school slug + userId
+    if (!districtSlug) {
+      const [schoolAdmin] = await db
+        .select({ id: schoolAdmins.id })
+        .from(schoolAdmins)
+        .where(
+          and(
+            eq(schoolAdmins.schoolSlug, schoolSlug),
+            eq(schoolAdmins.userId, user.id),
+          ),
+        )
+        .limit(1);
+
+      if (schoolAdmin) {
+        return jsonOk({ hasAccess: true, allowed: true, accessLevel: "school_admin" });
+      }
+
+      return jsonOk({ hasAccess: false, allowed: false, accessLevel: "none" });
     }
 
     // Look up the organization
@@ -54,7 +74,7 @@ export async function GET(req: Request) {
       .limit(1);
 
     if (membership) {
-      return jsonOk({ hasAccess: true, accessLevel: "district_admin" });
+      return jsonOk({ hasAccess: true, allowed: true, accessLevel: "district_admin" });
     }
 
     // Look up the school to get its ID
@@ -84,10 +104,10 @@ export async function GET(req: Request) {
       .limit(1);
 
     if (schoolAdmin) {
-      return jsonOk({ hasAccess: true, accessLevel: "school_admin" });
+      return jsonOk({ hasAccess: true, allowed: true, accessLevel: "school_admin" });
     }
 
-    return jsonOk({ hasAccess: false, accessLevel: "none" });
+    return jsonOk({ hasAccess: false, allowed: false, accessLevel: "none" });
   } catch (error) {
     if (error instanceof Response) return error;
     return jsonError(

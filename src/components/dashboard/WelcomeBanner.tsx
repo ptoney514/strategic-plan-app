@@ -64,13 +64,13 @@ export function WelcomeBanner() {
               <span className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm">
                 <FileText size={16} />
                 <span className="text-white">
-                  {isLoading ? '...' : stats?.activePlansCount || 0} active plans
+                  {isLoading ? '...' : stats?.plan_count || 0} active plans
                 </span>
               </span>
               <span className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm">
                 <Bell size={16} />
                 <span className="text-white">
-                  {isLoading ? '...' : stats?.totalObjectivesCount || 0} objectives
+                  {isLoading ? '...' : stats?.objective_count || 0} objectives
                 </span>
               </span>
             </div>

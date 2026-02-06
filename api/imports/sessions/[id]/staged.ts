@@ -2,10 +2,11 @@ import { eq } from "drizzle-orm";
 import { db } from "../../../lib/db";
 import {
   importSessions,
+  organizations,
   stagedGoals,
   stagedMetrics,
 } from "../../../lib/schema/index";
-import { requireAuth } from "../../../lib/middleware/auth";
+import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -71,8 +72,6 @@ function extractSessionId(req: Request): string {
  */
 export async function GET(req: Request) {
   try {
-    await requireAuth(req);
-
     const sessionId = extractSessionId(req);
 
     const [session] = await db
@@ -84,6 +83,17 @@ export async function GET(req: Request) {
     if (!session) {
       return jsonError("Import session not found", 404);
     }
+
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, session.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "viewer");
 
     const goalsData = await db
       .select()

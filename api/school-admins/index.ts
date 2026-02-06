@@ -1,9 +1,8 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../lib/db";
-import { schoolAdmins } from "../lib/schema/index";
+import { schoolAdmins, schools, organizations } from "../lib/schema/index";
 import {
   requireAuth,
-  requireSystemAdmin,
   requireOrgMember,
 } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
@@ -66,6 +65,30 @@ export async function POST(req: Request) {
     // Check authorization: system admin or org admin for the district
     if (!user.isSystemAdmin) {
       await requireOrgMember(req, district_slug, "admin");
+    }
+
+    // Verify school belongs to the district
+    const [org] = await db
+      .select({ id: organizations.id })
+      .from(organizations)
+      .where(eq(organizations.slug, district_slug))
+      .limit(1);
+
+    if (!org) return jsonError("District not found", 404);
+
+    const [school] = await db
+      .select({ id: schools.id })
+      .from(schools)
+      .where(
+        and(
+          eq(schools.id, school_id),
+          eq(schools.organizationId, org.id),
+        ),
+      )
+      .limit(1);
+
+    if (!school) {
+      return jsonError("School does not belong to this district", 400);
     }
 
     const [created] = await db

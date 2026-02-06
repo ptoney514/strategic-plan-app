@@ -1,7 +1,8 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "../lib/db";
-import { goals } from "../lib/schema/index";
-import { requireAuth } from "../lib/middleware/auth";
+import { goals, plans } from "../lib/schema/index";
+import { requireOrgMember } from "../lib/middleware/auth";
+import { getOrgSlugForGoal } from "../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../lib/response";
 
 export const config = { runtime: "edge" };
@@ -12,8 +13,6 @@ export const config = { runtime: "edge" };
 
 export async function PUT(req: Request) {
   try {
-    await requireAuth(req);
-
     const body = await req.json();
 
     if (!body.goals || !Array.isArray(body.goals) || body.goals.length === 0) {
@@ -30,6 +29,34 @@ export async function PUT(req: Request) {
           "Each goal entry must have id and order_position",
           400,
         );
+      }
+    }
+
+    // Look up org for the first goal and verify membership
+    const lookup = await getOrgSlugForGoal(body.goals[0].id);
+    if (!lookup) return jsonError("Goal not found", 404);
+
+    await requireOrgMember(req, lookup.orgSlug, "editor");
+
+    // Verify all goals belong to the same plan (same org)
+    if (body.goals.length > 1) {
+      const goalIds = body.goals.map((e: { id: string }) => e.id);
+      const rows = await db
+        .select({ id: goals.id, planId: goals.planId })
+        .from(goals)
+        .where(inArray(goals.id, goalIds));
+
+      const planIds = new Set(rows.map((r) => r.planId));
+      if (planIds.size > 1) {
+        // Verify all plans belong to the same org
+        const planRows = await db
+          .select({ orgId: plans.organizationId })
+          .from(plans)
+          .where(inArray(plans.id, [...planIds]));
+        const orgIds = new Set(planRows.map((r) => r.orgId));
+        if (orgIds.size > 1) {
+          return jsonError("All goals must belong to the same organization", 403);
+        }
       }
     }
 

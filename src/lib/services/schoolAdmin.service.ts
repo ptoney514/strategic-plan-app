@@ -30,12 +30,14 @@ export class SchoolAdminService {
   static async assignAdmin(
     schoolId: string,
     userId: string,
-    createdBy?: string
+    options?: { schoolSlug?: string; districtSlug?: string; createdBy?: string }
   ): Promise<SchoolAdmin> {
     return apiPost<SchoolAdmin>('/school-admins', {
       school_id: schoolId,
       user_id: userId,
-      created_by: createdBy,
+      school_slug: options?.schoolSlug,
+      district_slug: options?.districtSlug,
+      created_by: options?.createdBy,
     });
   }
 

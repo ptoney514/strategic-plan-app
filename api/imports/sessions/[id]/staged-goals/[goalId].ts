@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../../lib/db";
-import { stagedGoals } from "../../../../lib/schema/index";
-import { requireAuth } from "../../../../lib/middleware/auth";
+import { importSessions, organizations, stagedGoals } from "../../../../lib/schema/index";
+import { requireOrgMember } from "../../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -43,8 +43,6 @@ function extractGoalId(req: Request): string {
  */
 export async function PUT(req: Request) {
   try {
-    await requireAuth(req);
-
     const goalId = extractGoalId(req);
 
     const [existing] = await db
@@ -56,6 +54,25 @@ export async function PUT(req: Request) {
     if (!existing) {
       return jsonError("Staged goal not found", 404);
     }
+
+    // Look up session → org for membership check
+    const [session] = await db
+      .select({ organizationId: importSessions.organizationId })
+      .from(importSessions)
+      .where(eq(importSessions.id, existing.importSessionId))
+      .limit(1);
+
+    if (!session) return jsonError("Import session not found", 404);
+
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, session.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "editor");
 
     const body = await req.json();
 

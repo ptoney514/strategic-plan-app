@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../lib/db";
 import { goals, metrics } from "../../lib/schema/index";
-import { requireAuth } from "../../lib/middleware/auth";
+import { requireOrgMember } from "../../lib/middleware/auth";
+import { getOrgSlugForGoal, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -84,8 +85,6 @@ function extractGoalId(req: Request): string {
  */
 export async function GET(req: Request) {
   try {
-    await requireAuth(req);
-
     const goalId = extractGoalId(req);
 
     const [goal] = await db
@@ -96,6 +95,15 @@ export async function GET(req: Request) {
 
     if (!goal) {
       return jsonError("Goal not found", 404);
+    }
+
+    // Access check: allow if org is public, otherwise require org membership
+    const lookup = await getOrgSlugForGoal(goalId);
+    if (lookup) {
+      const orgIsPublic = await isPublicOrg(lookup.orgId);
+      if (!orgIsPublic) {
+        await requireOrgMember(req, lookup.orgSlug, "viewer");
+      }
     }
 
     // Get metrics for this goal

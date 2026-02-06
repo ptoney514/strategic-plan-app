@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../../lib/db";
 import {
   goals,
@@ -77,11 +77,14 @@ export async function POST(req: Request) {
         .select()
         .from(organizationMembers)
         .where(
-          eq(organizationMembers.organizationId, orgId),
+          and(
+            eq(organizationMembers.organizationId, orgId),
+            eq(organizationMembers.userId, user.id),
+          ),
         )
         .limit(1);
 
-      if (!membership || membership.userId !== user.id) {
+      if (!membership) {
         return jsonError("Forbidden", 403);
       }
     }

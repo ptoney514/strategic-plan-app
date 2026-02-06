@@ -1,32 +1,11 @@
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { db } from "../lib/db";
-import {
-  metrics,
-  goals,
-  plans,
-  organizations,
-} from "../lib/schema/index";
-import { requireAuth, requireOrgMember } from "../lib/middleware/auth";
+import { metrics, goals, plans } from "../lib/schema/index";
+import { requireOrgMember } from "../lib/middleware/auth";
+import { getOrgSlugForMetric } from "../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../lib/response";
 
 export const config = { runtime: "edge" };
-
-/** Look up metric -> goal -> plan -> organization slug */
-async function getOrgSlugForMetric(metricId: string) {
-  const [row] = await db
-    .select({
-      metricId: metrics.id,
-      orgSlug: organizations.slug,
-    })
-    .from(metrics)
-    .innerJoin(goals, eq(metrics.goalId, goals.id))
-    .innerJoin(plans, eq(goals.planId, plans.id))
-    .innerJoin(organizations, eq(plans.organizationId, organizations.id))
-    .where(eq(metrics.id, metricId))
-    .limit(1);
-
-  return row ?? null;
-}
 
 /**
  * PUT /api/metrics/reorder - Reorder metrics
@@ -36,8 +15,6 @@ async function getOrgSlugForMetric(metricId: string) {
  */
 export async function PUT(req: Request) {
   try {
-    await requireAuth(req);
-
     const body = await req.json();
 
     if (!Array.isArray(body.metrics) || body.metrics.length === 0) {
@@ -59,6 +36,32 @@ export async function PUT(req: Request) {
     if (!lookup) return jsonError("Metric not found", 404);
 
     await requireOrgMember(req, lookup.orgSlug, "editor");
+
+    // Verify all metrics belong to the same org
+    if (body.metrics.length > 1) {
+      const metricIds = body.metrics.map((m: { id: string }) => m.id);
+      const metricRows = await db
+        .select({ goalId: metrics.goalId })
+        .from(metrics)
+        .where(inArray(metrics.id, metricIds));
+      const uniqueGoalIds = [...new Set(metricRows.map((r) => r.goalId))];
+
+      const goalRows = await db
+        .select({ planId: goals.planId })
+        .from(goals)
+        .where(inArray(goals.id, uniqueGoalIds));
+      const uniquePlanIds = [...new Set(goalRows.map((r) => r.planId))];
+
+      const planRows = await db
+        .select({ orgId: plans.organizationId })
+        .from(plans)
+        .where(inArray(plans.id, uniquePlanIds));
+      const uniqueOrgIds = new Set(planRows.map((r) => r.orgId));
+
+      if (uniqueOrgIds.size > 1) {
+        return jsonError("All metrics must belong to the same organization", 403);
+      }
+    }
 
     // Update each metric's orderPosition
     const updates = await Promise.all(

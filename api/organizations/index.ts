@@ -152,7 +152,16 @@ export async function POST(req: Request) {
     await requireSystemAdmin(req);
 
     const body = await req.json();
-    const { name, entityType } = body;
+    const name = body.name;
+    const entityType = body.entityType || body.entity_type;
+    const entityLabel = body.entityLabel ?? body.entity_label;
+    const logoUrl = body.logoUrl ?? body.logo_url;
+    const primaryColor = body.primaryColor ?? body.primary_color;
+    const secondaryColor = body.secondaryColor ?? body.secondary_color;
+    const adminEmail = body.adminEmail ?? body.admin_email;
+    const dashboardTemplate = body.dashboardTemplate ?? body.dashboard_template;
+    const dashboardConfig = body.dashboardConfig ?? body.dashboard_config;
+    const isPublic = body.isPublic ?? body.is_public;
 
     if (!name || typeof name !== "string" || name.trim().length === 0) {
       return jsonError("name is required", 400);
@@ -162,7 +171,7 @@ export async function POST(req: Request) {
       typeof entityType !== "string" ||
       entityType.trim().length === 0
     ) {
-      return jsonError("entityType is required", 400);
+      return jsonError("entityType or entity_type is required", 400);
     }
 
     const slug = body.slug ? String(body.slug).trim() : slugify(name);
@@ -184,15 +193,15 @@ export async function POST(req: Request) {
         name: name.trim(),
         slug,
         entityType: entityType.trim(),
-        entityLabel: body.entityLabel ?? undefined,
-        logoUrl: body.logoUrl ?? undefined,
-        primaryColor: body.primaryColor ?? undefined,
-        secondaryColor: body.secondaryColor ?? undefined,
-        adminEmail: body.adminEmail ?? undefined,
+        entityLabel: entityLabel ?? undefined,
+        logoUrl: logoUrl ?? undefined,
+        primaryColor: primaryColor ?? undefined,
+        secondaryColor: secondaryColor ?? undefined,
+        adminEmail: adminEmail ?? undefined,
         tagline: body.tagline ?? undefined,
-        dashboardTemplate: body.dashboardTemplate ?? undefined,
-        dashboardConfig: body.dashboardConfig ?? undefined,
-        isPublic: body.isPublic ?? false,
+        dashboardTemplate: dashboardTemplate ?? undefined,
+        dashboardConfig: dashboardConfig ?? undefined,
+        isPublic: isPublic ?? false,
         settings: body.settings ?? undefined,
       })
       .returning();

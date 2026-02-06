@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../../lib/db";
-import { importSessions } from "../../../lib/schema/index";
-import { requireAuth } from "../../../lib/middleware/auth";
+import { importSessions, organizations } from "../../../lib/schema/index";
+import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -35,8 +35,6 @@ function extractSessionId(req: Request): string {
  */
 export async function GET(req: Request) {
   try {
-    await requireAuth(req);
-
     const id = extractSessionId(req);
 
     const [session] = await db
@@ -48,6 +46,17 @@ export async function GET(req: Request) {
     if (!session) {
       return jsonError("Import session not found", 404);
     }
+
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, session.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "viewer");
 
     return jsonOk(sessionToSnake(session));
   } catch (error) {
@@ -65,8 +74,6 @@ export async function GET(req: Request) {
  */
 export async function DELETE(req: Request) {
   try {
-    await requireAuth(req);
-
     const id = extractSessionId(req);
 
     const [existing] = await db
@@ -78,6 +85,17 @@ export async function DELETE(req: Request) {
     if (!existing) {
       return jsonError("Import session not found", 404);
     }
+
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, existing.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "editor");
 
     await db.delete(importSessions).where(eq(importSessions.id, id));
 

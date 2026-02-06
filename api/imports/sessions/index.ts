@@ -1,7 +1,7 @@
 import { eq, desc } from "drizzle-orm";
 import { db } from "../../lib/db";
-import { importSessions } from "../../lib/schema/index";
-import { requireAuth } from "../../lib/middleware/auth";
+import { importSessions, organizations } from "../../lib/schema/index";
+import { requireOrgMember } from "../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -29,17 +29,27 @@ function sessionToSnake(s: typeof importSessions.$inferSelect) {
  */
 export async function POST(req: Request) {
   try {
-    await requireAuth(req);
-
     const body = await req.json();
-    const { organization_id, filename, file_size, uploaded_by } = body;
+    const organization_id = body.organization_id || body.district_id;
+    const { filename, file_size, uploaded_by } = body;
 
     if (!organization_id) {
-      return jsonError("organization_id is required", 400);
+      return jsonError("organization_id or district_id is required", 400);
     }
     if (!filename) {
       return jsonError("filename is required", 400);
     }
+
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, organization_id))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "editor");
 
     const [created] = await db
       .insert(importSessions)
@@ -67,14 +77,23 @@ export async function POST(req: Request) {
  */
 export async function GET(req: Request) {
   try {
-    await requireAuth(req);
-
     const url = new URL(req.url);
     const orgId = url.searchParams.get("orgId");
 
     if (!orgId) {
       return jsonError("orgId query parameter is required", 400);
     }
+
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, orgId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "viewer");
 
     const sessions = await db
       .select()

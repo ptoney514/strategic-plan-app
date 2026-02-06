@@ -1,7 +1,8 @@
 import { eq, asc } from "drizzle-orm";
 import { db } from "../../lib/db";
 import { plans, goals, metrics, organizations } from "../../lib/schema/index";
-import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
+import { requireOrgMember } from "../../lib/middleware/auth";
+import { getOrgSlugForPlan, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -93,8 +94,6 @@ function metricToSnake(row: any) {
  */
 export async function GET(req: Request) {
   try {
-    await requireAuth(req);
-
     const id = new URL(req.url).pathname.split("/")[3];
     if (!id) return jsonError("Plan ID is required", 400);
 
@@ -106,6 +105,15 @@ export async function GET(req: Request) {
       .limit(1);
 
     if (!plan) return jsonError("Plan not found", 404);
+
+    // Access check: allow if org is public, otherwise require org membership
+    const lookup = await getOrgSlugForPlan(id);
+    if (lookup) {
+      const orgIsPublic = await isPublicOrg(lookup.orgId);
+      if (!orgIsPublic) {
+        await requireOrgMember(req, lookup.orgSlug, "viewer");
+      }
+    }
 
     // Get all goals for this plan, ordered by goal_number
     const planGoals = await db

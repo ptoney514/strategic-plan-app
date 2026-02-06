@@ -1,7 +1,7 @@
 import { eq, and } from "drizzle-orm";
 import { db } from "../lib/db";
-import { schoolAdmins, user } from "../lib/schema/index";
-import { requireAuth } from "../lib/middleware/auth";
+import { organizations, schoolAdmins, schools, user } from "../lib/schema/index";
+import { requireOrgMember } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
 export const config = { runtime: "edge" };
@@ -31,10 +31,27 @@ function adminWithUserToSnake(row: {
  */
 export async function GET(req: Request) {
   try {
-    await requireAuth(req);
-
     const schoolId = new URL(req.url).pathname.split("/")[3];
     if (!schoolId) return jsonError("School ID is required", 400);
+
+    // Look up the school's organization for membership check
+    const [school] = await db
+      .select({ organizationId: schools.organizationId })
+      .from(schools)
+      .where(eq(schools.id, schoolId))
+      .limit(1);
+
+    if (!school) return jsonError("School not found", 404);
+
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, school.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "viewer");
 
     const rows = await db
       .select({
@@ -62,8 +79,6 @@ export async function GET(req: Request) {
  */
 export async function DELETE(req: Request) {
   try {
-    await requireAuth(req);
-
     const url = new URL(req.url);
     const schoolId = url.pathname.split("/")[3];
     const userId = url.searchParams.get("userId");
@@ -72,7 +87,10 @@ export async function DELETE(req: Request) {
     if (!userId) return jsonError("userId query parameter is required", 400);
 
     const [existing] = await db
-      .select({ id: schoolAdmins.id })
+      .select({
+        id: schoolAdmins.id,
+        districtSlug: schoolAdmins.districtSlug,
+      })
       .from(schoolAdmins)
       .where(
         and(
@@ -83,6 +101,9 @@ export async function DELETE(req: Request) {
       .limit(1);
 
     if (!existing) return jsonError("School admin assignment not found", 404);
+
+    // Verify org membership (admin role) for the district
+    await requireOrgMember(req, existing.districtSlug, "admin");
 
     await db
       .delete(schoolAdmins)

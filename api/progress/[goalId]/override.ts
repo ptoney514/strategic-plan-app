@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../lib/db";
 import { goals, statusOverrides } from "../../lib/schema/index";
-import { requireAuth } from "../../lib/middleware/auth";
+import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
+import { getOrgSlugForGoal } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -67,8 +68,6 @@ function extractGoalId(req: Request): string {
  */
 export async function PUT(req: Request) {
   try {
-    const { user } = await requireAuth(req);
-
     const goalId = extractGoalId(req);
 
     const [existing] = await db
@@ -80,6 +79,11 @@ export async function PUT(req: Request) {
     if (!existing) {
       return jsonError("Goal not found", 404);
     }
+
+    // Verify org membership
+    const lookup = await getOrgSlugForGoal(goalId);
+    if (!lookup) return jsonError("Goal not found", 404);
+    const { user } = await requireOrgMember(req, lookup.orgSlug, "editor");
 
     const body = await req.json();
 
@@ -155,8 +159,6 @@ export async function PUT(req: Request) {
  */
 export async function DELETE(req: Request) {
   try {
-    await requireAuth(req);
-
     const goalId = extractGoalId(req);
 
     const [existing] = await db
@@ -168,6 +170,11 @@ export async function DELETE(req: Request) {
     if (!existing) {
       return jsonError("Goal not found", 404);
     }
+
+    // Verify org membership
+    const lookup = await getOrgSlugForGoal(goalId);
+    if (!lookup) return jsonError("Goal not found", 404);
+    await requireOrgMember(req, lookup.orgSlug, "editor");
 
     const [updated] = await db
       .update(goals)

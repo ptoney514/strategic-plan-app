@@ -2,9 +2,10 @@ import { apiGet } from '../api';
 import type { District, Plan, PlanWithSummary } from '../types';
 
 export interface UserDashboardStats {
-  activePlansCount: number;
-  totalObjectivesCount: number;
-  districtsCount: number;
+  district_count: number;
+  plan_count: number;
+  objective_count: number;
+  metric_count: number;
 }
 
 export class UserDashboardService {

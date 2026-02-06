@@ -8,6 +8,7 @@ import {
   organizationMembers,
 } from "../../lib/schema/index";
 import { requireAuth, hasMinimumRole } from "../../lib/middleware/auth";
+import { getOrgSlugForGoal, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -168,6 +169,15 @@ export async function GET(req: Request) {
 
     if (!goal) {
       return jsonError("Goal not found", 404);
+    }
+
+    // Access check: allow if org is public, otherwise require auth + membership
+    const lookup = await getOrgSlugForGoal(id);
+    if (lookup) {
+      const orgIsPublic = await isPublicOrg(lookup.orgId);
+      if (!orgIsPublic) {
+        await requireGoalOrgMember(req, goal, "viewer");
+      }
     }
 
     const goalMetrics = await db

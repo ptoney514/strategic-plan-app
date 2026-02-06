@@ -1,4 +1,4 @@
-import { eq, asc } from "drizzle-orm";
+import { eq, and, asc } from "drizzle-orm";
 import { db } from "../../../lib/db";
 import {
   importSessions,
@@ -6,8 +6,10 @@ import {
   stagedMetrics,
   goals,
   metrics,
+  plans,
+  organizations,
 } from "../../../lib/schema/index";
-import { requireAuth } from "../../../lib/middleware/auth";
+import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -20,12 +22,10 @@ function extractSessionId(req: Request): string {
 
 /**
  * POST /api/imports/sessions/:id/execute
- * Execute import (move staged data to production). Requires auth.
+ * Execute import (move staged data to production). Requires auth + org membership.
  */
 export async function POST(req: Request) {
   try {
-    await requireAuth(req);
-
     const sessionId = extractSessionId(req);
 
     const [session] = await db
@@ -36,6 +36,52 @@ export async function POST(req: Request) {
 
     if (!session) {
       return jsonError("Import session not found", 404);
+    }
+
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, session.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "editor");
+
+    // Determine the plan_id: from request body, or fall back to first active plan
+    let planId: string | null = null;
+    try {
+      const body = await req.json();
+      planId = body.plan_id ?? null;
+    } catch {
+      // No body or invalid JSON — that's fine, we'll look up a plan
+    }
+
+    // Verify plan belongs to the same organization as the import session
+    if (planId) {
+      const [plan] = await db
+        .select({ orgId: plans.organizationId })
+        .from(plans)
+        .where(eq(plans.id, planId))
+        .limit(1);
+      if (!plan || plan.orgId !== session.organizationId) {
+        return jsonError("Plan does not belong to this organization", 400);
+      }
+    }
+
+    if (!planId) {
+      const [activePlan] = await db
+        .select({ id: plans.id })
+        .from(plans)
+        .where(eq(plans.organizationId, session.organizationId))
+        .orderBy(asc(plans.createdAt))
+        .limit(1);
+
+      if (!activePlan) {
+        return jsonError("No plan found for this organization. Create a plan first.", 400);
+      }
+      planId = activePlan.id;
     }
 
     // Get all staged goals ordered by level (parents first)
@@ -70,7 +116,7 @@ export async function POST(req: Request) {
       const [created] = await db
         .insert(goals)
         .values({
-          planId: session.organizationId, // Caller should ensure a plan exists
+          planId,
           organizationId: session.organizationId,
           goalNumber: sg.goalNumber,
           title: sg.title,
@@ -85,11 +131,16 @@ export async function POST(req: Request) {
       stagedIdToGoalId.set(sg.id, created.id);
       goalsCreated++;
 
-      // Insert staged metrics for this goal
+      // Insert staged metrics for this goal (scoped to this session)
       const goalMetrics = await db
         .select()
         .from(stagedMetrics)
-        .where(eq(stagedMetrics.stagedGoalId, sg.id));
+        .where(
+          and(
+            eq(stagedMetrics.stagedGoalId, sg.id),
+            eq(stagedMetrics.importSessionId, sessionId),
+          ),
+        );
 
       for (const sm of goalMetrics) {
         if (sm.action !== "create") continue;

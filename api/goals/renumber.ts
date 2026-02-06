@@ -1,7 +1,8 @@
 import { eq, and, isNull, asc } from "drizzle-orm";
 import { db } from "../lib/db";
 import { goals } from "../lib/schema/index";
-import { requireAuth } from "../lib/middleware/auth";
+import { requireOrgMember } from "../lib/middleware/auth";
+import { getOrgSlugForPlan } from "../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../lib/response";
 
 export const config = { runtime: "edge" };
@@ -12,8 +13,6 @@ export const config = { runtime: "edge" };
 
 export async function PUT(req: Request) {
   try {
-    await requireAuth(req);
-
     const body = await req.json();
 
     if (!body.planId && !body.plan_id) {
@@ -21,6 +20,12 @@ export async function PUT(req: Request) {
     }
 
     const planId = body.planId || body.plan_id;
+
+    // Verify org membership via plan
+    const lookup = await getOrgSlugForPlan(planId);
+    if (!lookup) return jsonError("Plan not found", 404);
+
+    await requireOrgMember(req, lookup.orgSlug, "editor");
     const parentId = body.parentId || body.parent_id || null;
 
     // Determine the numbering prefix from parent goal

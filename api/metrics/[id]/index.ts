@@ -1,12 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../lib/db";
-import {
-  metrics,
-  goals,
-  plans,
-  organizations,
-} from "../../lib/schema/index";
-import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
+import { metrics } from "../../lib/schema/index";
+import { requireOrgMember } from "../../lib/middleware/auth";
+import { getOrgSlugForMetric, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -74,25 +70,6 @@ function metricToSnake(m: typeof metrics.$inferSelect) {
   };
 }
 
-/** Look up metric -> goal -> plan -> organization slug */
-async function getOrgSlugForMetric(metricId: string) {
-  const [row] = await db
-    .select({
-      metricId: metrics.id,
-      goalId: goals.id,
-      planId: plans.id,
-      orgSlug: organizations.slug,
-    })
-    .from(metrics)
-    .innerJoin(goals, eq(metrics.goalId, goals.id))
-    .innerJoin(plans, eq(goals.planId, plans.id))
-    .innerJoin(organizations, eq(plans.organizationId, organizations.id))
-    .where(eq(metrics.id, metricId))
-    .limit(1);
-
-  return row ?? null;
-}
-
 /**
  * GET /api/metrics/[id] - Get a metric by ID
  */
@@ -108,6 +85,15 @@ export async function GET(req: Request) {
       .limit(1);
 
     if (!metric) return jsonError("Metric not found", 404);
+
+    // Access check: allow if org is public, otherwise require auth + membership
+    const lookup = await getOrgSlugForMetric(id);
+    if (lookup) {
+      const orgIsPublic = await isPublicOrg(lookup.orgId);
+      if (!orgIsPublic) {
+        await requireOrgMember(req, lookup.orgSlug, "viewer");
+      }
+    }
 
     return jsonOk(metricToSnake(metric));
   } catch (error) {

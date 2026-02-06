@@ -2,12 +2,10 @@ import { eq, and, asc } from "drizzle-orm";
 import { db } from "../../lib/db";
 import {
   metrics,
-  goals,
-  plans,
-  organizations,
   metricTimeSeries,
 } from "../../lib/schema/index";
-import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
+import { requireOrgMember } from "../../lib/middleware/auth";
+import { getOrgSlugForMetric, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -30,24 +28,6 @@ function timeSeriesEntryToSnake(e: typeof metricTimeSeries.$inferSelect) {
   };
 }
 
-/** Look up metric -> goal -> plan -> organization (slug + org ID) */
-async function getOrgInfoForMetric(metricId: string) {
-  const [row] = await db
-    .select({
-      metricId: metrics.id,
-      orgId: organizations.id,
-      orgSlug: organizations.slug,
-    })
-    .from(metrics)
-    .innerJoin(goals, eq(metrics.goalId, goals.id))
-    .innerJoin(plans, eq(goals.planId, plans.id))
-    .innerJoin(organizations, eq(plans.organizationId, organizations.id))
-    .where(eq(metrics.id, metricId))
-    .limit(1);
-
-  return row ?? null;
-}
-
 /**
  * GET /api/metrics/[id]/time-series - Get time series for a metric
  * Query params:
@@ -68,6 +48,15 @@ export async function GET(req: Request) {
       .limit(1);
 
     if (!metric) return jsonError("Metric not found", 404);
+
+    // Access check: allow if org is public, otherwise require auth + membership
+    const metricLookup = await getOrgSlugForMetric(id);
+    if (metricLookup) {
+      const orgIsPublic = await isPublicOrg(metricLookup.orgId);
+      if (!orgIsPublic) {
+        await requireOrgMember(req, metricLookup.orgSlug, "viewer");
+      }
+    }
 
     const periodType = url.searchParams.get("periodType");
     const limit = url.searchParams.get("limit");
@@ -112,7 +101,7 @@ export async function POST(req: Request) {
     if (!id) return jsonError("Metric ID is required", 400);
 
     // Look up metric -> goal -> plan -> org
-    const lookup = await getOrgInfoForMetric(id);
+    const lookup = await getOrgSlugForMetric(id);
     if (!lookup) return jsonError("Metric not found", 404);
 
     const { user } = await requireOrgMember(req, lookup.orgSlug, "editor");
@@ -201,7 +190,7 @@ export async function DELETE(req: Request) {
     if (!entryId) return jsonError("entryId query parameter is required", 400);
 
     // Look up metric -> goal -> plan -> org
-    const lookup = await getOrgInfoForMetric(id);
+    const lookup = await getOrgSlugForMetric(id);
     if (!lookup) return jsonError("Metric not found", 404);
 
     await requireOrgMember(req, lookup.orgSlug, "admin");

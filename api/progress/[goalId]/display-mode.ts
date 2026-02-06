@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { db } from "../../lib/db";
 import { goals } from "../../lib/schema/index";
-import { requireAuth } from "../../lib/middleware/auth";
+import { requireOrgMember } from "../../lib/middleware/auth";
+import { getOrgSlugForGoal } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -27,8 +28,6 @@ const VALID_DISPLAY_MODES = [
  */
 export async function PUT(req: Request) {
   try {
-    await requireAuth(req);
-
     const goalId = extractGoalId(req);
 
     const [existing] = await db
@@ -40,6 +39,11 @@ export async function PUT(req: Request) {
     if (!existing) {
       return jsonError("Goal not found", 404);
     }
+
+    // Verify org membership
+    const lookup = await getOrgSlugForGoal(goalId);
+    if (!lookup) return jsonError("Goal not found", 404);
+    await requireOrgMember(req, lookup.orgSlug, "editor");
 
     const body = await req.json();
     const { display_mode } = body;

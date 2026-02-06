@@ -141,8 +141,8 @@ export function useAssignSchoolAdmin() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ schoolId, userId, createdBy }: { schoolId: string; userId: string; createdBy?: string }) =>
-      SchoolAdminService.assignAdmin(schoolId, userId, createdBy),
+    mutationFn: ({ schoolId, userId, schoolSlug, districtSlug, createdBy }: { schoolId: string; userId: string; schoolSlug?: string; districtSlug?: string; createdBy?: string }) =>
+      SchoolAdminService.assignAdmin(schoolId, userId, { schoolSlug, districtSlug, createdBy }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['school-admins', data.school_id] });
       queryClient.invalidateQueries({ queryKey: ['schools', 'my-schools'] });

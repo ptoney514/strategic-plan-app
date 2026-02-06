@@ -1,11 +1,12 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { db } from "../../../lib/db";
 import {
   importSessions,
+  organizations,
   stagedGoals,
   stagedMetrics,
 } from "../../../lib/schema/index";
-import { requireAuth } from "../../../lib/middleware/auth";
+import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
 export const config = { runtime: "edge" };
@@ -22,8 +23,6 @@ function extractSessionId(req: Request): string {
  */
 export async function POST(req: Request) {
   try {
-    await requireAuth(req);
-
     const sessionId = extractSessionId(req);
 
     const [session] = await db
@@ -36,6 +35,17 @@ export async function POST(req: Request) {
       return jsonError("Import session not found", 404);
     }
 
+    // Look up org slug for membership check
+    const [org] = await db
+      .select({ slug: organizations.slug })
+      .from(organizations)
+      .where(eq(organizations.id, session.organizationId))
+      .limit(1);
+
+    if (!org) return jsonError("Organization not found", 404);
+
+    await requireOrgMember(req, org.slug, "editor");
+
     const body = await req.json();
     const { goals: goalsData, metrics: metricsData } = body;
 
@@ -47,6 +57,8 @@ export async function POST(req: Request) {
     let metricsCount = 0;
 
     // Insert staged goals
+    const rowToIdMap = new Map<number, string>();
+
     if (goalsData.length > 0) {
       const goalValues = goalsData.map(
         (g: Record<string, unknown>, idx: number) => ({
@@ -70,31 +82,72 @@ export async function POST(req: Request) {
         }),
       );
 
-      await db.insert(stagedGoals).values(goalValues);
+      const insertedGoals = await db
+        .insert(stagedGoals)
+        .values(goalValues)
+        .returning({ id: stagedGoals.id, rowNumber: stagedGoals.rowNumber });
+
+      // Build row_number → staged goal ID map for metric linking
+      for (const ig of insertedGoals) {
+        rowToIdMap.set(ig.rowNumber, ig.id);
+      }
+
       goalsCount = goalValues.length;
     }
 
     // Insert staged metrics
     if (Array.isArray(metricsData) && metricsData.length > 0) {
+      // Validate any caller-provided staged_goal_id belongs to this session
+      const ownedGoalIds = new Set(rowToIdMap.values());
+      for (const m of metricsData) {
+        const directId = m.staged_goal_id as string | undefined;
+        if (directId && !ownedGoalIds.has(directId)) {
+          const [match] = await db
+            .select({ id: stagedGoals.id })
+            .from(stagedGoals)
+            .where(
+              and(
+                eq(stagedGoals.id, directId),
+                eq(stagedGoals.importSessionId, sessionId),
+              ),
+            )
+            .limit(1);
+          if (!match) {
+            return jsonError(
+              `staged_goal_id ${directId} does not belong to this session`,
+              400,
+            );
+          }
+          ownedGoalIds.add(directId);
+        }
+      }
+
       const metricValues = metricsData.map(
-        (m: Record<string, unknown>) => ({
-          stagedGoalId: m.staged_goal_id as string,
-          importSessionId: sessionId,
-          metricName: m.metric_name as string,
-          measureDescription: m.measure_description as string | undefined,
-          metricType: m.metric_type as string | undefined,
-          dataSource: m.data_source as string | undefined,
-          frequency: m.frequency as string | undefined,
-          baselineValue: m.baseline_value as string | undefined,
-          timeSeriesData: m.time_series_data ?? null,
-          unit: m.unit as string | undefined,
-          symbol: m.symbol as string | undefined,
-          validationStatus: (m.validation_status as string) ?? "valid",
-          validationMessages: (m.validation_messages as string[]) ?? [],
-          isMapped: (m.is_mapped as boolean) ?? false,
-          mappedToMetricId: m.mapped_to_metric_id as string | undefined,
-          action: (m.action as string) ?? "create",
-        }),
+        (m: Record<string, unknown>) => {
+          // Support both staged_goal_id (direct) and _row_number (lookup)
+          let stagedGoalId = m.staged_goal_id as string | undefined;
+          if (!stagedGoalId && m._row_number != null) {
+            stagedGoalId = rowToIdMap.get(m._row_number as number) ?? undefined;
+          }
+          return {
+            stagedGoalId: stagedGoalId as string,
+            importSessionId: sessionId,
+            metricName: m.metric_name as string,
+            measureDescription: m.measure_description as string | undefined,
+            metricType: m.metric_type as string | undefined,
+            dataSource: m.data_source as string | undefined,
+            frequency: m.frequency as string | undefined,
+            baselineValue: m.baseline_value as string | undefined,
+            timeSeriesData: m.time_series_data ?? null,
+            unit: m.unit as string | undefined,
+            symbol: m.symbol as string | undefined,
+            validationStatus: (m.validation_status as string) ?? "valid",
+            validationMessages: (m.validation_messages as string[]) ?? [],
+            isMapped: (m.is_mapped as boolean) ?? false,
+            mappedToMetricId: m.mapped_to_metric_id as string | undefined,
+            action: (m.action as string) ?? "create",
+          };
+        },
       );
 
       await db.insert(stagedMetrics).values(metricValues);

@@ -4,8 +4,6 @@ import { user } from "../lib/schema/index";
 import { requireSystemAdmin } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /**
  * GET /api/admin/recent-users
  * Get recent users. Requires system admin.

@@ -4,8 +4,6 @@ import { importSessions, organizations } from "../../../lib/schema/index";
 import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
-export const config = { runtime: "edge" };
-
 function sessionToSnake(s: typeof importSessions.$inferSelect) {
   return {
     id: s.id,

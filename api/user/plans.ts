@@ -8,8 +8,6 @@ import {
 } from "../lib/schema/index";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 function planToSnake(p: typeof plans.$inferSelect) {
   return {
     id: p.id,

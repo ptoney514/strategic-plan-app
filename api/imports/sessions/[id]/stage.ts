@@ -9,8 +9,6 @@ import {
 import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
-export const config = { runtime: "edge" };
-
 function extractSessionId(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");
   // /api/imports/sessions/[id]/stage -> segments[4]

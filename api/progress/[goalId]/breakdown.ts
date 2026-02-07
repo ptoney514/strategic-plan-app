@@ -5,8 +5,6 @@ import { requireOrgMember } from "../../lib/middleware/auth";
 import { getOrgSlugForGoal, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 function goalToSnake(g: Record<string, unknown>) {
   return {
     id: g.id,

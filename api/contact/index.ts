@@ -4,8 +4,6 @@ import { contactSubmissions } from "../lib/schema/index";
 import { requireSystemAdmin } from "../lib/middleware/auth";
 import { jsonOk, jsonError, parsePagination } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle contact submission row to snake_case for the frontend */
 function contactToSnake(c: typeof contactSubmissions.$inferSelect) {
   return {

@@ -10,8 +10,6 @@ import {
 import { requireSystemAdmin } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /**
  * GET /api/admin/districts
  * Get all districts with stats. Requires system admin.

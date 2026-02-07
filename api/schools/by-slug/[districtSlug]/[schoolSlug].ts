@@ -1,9 +1,7 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { schools, organizations } from "../../lib/schema/index";
-import { jsonOk, jsonError } from "../../lib/response";
-
-export const config = { runtime: "edge" };
+import { db } from "../../../lib/db";
+import { schools, organizations } from "../../../lib/schema/index";
+import { jsonOk, jsonError } from "../../../lib/response";
 
 /** Map a Drizzle school row to snake_case for the frontend */
 function schoolToSnake(s: typeof schools.$inferSelect) {
@@ -26,16 +24,16 @@ function schoolToSnake(s: typeof schools.$inferSelect) {
 }
 
 /**
- * GET /api/schools/[districtSlug]/[schoolSlug]
+ * GET /api/schools/by-slug/[districtSlug]/[schoolSlug]
  * Get a school by district slug and school slug.
  * Looks up the organization by districtSlug, then the school by orgId + schoolSlug.
  */
 export async function GET(req: Request) {
   try {
     const segments = new URL(req.url).pathname.split("/");
-    // pathname: /api/schools/{districtSlug}/{schoolSlug}
-    const districtSlug = segments[3];
-    const schoolSlug = segments[4];
+    // pathname: /api/schools/by-slug/{districtSlug}/{schoolSlug}
+    const districtSlug = segments[4];
+    const schoolSlug = segments[5];
 
     if (!districtSlug) return jsonError("District slug is required", 400);
     if (!schoolSlug) return jsonError("School slug is required", 400);

@@ -3,8 +3,6 @@ import { db } from "../../lib/db";
 import { schools, plans, goals, metrics } from "../../lib/schema/index";
 import { jsonOk, jsonError } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle school row to snake_case for the frontend */
 function schoolToSnake(s: typeof schools.$inferSelect) {
   return {

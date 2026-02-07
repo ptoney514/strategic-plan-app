@@ -4,8 +4,6 @@ import { organizations, plans } from "../../lib/schema/index";
 import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
 import { jsonOk, jsonError, parsePagination } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle plan row to snake_case for the frontend */
 function planToSnakeCase(plan: typeof plans.$inferSelect) {
   return {

@@ -7,8 +7,6 @@ import {
 import { requireSystemAdmin } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /**
  * GET /api/admin/members
  * List all organization members. Requires system admin.

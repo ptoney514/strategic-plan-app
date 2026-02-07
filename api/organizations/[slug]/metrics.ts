@@ -4,8 +4,6 @@ import { organizations, plans, goals, metrics } from "../../lib/schema/index";
 import { requireOrgMember } from "../../lib/middleware/auth";
 import { jsonOk, jsonError, parsePagination } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle metric row to snake_case for the frontend */
 function metricToSnakeCase(metric: typeof metrics.$inferSelect) {
   return {

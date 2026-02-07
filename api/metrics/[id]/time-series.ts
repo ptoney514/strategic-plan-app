@@ -8,8 +8,6 @@ import { requireOrgMember } from "../../lib/middleware/auth";
 import { getOrgSlugForMetric, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle metricTimeSeries row to snake_case for the frontend */
 function timeSeriesEntryToSnake(e: typeof metricTimeSeries.$inferSelect) {
   return {

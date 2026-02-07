@@ -9,8 +9,6 @@ import {
 import { requireAuth } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /**
  * GET /api/school-admins/check?district=slug&school=slug
  * Check if current user can access a school.

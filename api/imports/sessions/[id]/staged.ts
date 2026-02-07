@@ -9,8 +9,6 @@ import {
 import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../../lib/response";
 
-export const config = { runtime: "edge" };
-
 function stagedGoalToSnake(sg: typeof stagedGoals.$inferSelect) {
   return {
     id: sg.id,

@@ -4,8 +4,6 @@ import { organizations, schoolAdmins, schools, user } from "../lib/schema/index"
 import { requireOrgMember } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a school admin + user join to snake_case for the frontend */
 function adminWithUserToSnake(row: {
   schoolAdmin: typeof schoolAdmins.$inferSelect;

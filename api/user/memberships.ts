@@ -3,8 +3,6 @@ import { requireAuth } from "../lib/middleware/auth";
 import { db } from "../lib/db";
 import { organizations, organizationMembers } from "../lib/schema/index";
 
-export const config = { runtime: "edge" };
-
 export async function GET(request: Request) {
   try {
     const { user } = await requireAuth(request);

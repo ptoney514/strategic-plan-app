@@ -5,8 +5,6 @@ import { requireOrgMember } from "../lib/middleware/auth";
 import { getOrgSlugForPlan } from "../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /**
  * PUT /api/plans/reorder - Reorder plans by updating order_position
  * Body: { plans: [{ id: string, order_position: number }] }

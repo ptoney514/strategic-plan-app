@@ -5,8 +5,6 @@ import { requireOrgMember } from "../../lib/middleware/auth";
 import { getOrgSlugForGoal } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 function extractGoalId(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");
   // /api/progress/[goalId]/display-mode -> segments[3]

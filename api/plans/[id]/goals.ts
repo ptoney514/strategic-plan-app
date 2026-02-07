@@ -5,8 +5,6 @@ import { requireOrgMember } from "../../lib/middleware/auth";
 import { getOrgSlugForPlan, isPublicOrg } from "../../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function goalToSnake(row: any) {
   return {

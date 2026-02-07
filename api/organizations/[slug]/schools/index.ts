@@ -4,8 +4,6 @@ import { organizations, schools } from "../../../lib/schema/index";
 import { requireOrgMember } from "../../../lib/middleware/auth";
 import { jsonOk, jsonError, parsePagination } from "../../../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle school row to snake_case for the frontend */
 function schoolToSnakeCase(school: typeof schools.$inferSelect) {
   return {

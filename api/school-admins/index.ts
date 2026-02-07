@@ -7,8 +7,6 @@ import {
 } from "../lib/middleware/auth";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /** Map a Drizzle school admin row to snake_case for the frontend */
 function schoolAdminToSnake(sa: typeof schoolAdmins.$inferSelect) {
   return {

@@ -4,8 +4,6 @@ import { db } from "../lib/db";
 import { organizations, organizationMembers } from "../lib/schema/index";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 function orgToSnake(o: typeof organizations.$inferSelect) {
   return {
     id: o.id,

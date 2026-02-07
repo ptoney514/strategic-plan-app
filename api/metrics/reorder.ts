@@ -5,8 +5,6 @@ import { requireOrgMember } from "../lib/middleware/auth";
 import { getOrgSlugForMetric } from "../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 /**
  * PUT /api/metrics/reorder - Reorder metrics
  * Requires auth + org membership (editor role minimum)

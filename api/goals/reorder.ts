@@ -5,8 +5,6 @@ import { requireOrgMember } from "../lib/middleware/auth";
 import { getOrgSlugForGoal } from "../lib/helpers/org-lookup";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 // ---------------------------------------------------------------------------
 // PUT /api/goals/reorder — Reorder goals by updating order_position
 // ---------------------------------------------------------------------------

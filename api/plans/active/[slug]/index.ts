@@ -9,8 +9,6 @@ import {
 import { jsonOk, jsonError } from "../../../lib/response";
 import { auth } from "../../../lib/auth";
 
-export const config = { runtime: "edge" };
-
 function toSnake(row: typeof plans.$inferSelect) {
   return {
     id: row.id,

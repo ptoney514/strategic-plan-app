@@ -10,8 +10,6 @@ import {
 import { requireAuth } from "../../lib/middleware/auth";
 import { jsonOk, jsonError } from "../../lib/response";
 
-export const config = { runtime: "edge" };
-
 function extractOrgId(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");
   // /api/progress/recalculate/[orgId] -> segments[4]

@@ -10,8 +10,6 @@ import {
 } from "../lib/schema/index";
 import { jsonOk, jsonError } from "../lib/response";
 
-export const config = { runtime: "edge" };
-
 export async function GET(request: Request) {
   try {
     const { user } = await requireAuth(request);

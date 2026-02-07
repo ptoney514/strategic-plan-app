@@ -14,7 +14,7 @@ export class SchoolService {
    */
   static async getBySlug(districtSlug: string, schoolSlug: string): Promise<SchoolWithSummary | null> {
     try {
-      return await apiGet<SchoolWithSummary>(`/schools/${districtSlug}/${schoolSlug}`);
+      return await apiGet<SchoolWithSummary>(`/schools/by-slug/${districtSlug}/${schoolSlug}`);
     } catch (error) {
       if (error instanceof ApiError && error.status === 404) {
         return null;

@@ -1,5 +1,5 @@
 import { describe, it, expect, afterEach } from 'vitest';
-import { getCookieDomain } from '../supabase';
+import { getCookieDomain } from '../cookie-domain';
 
 /**
  * Mock window.location for testing different environments

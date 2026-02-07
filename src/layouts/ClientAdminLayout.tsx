@@ -12,7 +12,7 @@ import {
 import { UserAvatarMenu } from '../components/common/UserAvatarMenu';
 
 /**
- * ClientAdminLayout - Redesigned admin layout with hierarchical sidebar
+ * ClientAdminLayout - Unified admin layout with editorial dark sidebar
  * Supports both district and school admin contexts
  */
 export function ClientAdminLayout() {
@@ -37,10 +37,10 @@ export function ClientAdminLayout() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--editorial-bg)' }}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto" />
-          <p className="mt-4 text-slate-500">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto" style={{ borderColor: 'var(--editorial-accent-primary)' }} />
+          <p className="mt-4" style={{ color: 'var(--editorial-text-muted)' }}>Loading...</p>
         </div>
       </div>
     );
@@ -48,10 +48,10 @@ export function ClientAdminLayout() {
 
   if (!district) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--editorial-bg)' }}>
         <div className="text-center">
-          <p className="text-xl text-slate-500">District not found</p>
-          <Link to="/" className="mt-4 inline-flex items-center text-amber-600 hover:underline">
+          <p className="text-xl" style={{ color: 'var(--editorial-text-muted)' }}>District not found</p>
+          <Link to="/" className="mt-4 inline-flex items-center hover:underline" style={{ color: 'var(--editorial-accent-primary)' }}>
             Return to Home
           </Link>
         </div>
@@ -64,9 +64,9 @@ export function ClientAdminLayout() {
   const userRole = schoolSlug ? 'School Admin' : 'District Admin';
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Left Sidebar - Desktop */}
-      <aside className="hidden lg:flex lg:flex-col w-72 bg-white border-r border-slate-200">
+    <div className="min-h-screen flex" style={{ backgroundColor: 'var(--editorial-bg)' }}>
+      {/* Left Sidebar - Desktop (Editorial Dark) */}
+      <aside className="hidden lg:flex lg:flex-col w-72 flex-shrink-0" style={{ backgroundColor: 'var(--editorial-sidebar-bg)' }}>
         {/* Sidebar Header */}
         <SidebarHeader
           district={district}
@@ -93,22 +93,23 @@ export function ClientAdminLayout() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="bg-white border-b border-slate-200 px-6 py-4">
+        <header className="border-b px-6 py-4" style={{ backgroundColor: 'var(--editorial-surface)', borderColor: 'var(--editorial-border)' }}>
           <div className="flex items-center justify-between">
             {/* Left: Mobile menu + Title */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 -ml-2 rounded-md hover:bg-slate-50 transition-colors"
+                className="lg:hidden p-2 -ml-2 rounded-md transition-colors"
+                style={{ color: 'var(--editorial-text-secondary)' }}
               >
-                <Menu className="h-5 w-5 text-slate-700" />
+                <Menu className="h-5 w-5" />
               </button>
 
               <div className="lg:hidden">
-                <div className="font-semibold text-sm text-slate-900">
+                <div className="font-semibold text-sm" style={{ color: 'var(--editorial-text-primary)' }}>
                   {school?.name || district.name}
                 </div>
-                <div className="text-xs text-slate-500">{userRole}</div>
+                <div className="text-xs" style={{ color: 'var(--editorial-text-muted)' }}>{userRole}</div>
               </div>
             </div>
 
@@ -125,16 +126,19 @@ export function ClientAdminLayout() {
         </main>
       </div>
 
-      {/* Mobile Sidebar */}
+      {/* Mobile Sidebar (Editorial Dark) */}
       {isMobileMenuOpen && (
         <>
           <div
-            className="lg:hidden fixed inset-0 bg-black/20 z-40"
+            className="lg:hidden fixed inset-0 bg-black/30 z-40"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-72 bg-white border-r border-slate-200 z-50 flex flex-col">
+          <aside
+            className="lg:hidden fixed left-0 top-0 bottom-0 w-72 z-50 flex flex-col"
+            style={{ backgroundColor: 'var(--editorial-sidebar-bg)' }}
+          >
             {/* Mobile Header with Close */}
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+            <div className="p-4 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
               <div className="flex items-center gap-3">
                 {district.logo_url ? (
                   <img
@@ -145,18 +149,18 @@ export function ClientAdminLayout() {
                 ) : (
                   <div
                     className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold"
-                    style={{ backgroundColor: district.primary_color || '#D97706' }}
+                    style={{ backgroundColor: district.primary_color || 'var(--editorial-accent-primary)' }}
                   >
                     {district.name.substring(0, 2).toUpperCase()}
                   </div>
                 )}
                 <div>
-                  <div className="font-semibold text-sm text-slate-900">{district.name}</div>
-                  <div className="text-xs text-slate-500">Strategic Planning</div>
+                  <div className="font-semibold text-sm" style={{ color: 'var(--editorial-sidebar-text)' }}>{district.name}</div>
+                  <div className="text-xs" style={{ color: 'var(--editorial-sidebar-text-muted)' }}>Strategic Planning</div>
                 </div>
               </div>
-              <button onClick={() => setIsMobileMenuOpen(false)}>
-                <X className="h-5 w-5 text-slate-500" />
+              <button onClick={() => setIsMobileMenuOpen(false)} style={{ color: 'var(--editorial-sidebar-text-muted)' }}>
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -191,14 +195,15 @@ export function ClientAdminLayout() {
       {/* Add School Modal Placeholder */}
       {showAddSchoolModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl w-full max-w-md mx-4 p-6">
-            <h2 className="font-semibold text-slate-900 mb-4">Add School</h2>
-            <p className="text-slate-500 text-sm mb-4">
+          <div className="rounded-xl w-full max-w-md mx-4 p-6" style={{ backgroundColor: 'var(--editorial-surface)' }}>
+            <h2 className="font-semibold mb-4" style={{ color: 'var(--editorial-text-primary)' }}>Add School</h2>
+            <p className="text-sm mb-4" style={{ color: 'var(--editorial-text-muted)' }}>
               School creation modal coming soon...
             </p>
             <button
               onClick={() => setShowAddSchoolModal(false)}
-              className="px-4 py-2 text-sm font-medium bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200"
+              className="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--editorial-surface-alt)', color: 'var(--editorial-text-secondary)' }}
             >
               Close
             </button>

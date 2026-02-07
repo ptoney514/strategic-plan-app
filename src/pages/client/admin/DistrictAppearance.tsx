@@ -10,6 +10,7 @@ import type { DashboardTemplate, DashboardConfig } from '../../../lib/types';
 
 /**
  * DistrictAppearance - Customize district branding and appearance
+ * Restyled with editorial warm paper aesthetic
  */
 export function DistrictAppearance() {
   const { slug } = useSubdomain();
@@ -54,22 +55,27 @@ export function DistrictAppearance() {
 
   if (districtLoading) {
     return (
-      <div className="p-8 space-y-6">
+      <div className="p-6 lg:p-8 space-y-6 max-w-[1100px]">
         <div className="animate-pulse">
-          <div className="h-8 w-48 bg-slate-200 rounded" />
-          <div className="h-4 w-32 bg-slate-100 rounded mt-2" />
+          <div className="h-8 w-48 rounded" style={{ backgroundColor: 'var(--editorial-border)' }} />
+          <div className="h-4 w-32 rounded mt-2" style={{ backgroundColor: 'var(--editorial-border-light)' }} />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-6 lg:p-8 space-y-6 max-w-[1100px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Appearance</h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <h1
+            className="text-2xl sm:text-[28px] font-medium tracking-tight"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--editorial-text-primary)' }}
+          >
+            Appearance
+          </h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--editorial-text-muted)' }}>
             Customize your district's branding
           </p>
         </div>
@@ -77,7 +83,10 @@ export function DistrictAppearance() {
           data-testid="appearance-save-btn"
           onClick={handleSave}
           disabled={updateDistrict.isPending}
-          className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-4 py-2.5 text-white rounded-lg transition-colors disabled:opacity-50 font-semibold text-sm"
+          style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
+          onMouseEnter={(e) => { if (!updateDistrict.isPending) e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary-hover)'; }}
+          onMouseLeave={(e) => { if (!updateDistrict.isPending) e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary)'; }}
         >
           {updateDistrict.isPending ? (
             <>
@@ -96,17 +105,17 @@ export function DistrictAppearance() {
       {/* Settings Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Colors */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Palette className="h-5 w-5 text-purple-600" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(184, 92, 56, 0.1)' }}>
+              <Palette className="h-5 w-5" style={{ color: 'var(--editorial-accent-primary)' }} />
             </div>
-            <h2 className="text-lg font-semibold text-slate-900">Colors</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>Colors</h2>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--editorial-text-secondary)' }}>
                 Primary Color
               </label>
               <div className="flex items-center gap-3">
@@ -115,21 +124,23 @@ export function DistrictAppearance() {
                   data-testid="color-primary-picker"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="w-12 h-12 rounded-lg border border-slate-200 cursor-pointer"
+                  className="w-12 h-12 rounded-lg cursor-pointer"
+                  style={{ border: '1px solid var(--editorial-border)' }}
                 />
                 <input
                   type="text"
                   data-testid="color-primary-input"
                   value={primaryColor}
                   onChange={(e) => setPrimaryColor(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="flex-1 px-3 py-2 rounded-lg focus:outline-none"
+                  style={{ border: '1px solid var(--editorial-border)', color: 'var(--editorial-text-primary)' }}
                   placeholder="#0099CC"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--editorial-text-secondary)' }}>
                 Secondary Color
               </label>
               <div className="flex items-center gap-3">
@@ -138,14 +149,16 @@ export function DistrictAppearance() {
                   data-testid="color-secondary-picker"
                   value={secondaryColor}
                   onChange={(e) => setSecondaryColor(e.target.value)}
-                  className="w-12 h-12 rounded-lg border border-slate-200 cursor-pointer"
+                  className="w-12 h-12 rounded-lg cursor-pointer"
+                  style={{ border: '1px solid var(--editorial-border)' }}
                 />
                 <input
                   type="text"
                   data-testid="color-secondary-input"
                   value={secondaryColor}
                   onChange={(e) => setSecondaryColor(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  className="flex-1 px-3 py-2 rounded-lg focus:outline-none"
+                  style={{ border: '1px solid var(--editorial-border)', color: 'var(--editorial-text-primary)' }}
                   placeholder="#FFB800"
                 />
               </div>
@@ -154,12 +167,12 @@ export function DistrictAppearance() {
         </div>
 
         {/* Logo */}
-        <div className="bg-white rounded-xl border border-slate-200 p-6">
+        <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <ImageIcon className="h-5 w-5 text-blue-600" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(74, 111, 165, 0.1)' }}>
+              <ImageIcon className="h-5 w-5" style={{ color: 'var(--editorial-accent-link)' }} />
             </div>
-            <h2 className="text-lg font-semibold text-slate-900">Logo</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>Logo</h2>
           </div>
 
           <LogoUpload
@@ -174,14 +187,14 @@ export function DistrictAppearance() {
       </div>
 
       {/* Dashboard Template */}
-      <div className="bg-white rounded-xl border border-slate-200 p-6">
+      <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
         <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 bg-amber-100 rounded-lg">
-            <LayoutTemplate className="h-5 w-5 text-amber-600" />
+          <div className="p-2 rounded-lg" style={{ backgroundColor: 'rgba(201, 162, 39, 0.1)' }}>
+            <LayoutTemplate className="h-5 w-5" style={{ color: 'var(--editorial-accent-secondary)' }} />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-slate-900">Dashboard Template</h2>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>Dashboard Template</h2>
+            <p className="text-sm" style={{ color: 'var(--editorial-text-muted)' }}>
               Choose how your public dashboard looks
             </p>
           </div>
@@ -193,7 +206,7 @@ export function DistrictAppearance() {
           disabled={updateDistrict.isPending}
         />
 
-        <div className="mt-6 pt-6 border-t border-slate-100">
+        <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--editorial-border-light)' }}>
           <TemplateConfigEditor
             template={dashboardTemplate}
             config={dashboardConfig}

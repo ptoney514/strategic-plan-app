@@ -9,30 +9,27 @@ import type { District } from '../../lib/types';
 interface DistrictSwitcherProps {
   currentDistrict: District;
   className?: string;
+  /** 'light' for white sidebar, 'dark' for editorial dark sidebar */
+  variant?: 'light' | 'dark';
 }
 
 /**
  * DistrictSwitcher - Dropdown to switch between districts
  *
- * Similar to Supabase's organization/project switcher pattern.
- * Shows current district and allows switching to other districts
- * the user has admin access to.
- *
- * Features:
- * - Current district displayed with logo/initials
- * - Dropdown with all accessible districts
- * - Checkmark on current district
- * - "View All Districts" link to main dashboard
- * - Only renders if user has multiple districts
+ * Supports light (white bg) and dark (editorial sidebar) variants.
+ * For users with multiple districts, shows a dropdown to switch between them.
+ * For users with a single district, shows a static display.
  */
-export function DistrictSwitcher({ currentDistrict, className }: DistrictSwitcherProps) {
+export function DistrictSwitcher({ currentDistrict, className, variant = 'light' }: DistrictSwitcherProps) {
   const { data: districts, isLoading } = useUserDistricts();
   const { slug: currentSlug } = useSubdomain();
+
+  const isDark = variant === 'dark';
 
   // Don't render if loading or user has only one district (or none)
   if (isLoading || !districts || districts.length <= 1) {
     return (
-      <StaticDistrictHeader district={currentDistrict} className={className} />
+      <StaticDistrictHeader district={currentDistrict} className={className} isDark={isDark} />
     );
   }
 
@@ -41,23 +38,45 @@ export function DistrictSwitcher({ currentDistrict, className }: DistrictSwitche
       <DropdownMenu.Trigger asChild>
         <button
           className={cn(
-            'w-full flex items-center gap-3 p-4 border-b border-slate-200 dark:border-slate-700',
-            'hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-teal',
+            'w-full flex items-center gap-3 p-4 transition-colors',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset',
+            isDark
+              ? 'focus-visible:ring-white/30'
+              : 'focus-visible:ring-brand-teal',
             className
           )}
+          style={isDark ? {
+            borderBottom: '1px solid rgba(255,255,255,0.1)',
+          } : {
+            borderBottom: '1px solid var(--editorial-border, #e2e8f0)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = isDark ? 'var(--editorial-sidebar-hover)' : 'var(--editorial-surface-alt, #f8fafc)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+          }}
           data-testid="district-switcher"
         >
           <DistrictAvatar district={currentDistrict} />
           <div className="min-w-0 flex-1 text-left">
-            <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
+            <div
+              className="font-semibold text-sm truncate"
+              style={{ color: isDark ? 'var(--editorial-sidebar-text)' : 'var(--editorial-text-primary)' }}
+            >
               {currentDistrict.name}
             </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400">
+            <div
+              className="text-xs"
+              style={{ color: isDark ? 'var(--editorial-sidebar-text-muted)' : 'var(--editorial-text-muted)' }}
+            >
               Strategic Planning
             </div>
           </div>
-          <ChevronDown className="w-4 h-4 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+          <ChevronDown
+            className="w-4 h-4 flex-shrink-0"
+            style={{ color: isDark ? 'var(--editorial-sidebar-text-muted)' : 'var(--editorial-text-muted)' }}
+          />
         </button>
       </DropdownMenu.Trigger>
 
@@ -66,15 +85,21 @@ export function DistrictSwitcher({ currentDistrict, className }: DistrictSwitche
           align="start"
           sideOffset={4}
           className={cn(
-            'z-50 min-w-[240px] bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-slate-200 dark:border-slate-700 py-1',
+            'z-50 min-w-[240px] rounded-lg shadow-lg py-1',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-            'data-[side=bottom]:slide-in-from-top-2'
+            'data-[side=bottom]:slide-in-from-top-2',
+            isDark
+              ? 'bg-[#2a2a2a] border border-white/10'
+              : 'bg-white border border-slate-200'
           )}
         >
           {/* Districts Section Header */}
-          <div className="px-3 py-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+          <div
+            className="px-3 py-1.5 text-xs font-medium"
+            style={{ color: isDark ? 'var(--editorial-sidebar-text-muted)' : 'var(--editorial-text-muted)' }}
+          >
             Your Districts
           </div>
 
@@ -90,9 +115,13 @@ export function DistrictSwitcher({ currentDistrict, className }: DistrictSwitche
                   href={buildSubdomainUrlWithPath('district', '/admin', district.slug)}
                   className={cn(
                     'flex items-center gap-3 px-3 py-2 text-sm outline-none cursor-pointer transition-colors',
-                    isCurrent
-                      ? 'bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100'
-                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
+                    isDark
+                      ? isCurrent
+                        ? 'bg-white/10 text-white'
+                        : 'text-[#e8e6e1] hover:bg-white/10 hover:text-white'
+                      : isCurrent
+                        ? 'bg-slate-50 text-slate-900'
+                        : 'text-slate-700 hover:bg-slate-50'
                   )}
                   data-testid="district-option"
                   data-current={isCurrent}
@@ -100,22 +129,36 @@ export function DistrictSwitcher({ currentDistrict, className }: DistrictSwitche
                   <DistrictAvatar district={district} size="sm" />
                   <span className="flex-1 truncate">{district.name}</span>
                   {isCurrent && (
-                    <Check className="w-4 h-4 text-brand-teal flex-shrink-0" />
+                    <Check
+                      className="w-4 h-4 flex-shrink-0"
+                      style={{ color: isDark ? 'var(--editorial-accent-secondary)' : 'var(--editorial-accent-primary)' }}
+                    />
                   )}
                 </a>
               </DropdownMenu.Item>
             );
           })}
 
-          <DropdownMenu.Separator className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+          <DropdownMenu.Separator
+            className="h-px my-1"
+            style={{ backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : '#e2e8f0' }}
+          />
 
           {/* View All Districts Link */}
           <DropdownMenu.Item asChild>
             <a
               href={buildSubdomainUrlWithPath('root', '/dashboard')}
-              className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 outline-none cursor-pointer transition-colors"
+              className={cn(
+                'flex items-center gap-3 px-3 py-2 text-sm outline-none cursor-pointer transition-colors',
+                isDark
+                  ? 'text-[#e8e6e1] hover:bg-white/10 hover:text-white'
+                  : 'text-slate-700 hover:bg-slate-50'
+              )}
             >
-              <LayoutDashboard className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+              <LayoutDashboard
+                className="w-4 h-4"
+                style={{ color: isDark ? 'var(--editorial-sidebar-text-muted)' : 'var(--editorial-text-muted)' }}
+              />
               <span>View All Districts</span>
             </a>
           </DropdownMenu.Item>
@@ -128,16 +171,27 @@ export function DistrictSwitcher({ currentDistrict, className }: DistrictSwitche
 /**
  * Static district header - shown when user has only one district
  */
-function StaticDistrictHeader({ district, className }: { district: District; className?: string }) {
+function StaticDistrictHeader({ district, className, isDark }: { district: District; className?: string; isDark: boolean }) {
   return (
-    <div className={cn('p-4 border-b border-slate-200 dark:border-slate-700', className)}>
+    <div
+      className={cn('p-4', className)}
+      style={{
+        borderBottom: isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid var(--editorial-border, #e2e8f0)',
+      }}
+    >
       <div className="flex items-center gap-3">
         <DistrictAvatar district={district} />
         <div className="min-w-0 flex-1">
-          <div className="font-semibold text-slate-900 dark:text-slate-100 text-sm truncate">
+          <div
+            className="font-semibold text-sm truncate"
+            style={{ color: isDark ? 'var(--editorial-sidebar-text)' : 'var(--editorial-text-primary)' }}
+          >
             {district.name}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400">
+          <div
+            className="text-xs"
+            style={{ color: isDark ? 'var(--editorial-sidebar-text-muted)' : 'var(--editorial-text-muted)' }}
+          >
             Strategic Planning
           </div>
         </div>
@@ -168,7 +222,7 @@ function DistrictAvatar({ district, size = 'md' }: { district: District; size?: 
         sizeClasses,
         'rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0'
       )}
-      style={{ backgroundColor: district.primary_color || '#D97706' }}
+      style={{ backgroundColor: district.primary_color || 'var(--editorial-accent-primary)' }}
     >
       {district.name.substring(0, 2).toUpperCase()}
     </div>

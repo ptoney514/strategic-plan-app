@@ -29,18 +29,26 @@ export function AdminSettings() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="p-6 lg:p-8 space-y-6 max-w-[1100px]">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">District Settings</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1
+            className="text-2xl sm:text-[28px] font-medium tracking-tight"
+            style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--editorial-text-primary)' }}
+          >
+            District Settings
+          </h1>
+          <p className="text-sm mt-1" style={{ color: 'var(--editorial-text-muted)' }}>
             Customize your district's branding and appearance
           </p>
         </div>
         <button
           onClick={handleSave}
-          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 text-white rounded-lg transition-colors font-semibold text-sm"
+          style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary-hover)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary)'; }}
         >
           <Save className="h-4 w-4" />
           <span>Save Changes</span>
@@ -51,15 +59,15 @@ export function AdminSettings() {
         {/* Left Column - Settings */}
         <div className="lg:col-span-2 space-y-6">
           {/* Logo Upload */}
-          <div className="bg-white border border-border rounded-lg p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <ImageIcon className="h-5 w-5 text-muted-foreground" />
-              <h2 className="text-lg font-semibold text-foreground">District Logo</h2>
+          <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <ImageIcon className="h-5 w-5" style={{ color: 'var(--editorial-text-muted)' }} />
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>District Logo</h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-2">Logo URL</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--editorial-text-secondary)' }}>Logo URL</label>
                 <input
                   type="url"
                   value={settings.logoUrl}
@@ -68,16 +76,17 @@ export function AdminSettings() {
                     setPreviewLogo(e.target.value);
                   }}
                   placeholder="https://example.com/logo.png"
-                  className="w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-3 py-2 rounded-lg focus:outline-none"
+                  style={{ border: '1px solid var(--editorial-border)', color: 'var(--editorial-text-primary)' }}
                 />
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs mt-1" style={{ color: 'var(--editorial-text-muted)' }}>
                   Enter the URL of your district logo (recommended: 200x60px PNG with transparent background)
                 </p>
               </div>
 
               {previewLogo && (
-                <div className="border border-border rounded-md p-4 bg-muted/20">
-                  <p className="text-xs font-medium text-muted-foreground mb-2">Preview:</p>
+                <div className="rounded-lg p-4" style={{ border: '1px solid var(--editorial-border)', backgroundColor: 'var(--editorial-surface-alt)' }}>
+                  <p className="text-xs font-medium mb-2" style={{ color: 'var(--editorial-text-muted)' }}>Preview:</p>
                   <img
                     src={previewLogo}
                     alt="Logo preview"
@@ -90,142 +99,62 @@ export function AdminSettings() {
           </div>
 
           {/* Theme Colors */}
-          <div className="bg-white border border-border rounded-lg p-6">
-            <div className="flex items-center space-x-2 mb-4">
-              <Palette className="h-5 w-5 text-muted-foreground" />
-              <h2 className="text-lg font-semibold text-foreground">Theme Colors</h2>
+          <div className="rounded-xl p-6" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Palette className="h-5 w-5" style={{ color: 'var(--editorial-text-muted)' }} />
+              <h2 className="text-lg font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>Theme Colors</h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Primary Color */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Primary Color</label>
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="color"
-                    value={settings.primaryColor}
-                    onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
-                    className="h-12 w-20 border border-border rounded cursor-pointer"
-                  />
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={settings.primaryColor}
-                      onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
-                      className="w-full px-3 py-2 border border-border rounded-md font-mono text-sm"
-                    />
-                  </div>
-                </div>
-                <div
-                  className="mt-2 h-12 rounded-md border border-border"
-                  style={{ backgroundColor: settings.primaryColor }}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Used for buttons, links, and highlights
-                </p>
-              </div>
+              <ColorSetting
+                label="Primary Color"
+                value={settings.primaryColor}
+                onChange={(v) => setSettings({ ...settings, primaryColor: v })}
+                description="Used for buttons, links, and highlights"
+              />
 
               {/* Secondary Color */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Secondary Color</label>
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="color"
-                    value={settings.secondaryColor}
-                    onChange={(e) => setSettings({ ...settings, secondaryColor: e.target.value })}
-                    className="h-12 w-20 border border-border rounded cursor-pointer"
-                  />
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={settings.secondaryColor}
-                      onChange={(e) => setSettings({ ...settings, secondaryColor: e.target.value })}
-                      className="w-full px-3 py-2 border border-border rounded-md font-mono text-sm"
-                    />
-                  </div>
-                </div>
-                <div
-                  className="mt-2 h-12 rounded-md border border-border"
-                  style={{ backgroundColor: settings.secondaryColor }}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Used for headers and accents
-                </p>
-              </div>
+              <ColorSetting
+                label="Secondary Color"
+                value={settings.secondaryColor}
+                onChange={(v) => setSettings({ ...settings, secondaryColor: v })}
+                description="Used for headers and accents"
+              />
 
               {/* Header Color */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Header Color</label>
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="color"
-                    value={settings.headerColor}
-                    onChange={(e) => setSettings({ ...settings, headerColor: e.target.value })}
-                    className="h-12 w-20 border border-border rounded cursor-pointer"
-                  />
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={settings.headerColor}
-                      onChange={(e) => setSettings({ ...settings, headerColor: e.target.value })}
-                      className="w-full px-3 py-2 border border-border rounded-md font-mono text-sm"
-                    />
-                  </div>
-                </div>
-                <div
-                  className="mt-2 h-12 rounded-md border border-border"
-                  style={{ backgroundColor: settings.headerColor }}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Used for objective card headers
-                </p>
-              </div>
+              <ColorSetting
+                label="Header Color"
+                value={settings.headerColor}
+                onChange={(v) => setSettings({ ...settings, headerColor: v })}
+                description="Used for objective card headers"
+              />
 
               {/* Accent Color */}
-              <div>
-                <label className="block text-sm font-medium mb-2">Accent Color</label>
-                <div className="flex items-center space-x-3">
-                  <input
-                    type="color"
-                    value={settings.accentColor}
-                    onChange={(e) => setSettings({ ...settings, accentColor: e.target.value })}
-                    className="h-12 w-20 border border-border rounded cursor-pointer"
-                  />
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      value={settings.accentColor}
-                      onChange={(e) => setSettings({ ...settings, accentColor: e.target.value })}
-                      className="w-full px-3 py-2 border border-border rounded-md font-mono text-sm"
-                    />
-                  </div>
-                </div>
-                <div
-                  className="mt-2 h-12 rounded-md border border-border"
-                  style={{ backgroundColor: settings.accentColor }}
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Used for progress bars and indicators
-                </p>
-              </div>
+              <ColorSetting
+                label="Accent Color"
+                value={settings.accentColor}
+                onChange={(v) => setSettings({ ...settings, accentColor: v })}
+                description="Used for progress bars and indicators"
+              />
             </div>
           </div>
         </div>
 
         {/* Right Column - Preview */}
         <div className="lg:col-span-1">
-          <div className="bg-white border border-border rounded-lg p-6 sticky top-24">
-            <div className="flex items-center space-x-2 mb-4">
-              <Eye className="h-5 w-5 text-muted-foreground" />
-              <h3 className="font-semibold text-foreground">Preview</h3>
+          <div className="rounded-xl p-6 sticky top-24" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Eye className="h-5 w-5" style={{ color: 'var(--editorial-text-muted)' }} />
+              <h3 className="font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>Preview</h3>
             </div>
 
             {/* Logo Preview */}
-            <div className="mb-4 p-4 bg-muted/20 rounded-md">
+            <div className="mb-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--editorial-surface-alt)' }}>
               {previewLogo ? (
                 <img src={previewLogo} alt="Logo" className="h-12 object-contain" />
               ) : (
-                <div className="h-12 flex items-center justify-center text-muted-foreground text-sm">
+                <div className="h-12 flex items-center justify-center text-sm" style={{ color: 'var(--editorial-text-muted)' }}>
                   No logo set
                 </div>
               )}
@@ -233,44 +162,27 @@ export function AdminSettings() {
 
             {/* Color Palette Preview */}
             <div className="space-y-3">
-              <div>
-                <div className="text-xs font-medium text-muted-foreground mb-1">Primary</div>
-                <div
-                  className="h-10 rounded-md border border-border"
-                  style={{ backgroundColor: settings.primaryColor }}
-                />
-              </div>
-
-              <div>
-                <div className="text-xs font-medium text-muted-foreground mb-1">Secondary</div>
-                <div
-                  className="h-10 rounded-md border border-border"
-                  style={{ backgroundColor: settings.secondaryColor }}
-                />
-              </div>
-
-              <div>
-                <div className="text-xs font-medium text-muted-foreground mb-1">Header</div>
-                <div
-                  className="h-10 rounded-md border border-border"
-                  style={{ backgroundColor: settings.headerColor }}
-                />
-              </div>
-
-              <div>
-                <div className="text-xs font-medium text-muted-foreground mb-1">Accent</div>
-                <div
-                  className="h-10 rounded-md border border-border"
-                  style={{ backgroundColor: settings.accentColor }}
-                />
-              </div>
+              {[
+                { label: 'Primary', color: settings.primaryColor },
+                { label: 'Secondary', color: settings.secondaryColor },
+                { label: 'Header', color: settings.headerColor },
+                { label: 'Accent', color: settings.accentColor },
+              ].map(({ label, color }) => (
+                <div key={label}>
+                  <div className="text-xs font-medium mb-1" style={{ color: 'var(--editorial-text-muted)' }}>{label}</div>
+                  <div
+                    className="h-10 rounded-lg"
+                    style={{ backgroundColor: color, border: '1px solid var(--editorial-border)' }}
+                  />
+                </div>
+              ))}
             </div>
 
             {/* Sample Button */}
             <div className="mt-6">
-              <p className="text-xs font-medium text-muted-foreground mb-2">Sample Button:</p>
+              <p className="text-xs font-medium mb-2" style={{ color: 'var(--editorial-text-muted)' }}>Sample Button:</p>
               <button
-                className="w-full px-4 py-2 rounded-md text-white font-medium"
+                className="w-full px-4 py-2 rounded-lg text-white font-medium"
                 style={{ backgroundColor: settings.primaryColor }}
               >
                 Primary Button
@@ -279,6 +191,44 @@ export function AdminSettings() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+function ColorSetting({ label, value, onChange, description }: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  description: string;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--editorial-text-secondary)' }}>{label}</label>
+      <div className="flex items-center gap-3">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-12 w-20 rounded-lg cursor-pointer"
+          style={{ border: '1px solid var(--editorial-border)' }}
+        />
+        <div className="flex-1">
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full px-3 py-2 rounded-lg font-mono text-sm"
+            style={{ border: '1px solid var(--editorial-border)', color: 'var(--editorial-text-primary)' }}
+          />
+        </div>
+      </div>
+      <div
+        className="mt-2 h-12 rounded-lg"
+        style={{ backgroundColor: value, border: '1px solid var(--editorial-border)' }}
+      />
+      <p className="text-xs mt-1" style={{ color: 'var(--editorial-text-muted)' }}>
+        {description}
+      </p>
     </div>
   );
 }

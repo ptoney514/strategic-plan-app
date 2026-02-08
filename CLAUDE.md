@@ -77,12 +77,15 @@ strategic-plan-app/
 ### Essential commands
 
 ```bash
-npm run dev              # Start dev server (http://localhost:5174)
+npm run dev              # Frontend only (Vite on port 5174) — no API routes
+npm run dev:api          # Full-stack: frontend + API routes (vercel dev on port 5174)
 npm test                 # Run tests in watch mode
 npm run test:run         # Run tests once
 npm run build            # Production build
 npm run preview          # Preview production build
 ```
+
+> **`dev` vs `dev:api`:** Use `npm run dev` for frontend-only work (faster startup). Use `npm run dev:api` when you need login/auth or any API route — it runs `vercel dev` which serves both the Vite frontend and the `api/` serverless functions. Requires the Vercel CLI (`npm i -g vercel`).
 
 > **Note for AI agents:** Use `npm run test:run` (single run) instead of `npm test` (watch mode) to avoid spawning multiple background processes.
 >

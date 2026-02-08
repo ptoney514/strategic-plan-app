@@ -17,22 +17,6 @@
       "investigate",
       "bug",
       "issue"
-    ],
-    "supabase-dev-admin": [
-      "supabase",
-      "database",
-      "rls",
-      "row level security",
-      "migration",
-      "auth",
-      "authentication",
-      "edge function",
-      "storage",
-      "realtime",
-      "postgres",
-      "postgresql",
-      "query optimization",
-      "schema"
     ]
   }
 }

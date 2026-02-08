@@ -5,7 +5,7 @@ import { UserRoleBadge } from '../../../components/admin/dashboard';
 
 /**
  * DistrictUsers - View district team members and administrators
- * Read-only display - users are managed via Supabase directly
+ * Read-only display - users are managed via the admin dashboard
  * Restyled with editorial warm paper aesthetic
  */
 export function DistrictUsers() {
@@ -73,7 +73,7 @@ export function DistrictUsers() {
                     No team members yet
                   </h3>
                   <p className="text-sm" style={{ color: 'var(--editorial-text-muted)' }}>
-                    Add team members via Supabase to manage your district's strategic plan.
+                    Add team members to manage your district's strategic plan.
                   </p>
                 </td>
               </tr>
@@ -115,7 +115,7 @@ export function DistrictUsers() {
         style={{ backgroundColor: 'rgba(74, 111, 165, 0.08)', border: '1px solid rgba(74, 111, 165, 0.2)' }}
       >
         <p className="text-sm" style={{ color: 'var(--editorial-accent-link)' }}>
-          <strong>Note:</strong> User management is handled through Supabase.
+          <strong>Note:</strong> User management is handled through the admin dashboard.
           Contact your system administrator to add or modify team members.
         </p>
       </div>

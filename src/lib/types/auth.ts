@@ -1,5 +1,5 @@
 /**
- * AuthUser - Unified user type for Better Auth with Supabase compatibility shim.
+ * AuthUser - Unified user type for Better Auth with legacy compatibility shim.
  *
  * The `user_metadata` and `app_metadata` getters provide backward compatibility
  * so existing components that access `user.user_metadata.display_name` or
@@ -15,14 +15,14 @@ export interface AuthUser {
   createdAt: Date;
   updatedAt: Date;
 
-  /** Compatibility shim for Supabase user_metadata access */
+  /** Compatibility shim for legacy user_metadata access */
   user_metadata: {
     display_name: string | null;
     name: string | null;
     role: string | undefined;
   };
 
-  /** Compatibility shim for Supabase app_metadata access */
+  /** Compatibility shim for legacy app_metadata access */
   app_metadata: {
     role: string | undefined;
   };

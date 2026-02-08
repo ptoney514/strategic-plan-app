@@ -50,17 +50,6 @@ vi.mock('../../../lib/subdomain', () => ({
   getSubdomainUrl: () => 'http://localhost:5173',
 }));
 
-// Mock Supabase
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => Promise.resolve({ data: [], error: null }),
-      }),
-    }),
-  },
-}));
-
 describe('DashboardHeader', () => {
   it('renders the header with correct z-index class', () => {
     render(<DashboardHeader />);

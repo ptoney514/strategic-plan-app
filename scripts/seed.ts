@@ -2,7 +2,7 @@
  * Neon/Drizzle Seed Script
  *
  * Populates the Neon database with production-like test data.
- * Replaces the old supabase/seed.sql + create-test-users.sh workflow.
+ * Replaces the old seed.sql + create-test-users.sh workflow.
  *
  * Usage:
  *   npm run db:seed        # seed only (assumes migrations applied)

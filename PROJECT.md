@@ -1,29 +1,41 @@
-# PROJECT.md - Strategic Plan Vite
+# PROJECT.md - Strategic Plan Builder
 
 ## Project Overview
 
-**Name**: Strategic Plan Vite  
-**Type**: Single Page Application (SPA)  
-**Purpose**: Fast, modern rebuild of the strategic planning system using Vite  
-**Status**: Active Development - Phase 2 Complete  
-**Repository**: https://github.com/ptoney514/strategic-plan-vite
+**Name**: Strategic Plan Builder
+**Type**: Single Page Application (SPA) with Vercel Serverless API
+**Purpose**: Strategic planning system for educational districts
+**Status**: Active Development
+**Repository**: https://github.com/ptoney514/strategic-plan-app
 
 ## Technology Stack
 
 ### Core
-- **Build Tool**: Vite 6.3.6
-- **Framework**: React 19.1.1
-- **Language**: TypeScript 5.8.3
-- **Styling**: Tailwind CSS 3.4.17
+
+- **Build Tool**: Vite 6.x
+- **Framework**: React 18
+- **Language**: TypeScript 5.x
+- **Styling**: Tailwind CSS 3.x
 - **Package Manager**: npm
 
 ### Data & State
-- **Database**: Supabase (PostgreSQL)
-- **Data Fetching**: Tanstack Query v5
-- **Client**: @supabase/supabase-js
-- **State Management**: React Query cache
+
+- **Database**: Neon (PostgreSQL)
+- **ORM**: Drizzle ORM
+- **Data Fetching**: TanStack Query v5
+- **API**: Vercel Serverless Functions (Node.js runtime)
+- **Fetch Helper**: `src/lib/api.ts` (apiFetch, apiGet, apiPost, apiPut, apiDelete)
+- **State Management**: React Query cache + Zustand
+
+### Authentication
+
+- **Library**: Better Auth
+- **Server Config**: `api/lib/auth.ts`
+- **Client Config**: `src/lib/auth-client.ts`
+- **Session**: HTTP-only cookies (`credentials: 'include'`)
 
 ### UI & UX
+
 - **Routing**: React Router DOM v7
 - **Components**: Radix UI primitives
 - **Icons**: Lucide React
@@ -32,142 +44,158 @@
 ## Project Structure
 
 ```
-strategic-plan-vite/
+strategic-plan-app/
 ├── src/
 │   ├── components/      # Reusable UI components
 │   │   └── ui/          # Radix-based components
 │   ├── hooks/           # Custom React hooks
 │   ├── lib/             # Core utilities
+│   │   ├── api.ts       # Shared fetch helper
+│   │   ├── auth-client.ts # Better Auth client
 │   │   ├── services/    # Data service layers
-│   │   ├── supabase.ts  # Supabase client
 │   │   └── types.ts     # TypeScript interfaces
 │   ├── pages/           # Route components
 │   ├── App.tsx          # Main app with routing
 │   └── main.tsx         # Entry point
+├── api/                 # Vercel Serverless Functions
+│   └── lib/
+│       ├── auth.ts      # Better Auth server config
+│       ├── db.ts        # Drizzle + Neon client
+│       ├── response.ts  # Response helpers
+│       └── schema/      # Drizzle table schemas
+├── drizzle/
+│   ├── migrations/      # SQL migration files
+│   └── custom/          # Custom trigger SQL
 ├── public/              # Static assets
-├── .env.local           # Environment variables
 └── vite.config.ts       # Vite configuration
 ```
 
 ## Development Setup
 
 ### Prerequisites
+
 - Node.js 20.9.0+
 - npm 10.1.0+
-- Docker (for local Supabase)
+- Neon database (no local database required)
 
 ### Environment Variables
+
 ```bash
-VITE_SUPABASE_URL=http://127.0.0.1:54321
-VITE_SUPABASE_ANON_KEY=your_local_anon_key
+DATABASE_URL=postgresql://user:pass@ep-xxx.us-east-1.aws.neon.tech/strategic-plan-db
+BETTER_AUTH_SECRET=your-random-secret
+BETTER_AUTH_URL=http://localhost:5174
 ```
 
 ### Commands
+
 ```bash
-npm install          # Install dependencies
-npm run dev          # Start dev server (port 5173)
-npm run build        # Build for production
-npm run preview      # Preview production build
-npm run lint         # Run ESLint
+npm install              # Install dependencies
+npm run dev              # Start dev server (port 5174)
+npm run build            # Build for production
+npm run preview          # Preview production build
+npm run lint             # Run ESLint
+npm run type-check       # TypeScript type checking
+npx drizzle-kit generate # Generate migration
+npx drizzle-kit migrate  # Apply migration
+npx drizzle-kit studio   # Browse database
 ```
 
 ## Features Implemented
 
-### Phase 1 ✅
-- Project initialization
-- TypeScript configuration
-- Tailwind CSS setup
-- Supabase client configuration
-- Data service layers (District, Goals, Metrics)
-- Type definitions ported from original
+### Phase 1 - Foundation
 
-### Phase 2 ✅
+- Project initialization with Vite + TypeScript
+- Tailwind CSS setup
+- Neon database connection with Drizzle ORM
+- Data service layers (District, Goals, Metrics)
+- Type definitions
+
+### Phase 2 - Data Layer
+
 - React Query integration
 - Custom hooks for data fetching
-- React Router with 3 routes
-- HomePage (Districts list)
-- DistrictDashboard (Goals overview)
-- GoalDetail (Individual goal view)
+- React Router with multi-level routing
 - Loading states and error handling
 
-### Phase 3 ✅
+### Phase 3 - CRUD & Visualization
+
 - CRUD operations with inline editing
-- Data visualizations with recharts (bar, pie, line, area charts)
+- Data visualizations with Recharts (bar, pie, line, area charts)
 - Drag-and-drop reordering with @dnd-kit
-- Advanced form management with react-hook-form & zod validation
+- Advanced form management with react-hook-form & Zod validation
 - Modal dialogs for forms and confirmations
+
+### Phase 4 - API & Schema Extension
+
+- ~40 Vercel Serverless Function API routes
+- Extended goals table (+33 columns), metrics table (+43 columns)
+- 7 new tables (metric_time_series, school_admins, import_sessions, etc.)
+- 19 total tables in Neon database
+- API-level authorization middleware (requireAuth, requireOrgMember, requireSystemAdmin)
+
+### Phase 5 - Auth & Frontend Migration
+
+- Better Auth server + client setup
+- Frontend services migrated to use fetch helper (removed direct DB calls)
+- Session-based auth with HTTP-only cookies
 
 ## Database Schema
 
-Uses same schema as strategic-plan-builder:
-- `spb_districts` - Organizations
-- `spb_goals` - Hierarchical goals (3 levels)
-- `spb_metrics` - Performance metrics
+Drizzle ORM schema files in `api/lib/schema/`:
 
-## Key Differences from Original
-
-| Aspect | Original (Next.js) | This (Vite) |
-|--------|-------------------|-------------|
-| Build Tool | Next.js/Webpack | Vite |
-| Dev Speed | ~3s HMR | <100ms HMR |
-| Rendering | SSR/SSG capable | SPA only |
-| Routing | File-based | Component-based |
-| Env Vars | NEXT_PUBLIC_* | VITE_* |
-| API Routes | Built-in | External only |
+- `organizations` - District organizations
+- `goals` - Hierarchical goals (3 levels)
+- `metrics` - Performance metrics
+- `plans` - Strategic plans
+- `schools` - Schools within districts
+- `school_admins` - Admin access control
+- `metric_time_series` - Time-series data
+- `imports` - Import session tracking
+- `stock_photos` - Photo library
+- `contact` - Contact information
+- `progress` - Progress tracking
 
 ## Performance Metrics
 
 - **Dev Server Start**: ~150ms
 - **HMR Update**: <100ms
-- **Production Build**: ~10s
-- **Bundle Size**: ~250KB (gzipped)
+- **Production Build**: ~12s
+- **Bundle Size**: ~480KB (gzipped)
 
 ## Deployment
 
-### Development
-```bash
-npm run dev
-# Access at http://localhost:5173
-```
+**Platform**: Vercel (auto-deploys from `main`)
 
-### Production Build
 ```bash
 npm run build
-npm run preview
+npm run preview    # Local preview
 ```
 
-### Hosting Options
-- Netlify (recommended)
-- Vercel
-- GitHub Pages
-- Any static host
+### Environment Variables (Vercel)
 
-## API Integration
+- `DATABASE_URL` - Neon connection string
+- `BETTER_AUTH_SECRET` - Auth secret
+- `BETTER_AUTH_URL` - Production URL
 
-Connects to Supabase for all data:
-- **Local**: http://127.0.0.1:54321
-- **Production**: Configure in .env.production
+## Security
+
+- Environment variables for sensitive data
+- API-level authorization middleware on all routes
+- No sensitive data in client bundle
+- HTTP-only session cookies for authentication
 
 ## Testing Strategy
 
-- Unit tests: Vitest (planned)
-- Component tests: React Testing Library (planned)
-- E2E tests: Playwright (planned)
-
-## Security Considerations
-
-- Environment variables for sensitive data
-- Row Level Security (RLS) in Supabase
-- No sensitive data in client bundle
-- API keys use public (anon) role only
+- Unit tests: Vitest
+- Component tests: React Testing Library
+- Tests mock `fetch` for API calls
 
 ## Contributing
 
-1. Work on `develop` branch
-2. Create feature branches from develop
-3. Test with local Supabase
-4. Commit with conventional commits
-5. Push to GitHub for review
+1. Create feature branch from `main`
+2. Follow conventional commits
+3. Run tests and type-check before pushing
+4. Submit PR for review
 
 ## License
 
@@ -180,4 +208,4 @@ Private repository - All rights reserved
 
 ---
 
-*This project is a modern rebuild of strategic-plan-builder using Vite for improved developer experience and performance.*
+_Strategic planning platform for educational districts, built with Vite + React + Neon + Drizzle ORM._

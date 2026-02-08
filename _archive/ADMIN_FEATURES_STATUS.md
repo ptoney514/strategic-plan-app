@@ -11,6 +11,7 @@
 The admin interface provides district administrators with powerful tools to manage strategic plan data, override calculated statuses, and perform bulk data entry operations.
 
 ### Admin Routes
+
 - `/[slug]/admin` - Admin Dashboard
 - `/[slug]/admin/goals` - Goals & Status Management
 - `/[slug]/admin/metrics` - Metrics Data Entry
@@ -21,9 +22,11 @@ The admin interface provides district administrators with powerful tools to mana
 ## ✅ Implemented Features
 
 ### 1. Admin Dashboard (`AdminDashboard.tsx`)
+
 **Status**: 90% Complete - Display Only
 
 **Features Working**:
+
 - ✅ Status summary cards (on-target, at-risk, critical, not-started)
 - ✅ Quick action buttons with links
 - ✅ Goals needing attention list
@@ -33,14 +36,17 @@ The admin interface provides district administrators with powerful tools to mana
 - ✅ Status overrides counter
 
 **What's Missing**:
+
 - ❌ No data persistence (read-only)
 - ❌ Last import date is hardcoded
 - ❌ No actual import functionality
 
 ### 2. Goals & Status Management (`AdminGoals.tsx`)
+
 **Status**: 85% Complete - UI Complete, Save Missing
 
 **Features Working**:
+
 - ✅ Hierarchical goal display with expand/collapse
 - ✅ Status icons and badges
 - ✅ Metrics progress summary per goal
@@ -49,14 +55,17 @@ The admin interface provides district administrators with powerful tools to mana
 - ✅ Manual override indicator
 
 **What's Missing**:
+
 - ❌ Save functionality not connected to database
 - ❌ "Save All Changes" button does nothing
 - ❌ Status updates not persisted
 
 ### 3. Status Override Manager (`StatusManager.tsx`)
+
 **Status**: 95% Complete - Full UI, Save Hook Missing
 
 **Features Working**:
+
 - ✅ Status selection with visual indicators
 - ✅ System recommendation display
 - ✅ Override reason category selection
@@ -66,11 +75,13 @@ The admin interface provides district administrators with powerful tools to mana
 - ✅ Visual distinction between calculated and selected status
 
 **What's Missing**:
+
 - ❌ `onSave` callback not implemented in parent
 - ❌ No API call to save override to database
 - ❌ No audit trail creation
 
 **Expected Behavior**:
+
 ```typescript
 onSave: async (status: string, reason: string) => {
   // Should save to spb_goals table:
@@ -79,15 +90,16 @@ onSave: async (status: string, reason: string) => {
   // - status_override_reason
   // - status_override_by (user_id)
   // - status_override_at (timestamp)
-
   // Should trigger spb_status_overrides insert via trigger
-}
+};
 ```
 
 ### 4. Metrics Data Management (`AdminMetrics.tsx`)
+
 **Status**: 80% Complete - UI Complete, Save Missing
 
 **Features Working**:
+
 - ✅ Goal filter dropdown
 - ✅ Period selection
 - ✅ Grid view / List view toggle
@@ -97,15 +109,18 @@ onSave: async (status: string, reason: string) => {
 - ✅ Data validation warnings
 
 **What's Missing**:
+
 - ❌ Save All functionality not implemented
 - ❌ Export template not generating CSV
 - ❌ Import modal not created
 - ❌ No time series data support yet
 
 ### 5. Bulk Data Entry Grid (`BulkDataEntry.tsx`)
+
 **Status**: 90% Complete - Full Featured UI, Save Missing
 
 **Features Working**:
+
 - ✅ Excel-like editable grid
 - ✅ Current value and target value editing
 - ✅ Real-time progress calculation
@@ -116,26 +131,31 @@ onSave: async (status: string, reason: string) => {
 - ✅ Unsaved changes indicator
 
 **What's Missing**:
+
 - ❌ `handleSaveAll` not implemented
 - ❌ No batch update to database
 - ❌ No optimistic updates
 
 **Expected Behavior**:
+
 ```typescript
 handleSaveAll: async () => {
-  const changedEntries = Array.from(dataEntries.values())
-    .filter(e => e.hasChanges);
+  const changedEntries = Array.from(dataEntries.values()).filter(
+    (e) => e.hasChanges,
+  );
 
   // Batch update spb_metrics table for each changed entry
   // Should also create metric_time_series records
   // Should update ytd_change and other calculated fields
-}
+};
 ```
 
 ### 6. Admin Layout (`AdminLayout.tsx`)
+
 **Status**: 100% Complete
 
 **Features Working**:
+
 - ✅ Admin mode indicator banner
 - ✅ Sidebar navigation
 - ✅ Quick actions menu
@@ -150,6 +170,7 @@ handleSaveAll: async () => {
 ### Current Schema (Implemented)
 
 #### `spb_goals` (from migration 006)
+
 ```sql
 -- Status fields
 status VARCHAR(20) DEFAULT 'not-started'
@@ -168,6 +189,7 @@ cover_photo_alt TEXT
 ```
 
 #### `spb_status_overrides` (from migration 006)
+
 ```sql
 id UUID PRIMARY KEY
 goal_id UUID REFERENCES spb_goals
@@ -188,6 +210,7 @@ review_notes TEXT
 ```
 
 #### `spb_metrics` (existing)
+
 ```sql
 id UUID PRIMARY KEY
 goal_id UUID REFERENCES spb_goals
@@ -206,9 +229,11 @@ last_actual_period VARCHAR(50)
 ### Schema Gaps Identified
 
 #### ❌ Missing: Metric Time Series Support
+
 The UI references periods (Q1, Q2, etc.) but there's no table for storing historical metric values.
 
 **Recommended Addition**:
+
 ```sql
 CREATE TABLE spb_metric_time_series (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -228,9 +253,11 @@ CREATE TABLE spb_metric_time_series (
 ```
 
 #### ❌ Missing: Bulk Import Audit Trail
+
 Need to track when bulk imports occur.
 
 **Recommended Addition**:
+
 ```sql
 CREATE TABLE spb_bulk_imports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -246,9 +273,11 @@ CREATE TABLE spb_bulk_imports (
 ```
 
 #### ⚠️ Potential Enhancement: User Activity Tracking
+
 Currently using `created_by UUID` but no user names stored consistently.
 
 **Recommended Enhancement**:
+
 ```sql
 -- Add to relevant tables
 ALTER TABLE spb_status_overrides
@@ -263,6 +292,7 @@ ADD COLUMN IF NOT EXISTS user_display_name VARCHAR(255);
 ### Phase 1: Critical - Database Persistence (Current Priority)
 
 #### 1.1 Connect Status Override Save
+
 **File**: `src/pages/AdminGoals.tsx`
 **Task**: Implement the `onSave` callback for StatusManager
 
@@ -275,18 +305,18 @@ export async function updateGoalStatus(
   status: string,
   reason: string,
   userId: string,
-  overrideCategory: string = 'contextual'
+  overrideCategory: string = "contextual",
 ) {
   const { data, error } = await supabase
-    .from('spb_goals')
+    .from("spb_goals")
     .update({
       status,
-      status_source: 'manual',
+      status_source: "manual",
       status_override_reason: reason,
       status_override_by: userId,
       status_override_at: new Date().toISOString(),
     })
-    .eq('id', goalId)
+    .eq("id", goalId)
     .select();
 
   if (error) throw error;
@@ -295,6 +325,7 @@ export async function updateGoalStatus(
 ```
 
 #### 1.2 Connect Metrics Bulk Save
+
 **File**: `src/components/BulkDataEntry.tsx`
 **Task**: Implement `handleSaveAll` to batch update metrics
 
@@ -307,18 +338,18 @@ export async function batchUpdateMetrics(
     id: string;
     current_value: number;
     target_value: number;
-  }>
+  }>,
 ) {
   // Use supabase batch update or individual updates
-  const promises = updates.map(update =>
+  const promises = updates.map((update) =>
     supabase
-      .from('spb_metrics')
+      .from("spb_metrics")
       .update({
         current_value: update.current_value,
         target_value: update.target_value,
-        last_actual_period: new Date().toISOString()
+        last_actual_period: new Date().toISOString(),
       })
-      .eq('id', update.id)
+      .eq("id", update.id),
   );
 
   return Promise.all(promises);
@@ -326,6 +357,7 @@ export async function batchUpdateMetrics(
 ```
 
 #### 1.3 Add Authentication Context
+
 **Files**: New - `src/lib/auth/AuthContext.tsx`
 **Task**: Create auth context to get current user ID
 
@@ -334,7 +366,7 @@ export interface AuthUser {
   id: string;
   email: string;
   displayName: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
 }
 
 export const AuthContext = createContext<{
@@ -342,24 +374,27 @@ export const AuthContext = createContext<{
   isAdmin: boolean;
 }>({
   user: null,
-  isAdmin: false
+  isAdmin: false,
 });
 ```
 
 ### Phase 2: High Priority - Data Integrity
 
 #### 2.1 Add Form Validation
+
 - Validate numeric inputs (no negative values where inappropriate)
 - Validate override reason length (min 50 chars)
 - Validate date ranges for periods
 - Add success/error toast notifications
 
 #### 2.2 Add Loading States
+
 - Show spinners during save operations
 - Disable buttons while saving
 - Show optimistic updates
 
 #### 2.3 Add Error Handling
+
 - Try/catch blocks around all database operations
 - User-friendly error messages
 - Retry logic for failed saves
@@ -367,22 +402,26 @@ export const AuthContext = createContext<{
 ### Phase 3: Medium Priority - Enhanced Features
 
 #### 3.1 Create Metric Time Series Support
+
 - Add migration for `spb_metric_time_series` table
 - Modify BulkDataEntry to save to time series
 - Add period selection that actually filters data
 
 #### 3.2 Implement Export Functionality
+
 - CSV export of metrics data
 - Excel template generation
 - PDF reports
 
 #### 3.3 Implement Import Functionality
+
 - CSV/Excel file upload
 - Data validation before import
 - Preview imported data
 - Bulk insert to database
 
 #### 3.4 Build Audit Trail Page
+
 - Display `spb_status_overrides` history
 - Filter by goal, user, date range
 - Show who changed what and when
@@ -390,16 +429,19 @@ export const AuthContext = createContext<{
 ### Phase 4: Polish - UI/UX Improvements
 
 #### 4.1 Mobile Responsiveness
+
 - Make admin tables scrollable on mobile
 - Stack cards vertically on small screens
 - Touch-friendly buttons
 
 #### 4.2 Accessibility
+
 - Add ARIA labels
 - Keyboard navigation
 - Screen reader support
 
 #### 4.3 Performance Optimization
+
 - Implement virtual scrolling for large datasets
 - Debounce input changes
 - Memoize expensive calculations
@@ -433,17 +475,20 @@ export const AuthContext = createContext<{
 ## 📝 Code Quality TODOs
 
 ### TypeScript
+
 - [ ] Add proper types for all service functions
 - [ ] Create zod schemas for validation
 - [ ] Remove all `any` types
 - [ ] Add JSDoc comments to exported functions
 
 ### Error Handling
+
 - [ ] Create custom error classes
 - [ ] Implement error boundary components
 - [ ] Add Sentry or error tracking
 
 ### State Management
+
 - [ ] Consider moving admin state to React Query
 - [ ] Add optimistic updates for better UX
 - [ ] Cache admin data appropriately
@@ -453,6 +498,7 @@ export const AuthContext = createContext<{
 ## 🔗 Related Files
 
 ### Core Admin Files
+
 - `src/components/AdminLayout.tsx` - Main layout
 - `src/pages/AdminDashboard.tsx` - Overview page
 - `src/pages/AdminGoals.tsx` - Goals management
@@ -462,12 +508,14 @@ export const AuthContext = createContext<{
 - `src/components/BulkDataEntry.tsx` - Grid editor
 
 ### Services to Create
+
 - `src/lib/services/goalService.ts` - Goal CRUD operations
 - `src/lib/services/metricService.ts` - Metric CRUD operations
 - `src/lib/services/auditService.ts` - Audit queries
 - `src/lib/services/importService.ts` - Import/export logic
 
 ### Database Files
+
 - `migrations/006_goal_status_overrides.sql` - Status schema
 - `migrations/011_add_cover_photos.sql` - Cover photos
 - `migrations/NEW_012_metric_time_series.sql` - To be created

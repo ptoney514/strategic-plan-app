@@ -10,6 +10,7 @@
 **Blocking Issue**: None
 
 ### Today's Wins ✅
+
 - ✅ Set up Vite + React + TypeScript project
 - ✅ Connected to local Supabase instance
 - ✅ Implemented React Query for data fetching
@@ -18,12 +19,14 @@
 - ✅ All code committed to GitHub
 
 ### Session Notes
+
 - Using local Supabase (http://127.0.0.1:54321) for development
 - Vite dev server running on port 5173
 - HMR working perfectly - instant updates
 - React Query DevTools integrated for debugging
 
 **Next 3 Actions**:
+
 1. Add CRUD operations for goals and metrics
 2. Implement data visualization charts
 3. Add drag-and-drop reordering for goals
@@ -33,6 +36,7 @@
 ## 📋 BACKLOG - Planned Work
 
 ### Next Sprint (Phase 3)
+
 - [ ] Create/Edit/Delete operations for Districts
 - [ ] Goal management (CRUD operations)
 - [ ] Metric management interface
@@ -42,6 +46,7 @@
 - [ ] Create modal dialogs for editing
 
 ### Future Sprints
+
 - [ ] Authentication system
 - [ ] User permissions and roles
 - [ ] Export functionality (PDF, CSV)
@@ -66,6 +71,7 @@
 ## 📖 HISTORY - Completed Work
 
 ### 2025-09-20 - Project Setup & Phase 1-2
+
 - Created new Vite project from scratch
 - Migrated from Next.js to Vite for better DX
 - Set up TypeScript and Tailwind CSS

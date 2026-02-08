@@ -83,7 +83,7 @@ test.describe('System Admin Login Flow', () => {
     test.skip('successful system admin login shows dashboard', async ({ page }) => {
       // TODO: Requires test user with system_admin role
       // Setup:
-      // 1. Create user in Supabase with system_admin role in user_metadata
+      // 1. Create user via Better Auth with isSystemAdmin flag
       // 2. Add credentials to .env.test:
       //    TEST_SYSTEM_ADMIN_EMAIL=sysadmin@test.com
       //    TEST_SYSTEM_ADMIN_PASSWORD=testpassword123

@@ -8,8 +8,8 @@ import { test, expect } from '@playwright/test';
  *
  * Prerequisites:
  * 1. Dev server running (npm run dev)
- * 2. Test users created (run ./scripts/create-test-users.sh)
- * 3. Supabase running locally (supabase start)
+ * 2. Test users seeded (npx tsx scripts/seed.ts)
+ * 3. Database accessible (Neon connection configured)
  *
  * To enable these tests:
  * 1. Ensure prerequisites above are met

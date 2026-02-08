@@ -159,7 +159,7 @@ test.describe('Contact Form', () => {
   });
 
   // Note: This test requires the database to be set up and accessible
-  // It will be skipped if the Supabase connection is not available
+  // It will be skipped if the database connection is not available
   test.skip('should submit form successfully and show thank you message', async ({ page }) => {
     // Open the modal
     await page.locator('button:has-text("Schedule a Demo")').click();

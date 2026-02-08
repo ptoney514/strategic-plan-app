@@ -52,6 +52,9 @@ export const auth = betterAuth({
       enabled: true,
       domain: process.env.BETTER_AUTH_COOKIE_DOMAIN,
     },
+    database: {
+      generateId: "uuid",
+    },
   },
 });
 

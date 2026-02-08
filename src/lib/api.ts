@@ -1,7 +1,7 @@
 /**
  * Shared API fetch helper for the new Neon/Drizzle/Better Auth backend.
  *
- * All service files use these helpers instead of the Supabase client.
+ * All service files use these helpers for API communication.
  * Authentication is handled via Better Auth session cookies (credentials: 'include').
  */
 

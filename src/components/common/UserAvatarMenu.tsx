@@ -19,7 +19,7 @@ interface UserAvatarMenuProps {
 }
 
 /**
- * UserAvatarMenu - Supabase-style user dropdown menu with avatar
+ * UserAvatarMenu - User dropdown menu with avatar
  *
  * Features:
  * - Radix UI DropdownMenu for accessibility (focus trapping, keyboard nav, ARIA)

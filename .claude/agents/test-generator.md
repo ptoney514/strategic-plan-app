@@ -16,36 +16,37 @@ You are a test generation specialist for React + TypeScript + Vitest application
 ## Test Structure
 
 ```typescript
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 
-describe('ComponentName', () => {
+describe("ComponentName", () => {
   beforeEach(() => {
     // Setup
-  })
+  });
 
-  describe('methodName', () => {
-    it('should handle happy path', async () => {
+  describe("methodName", () => {
+    it("should handle happy path", async () => {
       // Arrange
       // Act
       // Assert
-    })
+    });
 
-    it('should handle edge case', async () => {
+    it("should handle edge case", async () => {
       // Test edge case
-    })
+    });
 
-    it('should handle error case', async () => {
+    it("should handle error case", async () => {
       // Test error handling
-    })
-  })
-})
+    });
+  });
+});
 ```
 
 ## React Component Testing
 
 ### What to Test
+
 - Rendering with different props
 - User interactions (clicks, form submissions)
 - Conditional rendering
@@ -54,6 +55,7 @@ describe('ComponentName', () => {
 - Accessibility (screen reader text, roles)
 
 ### Testing Library Patterns
+
 ```typescript
 // Render with providers
 const renderWithProviders = (ui: React.ReactElement) => {
@@ -77,55 +79,54 @@ await waitFor(() => {
 ## React Query Testing
 
 ```typescript
-// Mock Supabase client
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn().mockResolvedValue({ data: mockData, error: null }),
-      insert: vi.fn().mockResolvedValue({ data: mockData, error: null }),
-      update: vi.fn().mockResolvedValue({ data: mockData, error: null }),
-      delete: vi.fn().mockResolvedValue({ error: null })
-    }))
-  }
-}))
+// Mock fetch for API calls
+vi.stubGlobal(
+  "fetch",
+  vi.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve(mockData),
+    }),
+  ),
+);
 ```
 
 ## Custom Hook Testing
 
 ```typescript
-import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from "@testing-library/react";
 
-it('should fetch goals successfully', async () => {
-  const { result } = renderHook(() => useGoals('district-123'), {
-    wrapper: createQueryWrapper()
-  })
+it("should fetch goals successfully", async () => {
+  const { result } = renderHook(() => useGoals("district-123"), {
+    wrapper: createQueryWrapper(),
+  });
 
-  await waitFor(() => expect(result.current.isSuccess).toBe(true))
-  expect(result.current.data).toEqual(mockGoals)
-})
+  await waitFor(() => expect(result.current.isSuccess).toBe(true));
+  expect(result.current.data).toEqual(mockGoals);
+});
 ```
 
 ## Utility Function Testing
 
 ```typescript
-describe('calculateProgress', () => {
-  it('should return 0 for no completed items', () => {
-    expect(calculateProgress(0, 10)).toBe(0)
-  })
+describe("calculateProgress", () => {
+  it("should return 0 for no completed items", () => {
+    expect(calculateProgress(0, 10)).toBe(0);
+  });
 
-  it('should return 100 for all completed items', () => {
-    expect(calculateProgress(10, 10)).toBe(100)
-  })
+  it("should return 100 for all completed items", () => {
+    expect(calculateProgress(10, 10)).toBe(100);
+  });
 
-  it('should handle division by zero', () => {
-    expect(calculateProgress(0, 0)).toBe(0)
-  })
-})
+  it("should handle division by zero", () => {
+    expect(calculateProgress(0, 0)).toBe(0);
+  });
+});
 ```
 
 ## What NOT To Test
 
-- Third-party library internals (React, React Query, Supabase)
+- Third-party library internals (React, React Query, Better Auth)
 - Framework behavior
 - Implementation details (test behavior, not internals)
 - CSS styling (use visual regression tests instead)
@@ -152,31 +153,35 @@ src/
 
 ## Mocking Strategies
 
-### Supabase
+### API Fetch
+
 ```typescript
-vi.mock('@/lib/supabase', () => ({
-  supabase: {
-    from: vi.fn(),
-    auth: {
-      getUser: vi.fn().mockResolvedValue({ data: { user: mockUser }, error: null })
-    }
-  }
-}))
+vi.stubGlobal(
+  "fetch",
+  vi.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({ data: mockData }),
+    }),
+  ),
+);
 ```
 
 ### React Query
+
 ```typescript
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: false },
-    mutations: { retry: false }
-  }
-})
+    mutations: { retry: false },
+  },
+});
 ```
 
 ### Date/Time
+
 ```typescript
-vi.setSystemTime(new Date('2025-10-18'))
+vi.setSystemTime(new Date("2025-10-18"));
 ```
 
 ## Accessibility Testing
@@ -195,6 +200,7 @@ it('should have no accessibility violations', async () => {
 ## Output Guidelines
 
 For each file tested:
+
 1. Import statements
 2. Mock setup
 3. Test helpers/utilities

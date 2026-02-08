@@ -51,17 +51,6 @@ vi.mock('../../lib/subdomain', () => ({
   getSubdomainUrl: () => 'http://localhost:5173',
 }));
 
-// Mock Supabase
-vi.mock('../../lib/supabase', () => ({
-  supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => Promise.resolve({ data: [], error: null }),
-      }),
-    }),
-  },
-}));
-
 describe('DashboardLayout', () => {
   it('renders the layout structure', () => {
     render(<DashboardLayout basePath="/" />);

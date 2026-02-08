@@ -3,19 +3,6 @@ import { render, screen, fireEvent, act } from '../../../test/setup';
 import { GoalsOverviewGrid } from '../GoalsOverviewGrid';
 import type { HierarchicalGoal, Metric } from '../../../lib/types';
 
-// Mock Supabase client to avoid env var errors
-vi.mock('../../../lib/supabase', () => ({
-  supabase: {
-    from: vi.fn(() => ({
-      select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          order: vi.fn(() => Promise.resolve({ data: [], error: null })),
-        })),
-      })),
-    })),
-  },
-}));
-
 // Mock the metrics hook to avoid service layer imports
 vi.mock('../../../hooks/useMetrics', () => ({
   useMetricChartData: vi.fn(() => ({

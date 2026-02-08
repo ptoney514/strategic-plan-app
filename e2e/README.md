@@ -19,7 +19,7 @@ e2e/
 ### Prerequisites
 
 - Local dev server must be running (or will be started automatically)
-- Supabase local instance should be running for full functionality
+- Neon database accessible
 
 ### Available Commands
 
@@ -105,25 +105,9 @@ npx playwright test e2e/admin
 
 #### System Admin User (for system-admin-dashboard-counts.spec.ts)
 
-1. Create a test user in your Supabase instance:
+1. Run `npx tsx scripts/seed.ts` to create test users
 
-   ```sql
-   -- Sign up through the UI first, or use SQL
-   -- Then update user metadata to grant system admin access
-   ```
-
-2. Update user metadata to grant system admin role:
-   - Go to Supabase Dashboard → Authentication → Users
-   - Click on test user → Edit User
-   - Update `user_metadata` JSON:
-
-   ```json
-   {
-     "system_admin": true
-   }
-   ```
-
-3. Create `.env.test` file with system admin credentials:
+2. Create `.env.test` file with system admin credentials:
    ```env
    # System Admin Test User
    TEST_SYSTEM_ADMIN_EMAIL=sysadmin@test.com
@@ -132,22 +116,7 @@ npx playwright test e2e/admin
 
 #### District Admin User (for district admin tests)
 
-1. Create a test user in your local Supabase instance:
-
-   ```sql
-   -- Create test user (run in Supabase SQL Editor)
-   -- Note: You'll need to sign up through the UI first, then get the user_id
-
-   -- Grant district admin access
-   INSERT INTO public.spb_district_admins (user_id, district_id, district_slug)
-   SELECT
-     'YOUR_TEST_USER_ID_HERE'::uuid,
-     id,
-     slug
-   FROM public.spb_districts
-   WHERE slug = 'westside'
-   ON CONFLICT (user_id, district_id) DO NOTHING;
-   ```
+1. Run `npx tsx scripts/seed.ts` to create test users via Better Auth
 
 2. Add district admin credentials to `.env.test`:
 

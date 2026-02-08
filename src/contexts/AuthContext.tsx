@@ -78,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     // Reset cached memberships on login
     setMemberships(null);
 
-    // Return Supabase-compatible shape so Login.tsx doesn't need changes
+    // Return compatible shape so Login.tsx doesn't need changes
     const mappedUser = result.data?.user
       ? mapBetterAuthUser(result.data.user as Parameters<typeof mapBetterAuthUser>[0])
       : null;

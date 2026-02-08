@@ -22,7 +22,7 @@ import { UserMenu } from '../components/common/UserMenu';
  */
 const externalTools = [
   { name: 'Stripe', url: 'https://dashboard.stripe.com' },
-  { name: 'Supabase', url: 'https://supabase.com/dashboard' },
+  { name: 'Neon', url: 'https://console.neon.tech' },
   { name: 'Vercel', url: 'https://vercel.com/dashboard' },
   { name: 'Cloudflare', url: 'https://dash.cloudflare.com' },
   { name: 'Sentry', url: 'https://sentry.io' },

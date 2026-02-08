@@ -251,7 +251,7 @@ export function UserManagement() {
         <div className="text-sm text-blue-700 dark:text-blue-300">
           <p className="font-medium mb-1">Note about user management</p>
           <p className="text-blue-600 dark:text-blue-400">
-            To create new users, use the Supabase dashboard or invite users via email.
+            To create new users, use the admin dashboard or invite users via email.
             Users must sign up before they can be assigned as district admins.
           </p>
         </div>
@@ -389,7 +389,7 @@ function AddAdminModal({ districts, existingAdmins, onClose, onSuccess }: AddAdm
               placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Enter the UUID of the user from Supabase Auth
+              Enter the UUID of the user from the database
             </p>
           </div>
 

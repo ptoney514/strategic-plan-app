@@ -4,7 +4,7 @@ import { db } from "./db";
 import * as schema from "./schema/index";
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -43,6 +43,10 @@ export const auth = betterAuth({
     // Allow any subdomain of lvh.me for local dev
     const origin = request?.headers.get("origin");
     if (origin && /^https?:\/\/.*\.lvh\.me:5174$/.test(origin)) {
+      origins.push(origin);
+    }
+    // Allow Vercel preview deployment URLs
+    if (origin && /^https:\/\/.*\.vercel\.app$/.test(origin)) {
       origins.push(origin);
     }
     return origins;

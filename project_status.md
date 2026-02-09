@@ -1,5 +1,7 @@
 # Strategic Plan Builder - Project Status
 
+<!-- Preview DB smoke test -->
+
 ## Tracking
 
 **GitHub Repo**: [ptoney514/strategic-plan-app](https://github.com/ptoney514/strategic-plan-app)

@@ -1,12 +1,12 @@
 import { eq, and } from "drizzle-orm";
-import { auth } from "../auth";
-import { db } from "../db";
-import { organizations, organizationMembers } from "../schema/index";
-import { hasMinimumRole } from "./roles";
-import type { OrgRole } from "./roles";
+import { auth } from "../auth.js";
+import { db } from "../db.js";
+import { organizations, organizationMembers } from "../schema/index.js";
+import { hasMinimumRole } from "./roles.js";
+import type { OrgRole } from "./roles.js";
 
-export { hasMinimumRole } from "./roles";
-export type { OrgRole } from "./roles";
+export { hasMinimumRole } from "./roles.js";
+export type { OrgRole } from "./roles.js";
 
 /** User type with additionalFields from Better Auth config */
 export interface SessionUser {

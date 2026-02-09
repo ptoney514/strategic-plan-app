@@ -1,13 +1,13 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../lib/db";
+import { db } from "../../lib/db.js";
 import {
   metrics,
   goals,
   plans,
   organizations,
-} from "../../lib/schema/index";
-import { requireOrgMember } from "../../lib/middleware/auth";
-import { jsonOk, jsonError } from "../../lib/response";
+} from "../../lib/schema/index.js";
+import { requireOrgMember } from "../../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../../lib/response.js";
 
 /** Map a Drizzle metrics row to snake_case for the frontend */
 function metricToSnake(m: typeof metrics.$inferSelect) {

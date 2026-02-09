@@ -1,13 +1,13 @@
 import { eq, and, count, inArray } from "drizzle-orm";
-import { db } from "../../../lib/db";
+import { db } from "../../../lib/db.js";
 import {
   plans,
   goals,
   organizations,
   organizationMembers,
-} from "../../../lib/schema/index";
-import { jsonOk, jsonError } from "../../../lib/response";
-import { auth } from "../../../lib/auth";
+} from "../../../lib/schema/index.js";
+import { jsonOk, jsonError } from "../../../lib/response.js";
+import { auth } from "../../../lib/auth.js";
 
 function toSnake(row: typeof plans.$inferSelect) {
   return {

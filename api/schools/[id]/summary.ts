@@ -1,7 +1,7 @@
 import { eq, and, count } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { schools, plans, goals, metrics } from "../../lib/schema/index";
-import { jsonOk, jsonError } from "../../lib/response";
+import { db } from "../../lib/db.js";
+import { schools, plans, goals, metrics } from "../../lib/schema/index.js";
+import { jsonOk, jsonError } from "../../lib/response.js";
 
 /** Map a Drizzle school row to snake_case for the frontend */
 function schoolToSnake(s: typeof schools.$inferSelect) {

@@ -1,9 +1,9 @@
 import { eq, inArray } from "drizzle-orm";
-import { db } from "../lib/db";
-import { plans } from "../lib/schema/index";
-import { requireOrgMember } from "../lib/middleware/auth";
-import { getOrgSlugForPlan } from "../lib/helpers/org-lookup";
-import { jsonOk, jsonError } from "../lib/response";
+import { db } from "../lib/db.js";
+import { plans } from "../lib/schema/index.js";
+import { requireOrgMember } from "../lib/middleware/auth.js";
+import { getOrgSlugForPlan } from "../lib/helpers/org-lookup.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 /**
  * PUT /api/plans/reorder - Reorder plans by updating order_position

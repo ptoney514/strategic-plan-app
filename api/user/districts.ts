@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import { requireAuth } from "../lib/middleware/auth";
-import { db } from "../lib/db";
-import { organizations, organizationMembers } from "../lib/schema/index";
-import { jsonOk, jsonError } from "../lib/response";
+import { requireAuth } from "../lib/middleware/auth.js";
+import { db } from "../lib/db.js";
+import { organizations, organizationMembers } from "../lib/schema/index.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 function orgToSnake(o: typeof organizations.$inferSelect) {
   return {

@@ -1,15 +1,15 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../../lib/db";
+import { db } from "../../lib/db.js";
 import {
   goals,
   metrics,
   plans,
   organizations,
   organizationMembers,
-} from "../../lib/schema/index";
-import { requireAuth, hasMinimumRole } from "../../lib/middleware/auth";
-import { getOrgSlugForGoal, isPublicOrg } from "../../lib/helpers/org-lookup";
-import { jsonOk, jsonError } from "../../lib/response";
+} from "../../lib/schema/index.js";
+import { requireAuth, hasMinimumRole } from "../../lib/middleware/auth.js";
+import { getOrgSlugForGoal, isPublicOrg } from "../../lib/helpers/org-lookup.js";
+import { jsonOk, jsonError } from "../../lib/response.js";
 
 // ---------------------------------------------------------------------------
 // Helpers

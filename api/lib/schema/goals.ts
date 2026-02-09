@@ -12,9 +12,9 @@ import {
   jsonb,
   foreignKey,
 } from "drizzle-orm/pg-core";
-import { plans } from "./plans";
-import { organizations } from "./organizations";
-import { schools } from "./schools";
+import { plans } from "./plans.js";
+import { organizations } from "./organizations.js";
+import { schools } from "./schools.js";
 
 export const goals = pgTable(
   "goals",

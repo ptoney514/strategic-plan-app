@@ -1,14 +1,14 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../lib/db";
+import { db } from "../lib/db.js";
 import {
   organizations,
   organizationMembers,
-} from "../lib/schema/index";
+} from "../lib/schema/index.js";
 import {
   requireAuth,
   requireSystemAdmin,
-} from "../lib/middleware/auth";
-import { jsonOk, jsonError, parsePagination } from "../lib/response";
+} from "../lib/middleware/auth.js";
+import { jsonOk, jsonError, parsePagination } from "../lib/response.js";
 
 /** Map a Drizzle organization row to snake_case for the frontend */
 function toSnakeCase(org: typeof organizations.$inferSelect) {

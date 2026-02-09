@@ -1,8 +1,8 @@
 import { desc } from "drizzle-orm";
-import { db } from "../lib/db";
-import { contactSubmissions } from "../lib/schema/index";
-import { requireSystemAdmin } from "../lib/middleware/auth";
-import { jsonOk, jsonError, parsePagination } from "../lib/response";
+import { db } from "../lib/db.js";
+import { contactSubmissions } from "../lib/schema/index.js";
+import { requireSystemAdmin } from "../lib/middleware/auth.js";
+import { jsonOk, jsonError, parsePagination } from "../lib/response.js";
 
 /** Map a Drizzle contact submission row to snake_case for the frontend */
 function contactToSnake(c: typeof contactSubmissions.$inferSelect) {

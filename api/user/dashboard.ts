@@ -1,14 +1,14 @@
 import { eq, and, inArray, count } from "drizzle-orm";
-import { requireAuth } from "../lib/middleware/auth";
-import { db } from "../lib/db";
+import { requireAuth } from "../lib/middleware/auth.js";
+import { db } from "../lib/db.js";
 import {
   organizations,
   organizationMembers,
   plans,
   goals,
   metrics,
-} from "../lib/schema/index";
-import { jsonOk, jsonError } from "../lib/response";
+} from "../lib/schema/index.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 export async function GET(request: Request) {
   try {

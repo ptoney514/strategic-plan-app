@@ -1,14 +1,14 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../../lib/db";
+import { db } from "../../lib/db.js";
 import {
   goals,
   metrics,
   plans,
   organizations,
   organizationMembers,
-} from "../../lib/schema/index";
-import { requireAuth } from "../../lib/middleware/auth";
-import { jsonOk, jsonError } from "../../lib/response";
+} from "../../lib/schema/index.js";
+import { requireAuth } from "../../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../../lib/response.js";
 
 function extractOrgId(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");

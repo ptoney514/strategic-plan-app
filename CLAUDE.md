@@ -109,7 +109,7 @@ npx drizzle-kit studio     # Open Drizzle Studio (database browser)
 
 ## Database
 
-### Neon PostgreSQL (Production / Cloud)
+### Neon PostgreSQL
 
 The application uses [Neon](https://neon.tech) serverless PostgreSQL for production and cloud development.
 
@@ -117,44 +117,32 @@ The application uses [Neon](https://neon.tech) serverless PostgreSQL for product
 - **Database**: `strategic-plan-db`
 - **Driver**: `@neondatabase/serverless` (HTTP-based, works in both Edge and Node.js runtimes)
 
-### Local Docker PostgreSQL (Offline Development)
+### Neon Dev Branch (Local Development)
 
-A local PostgreSQL option is available for offline development via Docker. The app auto-detects which driver to use based on `DATABASE_URL`: if it contains `neon.tech`, the neon-http driver is used; otherwise, `pg` (node-postgres) is used.
+For local development, use a `dev` branch in the Neon project. This uses the same `@neondatabase/serverless` HTTP driver as production — no dual-driver complexity.
 
-**First-time setup:**
-
-```bash
-cp docker.env.example .env.local   # Local database URL + auth secrets
-npm run db:local:setup              # Starts Docker, migrates, applies triggers, seeds
-npm run dev:api                     # Full-stack dev server against local DB
-```
-
-**Daily workflow:**
+**One-time setup** (requires [neonctl](https://neon.tech/docs/reference/neon-cli)):
 
 ```bash
-npm run db:local:up                 # Start Docker PostgreSQL (if not running)
-npm run dev:api                     # Full-stack dev server
-npm run db:local:down               # Stop Docker (data preserved in named volume)
+neonctl branches create --name dev --project-id small-salad-72814952
+neonctl connection-string --branch dev --database-name strategic-plan-db --project-id small-salad-72814952
 ```
 
-**Local database scripts:**
+Copy the connection string into `.env.local` as `DATABASE_URL`, then:
 
 ```bash
-npm run db:local:up        # Start Docker PostgreSQL + wait for ready
-npm run db:local:down      # Stop Docker (preserves data)
-npm run db:local:setup     # up + migrate + triggers + seed (first-time)
-npm run db:local:reset     # Destroy volume + full setup (nuclear reset)
-npm run db:local:migrate   # Apply Drizzle migrations to local DB
-npm run db:local:triggers  # Apply custom trigger SQL to local DB
-npm run db:local:seed      # Run seed script against local DB
+cp .env.local.example .env.local     # Fill in DATABASE_URL, BETTER_AUTH_SECRET
+npm run db:seed:fresh                 # Run migrations + seed
+npm run dev:api                       # Full-stack dev server
 ```
 
-**Switching between local and Neon:** Just change `DATABASE_URL` in `.env.local`. Point to `localhost` for local Docker, or `neon.tech` for cloud. No code changes needed.
+**Reset dev data:** `npm run db:seed` (truncates + re-seeds)
+**Sync schema:** `npm run db:seed:fresh` (runs migrations then seeds)
 
 ### Prerequisites
 
 - Node.js 20+
-- Docker (for local development) or a `DATABASE_URL` connection string (from Neon dashboard)
+- A Neon `DATABASE_URL` connection string (from Neon dashboard or `neonctl`)
 
 ### First-Time Setup
 
@@ -286,7 +274,7 @@ PR closed/merged
   └── GitHub Action deletes Neon branch (cleanup)
 ```
 
-**Full workflow:** Local Docker DB → Push PR → Vercel preview + Neon branch (auto-migrated, seeded) → Merge to main → Production
+**Full workflow:** Neon dev branch → Push PR → Vercel preview + Neon branch (auto-migrated, seeded) → Merge to main → Production
 
 ### Preview Environment Variables
 

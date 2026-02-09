@@ -11,15 +11,14 @@
  * Requires .env.local with DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL
  */
 
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sql, count } from "drizzle-orm";
+import type { NeonHttpDatabase } from "drizzle-orm/neon-http";
 import * as schema from "../api/lib/schema/index.js";
 
 // ---------------------------------------------------------------------------
-// Section 0: Standalone DB + Auth setup
+// Section 0: Standalone DB + Auth setup (dynamic driver)
 // ---------------------------------------------------------------------------
 
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -48,8 +47,21 @@ if (process.env.NODE_ENV === "production" && !process.argv.includes("--force")) 
   process.exit(1);
 }
 
-const neonSql = neon(DATABASE_URL);
-const db = drizzle(neonSql, { schema });
+const isNeon = DATABASE_URL.includes("neon.tech");
+
+let db: NeonHttpDatabase<typeof schema>;
+
+if (isNeon) {
+  const { neon } = await import("@neondatabase/serverless");
+  const { drizzle } = await import("drizzle-orm/neon-http");
+  const neonSql = neon(DATABASE_URL);
+  db = drizzle(neonSql, { schema });
+} else {
+  const pg = await import("pg");
+  const { drizzle } = await import("drizzle-orm/node-postgres");
+  const pool = new pg.default.Pool({ connectionString: DATABASE_URL });
+  db = drizzle(pool, { schema }) as unknown as NeonHttpDatabase<typeof schema>;
+}
 
 const auth = betterAuth({
   baseURL: BETTER_AUTH_URL,
@@ -91,7 +103,7 @@ async function seed() {
   // Section 1: TRUNCATE all tables (CASCADE) — clean slate
   // -------------------------------------------------------------------------
   console.log("1. Truncating all tables...");
-  await neonSql`TRUNCATE TABLE
+  await db.execute(sql`TRUNCATE TABLE
       stock_photos,
       status_overrides,
       staged_metrics,
@@ -111,7 +123,7 @@ async function seed() {
       account,
       verification,
       "user"
-    CASCADE`;
+    CASCADE`);
   console.log("   Done.\n");
 
   // -------------------------------------------------------------------------

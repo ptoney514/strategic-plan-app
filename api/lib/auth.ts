@@ -45,9 +45,12 @@ export const auth = betterAuth({
     if (origin && /^https?:\/\/.*\.lvh\.me:5174$/.test(origin)) {
       origins.push(origin);
     }
-    // Allow Vercel preview deployment URLs
-    if (origin && /^https:\/\/.*\.vercel\.app$/.test(origin)) {
-      origins.push(origin);
+    // Allow this project's Vercel preview deployment URLs
+    if (process.env.VERCEL_URL) {
+      origins.push(`https://${process.env.VERCEL_URL}`);
+    }
+    if (process.env.VERCEL_BRANCH_URL) {
+      origins.push(`https://${process.env.VERCEL_BRANCH_URL}`);
     }
     return origins;
   },

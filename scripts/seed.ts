@@ -50,20 +50,17 @@ if (process.env.NODE_ENV === "production" && !process.argv.includes("--force")) 
 const isNeon = DATABASE_URL.includes("neon.tech");
 
 let db: NeonHttpDatabase<typeof schema>;
-let rawSql: (query: string) => Promise<unknown>;
 
 if (isNeon) {
   const { neon } = await import("@neondatabase/serverless");
   const { drizzle } = await import("drizzle-orm/neon-http");
   const neonSql = neon(DATABASE_URL);
   db = drizzle(neonSql, { schema });
-  rawSql = (query: string) => neonSql(query as unknown as TemplateStringsArray);
 } else {
   const pg = await import("pg");
   const { drizzle } = await import("drizzle-orm/node-postgres");
   const pool = new pg.default.Pool({ connectionString: DATABASE_URL });
   db = drizzle(pool, { schema }) as unknown as NeonHttpDatabase<typeof schema>;
-  rawSql = (query: string) => pool.query(query);
 }
 
 const auth = betterAuth({
@@ -106,7 +103,7 @@ async function seed() {
   // Section 1: TRUNCATE all tables (CASCADE) — clean slate
   // -------------------------------------------------------------------------
   console.log("1. Truncating all tables...");
-  await rawSql(`TRUNCATE TABLE
+  await db.execute(sql`TRUNCATE TABLE
       stock_photos,
       status_overrides,
       staged_metrics,

@@ -55,7 +55,9 @@ export const auth = betterAuth({
     return origins;
   },
   advanced: {
-    generateId: () => crypto.randomUUID(),
+    database: {
+      generateId: () => crypto.randomUUID(),
+    },
     crossSubDomainCookies: {
       enabled: true,
       domain: process.env.BETTER_AUTH_COOKIE_DOMAIN,

@@ -58,7 +58,7 @@ export function RootRouter() {
       >
         <Route index element={<UserDashboard />} />
         <Route path="plans" element={<DashboardPlansPage />} />
-        <Route path="plans/:planId" element={<DashboardPlansPage />} />
+        <Route path="plans/*" element={<DashboardPlansPage />} />
         <Route path="objectives" element={<PlaceholderPage title="Objectives & Goals" description="Track and manage your strategic objectives and goals." />} />
         <Route path="objectives/create" element={<PlaceholderPage title="Create Objective" description="Create a new objective for your strategic plan." />} />
         <Route path="objectives/:objectiveId" element={<PlaceholderPage title="Objective Details" description="View and edit objective details." />} />

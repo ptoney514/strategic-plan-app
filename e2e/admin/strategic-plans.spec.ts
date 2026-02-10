@@ -64,12 +64,15 @@ test.describe('Strategic Plans - Root Domain Dashboard', () => {
     // Wait for table to load
     await page.waitForSelector('table', { timeout: 10000 });
 
-    // Click the first plan link
+    // Get the first plan link and verify its href
     const firstPlanLink = page.locator('tbody tr:first-child a').first();
     const href = await firstPlanLink.getAttribute('href');
-
-    // The link should point to a district admin page
     expect(href).toContain('/admin/plans/');
+
+    // Click the link and verify navigation to district admin detail page
+    await firstPlanLink.click();
+    await page.waitForURL(/\/admin\/plans\//, { timeout: 10000 });
+    await expect(page).toHaveURL(/\/admin\/plans\//);
   });
 
   test('dashboard "View all plans" link navigates to plans list', async ({ page }) => {

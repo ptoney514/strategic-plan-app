@@ -2,10 +2,12 @@ import { useState, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { FileText, Target, TrendingUp, ArrowRight, Plus, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useUserDashboardStats } from '../../hooks/useUserDistricts';
+import { useUserDashboardStats, useUserDistricts } from '../../hooks/useUserDistricts';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
 import { usePlanGoals } from '../../hooks/useGoals';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 import { buildGoalHierarchy, type HierarchicalGoal, type PlanWithSummary } from '../../lib/types';
+import type { District } from '../../lib/types';
 
 export function UserDashboard() {
   const navigate = useNavigate();
@@ -17,9 +19,32 @@ export function UserDashboard() {
   const isDistrictAdmin = location.pathname.startsWith('/admin');
   const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
 
-  // Fetch stats and plans
+  // Fetch stats, plans, and districts
   const { data: stats, isLoading: statsLoading } = useUserDashboardStats();
   const { data: plans = [], isLoading: plansLoading } = useUserPlansWithCounts();
+  const { data: districts = [] } = useUserDistricts();
+
+  // Build district lookup for cross-domain navigation on root domain
+  const districtMap = useMemo(() => {
+    const map = new Map<string, District>();
+    for (const d of districts) {
+      map.set(d.id, d);
+    }
+    return map;
+  }, [districts]);
+
+  // Navigate to district admin page (cross-domain on root, in-app on district admin)
+  const navigateToDistrictAdmin = (path: string, districtId?: string | null) => {
+    if (isDistrictAdmin) {
+      navigate(path);
+      return;
+    }
+    // Root domain: redirect to district subdomain
+    const district = districtId ? districtMap.get(districtId) : districts[0];
+    if (district) {
+      window.location.href = buildSubdomainUrlWithPath('district', path, district.slug);
+    }
+  };
 
   // Fetch goals for the first plan to show in tree view
   const planIds = plans.map((p) => p.id);
@@ -108,7 +133,7 @@ export function UserDashboard() {
               <ArrowRight size={14} />
             </Link>
             <button
-              onClick={() => navigate(`${basePath}/plans/create`)}
+              onClick={() => navigateToDistrictAdmin('/admin/plans/create')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white rounded-lg transition-colors font-medium text-sm"
               style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary-hover)'; }}
@@ -144,7 +169,7 @@ export function UserDashboard() {
               Create your first strategic plan to organize your objectives.
             </p>
             <button
-              onClick={() => navigate(`${basePath}/plans/create`)}
+              onClick={() => navigateToDistrictAdmin('/admin/plans/create')}
               className="inline-flex items-center gap-2 px-4 py-2.5 text-white rounded-lg font-semibold text-sm"
               style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
             >
@@ -161,6 +186,7 @@ export function UserDashboard() {
                 basePath={basePath}
                 isSelected={selectedPlanId === plan.id}
                 onClick={() => setSelectedPlanId(plan.id)}
+                onNavigateDetail={() => navigateToDistrictAdmin(`/admin/plans/${plan.id}`, plan.district_id)}
               />
             ))}
           </div>
@@ -239,14 +265,13 @@ function StatCard({ label, value, icon, hidden }: { label: string; value: string
   );
 }
 
-function PlanRow({ plan, basePath, isSelected, onClick }: {
+function PlanRow({ plan, isSelected, onClick, onNavigateDetail }: {
   plan: PlanWithSummary;
   basePath: string;
   isSelected: boolean;
   onClick: () => void;
+  onNavigateDetail: () => void;
 }) {
-  const navigate = useNavigate();
-
   return (
     <div
       className="rounded-xl px-5 py-4 flex items-center justify-between cursor-pointer transition-all"
@@ -291,7 +316,7 @@ function PlanRow({ plan, basePath, isSelected, onClick }: {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          navigate(`${basePath}/plans/${plan.id}`);
+          onNavigateDetail();
         }}
         className="p-2 rounded-lg transition-colors"
         style={{ color: 'var(--editorial-text-muted)' }}

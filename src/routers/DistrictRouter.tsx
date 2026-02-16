@@ -30,7 +30,7 @@ import { AdminDashboard2 } from '../pages/client/admin/AdminDashboard2';
 import { CreateObjective } from '../pages/client/admin/CreateObjective';
 import { EditObjective } from '../pages/client/admin/EditObjective';
 import { ObjectiveDetail as AdminObjectiveDetail } from '../pages/client/admin/ObjectiveDetail';
-import { DistrictUsers } from '../pages/client/admin/DistrictUsers';
+import { TeamMembers } from '../pages/client/admin/TeamMembers';
 import { DistrictAppearance } from '../pages/client/admin/DistrictAppearance';
 import { VisualLibrary } from '../pages/client/admin/VisualLibrary';
 import { PlansList } from '../pages/client/admin/PlansList';
@@ -48,9 +48,11 @@ import {
 
 // Auth
 import { Login } from '../pages/Login';
+import { Signup } from '../pages/Signup';
+import { AcceptInvitation } from '../pages/AcceptInvitation';
 
 // Dashboard Pages
-import { UserDashboard } from '../pages/dashboard';
+import { DistrictAdminDashboard } from '../pages/client/admin/DistrictAdminDashboard';
 
 /**
  * Router for district subdomains (e.g., westside.stratadash.org)
@@ -66,8 +68,10 @@ export function DistrictRouter() {
 
   return (
     <Routes>
-      {/* Login */}
+      {/* Auth */}
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       {/* Public Routes (New sidebar design) - Main entry point */}
       <Route path="/" element={<PublicLayout districtSlug={slug} />}>
@@ -127,7 +131,7 @@ export function DistrictRouter() {
           </ClientAdminGuard>
         }
       >
-        <Route index element={<UserDashboard />} />
+        <Route index element={<DistrictAdminDashboard />} />
         {/* Objectives/Goals routes */}
         <Route path="objectives" element={<AdminDashboard2 />} />
         <Route path="objectives/create" element={<CreateObjective />} />
@@ -139,7 +143,7 @@ export function DistrictRouter() {
         <Route path="plans/:planId" element={<PlanDetail />} />
         <Route path="plans/:planId/edit" element={<EditPlan />} />
         {/* District-level pages */}
-        <Route path="users" element={<DistrictUsers />} />
+        <Route path="users" element={<TeamMembers />} />
         <Route path="appearance" element={<DistrictAppearance />} />
         <Route path="visuals" element={<VisualLibrary />} />
         <Route path="settings" element={<AdminSettings />} />

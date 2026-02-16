@@ -27,6 +27,8 @@ export type UserRole = 'system_admin' | 'district_admin' | 'school_admin' | 'edi
 export interface UserWithRole {
   id: string;
   user_id: string;
+  name?: string;
+  email?: string;
   role: UserRole;
   district_name?: string;
   district_slug?: string;

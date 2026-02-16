@@ -3,12 +3,12 @@ import type { MetricType } from '../types';
 export type NumberFormat = 'whole' | 'decimal' | 'percentage';
 
 export interface FormatMetricValueOptions {
-  value: number | null | undefined;
+  value: number | string | null | undefined;
   isPercentage?: boolean;
   decimalPlaces?: number;
   metricType?: MetricType;
   unit?: string;
-  targetValue?: number; // For rating display (e.g., "3.83 / 5.0")
+  targetValue?: number | string; // For rating display (e.g., "3.83 / 5.0")
 }
 
 export interface FormattedValue {
@@ -38,13 +38,18 @@ export function formatMetricValue({
     return { value: '--', unit: '', display: '--' };
   }
 
+  const numericValue = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return { value: '--', unit: '', display: '--' };
+  }
+
   // Clamp decimal places to valid range (0-4)
   const places = Math.max(0, Math.min(4, decimalPlaces));
 
   // Priority 1: Explicit isPercentage flag takes precedence when defined
   // This allows is_percentage=false to override metric_type='percent'
   if (isPercentage === true) {
-    const formatted = value.toFixed(places);
+    const formatted = numericValue.toFixed(places);
     return { value: formatted, unit: '%', display: `${formatted}%` };
   }
 
@@ -53,18 +58,19 @@ export function formatMetricValue({
 
   // Priority 2: Legacy metric_type handling (only when isPercentage is undefined)
   if (!skipLegacyPercent && metricType === 'percent') {
-    const formatted = value.toFixed(places);
+    const formatted = numericValue.toFixed(places);
     return { value: formatted, unit: '%', display: `${formatted}%` };
   }
 
   if (metricType === 'rating') {
-    const formatted = value.toFixed(places);
-    const ratingUnit = `/ ${targetValue || 5.0}`;
+    const formatted = numericValue.toFixed(places);
+    const numericTargetValue = targetValue == null ? null : Number(targetValue);
+    const ratingUnit = `/ ${Number.isFinite(numericTargetValue) ? numericTargetValue : 5.0}`;
     return { value: formatted, unit: ratingUnit, display: `${formatted} ${ratingUnit}` };
   }
 
   if (metricType === 'currency') {
-    const formatted = value.toLocaleString(undefined, {
+    const formatted = numericValue.toLocaleString(undefined, {
       minimumFractionDigits: places,
       maximumFractionDigits: places,
     });
@@ -74,8 +80,8 @@ export function formatMetricValue({
   // Priority 3: Standard number formatting with decimal_places
   // For whole numbers (0 decimal places), don't show decimals
   const formatted = places === 0
-    ? Math.round(value).toString()
-    : value.toFixed(places);
+    ? Math.round(numericValue).toString()
+    : numericValue.toFixed(places);
 
   // When isPercentage is explicitly false, clear % unit from legacy data
   const finalUnit = (isPercentage === false && unit === '%') ? '' : unit;

@@ -218,9 +218,9 @@ export function SystemDashboard() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <code className="text-xs text-[#4a4a4a] font-mono">
-                      {user.user_id.slice(0, 8)}...
-                    </code>
+                    <span className="text-sm font-medium text-[#1a1a1a] truncate">
+                      {user.name || user.email || user.user_id?.slice(0, 8) || user.id.slice(0, 8)}
+                    </span>
                     <UserRoleBadge role={user.role} />
                   </div>
                   <p className="text-xs text-[#8a8a8a] mt-0.5">

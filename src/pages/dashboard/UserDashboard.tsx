@@ -6,7 +6,7 @@ import { useUserDashboardStats, useUserDistricts } from '../../hooks/useUserDist
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
 import { usePlanGoals } from '../../hooks/useGoals';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
-import { buildGoalHierarchy, type HierarchicalGoal, type PlanWithSummary } from '../../lib/types';
+import type { HierarchicalGoal, PlanWithSummary } from '../../lib/types';
 import type { District } from '../../lib/types';
 
 export function UserDashboard() {
@@ -46,17 +46,15 @@ export function UserDashboard() {
     }
   };
 
-  // Fetch goals for the first plan to show in tree view
-  const planIds = plans.map((p) => p.id);
-  const { data: goalsData } = usePlanGoals(planIds[0] || '');
+  const selectedPlan = useMemo(
+    () => plans.find((plan) => plan.id === selectedPlanId) ?? null,
+    [plans, selectedPlanId]
+  );
 
-  const goalsByPlan = useMemo(() => {
-    const map: Record<string, HierarchicalGoal[]> = {};
-    if (planIds[0] && goalsData) {
-      map[planIds[0]] = buildGoalHierarchy(goalsData);
-    }
-    return map;
-  }, [planIds, goalsData]);
+  const {
+    data: selectedPlanObjectives = [],
+    isLoading: selectedObjectivesLoading,
+  } = usePlanGoals(selectedPlanId || '', { includeMetrics: false });
 
   // Get user display name
   const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
@@ -183,7 +181,6 @@ export function UserDashboard() {
               <PlanRow
                 key={plan.id}
                 plan={plan}
-                basePath={basePath}
                 isSelected={selectedPlanId === plan.id}
                 onClick={() => setSelectedPlanId(plan.id)}
                 onNavigateDetail={() => navigateToDistrictAdmin(`/admin/plans/${plan.id}`, plan.district_id)}
@@ -200,16 +197,32 @@ export function UserDashboard() {
             className="text-lg font-medium mb-4"
             style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--editorial-text-primary)' }}
           >
-            Plan Overview: {plans[0]?.name}
+            {selectedPlan ? `Plan Overview: ${selectedPlan.name}` : 'Plan Overview'}
           </h2>
 
           <div
             className="rounded-xl overflow-hidden"
             style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}
           >
-            {goalsByPlan[planIds[0]]?.length ? (
+            {!selectedPlan ? (
+              <div className="p-6 text-center">
+                <p className="text-sm" style={{ color: 'var(--editorial-text-muted)' }}>
+                  Select a plan above to preview its objectives.
+                </p>
+              </div>
+            ) : selectedObjectivesLoading ? (
+              <div className="space-y-2 p-4">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-11 rounded animate-pulse"
+                    style={{ backgroundColor: 'var(--editorial-surface-alt)' }}
+                  />
+                ))}
+              </div>
+            ) : selectedPlanObjectives.length ? (
               <div className="divide-y" style={{ borderColor: 'var(--editorial-border-light)' }}>
-                {goalsByPlan[planIds[0]].map((objective) => (
+                {selectedPlanObjectives.map((objective) => (
                   <ObjectiveRow
                     key={objective.id}
                     objective={objective}
@@ -267,7 +280,6 @@ function StatCard({ label, value, icon, hidden }: { label: string; value: string
 
 function PlanRow({ plan, isSelected, onClick, onNavigateDetail }: {
   plan: PlanWithSummary;
-  basePath: string;
   isSelected: boolean;
   onClick: () => void;
   onNavigateDetail: () => void;

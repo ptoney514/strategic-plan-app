@@ -105,6 +105,7 @@ export const goals = pgTable(
       foreignColumns: [table.id],
     }).onDelete("cascade"),
     index("goals_plan_id_idx").on(table.planId),
+    index("goals_plan_level_idx").on(table.planId, table.level),
     index("goals_parent_id_idx").on(table.parentId),
     index("goals_level_idx").on(table.level),
     index("goals_order_position_idx").on(table.orderPosition),

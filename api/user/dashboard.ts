@@ -15,24 +15,23 @@ export async function GET(request: Request) {
     const { user } = await requireAuth(request);
 
     if (user.isSystemAdmin) {
-      // System admin: count everything
-      const [orgCount] = await db
-        .select({ value: count() })
-        .from(organizations)
-        .where(eq(organizations.isActive, true));
-
-      const [planCount] = await db
-        .select({ value: count() })
-        .from(plans);
-
-      const [goalCount] = await db
-        .select({ value: count() })
-        .from(goals)
-        .where(eq(goals.level, 0));
-
-      const [metricCount] = await db
-        .select({ value: count() })
-        .from(metrics);
+      // System admin: aggregate counts in parallel
+      const [[orgCount], [planCount], [goalCount], [metricCount]] = await Promise.all([
+        db
+          .select({ value: count() })
+          .from(organizations)
+          .where(eq(organizations.isActive, true)),
+        db
+          .select({ value: count() })
+          .from(plans),
+        db
+          .select({ value: count() })
+          .from(goals)
+          .where(eq(goals.level, 0)),
+        db
+          .select({ value: count() })
+          .from(metrics),
+      ]);
 
       return jsonOk({
         district_count: orgCount.value,
@@ -48,7 +47,7 @@ export async function GET(request: Request) {
       .from(organizationMembers)
       .where(eq(organizationMembers.userId, user.id));
 
-    const orgIds = memberships.map((m) => m.organizationId);
+    const orgIds = [...new Set(memberships.map((m) => m.organizationId))];
 
     if (orgIds.length === 0) {
       return jsonOk({
@@ -59,53 +58,29 @@ export async function GET(request: Request) {
       });
     }
 
-    const [planCount] = await db
-      .select({ value: count() })
-      .from(plans)
-      .where(inArray(plans.organizationId, orgIds));
-
-    // Get plan IDs for goal/metric lookups
-    const userPlans = await db
-      .select({ id: plans.id })
-      .from(plans)
-      .where(inArray(plans.organizationId, orgIds));
-
-    const planIds = userPlans.map((p) => p.id);
-
-    let goalCountValue = 0;
-    let metricCountValue = 0;
-
-    if (planIds.length > 0) {
-      const [goalCount] = await db
+    const [[planCount], [goalCount], [metricCount]] = await Promise.all([
+      db
+        .select({ value: count() })
+        .from(plans)
+        .where(inArray(plans.organizationId, orgIds)),
+      db
         .select({ value: count() })
         .from(goals)
-        .where(and(eq(goals.level, 0), inArray(goals.planId, planIds)));
-
-      goalCountValue = goalCount.value;
-
-      // Get goal IDs for metric lookup
-      const userGoals = await db
-        .select({ id: goals.id })
-        .from(goals)
-        .where(inArray(goals.planId, planIds));
-
-      const goalIds = userGoals.map((g) => g.id);
-
-      if (goalIds.length > 0) {
-        const [metricCount] = await db
-          .select({ value: count() })
-          .from(metrics)
-          .where(inArray(metrics.goalId, goalIds));
-
-        metricCountValue = metricCount.value;
-      }
-    }
+        .innerJoin(plans, eq(goals.planId, plans.id))
+        .where(and(eq(goals.level, 0), inArray(plans.organizationId, orgIds))),
+      db
+        .select({ value: count() })
+        .from(metrics)
+        .innerJoin(goals, eq(metrics.goalId, goals.id))
+        .innerJoin(plans, eq(goals.planId, plans.id))
+        .where(inArray(plans.organizationId, orgIds)),
+    ]);
 
     return jsonOk({
       district_count: orgIds.length,
       plan_count: planCount.value,
-      objective_count: goalCountValue,
-      metric_count: metricCountValue,
+      objective_count: goalCount.value,
+      metric_count: metricCount.value,
     });
   } catch (error) {
     if (error instanceof Response) return error;

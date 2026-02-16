@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSubdomain } from '../contexts/SubdomainContext';
+import { useAuth } from '../contexts/AuthContext';
 
 // Layouts
 import { PublicLayout } from '../layouts/PublicLayout';
@@ -49,10 +50,29 @@ import {
 // Auth
 import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
+import { Welcome } from '../pages/Welcome';
 import { AcceptInvitation } from '../pages/AcceptInvitation';
 
 // Dashboard Pages
 import { DistrictAdminDashboard } from '../pages/client/admin/DistrictAdminDashboard';
+
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
 
 /**
  * Router for district subdomains (e.g., westside.stratadash.org)
@@ -71,6 +91,7 @@ export function DistrictRouter() {
       {/* Auth */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/welcome" element={<RequireAuth><Welcome /></RequireAuth>} />
       <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       {/* Public Routes (New sidebar design) - Main entry point */}

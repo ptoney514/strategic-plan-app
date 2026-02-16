@@ -35,6 +35,14 @@ export async function POST(req: Request) {
       return jsonError("Invitation has already been accepted", 400);
     }
 
+    // Verify the logged-in user's email matches the invitation
+    if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+      return jsonError(
+        "This invitation was sent to a different email address",
+        403,
+      );
+    }
+
     await db
       .delete(organizationInvitations)
       .where(eq(organizationInvitations.id, invitation.id));

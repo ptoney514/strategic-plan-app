@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useValidateInvitation, useAcceptInvitation, useDeclineInvitation } from '../hooks/useInvitations';
 import { authClient } from '../lib/auth-client';
-import { getSubdomainUrl } from '../lib/subdomain';
+import { buildSubdomainUrlWithPath } from '../lib/subdomain';
 import { Loader2, AlertCircle, CheckCircle2, XCircle, Building2 } from 'lucide-react';
 
 type Tab = 'create' | 'signin';
@@ -138,7 +138,7 @@ export function AcceptInvitation() {
     if (!token) return;
     try {
       await accept.mutateAsync(token);
-      const adminUrl = getSubdomainUrl('district', invitation!.organization.slug) + '/admin';
+      const adminUrl = buildSubdomainUrlWithPath('district', '/admin', invitation!.organization.slug);
       window.location.href = adminUrl;
     } catch (err) {
       console.error('[AcceptInvitation] Accept error:', err);

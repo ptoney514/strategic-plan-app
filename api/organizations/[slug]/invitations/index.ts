@@ -95,11 +95,14 @@ export async function POST(req: Request) {
       return jsonError("Invalid role. Must be viewer, editor, or admin", 400);
     }
 
+    // Normalize email to lowercase for consistent matching
+    const normalizedEmail = email.toLowerCase();
+
     // Check if user is already a member
     const [existingUser] = await db
       .select({ id: user.id })
       .from(user)
-      .where(eq(user.email, email))
+      .where(eq(user.email, normalizedEmail))
       .limit(1);
 
     if (existingUser) {
@@ -126,7 +129,7 @@ export async function POST(req: Request) {
       .where(
         and(
           eq(organizationInvitations.organizationId, organization.id),
-          eq(organizationInvitations.email, email),
+          eq(organizationInvitations.email, normalizedEmail),
           isNull(organizationInvitations.acceptedAt),
         ),
       )
@@ -146,7 +149,7 @@ export async function POST(req: Request) {
       .insert(organizationInvitations)
       .values({
         organizationId: organization.id,
-        email,
+        email: normalizedEmail,
         role,
         token,
         invitedBy: currentUser.id,

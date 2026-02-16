@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserInvitations, useAcceptInvitation, useDeclineInvitation } from '../hooks/useInvitations';
-import { getSubdomainUrl } from '../lib/subdomain';
+import { buildSubdomainUrlWithPath } from '../lib/subdomain';
 import { Loader2, CheckCircle2, XCircle, Mail, Building2 } from 'lucide-react';
 import type { InvitationWithOrg } from '../lib/services/invitation.service';
 
@@ -12,7 +12,7 @@ function InvitationCard({ invitation }: { invitation: InvitationWithOrg }) {
   const handleAccept = async () => {
     try {
       await accept.mutateAsync(invitation.token);
-      const adminUrl = getSubdomainUrl('district', invitation.organization.slug) + '/admin';
+      const adminUrl = buildSubdomainUrlWithPath('district', '/admin', invitation.organization.slug);
       window.location.href = adminUrl;
     } catch (err) {
       console.error('[Welcome] Accept error:', err);

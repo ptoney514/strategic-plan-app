@@ -36,7 +36,7 @@ export async function GET(req: Request) {
       )
       .where(
         and(
-          eq(organizationInvitations.email, user.email),
+          eq(organizationInvitations.email, user.email.toLowerCase()),
           isNull(organizationInvitations.acceptedAt),
           gt(organizationInvitations.expiresAt, new Date()),
         ),

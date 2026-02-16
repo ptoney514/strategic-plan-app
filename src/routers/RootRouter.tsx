@@ -1,6 +1,9 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MarketingLanding } from '../pages/marketing/Landing';
 import { Login } from '../pages/Login';
+import { Signup } from '../pages/Signup';
+import { Welcome } from '../pages/Welcome';
+import { AcceptInvitation } from '../pages/AcceptInvitation';
 import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
 import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
@@ -69,8 +72,18 @@ export function RootRouter() {
         <Route path="help" element={<PlaceholderPage title="Help & Support" description="Get help with using StrataDASH and contact support." />} />
       </Route>
 
-      {/* Login page */}
+      {/* Auth pages */}
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route
+        path="/welcome"
+        element={
+          <RequireAuth>
+            <Welcome />
+          </RequireAuth>
+        }
+      />
+      <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       {/* Legal pages */}
       <Route path="/about" element={<AboutPage />} />

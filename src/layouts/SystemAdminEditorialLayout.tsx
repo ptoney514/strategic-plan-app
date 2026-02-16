@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import {
   Shield,
+  LayoutDashboard,
   Building2,
   Users,
   Settings,
@@ -68,6 +69,18 @@ export function SystemAdminEditorialLayout() {
             to="/"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               isActiveRoute('/')
+                ? 'bg-[#333333] text-white'
+                : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
+            }`}
+          >
+            <LayoutDashboard className="h-[18px] w-[18px] opacity-70" />
+            {!isSidebarCollapsed && <span>Dashboard</span>}
+          </Link>
+
+          <Link
+            to="/districts"
+            className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              isActiveRoute('/districts')
                 ? 'bg-[#333333] text-white'
                 : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
             }`}
@@ -246,6 +259,19 @@ export function SystemAdminEditorialLayout() {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActiveRoute('/')
+                    ? 'bg-[#333333] text-white'
+                    : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
+                }`}
+              >
+                <LayoutDashboard className="h-[18px] w-[18px] opacity-70" />
+                <span>Dashboard</span>
+              </Link>
+
+              <Link
+                to="/districts"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                  isActiveRoute('/districts')
                     ? 'bg-[#333333] text-white'
                     : 'text-[#9a9a9a] hover:bg-[#2a2a2a] hover:text-white'
                 }`}

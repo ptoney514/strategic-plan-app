@@ -1,433 +1,275 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Users, Plus, Search, Loader2, X, Building2, Shield, AlertCircle } from 'lucide-react';
+import { UserPlus, Search, Loader2, Shield, ChevronDown } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { apiGet, apiPost, apiDelete } from '../../lib/api';
-import type { District } from '../../lib/types';
+import { InviteUserModal } from '../../components/admin/InviteUserModal';
+import { apiGet, apiPut } from '../../lib/api';
 
-interface DistrictAdmin {
-  id: string;
-  user_id: string;
-  district_id: string;
-  district_slug: string;
-  created_at: string;
-  created_by: string | null;
-  user_email?: string;
-  district?: District;
+interface UserMembership {
+  org_id: string;
+  org_name: string;
+  org_slug: string;
+  role: string;
 }
 
-/**
- * UserManagement - Manage district admin assignments
- * Only accessible to system administrators
- */
+interface SystemUser {
+  id: string;
+  email: string;
+  name: string | null;
+  image: string | null;
+  is_system_admin: boolean;
+  created_at: string;
+  memberships: UserMembership[];
+}
+
+const ROLE_STYLES: Record<string, { bg: string; text: string }> = {
+  system_admin: { bg: 'rgba(234, 179, 8, 0.15)', text: '#eab308' },
+  admin: { bg: 'rgba(59, 130, 246, 0.15)', text: '#3b82f6' },
+  owner: { bg: 'rgba(59, 130, 246, 0.15)', text: '#3b82f6' },
+  editor: { bg: 'rgba(168, 85, 247, 0.15)', text: '#a855f7' },
+  viewer: { bg: 'rgba(107, 114, 128, 0.15)', text: '#9ca3af' },
+};
+
+function RoleBadge({ role }: { role: string }) {
+  const style = ROLE_STYLES[role] ?? ROLE_STYLES.viewer;
+  return (
+    <span
+      className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+      style={{ backgroundColor: style.bg, color: style.text }}
+    >
+      {role.replace('_', ' ')}
+    </span>
+  );
+}
+
 export function UserManagement() {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [expandedUser, setExpandedUser] = useState<string | null>(null);
 
-  // Fetch all district admins with their district info
-  const { data: districtAdmins = [], isLoading, error } = useQuery({
-    queryKey: ['district-admins'],
-    queryFn: async () => {
-      // Get all org members (admin route)
-      const admins = await apiGet<DistrictAdmin[]>('/admin/members');
-      if (!admins || admins.length === 0) return [];
-
-      // Get all districts for lookup
-      const districts = await apiGet<District[]>('/organizations');
-
-      const districtMap = new Map((districts || []).map(d => [d.id, d]));
-
-      // Return admins with district info
-      return admins.map(admin => ({
-        ...admin,
-        district: districtMap.get(admin.district_id),
-      }));
-    },
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['admin-users'],
+    queryFn: () => apiGet<SystemUser[]>('/admin/users'),
   });
 
-  // Fetch all districts for the add form
-  const { data: districts = [] } = useQuery({
-    queryKey: ['districts'],
-    queryFn: async () => {
-      return apiGet<District[]>('/organizations');
-    },
+  const toggleAdminMutation = useMutation({
+    mutationFn: ({ id, is_system_admin }: { id: string; is_system_admin: boolean }) =>
+      apiPut(`/admin/users/${id}`, { is_system_admin }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-users'] }),
   });
 
-  // Delete district admin mutation
-  const deleteAdminMutation = useMutation({
-    mutationFn: async (id: string) => {
-      await apiDelete(`/admin/members?id=${id}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['district-admins'] });
-      setDeleteConfirm(null);
-    },
-  });
-
-  // Group admins by user_id for display
-  const adminsByUser = districtAdmins.reduce((acc, admin) => {
-    if (!acc[admin.user_id]) {
-      acc[admin.user_id] = [];
-    }
-    acc[admin.user_id].push(admin);
-    return acc;
-  }, {} as Record<string, DistrictAdmin[]>);
-
-  // Filter by search term
-  const filteredUsers = (Object.entries(adminsByUser) as [string, DistrictAdmin[]][]).filter(([userId, admins]) => {
-    const searchLower = searchTerm.toLowerCase();
+  const filtered = users.filter((u) => {
+    const term = searchTerm.toLowerCase();
+    if (!term) return true;
     return (
-      userId.toLowerCase().includes(searchLower) ||
-      admins.some(a =>
-        a.district_slug.toLowerCase().includes(searchLower) ||
-        a.district?.name.toLowerCase().includes(searchLower)
-      )
+      u.email.toLowerCase().includes(term) ||
+      (u.name?.toLowerCase().includes(term) ?? false) ||
+      u.memberships.some((m) => m.org_name.toLowerCase().includes(term))
     );
   });
+
+  const totalAdmins = users.filter((u) => u.is_system_admin).length;
+  const totalWithDistricts = users.filter((u) => u.memberships.length > 0).length;
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">Loading district admins...</p>
-        </div>
+        <Loader2 className="h-10 w-10 animate-spin" style={{ color: 'var(--editorial-accent)' }} />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-6 text-center">
-        <p className="text-destructive font-medium">Failed to load district admins</p>
-        <p className="text-sm text-destructive/80 mt-1">{(error as Error).message}</p>
+      <div className="rounded-xl p-6 text-center" style={{ backgroundColor: 'rgba(239,68,68,0.1)', border: '1px solid rgba(239,68,68,0.2)' }}>
+        <p className="font-medium text-red-400">Failed to load users</p>
+        <p className="text-sm text-red-400/70 mt-1">{(error as Error).message}</p>
       </div>
     );
   }
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">User Management</h1>
-        <p className="text-muted-foreground mt-2">
-          Manage district administrator access
-        </p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">District Admins</p>
-              <p className="text-3xl font-bold text-foreground mt-1">
-                {Object.keys(adminsByUser).length}
-              </p>
-            </div>
-            <Users className="h-12 w-12 text-primary opacity-50" />
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Assignments</p>
-              <p className="text-3xl font-bold text-foreground mt-1">
-                {districtAdmins.length}
-              </p>
-            </div>
-            <Building2 className="h-12 w-12 text-blue-500 opacity-50" />
-          </div>
-        </div>
-
-        <div className="bg-card border border-border rounded-lg p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Districts with Admins</p>
-              <p className="text-3xl font-bold text-foreground mt-1">
-                {new Set(districtAdmins.map(a => a.district_id)).size}
-              </p>
-            </div>
-            <Shield className="h-12 w-12 text-green-500 opacity-50" />
-          </div>
-        </div>
-      </div>
-
-      {/* Admin List */}
-      <div className="bg-card border border-border rounded-lg">
-        <div className="p-6 border-b border-border">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <h2 className="text-xl font-semibold text-foreground">District Admins</h2>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <div className="relative flex-1 sm:flex-initial">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="text"
-                  placeholder="Search users..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 w-full sm:w-64"
-                />
-              </div>
-              <Button onClick={() => setShowAddForm(true)}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Admin
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        <div className="divide-y divide-border">
-          {filteredUsers.length === 0 ? (
-            <div className="px-6 py-8 text-center text-muted-foreground">
-              {searchTerm
-                ? 'No users match your search'
-                : 'No district admins yet. Add your first admin!'}
-            </div>
-          ) : (
-            filteredUsers.map(([userId, admins]) => (
-              <div key={userId} className="p-6">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                        <Users className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-foreground">User ID</p>
-                        <code className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                          {userId.slice(0, 8)}...{userId.slice(-4)}
-                        </code>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2">
-                      {admins.map((admin) => (
-                        <div
-                          key={admin.id}
-                          className="flex items-center gap-2 bg-muted/50 rounded-lg px-3 py-2"
-                        >
-                          {admin.district?.logo_url ? (
-                            <img
-                              src={admin.district.logo_url}
-                              alt=""
-                              className="w-6 h-6 rounded object-cover"
-                            />
-                          ) : (
-                            <div
-                              className="w-6 h-6 rounded flex items-center justify-center text-white text-xs font-bold"
-                              style={{ backgroundColor: admin.district?.primary_color || '#C03537' }}
-                            >
-                              {admin.district?.name.charAt(0) || 'D'}
-                            </div>
-                          )}
-                          <span className="text-sm text-foreground">
-                            {admin.district?.name || admin.district_slug}
-                          </span>
-                          <button
-                            onClick={() => setDeleteConfirm(admin.id)}
-                            className="ml-1 text-muted-foreground hover:text-destructive transition-colors"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Info Note */}
-      <div className="mt-6 bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex gap-3">
-        <AlertCircle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-blue-700 dark:text-blue-300">
-          <p className="font-medium mb-1">Note about user management</p>
-          <p className="text-blue-600 dark:text-blue-400">
-            To create new users, use the admin dashboard or invite users via email.
-            Users must sign up before they can be assigned as district admins.
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--editorial-text)' }}>
+            System Users
+          </h1>
+          <p className="mt-1" style={{ color: 'var(--editorial-muted)' }}>
+            {users.length} users &middot; {totalAdmins} system admins &middot; {totalWithDistricts} with district access
           </p>
         </div>
+        <Button onClick={() => setShowInviteModal(true)}>
+          <UserPlus className="h-4 w-4 mr-2" />
+          Invite User
+        </Button>
       </div>
 
-      {/* Add Admin Modal */}
-      {showAddForm && (
-        <AddAdminModal
-          districts={districts}
-          existingAdmins={districtAdmins}
-          onClose={() => setShowAddForm(false)}
-          onSuccess={() => {
-            queryClient.invalidateQueries({ queryKey: ['district-admins'] });
-            setShowAddForm(false);
-          }}
+      {/* Search */}
+      <div className="relative mb-6">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--editorial-muted)' }} />
+        <Input
+          type="text"
+          placeholder="Search by name, email, or district..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10 w-full sm:w-96"
         />
-      )}
+      </div>
 
-      {/* Delete Confirmation Modal */}
-      {deleteConfirm && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card border border-border rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-foreground mb-2">Remove Admin Access?</h3>
-            <p className="text-sm text-muted-foreground mb-6">
-              This will remove the user's access to this district. They will no longer be able to manage its goals and metrics.
-            </p>
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
-                Cancel
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => deleteAdminMutation.mutate(deleteConfirm)}
-                disabled={deleteAdminMutation.isPending}
-              >
-                {deleteAdminMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                    Removing...
-                  </>
-                ) : (
-                  'Remove Access'
-                )}
-              </Button>
-            </div>
-          </div>
+      {/* Users table */}
+      <div className="rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}>
+        {/* Header row */}
+        <div
+          className="grid grid-cols-[1fr_1fr_1fr_140px_100px] gap-4 px-6 py-3 text-xs font-semibold uppercase tracking-wider"
+          style={{ color: 'var(--editorial-muted)', borderBottom: '1px solid var(--editorial-border)' }}
+        >
+          <span>User</span>
+          <span>Email</span>
+          <span>Districts</span>
+          <span>System Admin</span>
+          <span>Joined</span>
         </div>
-      )}
+
+        {filtered.length === 0 ? (
+          <div className="px-6 py-12 text-center" style={{ color: 'var(--editorial-muted)' }}>
+            {searchTerm ? 'No users match your search' : 'No users found'}
+          </div>
+        ) : (
+          filtered.map((u) => (
+            <UserRow
+              key={u.id}
+              user={u}
+              isExpanded={expandedUser === u.id}
+              onToggleExpand={() => setExpandedUser(expandedUser === u.id ? null : u.id)}
+              onToggleAdmin={() =>
+                toggleAdminMutation.mutate({ id: u.id, is_system_admin: !u.is_system_admin })
+              }
+              isToggling={toggleAdminMutation.isPending}
+            />
+          ))
+        )}
+      </div>
+
+      <InviteUserModal isOpen={showInviteModal} onClose={() => setShowInviteModal(false)} />
     </div>
   );
 }
 
-interface AddAdminModalProps {
-  districts: District[];
-  existingAdmins: DistrictAdmin[];
-  onClose: () => void;
-  onSuccess: () => void;
-}
-
-function AddAdminModal({ districts, existingAdmins, onClose, onSuccess }: AddAdminModalProps) {
-  const [userId, setUserId] = useState('');
-  const [selectedDistrict, setSelectedDistrict] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (!userId.trim()) {
-      setError('User ID is required');
-      return;
-    }
-
-    if (!selectedDistrict) {
-      setError('Please select a district');
-      return;
-    }
-
-    // Check if this assignment already exists
-    const exists = existingAdmins.some(
-      a => a.user_id === userId && a.district_id === selectedDistrict
-    );
-    if (exists) {
-      setError('This user is already an admin for this district');
-      return;
-    }
-
-    const district = districts.find(d => d.id === selectedDistrict);
-    if (!district) {
-      setError('Selected district not found');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await apiPost('/admin/members', {
-        user_id: userId.trim(),
-        organization_id: selectedDistrict,
-        role: 'admin',
-      });
-
-      onSuccess();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add admin');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+function UserRow({
+  user,
+  isExpanded,
+  onToggleExpand,
+  onToggleAdmin,
+  isToggling,
+}: {
+  user: SystemUser;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  onToggleAdmin: () => void;
+  isToggling: boolean;
+}) {
+  const initials = (user.name ?? user.email).slice(0, 2).toUpperCase();
+  const joined = user.created_at ? new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '--';
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-card border border-border rounded-lg p-6 max-w-md w-full mx-4">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-foreground">Add District Admin</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="h-5 w-5" />
+    <div style={{ borderBottom: '1px solid var(--editorial-border)' }}>
+      <div className="grid grid-cols-[1fr_1fr_1fr_140px_100px] gap-4 px-6 py-4 items-center">
+        {/* User */}
+        <div className="flex items-center gap-3 min-w-0">
+          {user.image ? (
+            <img src={user.image} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+          ) : (
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              style={{ backgroundColor: 'var(--editorial-accent)', color: '#fff' }}
+            >
+              {initials}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-medium truncate" style={{ color: 'var(--editorial-text)' }}>
+              {user.name ?? 'Unnamed'}
+            </p>
+            {user.is_system_admin && <RoleBadge role="system_admin" />}
+          </div>
+        </div>
+
+        {/* Email */}
+        <span className="text-sm truncate" style={{ color: 'var(--editorial-muted)' }}>
+          {user.email}
+        </span>
+
+        {/* Districts */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          {user.memberships.length === 0 ? (
+            <span className="text-xs" style={{ color: 'var(--editorial-muted)' }}>None</span>
+          ) : (
+            <>
+              {user.memberships.slice(0, 2).map((m) => (
+                <span
+                  key={m.org_id}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs"
+                  style={{ backgroundColor: 'var(--editorial-bg)', color: 'var(--editorial-text)' }}
+                >
+                  {m.org_name}
+                  <RoleBadge role={m.role} />
+                </span>
+              ))}
+              {user.memberships.length > 2 && (
+                <button
+                  onClick={onToggleExpand}
+                  className="text-xs px-1.5 py-0.5 rounded hover:opacity-80"
+                  style={{ color: 'var(--editorial-accent)' }}
+                >
+                  +{user.memberships.length - 2} more
+                  <ChevronDown className="inline h-3 w-3 ml-0.5" />
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* System Admin toggle */}
+        <div>
+          <button
+            onClick={onToggleAdmin}
+            disabled={isToggling}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors hover:opacity-80"
+            style={{
+              backgroundColor: user.is_system_admin ? 'rgba(234,179,8,0.15)' : 'var(--editorial-bg)',
+              color: user.is_system_admin ? '#eab308' : 'var(--editorial-muted)',
+              border: `1px solid ${user.is_system_admin ? 'rgba(234,179,8,0.3)' : 'var(--editorial-border)'}`,
+            }}
+          >
+            <Shield className="h-3.5 w-3.5" />
+            {user.is_system_admin ? 'Admin' : 'User'}
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              User ID *
-            </label>
-            <Input
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            />
-            <p className="text-xs text-muted-foreground mt-1">
-              Enter the UUID of the user from the database
-            </p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
-              District *
-            </label>
-            <select
-              value={selectedDistrict}
-              onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              <option value="">Select a district...</option>
-              {districts.map((district) => (
-                <option key={district.id} value={district.id}>
-                  {district.name} ({district.slug})
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" type="button" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                  Adding...
-                </>
-              ) : (
-                'Add Admin'
-              )}
-            </Button>
-          </div>
-        </form>
+        {/* Joined */}
+        <span className="text-xs" style={{ color: 'var(--editorial-muted)' }}>{joined}</span>
       </div>
+
+      {/* Expanded memberships */}
+      {isExpanded && user.memberships.length > 2 && (
+        <div className="px-6 pb-4">
+          <div className="flex flex-wrap gap-1.5 pl-11">
+            {user.memberships.slice(2).map((m) => (
+              <span
+                key={m.org_id}
+                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs"
+                style={{ backgroundColor: 'var(--editorial-bg)', color: 'var(--editorial-text)' }}
+              >
+                {m.org_name}
+                <RoleBadge role={m.role} />
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

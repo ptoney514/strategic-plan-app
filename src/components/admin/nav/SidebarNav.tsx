@@ -165,7 +165,7 @@ export function SidebarNav({
           }}
         >
           <Users size={18} />
-          <span>Users</span>
+          <span>Team Members</span>
         </button>
 
         {/* Appearance */}

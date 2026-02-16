@@ -146,9 +146,9 @@ describe('SidebarNav', () => {
     expect(onAddSchool).toHaveBeenCalledTimes(1);
   });
 
-  it('renders Users and Appearance navigation items', () => {
+  it('renders Team Members and Appearance navigation items', () => {
     render(<SidebarNav {...defaultProps} />);
-    expect(screen.getByText('Users')).toBeInTheDocument();
+    expect(screen.getByText('Team Members')).toBeInTheDocument();
     expect(screen.getByText('Appearance')).toBeInTheDocument();
   });
 
@@ -199,9 +199,9 @@ describe('SidebarNav', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/admin/plans');
     });
 
-    it('navigates to /admin/users when Users is clicked', () => {
+    it('navigates to /admin/users when Team Members is clicked', () => {
       render(<SidebarNav {...defaultProps} />);
-      fireEvent.click(screen.getByText('Users'));
+      fireEvent.click(screen.getByText('Team Members'));
       expect(mockNavigate).toHaveBeenCalledWith('/admin/users');
     });
 

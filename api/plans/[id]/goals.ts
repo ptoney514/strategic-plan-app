@@ -87,12 +87,15 @@ function metricToSnake(row: any) {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
- * GET /api/plans/[id]/goals - Get all goals for a plan with their metrics
+ * GET /api/plans/[id]/goals - Get all goals for a plan with optional metrics
+ * Query param: includeMetrics=false to skip metric payload for lighter list views.
  * Returns a flat list ordered by goal_number; frontend builds hierarchy.
  */
 export async function GET(req: Request) {
   try {
-    const id = new URL(req.url).pathname.split("/")[3];
+    const url = new URL(req.url);
+    const id = url.pathname.split("/")[3];
+    const includeMetrics = url.searchParams.get("includeMetrics") !== "false";
     if (!id) return jsonError("Plan ID is required", 400);
 
     // Verify plan exists
@@ -120,11 +123,8 @@ export async function GET(req: Request) {
       .where(eq(goals.planId, id))
       .orderBy(asc(goals.goalNumber));
 
-    // Get all metrics for these goals in one query
-    const goalIds = planGoals.map((g) => g.id);
-
     let planMetrics: (typeof metrics.$inferSelect)[] = [];
-    if (goalIds.length > 0) {
+    if (includeMetrics && planGoals.length > 0) {
       planMetrics = await db
         .select()
         .from(metrics)

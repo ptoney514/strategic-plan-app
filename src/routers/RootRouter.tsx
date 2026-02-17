@@ -109,7 +109,15 @@ export function RootRouter() {
         <Route path="goal/:goalId" element={<GoalDetailNew />} />
       </Route>
 
-      {/* Redirect legacy district paths to subdomains */}
+      {/* Path-based district access: stratadash.org/:slug */}
+      <Route path="/:slug" element={<PublicDistrictLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="overview" element={<Dashboard />} />
+        <Route path="objective/:goalId" element={<ObjectiveDetail />} />
+        <Route path="goal/:goalId" element={<GoalDetailNew />} />
+      </Route>
+
+      {/* Redirect other /:slug/* paths (goals, admin, schools) to subdomain */}
       <Route path="/:slug/*" element={<DistrictRedirect />} />
 
       {/* Catch-all */}

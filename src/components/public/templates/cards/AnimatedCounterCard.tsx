@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import type { Metric } from '../../../../lib/types';
+import { safeNumber } from '../../../../lib/utils/safeNumber';
 
 interface AnimatedCounterCardProps {
   metric: Metric;
@@ -25,7 +26,7 @@ export function AnimatedCounterCard({
 }: AnimatedCounterCardProps) {
   const [displayValue, setDisplayValue] = useState(0);
   const animationRef = useRef<number | null>(null);
-  const targetValue = metric.current_value ?? metric.actual_value ?? 0;
+  const targetValue = safeNumber(metric.current_value ?? metric.actual_value ?? 0);
   const unit = metric.unit || '';
   const isPercentage = metric.is_percentage || unit === '%';
 
@@ -133,7 +134,7 @@ export function AnimatedCounterCard({
           <TrendIcon className="h-4 w-4" />
           {metric.ytd_change !== undefined && (
             <span className="text-xs font-medium">
-              {metric.ytd_change > 0 ? '+' : ''}{metric.ytd_change.toFixed(1)}%
+              {metric.ytd_change > 0 ? '+' : ''}{safeNumber(metric.ytd_change).toFixed(1)}%
             </span>
           )}
         </div>

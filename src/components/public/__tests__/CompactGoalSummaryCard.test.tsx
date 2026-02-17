@@ -464,6 +464,71 @@ describe('CompactGoalSummaryCard', () => {
     });
   });
 
+  describe('string values in visualization_config (JSONB coercion)', () => {
+    it('does not crash when dataPoints values are strings from JSONB', () => {
+      const metricWithStringViz: Metric = {
+        id: 'metric-string',
+        goal_id: 'goal-1',
+        district_id: 'district-1',
+        metric_name: 'String Value Metric',
+        metric_type: 'number',
+        current_value: undefined,
+        target_value: undefined,
+        visualization_config: {
+          chartType: 'bar',
+          dataPoints: [
+            { label: '2023', value: '3.78' as unknown as number },
+            { label: '2024', value: '4.12' as unknown as number },
+          ],
+          targetValue: '4.50' as unknown as number,
+        },
+        frequency: 'yearly',
+        aggregation_method: 'average',
+        unit: 'score',
+        created_at: '2024-01-01',
+        updated_at: '2024-01-01',
+      };
+
+      // Should not throw TypeError: e.toFixed is not a function
+      expect(() => {
+        render(
+          <CompactGoalSummaryCard
+            goal={mockGoal}
+            metrics={[metricWithStringViz]}
+            colorClass="bg-district-red"
+            isExpanded={false}
+            onClick={vi.fn()}
+          />
+        );
+      }).not.toThrow();
+    });
+
+    it('shows comparison indicator with string values from JSONB', () => {
+      const metricWithStringTarget: Metric = {
+        ...mockRatingMetric,
+        current_value: 4.0,
+        target_value: undefined,
+        visualization_config: {
+          targetValue: '3.50' as unknown as number,
+        },
+      };
+
+      render(
+        <CompactGoalSummaryCard
+          goal={mockGoal}
+          metrics={[metricWithStringTarget]}
+          colorClass="bg-district-red"
+          isExpanded={false}
+          onClick={vi.fn()}
+        />
+      );
+
+      // Should show "On Target" comparison since 4.0 > 3.5
+      const onTargetElements = screen.getAllByText('On Target');
+      expect(onTargetElements.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
   describe('title height consistency', () => {
     it('applies min-height class to title for consistent card heights', () => {
       const { container } = render(

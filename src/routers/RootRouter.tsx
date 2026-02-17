@@ -4,7 +4,6 @@ import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
 import { Welcome } from '../pages/Welcome';
 import { AcceptInvitation } from '../pages/AcceptInvitation';
-import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
 import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { DashboardLayout } from '../layouts/DashboardLayout';
@@ -109,8 +108,13 @@ export function RootRouter() {
         <Route path="goal/:goalId" element={<GoalDetailNew />} />
       </Route>
 
-      {/* Redirect legacy district paths to subdomains */}
-      <Route path="/:slug/*" element={<DistrictRedirect />} />
+      {/* Path-based district access: stratadash.org/:slug */}
+      <Route path="/:slug" element={<PublicDistrictLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="overview" element={<Dashboard />} />
+        <Route path="objective/:goalId" element={<ObjectiveDetail />} />
+        <Route path="goal/:goalId" element={<GoalDetailNew />} />
+      </Route>
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

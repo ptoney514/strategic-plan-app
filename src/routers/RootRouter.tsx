@@ -4,6 +4,7 @@ import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
 import { Welcome } from '../pages/Welcome';
 import { AcceptInvitation } from '../pages/AcceptInvitation';
+import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
 import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { DashboardLayout } from '../layouts/DashboardLayout';
@@ -115,6 +116,9 @@ export function RootRouter() {
         <Route path="objective/:goalId" element={<ObjectiveDetail />} />
         <Route path="goal/:goalId" element={<GoalDetailNew />} />
       </Route>
+
+      {/* Redirect other /:slug/* paths (goals, admin, schools) to subdomain */}
+      <Route path="/:slug/*" element={<DistrictRedirect />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

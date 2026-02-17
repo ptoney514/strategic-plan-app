@@ -2,9 +2,7 @@ import { sql } from "drizzle-orm";
 import { db } from "../lib/db.js";
 import {
   organizations,
-  plans,
   goals,
-  metrics,
   schools,
   user,
 } from "../lib/schema/index.js";
@@ -23,18 +21,10 @@ export async function GET(req: Request) {
       .select({ count: sql<number>`count(*)::int` })
       .from(organizations);
 
-    const [planCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(plans);
-
     const [objectiveCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(goals)
       .where(sql`${goals.level} = 0`);
-
-    const [metricCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(metrics);
 
     const [schoolCount] = await db
       .select({ count: sql<number>`count(*)::int` })
@@ -45,12 +35,10 @@ export async function GET(req: Request) {
       .from(user);
 
     return jsonOk({
-      district_count: districtCount.count,
-      plan_count: planCount.count,
-      objective_count: objectiveCount.count,
-      metric_count: metricCount.count,
-      school_count: schoolCount.count,
-      user_count: userCount.count,
+      totalDistricts: districtCount.count,
+      totalGoals: objectiveCount.count,
+      totalUsers: userCount.count,
+      totalSchools: schoolCount.count,
     });
   } catch (error) {
     if (error instanceof Response) return error;

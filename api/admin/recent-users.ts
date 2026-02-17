@@ -6,6 +6,26 @@ import { requireSystemAdmin } from "../lib/middleware/auth.js";
 import { jsonOk, jsonError } from "../lib/response.js";
 
 /**
+ * Maps backend org roles to frontend display roles.
+ * Backend org roles (viewer, editor, admin, owner) don't map 1:1
+ * to frontend UserRole values used by UserRoleBadge.
+ */
+export function toDisplayRole(isSystemAdmin: boolean, memberRole: string | null): string {
+  if (isSystemAdmin) return "system_admin";
+  if (!memberRole) return "viewer";
+  switch (memberRole) {
+    case "owner":
+    case "admin":
+      return "district_admin";
+    case "editor":
+      return "editor";
+    case "viewer":
+    default:
+      return "viewer";
+  }
+}
+
+/**
  * GET /api/admin/recent-users
  * Get recent users with their org membership info. Requires system admin.
  */
@@ -47,9 +67,7 @@ export async function GET(req: Request) {
       if (seen.has(row.id)) continue;
       seen.add(row.id);
 
-      const role = row.isSystemAdmin
-        ? "system_admin"
-        : row.memberRole ?? "viewer";
+      const role = toDisplayRole(row.isSystemAdmin ?? false, row.memberRole);
 
       result.push({
         id: row.id,

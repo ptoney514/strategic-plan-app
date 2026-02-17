@@ -3,6 +3,7 @@ import { db } from "../../lib/db.js";
 import { goals, metrics } from "../../lib/schema/index.js";
 import { requireOrgMember } from "../../lib/middleware/auth.js";
 import { getOrgSlugForGoal, isPublicOrg } from "../../lib/helpers/org-lookup.js";
+import { toNumberOrNull } from "../../lib/helpers/number.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
 
 function goalToSnake(g: Record<string, unknown>) {
@@ -33,8 +34,8 @@ function metricToSnake(m: Record<string, unknown>) {
     name: m.name,
     metric_name: m.metricName,
     metric_type: m.metricType,
-    current_value: m.currentValue,
-    target_value: m.targetValue,
+    current_value: toNumberOrNull(m.currentValue),
+    target_value: toNumberOrNull(m.targetValue),
     unit: m.unit,
     status: m.status,
     is_percentage: m.isPercentage,

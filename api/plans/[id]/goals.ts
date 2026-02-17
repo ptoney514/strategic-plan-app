@@ -3,6 +3,7 @@ import { db } from "../../lib/db.js";
 import { plans, goals, metrics, organizations } from "../../lib/schema/index.js";
 import { requireOrgMember } from "../../lib/middleware/auth.js";
 import { getOrgSlugForPlan, isPublicOrg } from "../../lib/helpers/org-lookup.js";
+import { toNumberOrNull } from "../../lib/helpers/number.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -55,8 +56,8 @@ function metricToSnake(row: any) {
     description: row.description,
     metric_type: row.metricType,
     data_source: row.dataSource,
-    current_value: row.currentValue,
-    target_value: row.targetValue,
+    current_value: toNumberOrNull(row.currentValue),
+    target_value: toNumberOrNull(row.targetValue),
     unit: row.unit,
     status: row.status,
     chart_type: row.chartType,
@@ -75,10 +76,10 @@ function metricToSnake(row: any) {
     decimal_places: row.decimalPlaces,
     is_percentage: row.isPercentage,
     is_higher_better: row.isHigherBetter,
-    ytd_value: row.ytdValue,
-    eoy_projection: row.eoyProjection,
+    ytd_value: toNumberOrNull(row.ytdValue),
+    eoy_projection: toNumberOrNull(row.eoyProjection),
     last_actual_period: row.lastActualPeriod,
-    baseline_value: row.baselineValue,
+    baseline_value: toNumberOrNull(row.baselineValue),
     trend_direction: row.trendDirection,
     created_at: row.createdAt,
     updated_at: row.updatedAt,

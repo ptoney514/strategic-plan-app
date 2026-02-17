@@ -3,6 +3,7 @@ import { db } from "../lib/db.js";
 import { metrics, goals, plans } from "../lib/schema/index.js";
 import { requireOrgMember } from "../lib/middleware/auth.js";
 import { getOrgSlugForMetric } from "../lib/helpers/org-lookup.js";
+import { toNumberOrNull } from "../lib/helpers/number.js";
 import { jsonOk, jsonError } from "../lib/response.js";
 
 /** Map a Drizzle metrics row to snake_case for the frontend */
@@ -16,8 +17,8 @@ function metricToSnake(m: typeof metrics.$inferSelect) {
     description: m.description,
     metric_type: m.metricType,
     data_source: m.dataSource,
-    current_value: m.currentValue,
-    target_value: m.targetValue,
+    current_value: toNumberOrNull(m.currentValue),
+    target_value: toNumberOrNull(m.targetValue),
     unit: m.unit,
     status: m.status,
     chart_type: m.chartType,
@@ -36,23 +37,23 @@ function metricToSnake(m: typeof metrics.$inferSelect) {
     decimal_places: m.decimalPlaces,
     is_percentage: m.isPercentage,
     is_higher_better: m.isHigherBetter,
-    ytd_value: m.ytdValue,
-    eoy_projection: m.eoyProjection,
+    ytd_value: toNumberOrNull(m.ytdValue),
+    eoy_projection: toNumberOrNull(m.eoyProjection),
     last_actual_period: m.lastActualPeriod,
-    risk_threshold_critical: m.riskThresholdCritical,
-    risk_threshold_warning: m.riskThresholdWarning,
-    risk_threshold_off_target: m.riskThresholdOffTarget,
+    risk_threshold_critical: toNumberOrNull(m.riskThresholdCritical),
+    risk_threshold_warning: toNumberOrNull(m.riskThresholdWarning),
+    risk_threshold_off_target: toNumberOrNull(m.riskThresholdOffTarget),
     collection_frequency: m.collectionFrequency,
-    baseline_value: m.baselineValue,
+    baseline_value: toNumberOrNull(m.baselineValue),
     trend_direction: m.trendDirection,
     data_source_details: m.dataSourceDetails,
     last_collected: m.lastCollected,
     measurement_scale: m.measurementScale,
-    ytd_change: m.ytdChange,
-    period_over_period_change: m.periodOverPeriodChange,
-    period_over_period_percent: m.periodOverPeriodPercent,
+    ytd_change: toNumberOrNull(m.ytdChange),
+    period_over_period_change: toNumberOrNull(m.periodOverPeriodChange),
+    period_over_period_percent: toNumberOrNull(m.periodOverPeriodPercent),
     calculation_method: m.calculationMethod,
-    data_completeness: m.dataCompleteness,
+    data_completeness: toNumberOrNull(m.dataCompleteness),
     confidence_level: m.confidenceLevel,
     last_calculated_at: m.lastCalculatedAt,
     calculation_notes: m.calculationNotes,

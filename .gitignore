@@ -11,6 +11,8 @@
 **/.env.staging
 **/.env.production
 **/.env.*.local
+**/.env*-backup
+**/.env*.backup
 
 # Build outputs
 **/dist/

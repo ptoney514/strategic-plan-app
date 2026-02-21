@@ -1,9 +1,9 @@
 import { eq, inArray } from "drizzle-orm";
-import { db } from "../lib/db";
-import { metrics, goals, plans } from "../lib/schema/index";
-import { requireOrgMember } from "../lib/middleware/auth";
-import { getOrgSlugForMetric } from "../lib/helpers/org-lookup";
-import { jsonOk, jsonError } from "../lib/response";
+import { db } from "../lib/db.js";
+import { metrics, goals, plans } from "../lib/schema/index.js";
+import { requireOrgMember } from "../lib/middleware/auth.js";
+import { getOrgSlugForMetric } from "../lib/helpers/org-lookup.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 /**
  * PUT /api/metrics/reorder - Reorder metrics

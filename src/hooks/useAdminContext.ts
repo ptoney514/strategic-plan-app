@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { useDistrict } from './useDistricts';
 import { useSchools, useSchool } from './useSchools';
+import { useSubdomain } from '../contexts/SubdomainContext';
 
 export type AdminContextType = 'district' | 'school';
 
@@ -22,7 +23,10 @@ export interface AdminContext {
  * and provide relevant data for navigation and routing
  */
 export function useAdminContext(): AdminContext {
-  const { slug: districtSlug = '', schoolSlug } = useParams<{ slug: string; schoolSlug?: string }>();
+  const { slug: routeSlug = '', schoolSlug } = useParams<{ slug: string; schoolSlug?: string }>();
+  const { type: subdomainType, slug: subdomainSlug } = useSubdomain();
+  const isDistrictSubdomain = subdomainType === 'district' && !!subdomainSlug;
+  const districtSlug = routeSlug || (isDistrictSubdomain ? subdomainSlug : '');
 
   // Fetch district data
   const { data: district, isLoading: districtLoading } = useDistrict(districtSlug);
@@ -39,18 +43,30 @@ export function useAdminContext(): AdminContext {
   // Compute base path for navigation
   const basePath = useMemo(() => {
     if (schoolSlug) {
+      if (isDistrictSubdomain) {
+        return `/schools/${schoolSlug}/admin`;
+      }
       return `/${districtSlug}/schools/${schoolSlug}/admin`;
     }
+    if (isDistrictSubdomain) {
+      return '/admin';
+    }
     return `/${districtSlug}/admin`;
-  }, [districtSlug, schoolSlug]);
+  }, [districtSlug, schoolSlug, isDistrictSubdomain]);
 
   // Compute public URL
   const publicUrl = useMemo(() => {
     if (schoolSlug) {
+      if (isDistrictSubdomain) {
+        return `/schools/${schoolSlug}`;
+      }
       return `/${districtSlug}/schools/${schoolSlug}`;
     }
+    if (isDistrictSubdomain) {
+      return '/';
+    }
     return `/${districtSlug}`;
-  }, [districtSlug, schoolSlug]);
+  }, [districtSlug, schoolSlug, isDistrictSubdomain]);
 
   const isLoading = districtLoading || schoolsLoading || (schoolSlug ? schoolLoading : false);
 

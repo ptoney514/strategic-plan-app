@@ -1,9 +1,9 @@
 import { eq, and, isNull, asc } from "drizzle-orm";
-import { db } from "../lib/db";
-import { goals } from "../lib/schema/index";
-import { requireOrgMember } from "../lib/middleware/auth";
-import { getOrgSlugForPlan } from "../lib/helpers/org-lookup";
-import { jsonOk, jsonError } from "../lib/response";
+import { db } from "../lib/db.js";
+import { goals } from "../lib/schema/index.js";
+import { requireOrgMember } from "../lib/middleware/auth.js";
+import { getOrgSlugForPlan } from "../lib/helpers/org-lookup.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 // ---------------------------------------------------------------------------
 // PUT /api/goals/renumber — Renumber goals sequentially

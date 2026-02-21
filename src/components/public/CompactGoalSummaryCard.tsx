@@ -1,6 +1,7 @@
 import type { Goal, Metric } from '../../lib/types';
 import { TrendingUp, TrendingDown, Check, ArrowRight } from 'lucide-react';
 import { formatMetricValue as formatMetricValueUtil } from '../../lib/utils/formatMetricValue';
+import { safeNumber } from '../../lib/utils/safeNumber';
 
 interface CompactGoalSummaryCardProps {
   goal: Goal;
@@ -102,7 +103,7 @@ function getPrimaryMetric(metrics: Metric[], goalId: string): Metric | null {
       return metric;
     }
     const vizConfig = metric.visualization_config as { dataPoints?: { value: number }[] } | undefined;
-    if (vizConfig?.dataPoints?.some(dp => dp.value > 0)) {
+    if (vizConfig?.dataPoints?.some(dp => safeNumber(dp.value) > 0)) {
       return metric;
     }
   }
@@ -118,9 +119,9 @@ function getCurrentValue(metric: Metric): number {
 
   const vizConfig = metric.visualization_config as { dataPoints?: { value: number }[] } | undefined;
   if (vizConfig?.dataPoints?.length) {
-    const nonZero = vizConfig.dataPoints.filter(dp => dp.value > 0);
+    const nonZero = vizConfig.dataPoints.filter(dp => safeNumber(dp.value) > 0);
     if (nonZero.length > 0) {
-      return nonZero.reduce((sum, dp) => sum + dp.value, 0) / nonZero.length;
+      return nonZero.reduce((sum, dp) => sum + safeNumber(dp.value), 0) / nonZero.length;
     }
   }
 
@@ -131,7 +132,7 @@ function getCurrentValue(metric: Metric): number {
 function getTargetValue(metric: Metric): number | null {
   if (metric.target_value != null) return metric.target_value;
   const vizConfig = metric.visualization_config as { targetValue?: number } | undefined;
-  if (vizConfig?.targetValue != null) return vizConfig.targetValue;
+  if (vizConfig?.targetValue != null) return safeNumber(vizConfig.targetValue);
   return null;
 }
 

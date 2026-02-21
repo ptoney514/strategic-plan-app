@@ -36,6 +36,7 @@ jobs:
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
           echo "Looking for Neon branch matching: $BRANCH_NAME"
+          echo "branch_found=false" >> "$GITHUB_OUTPUT"
 
           # Poll for up to 90 seconds — the Neon-Vercel integration creates
           # the branch asynchronously after the preview deployment starts
@@ -49,6 +50,7 @@ jobs:
             if [ -n "$BRANCH_ID" ]; then
               echo "Found Neon branch: $BRANCH_ID"
               echo "branch_id=$BRANCH_ID" >> "$GITHUB_OUTPUT"
+              echo "branch_found=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -56,10 +58,11 @@ jobs:
             sleep 5
           done
 
-          echo "::error::Neon branch not found after 90s. Is the Neon-Vercel integration installed?"
-          exit 1
+          echo "::warning::Neon branch not found after 90s. Skipping preview DB setup for this PR run."
+          exit 0
 
       - name: Get connection string
+        if: steps.find-branch.outputs.branch_found == 'true'
         id: connection
         env:
           NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
@@ -72,22 +75,27 @@ jobs:
           echo "database_url=$CONNECTION_STRING" >> "$GITHUB_OUTPUT"
 
       - name: Run Drizzle migrations
+        if: steps.find-branch.outputs.branch_found == 'true'
         env:
           DATABASE_URL: ${{ steps.connection.outputs.database_url }}
         run: npx drizzle-kit migrate
 
       - name: Apply trigger SQL
+        if: steps.find-branch.outputs.branch_found == 'true'
         env:
           DATABASE_URL: ${{ steps.connection.outputs.database_url }}
         run: psql "$DATABASE_URL" -f drizzle/custom/0001_updated_at_trigger.sql
 
       - name: Seed preview database
+        if: steps.find-branch.outputs.branch_found == 'true'
         env:
           DATABASE_URL: ${{ steps.connection.outputs.database_url }}
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
         run: npx tsx scripts/seed.ts
 
       - name: Comment on PR
+        if: steps.find-branch.outputs.branch_found == 'true'
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
@@ -114,6 +122,44 @@ jobs:
             });
             const botComment = comments.find(c =>
               c.user.type === 'Bot' && c.body.includes('Preview Database Ready')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Comment on PR (preview DB skipped)
+        if: steps.find-branch.outputs.branch_found != 'true'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              '## Preview Database Skipped',
+              '',
+              'No matching Neon branch was detected for this PR within the polling window.',
+              'Preview deployment can still proceed; database setup was skipped for this run.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Preview Database Skipped')
             );
 
             if (botComment) {

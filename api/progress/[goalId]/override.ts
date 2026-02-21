@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { goals, statusOverrides } from "../../lib/schema/index";
-import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
-import { getOrgSlugForGoal } from "../../lib/helpers/org-lookup";
-import { jsonOk, jsonError } from "../../lib/response";
+import { db } from "../../lib/db.js";
+import { goals, statusOverrides } from "../../lib/schema/index.js";
+import { requireAuth, requireOrgMember } from "../../lib/middleware/auth.js";
+import { getOrgSlugForGoal } from "../../lib/helpers/org-lookup.js";
+import { jsonOk, jsonError } from "../../lib/response.js";
 
 function goalToSnake(g: Record<string, unknown>) {
   return {

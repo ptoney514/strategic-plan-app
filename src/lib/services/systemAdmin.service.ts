@@ -22,11 +22,13 @@ export interface DistrictWithStats {
   updated_at: string;
 }
 
-export type UserRole = 'system_admin' | 'district_admin' | 'school_admin' | 'editor';
+export type UserRole = 'system_admin' | 'district_admin' | 'school_admin' | 'editor' | 'viewer';
 
 export interface UserWithRole {
   id: string;
   user_id: string;
+  name?: string;
+  email?: string;
   role: UserRole;
   district_name?: string;
   district_slug?: string;

@@ -42,11 +42,24 @@ export class GoalsService {
   /**
    * Get goals (objectives) for a specific plan
    */
-  static async getByPlan(planId: string): Promise<HierarchicalGoal[]> {
+  static async getByPlan(
+    planId: string,
+    options?: { includeMetrics?: boolean }
+  ): Promise<HierarchicalGoal[]> {
     log.debug('Fetching goals for plan:', planId);
 
+    const includeMetrics = options?.includeMetrics ?? true;
+    const params = new URLSearchParams();
+    if (!includeMetrics) {
+      params.set('includeMetrics', 'false');
+    }
+
+    const endpoint = params.size > 0
+      ? `/plans/${planId}/goals?${params.toString()}`
+      : `/plans/${planId}/goals`;
+
     // The API returns all goals for the plan with metrics nested
-    const goals = await apiGet<Goal[]>(`/plans/${planId}/goals`);
+    const goals = await apiGet<Goal[]>(endpoint);
 
     log.debug('Total goals for plan:', goals?.length ?? 0);
 

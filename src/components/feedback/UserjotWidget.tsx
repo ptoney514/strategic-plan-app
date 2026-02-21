@@ -62,11 +62,15 @@ export function UserjotWidget() {
     }
 
     if (isAuthenticated && user) {
-      window.uj.identify({
-        id: user.id,
-        email: user.email || '',
-        name: user.user_metadata?.name || user.email?.split('@')[0] || ''
-      });
+      try {
+        window.uj.identify({
+          id: user.id,
+          email: user.email || '',
+          name: user.user_metadata?.name || user.email?.split('@')[0] || ''
+        });
+      } catch {
+        // UserJot identify can fail if the project ID is invalid or SDK not loaded yet
+      }
     }
   }, [isAuthenticated, user]);
 

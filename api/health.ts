@@ -1,5 +1,5 @@
-import { db } from "./lib/db";
-import { organizations } from "./lib/schema/index";
+import { db } from "./lib/db.js";
+import { organizations } from "./lib/schema/index.js";
 
 export async function GET() {
   try {

@@ -1,19 +1,19 @@
-export { user, session, account, verification } from "./auth";
+export { user, session, account, verification } from "./auth.js";
 export {
   organizations,
   organizationMembers,
   organizationInvitations,
-} from "./organizations";
-export { plans } from "./plans";
-export { goals, metrics } from "./goals";
-export { schools } from "./schools";
-export { contactSubmissions } from "./contact";
-export { metricTimeSeries } from "./metricTimeSeries";
-export { schoolAdmins } from "./schoolAdmins";
+} from "./organizations.js";
+export { plans } from "./plans.js";
+export { goals, metrics } from "./goals.js";
+export { schools } from "./schools.js";
+export { contactSubmissions } from "./contact.js";
+export { metricTimeSeries } from "./metricTimeSeries.js";
+export { schoolAdmins } from "./schoolAdmins.js";
 export {
   importSessions,
   stagedGoals,
   stagedMetrics,
-} from "./imports";
-export { statusOverrides } from "./progress";
-export { stockPhotos } from "./stockPhotos";
+} from "./imports.js";
+export { statusOverrides } from "./progress.js";
+export { stockPhotos } from "./stockPhotos.js";

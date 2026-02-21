@@ -1,11 +1,11 @@
 import { eq, desc } from "drizzle-orm";
-import { db } from "../lib/db";
+import { db } from "../lib/db.js";
 import {
   organizations,
   organizationMembers,
-} from "../lib/schema/index";
-import { requireSystemAdmin } from "../lib/middleware/auth";
-import { jsonOk, jsonError } from "../lib/response";
+} from "../lib/schema/index.js";
+import { requireSystemAdmin } from "../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 /**
  * GET /api/admin/members

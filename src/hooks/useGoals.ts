@@ -28,10 +28,15 @@ export function useSchoolGoals(schoolId: string) {
  * Hook to fetch goals (objectives) for a specific plan
  * @param planId - The plan ID to fetch objectives for
  */
-export function usePlanGoals(planId: string) {
+export function usePlanGoals(
+  planId: string,
+  options?: { includeMetrics?: boolean }
+) {
+  const includeMetrics = options?.includeMetrics ?? true;
+
   return useQuery({
-    queryKey: ['goals', 'plan', planId],
-    queryFn: () => GoalsService.getByPlan(planId),
+    queryKey: ['goals', 'plan', planId, includeMetrics ? 'with-metrics' : 'without-metrics'],
+    queryFn: () => GoalsService.getByPlan(planId, { includeMetrics }),
     enabled: !!planId && planId.length > 0,
     retry: false,
   });

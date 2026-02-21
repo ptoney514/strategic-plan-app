@@ -1,12 +1,12 @@
 import { eq } from "drizzle-orm";
-import { db } from "../db";
+import { db } from "../db.js";
 import {
   goals,
   importSessions,
   metrics,
   plans,
   organizations,
-} from "../schema/index";
+} from "../schema/index.js";
 
 /**
  * Look up the organization for a goal via goal → plan → organization.

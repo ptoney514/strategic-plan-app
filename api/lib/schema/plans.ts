@@ -11,8 +11,8 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { isNull, isNotNull } from "drizzle-orm";
-import { organizations } from "./organizations";
-import { schools } from "./schools";
+import { organizations } from "./organizations.js";
+import { schools } from "./schools.js";
 
 export const plans = pgTable(
   "plans",

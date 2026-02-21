@@ -1,8 +1,8 @@
 import { eq, and, asc } from "drizzle-orm";
-import { db } from "../../../lib/db";
-import { organizations, schools } from "../../../lib/schema/index";
-import { requireOrgMember } from "../../../lib/middleware/auth";
-import { jsonOk, jsonError, parsePagination } from "../../../lib/response";
+import { db } from "../../../lib/db.js";
+import { organizations, schools } from "../../../lib/schema/index.js";
+import { requireOrgMember } from "../../../lib/middleware/auth.js";
+import { jsonOk, jsonError, parsePagination } from "../../../lib/response.js";
 
 /** Map a Drizzle school row to snake_case for the frontend */
 function schoolToSnakeCase(school: typeof schools.$inferSelect) {

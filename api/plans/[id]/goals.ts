@@ -1,9 +1,10 @@
 import { eq, asc } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { plans, goals, metrics, organizations } from "../../lib/schema/index";
-import { requireOrgMember } from "../../lib/middleware/auth";
-import { getOrgSlugForPlan, isPublicOrg } from "../../lib/helpers/org-lookup";
-import { jsonOk, jsonError } from "../../lib/response";
+import { db } from "../../lib/db.js";
+import { plans, goals, metrics, organizations } from "../../lib/schema/index.js";
+import { requireOrgMember } from "../../lib/middleware/auth.js";
+import { getOrgSlugForPlan, isPublicOrg } from "../../lib/helpers/org-lookup.js";
+import { toNumberOrNull } from "../../lib/helpers/number.js";
+import { jsonOk, jsonError } from "../../lib/response.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function goalToSnake(row: any) {
@@ -55,8 +56,8 @@ function metricToSnake(row: any) {
     description: row.description,
     metric_type: row.metricType,
     data_source: row.dataSource,
-    current_value: row.currentValue,
-    target_value: row.targetValue,
+    current_value: toNumberOrNull(row.currentValue),
+    target_value: toNumberOrNull(row.targetValue),
     unit: row.unit,
     status: row.status,
     chart_type: row.chartType,
@@ -75,10 +76,10 @@ function metricToSnake(row: any) {
     decimal_places: row.decimalPlaces,
     is_percentage: row.isPercentage,
     is_higher_better: row.isHigherBetter,
-    ytd_value: row.ytdValue,
-    eoy_projection: row.eoyProjection,
+    ytd_value: toNumberOrNull(row.ytdValue),
+    eoy_projection: toNumberOrNull(row.eoyProjection),
     last_actual_period: row.lastActualPeriod,
-    baseline_value: row.baselineValue,
+    baseline_value: toNumberOrNull(row.baselineValue),
     trend_direction: row.trendDirection,
     created_at: row.createdAt,
     updated_at: row.updatedAt,
@@ -87,12 +88,15 @@ function metricToSnake(row: any) {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
- * GET /api/plans/[id]/goals - Get all goals for a plan with their metrics
+ * GET /api/plans/[id]/goals - Get all goals for a plan with optional metrics
+ * Query param: includeMetrics=false to skip metric payload for lighter list views.
  * Returns a flat list ordered by goal_number; frontend builds hierarchy.
  */
 export async function GET(req: Request) {
   try {
-    const id = new URL(req.url).pathname.split("/")[3];
+    const url = new URL(req.url);
+    const id = url.pathname.split("/")[3];
+    const includeMetrics = url.searchParams.get("includeMetrics") !== "false";
     if (!id) return jsonError("Plan ID is required", 400);
 
     // Verify plan exists
@@ -120,11 +124,8 @@ export async function GET(req: Request) {
       .where(eq(goals.planId, id))
       .orderBy(asc(goals.goalNumber));
 
-    // Get all metrics for these goals in one query
-    const goalIds = planGoals.map((g) => g.id);
-
     let planMetrics: (typeof metrics.$inferSelect)[] = [];
-    if (goalIds.length > 0) {
+    if (includeMetrics && planGoals.length > 0) {
       planMetrics = await db
         .select()
         .from(metrics)

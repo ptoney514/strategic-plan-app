@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
-import { db } from "./lib/db";
-import { stockPhotos } from "./lib/schema/index";
-import { jsonOk, jsonError } from "./lib/response";
+import { db } from "./lib/db.js";
+import { stockPhotos } from "./lib/schema/index.js";
+import { jsonOk, jsonError } from "./lib/response.js";
 
 /**
  * GET /api/stock-photos

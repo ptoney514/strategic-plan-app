@@ -15,6 +15,20 @@
       "when": 1770344010270,
       "tag": "0001_careless_thunderball",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1770645000000,
+      "tag": "0002_align_account_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1770650000000,
+      "tag": "0003_goals_plan_level_idx",
+      "breakpoints": true
     }
   ]
 }

@@ -1,8 +1,9 @@
-import { eq, and, asc } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { organizations, plans, goals, metrics } from "../../lib/schema/index";
-import { requireOrgMember } from "../../lib/middleware/auth";
-import { jsonOk, jsonError, parsePagination } from "../../lib/response";
+import { eq, asc } from "drizzle-orm";
+import { db } from "../../lib/db.js";
+import { organizations, plans, goals, metrics } from "../../lib/schema/index.js";
+import { requireOrgMember } from "../../lib/middleware/auth.js";
+import { toNumberOrNull } from "../../lib/helpers/number.js";
+import { jsonOk, jsonError, parsePagination } from "../../lib/response.js";
 
 /** Map a Drizzle metric row to snake_case for the frontend */
 function metricToSnakeCase(metric: typeof metrics.$inferSelect) {
@@ -15,8 +16,8 @@ function metricToSnakeCase(metric: typeof metrics.$inferSelect) {
     description: metric.description,
     metric_type: metric.metricType,
     data_source: metric.dataSource,
-    current_value: metric.currentValue,
-    target_value: metric.targetValue,
+    current_value: toNumberOrNull(metric.currentValue),
+    target_value: toNumberOrNull(metric.targetValue),
     unit: metric.unit,
     status: metric.status,
     chart_type: metric.chartType,
@@ -35,23 +36,23 @@ function metricToSnakeCase(metric: typeof metrics.$inferSelect) {
     decimal_places: metric.decimalPlaces,
     is_percentage: metric.isPercentage,
     is_higher_better: metric.isHigherBetter,
-    ytd_value: metric.ytdValue,
-    eoy_projection: metric.eoyProjection,
+    ytd_value: toNumberOrNull(metric.ytdValue),
+    eoy_projection: toNumberOrNull(metric.eoyProjection),
     last_actual_period: metric.lastActualPeriod,
-    risk_threshold_critical: metric.riskThresholdCritical,
-    risk_threshold_warning: metric.riskThresholdWarning,
-    risk_threshold_off_target: metric.riskThresholdOffTarget,
+    risk_threshold_critical: toNumberOrNull(metric.riskThresholdCritical),
+    risk_threshold_warning: toNumberOrNull(metric.riskThresholdWarning),
+    risk_threshold_off_target: toNumberOrNull(metric.riskThresholdOffTarget),
     collection_frequency: metric.collectionFrequency,
-    baseline_value: metric.baselineValue,
+    baseline_value: toNumberOrNull(metric.baselineValue),
     trend_direction: metric.trendDirection,
     data_source_details: metric.dataSourceDetails,
     last_collected: metric.lastCollected?.toISOString() ?? null,
     measurement_scale: metric.measurementScale,
-    ytd_change: metric.ytdChange,
-    period_over_period_change: metric.periodOverPeriodChange,
-    period_over_period_percent: metric.periodOverPeriodPercent,
+    ytd_change: toNumberOrNull(metric.ytdChange),
+    period_over_period_change: toNumberOrNull(metric.periodOverPeriodChange),
+    period_over_period_percent: toNumberOrNull(metric.periodOverPeriodPercent),
     calculation_method: metric.calculationMethod,
-    data_completeness: metric.dataCompleteness,
+    data_completeness: toNumberOrNull(metric.dataCompleteness),
     confidence_level: metric.confidenceLevel,
     last_calculated_at: metric.lastCalculatedAt?.toISOString() ?? null,
     calculation_notes: metric.calculationNotes,

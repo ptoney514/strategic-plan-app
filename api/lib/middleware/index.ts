@@ -3,4 +3,4 @@ export {
   requireOrgMember,
   requireSystemAdmin,
   hasMinimumRole,
-} from "./auth";
+} from "./auth.js";

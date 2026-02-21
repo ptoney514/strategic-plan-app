@@ -268,9 +268,12 @@ export function Login() {
             <div className="mt-6 text-center">
               <p className="text-sm text-slate-500">
                 Don't have an account?{' '}
-                <span className="font-medium text-indigo-600 cursor-default">
-                  Contact us to get started
-                </span>
+                <Link
+                  to="/signup"
+                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
+                >
+                  Sign up
+                </Link>
               </p>
             </div>
           </div>

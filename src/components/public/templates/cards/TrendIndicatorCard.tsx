@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { TrendingUp, TrendingDown, Minus, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer } from 'recharts';
 import type { Metric, TimeSeriesDataPoint } from '../../../../lib/types';
+import { safeNumber } from '../../../../lib/utils/safeNumber';
 
 interface TrendIndicatorCardProps {
   metric: Metric;
@@ -23,8 +24,8 @@ export function TrendIndicatorCard({
   animationDelay = 0,
   darkMode = false,
 }: TrendIndicatorCardProps) {
-  const currentValue = metric.current_value ?? metric.actual_value ?? 0;
-  const change = metric.ytd_change ?? 0;
+  const currentValue = safeNumber(metric.current_value ?? metric.actual_value ?? 0);
+  const change = safeNumber(metric.ytd_change ?? 0);
   const isPositive = change > 0;
   const isNegative = change < 0;
 

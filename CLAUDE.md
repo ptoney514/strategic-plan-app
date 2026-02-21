@@ -77,12 +77,15 @@ strategic-plan-app/
 ### Essential commands
 
 ```bash
-npm run dev              # Start dev server (http://localhost:5174)
+npm run dev              # Frontend only (Vite on port 5174) — no API routes
+npm run dev:api          # Full-stack: frontend + API routes (vercel dev on port 5174)
 npm test                 # Run tests in watch mode
 npm run test:run         # Run tests once
 npm run build            # Production build
 npm run preview          # Preview production build
 ```
+
+> **`dev` vs `dev:api`:** Use `npm run dev` for frontend-only work (faster startup). Use `npm run dev:api` when you need login/auth or any API route — it runs `vercel dev` which serves both the Vite frontend and the `api/` serverless functions. Requires the Vercel CLI (`npm i -g vercel`).
 
 > **Note for AI agents:** Use `npm run test:run` (single run) instead of `npm test` (watch mode) to avoid spawning multiple background processes.
 >
@@ -108,16 +111,38 @@ npx drizzle-kit studio     # Open Drizzle Studio (database browser)
 
 ### Neon PostgreSQL
 
-The application uses [Neon](https://neon.tech) serverless PostgreSQL. No local database setup is required -- the app connects directly to the hosted Neon database.
+The application uses [Neon](https://neon.tech) serverless PostgreSQL for production and cloud development.
 
 - **Project**: `small-salad-72814952` (stratadash, us-east-1)
 - **Database**: `strategic-plan-db`
 - **Driver**: `@neondatabase/serverless` (HTTP-based, works in both Edge and Node.js runtimes)
 
+### Neon Dev Branch (Local Development)
+
+For local development, use a `dev` branch in the Neon project. This uses the same `@neondatabase/serverless` HTTP driver as production — no dual-driver complexity.
+
+**One-time setup** (requires [neonctl](https://neon.tech/docs/reference/neon-cli)):
+
+```bash
+neonctl branches create --name dev --project-id small-salad-72814952
+neonctl connection-string --branch dev --database-name strategic-plan-db --project-id small-salad-72814952
+```
+
+Copy the connection string into `.env.local` as `DATABASE_URL`, then:
+
+```bash
+cp .env.local.example .env.local     # Fill in DATABASE_URL, BETTER_AUTH_SECRET
+npm run db:seed:fresh                 # Run migrations + seed
+npm run dev:api                       # Full-stack dev server
+```
+
+**Reset dev data:** `npm run db:seed` (truncates + re-seeds)
+**Sync schema:** `npm run db:seed:fresh` (runs migrations then seeds)
+
 ### Prerequisites
 
 - Node.js 20+
-- A `DATABASE_URL` connection string (from Neon dashboard)
+- A Neon `DATABASE_URL` connection string (from Neon dashboard or `neonctl`)
 
 ### First-Time Setup
 
@@ -232,6 +257,54 @@ lint-typecheck
 1. **Linting & Type checking** - ESLint + TypeScript compiler
 2. **Unit tests** - Vitest test suite
 3. **Build** - Production build completes successfully
+
+## Preview/Staging Workflow
+
+Every PR gets an isolated preview environment with its own database branch, enabling full-stack testing before merge.
+
+### How It Works
+
+```
+PR opened/updated
+  ├── Vercel creates Preview Deployment (automatic)
+  ├── Neon-Vercel integration creates database branch + injects DATABASE_URL (automatic)
+  └── GitHub Action (preview-db.yml) runs migrations + triggers + seed on that branch
+
+PR closed/merged
+  └── GitHub Action deletes Neon branch (cleanup)
+```
+
+**Full workflow:** Neon dev branch → Push PR → Vercel preview + Neon branch (auto-migrated, seeded) → Merge to main → Production
+
+### Preview Environment Variables
+
+| Variable             | Source                                  | Notes                             |
+| -------------------- | --------------------------------------- | --------------------------------- |
+| `DATABASE_URL`       | Neon-Vercel integration (auto-injected) | Points to PR-specific Neon branch |
+| `BETTER_AUTH_SECRET` | Vercel env vars (Preview scope)         | Must match GitHub secret          |
+| `BETTER_AUTH_URL`    | Auto-derived from `VERCEL_URL`          | Falls back in `api/lib/auth.ts`   |
+| `VITE_ENVIRONMENT`   | Vercel env vars (Preview scope)         | Set to `preview`                  |
+
+### Verifying a Preview Deployment
+
+1. Open the Vercel preview URL from the PR
+2. Login with test credentials (see Test Credentials section)
+3. Verify data exists (goals, metrics, districts)
+4. Check PR comments for "Preview Database Ready" confirmation
+
+### Setup Requirements
+
+The Neon-Vercel integration must be installed (one-time setup):
+
+1. Install from https://vercel.com/marketplace/neon
+2. Link to Neon project `small-salad-72814952`, database `strategic-plan-db`
+3. Enable "Create a branch for each preview deployment"
+4. Add `NEON_API_KEY` and `BETTER_AUTH_SECRET` as GitHub Actions secrets
+5. Add `NEON_PROJECT_ID` as a GitHub Actions variable
+
+### Branch Limits
+
+Neon free tier allows 10 branches. The `preview-db.yml` workflow automatically deletes branches when PRs close. Keep PR count manageable.
 
 ## Critical Constraints
 

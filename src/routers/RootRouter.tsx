@@ -1,11 +1,14 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MarketingLanding } from '../pages/marketing/Landing';
 import { Login } from '../pages/Login';
+import { Signup } from '../pages/Signup';
+import { Welcome } from '../pages/Welcome';
+import { AcceptInvitation } from '../pages/AcceptInvitation';
 import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
 import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-import { UserDashboard, PlaceholderPage } from '../pages/dashboard';
+import { UserDashboard, PlaceholderPage, DashboardPlansPage } from '../pages/dashboard';
 import { useAuth } from '../contexts/AuthContext';
 
 // Public District Layout and Pages
@@ -57,11 +60,8 @@ export function RootRouter() {
         }
       >
         <Route index element={<UserDashboard />} />
-        <Route path="plans" element={<PlaceholderPage title="Strategic Plans" description="View and manage all your strategic plans in one place." />} />
-        <Route path="plans/new" element={<PlaceholderPage title="Create New Plan" description="Create a new strategic plan for your organization." />} />
-        <Route path="plans/create" element={<PlaceholderPage title="Create New Plan" description="Create a new strategic plan for your organization." />} />
-        <Route path="plans/:planId" element={<PlaceholderPage title="Plan Details" description="View and manage your strategic plan details." />} />
-        <Route path="plans/:planId/objectives/new" element={<PlaceholderPage title="Add New Objective" description="Add a new objective to your strategic plan." />} />
+        <Route path="plans" element={<DashboardPlansPage />} />
+        <Route path="plans/*" element={<DashboardPlansPage />} />
         <Route path="objectives" element={<PlaceholderPage title="Objectives & Goals" description="Track and manage your strategic objectives and goals." />} />
         <Route path="objectives/create" element={<PlaceholderPage title="Create Objective" description="Create a new objective for your strategic plan." />} />
         <Route path="objectives/:objectiveId" element={<PlaceholderPage title="Objective Details" description="View and edit objective details." />} />
@@ -72,8 +72,18 @@ export function RootRouter() {
         <Route path="help" element={<PlaceholderPage title="Help & Support" description="Get help with using StrataDASH and contact support." />} />
       </Route>
 
-      {/* Login page */}
+      {/* Auth pages */}
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route
+        path="/welcome"
+        element={
+          <RequireAuth>
+            <Welcome />
+          </RequireAuth>
+        }
+      />
+      <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       {/* Legal pages */}
       <Route path="/about" element={<AboutPage />} />
@@ -99,7 +109,15 @@ export function RootRouter() {
         <Route path="goal/:goalId" element={<GoalDetailNew />} />
       </Route>
 
-      {/* Redirect legacy district paths to subdomains */}
+      {/* Path-based district access: stratadash.org/:slug */}
+      <Route path="/:slug" element={<PublicDistrictLayout />}>
+        <Route index element={<Dashboard />} />
+        <Route path="overview" element={<Dashboard />} />
+        <Route path="objective/:goalId" element={<ObjectiveDetail />} />
+        <Route path="goal/:goalId" element={<GoalDetailNew />} />
+      </Route>
+
+      {/* Redirect other /:slug/* paths (goals, admin, schools) to subdomain */}
       <Route path="/:slug/*" element={<DistrictRedirect />} />
 
       {/* Catch-all */}

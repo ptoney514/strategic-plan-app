@@ -11,8 +11,8 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { organizations } from "./organizations";
-import { goals, metrics } from "./goals";
+import { organizations } from "./organizations.js";
+import { goals, metrics } from "./goals.js";
 
 export const importSessions = pgTable(
   "import_sessions",

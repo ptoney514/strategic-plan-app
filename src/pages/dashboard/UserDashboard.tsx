@@ -2,10 +2,12 @@ import { useState, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { FileText, Target, TrendingUp, ArrowRight, Plus, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useUserDashboardStats } from '../../hooks/useUserDistricts';
+import { useUserDashboardStats, useUserDistricts } from '../../hooks/useUserDistricts';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
 import { usePlanGoals } from '../../hooks/useGoals';
-import { buildGoalHierarchy, type HierarchicalGoal, type PlanWithSummary } from '../../lib/types';
+import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
+import type { HierarchicalGoal, PlanWithSummary } from '../../lib/types';
+import type { District } from '../../lib/types';
 
 export function UserDashboard() {
   const navigate = useNavigate();
@@ -17,21 +19,42 @@ export function UserDashboard() {
   const isDistrictAdmin = location.pathname.startsWith('/admin');
   const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
 
-  // Fetch stats and plans
+  // Fetch stats, plans, and districts
   const { data: stats, isLoading: statsLoading } = useUserDashboardStats();
   const { data: plans = [], isLoading: plansLoading } = useUserPlansWithCounts();
+  const { data: districts = [] } = useUserDistricts();
 
-  // Fetch goals for the first plan to show in tree view
-  const planIds = plans.map((p) => p.id);
-  const { data: goalsData } = usePlanGoals(planIds[0] || '');
-
-  const goalsByPlan = useMemo(() => {
-    const map: Record<string, HierarchicalGoal[]> = {};
-    if (planIds[0] && goalsData) {
-      map[planIds[0]] = buildGoalHierarchy(goalsData);
+  // Build district lookup for cross-domain navigation on root domain
+  const districtMap = useMemo(() => {
+    const map = new Map<string, District>();
+    for (const d of districts) {
+      map.set(d.id, d);
     }
     return map;
-  }, [planIds, goalsData]);
+  }, [districts]);
+
+  // Navigate to district admin page (cross-domain on root, in-app on district admin)
+  const navigateToDistrictAdmin = (path: string, districtId?: string | null) => {
+    if (isDistrictAdmin) {
+      navigate(path);
+      return;
+    }
+    // Root domain: redirect to district subdomain
+    const district = districtId ? districtMap.get(districtId) : districts[0];
+    if (district) {
+      window.location.href = buildSubdomainUrlWithPath('district', path, district.slug);
+    }
+  };
+
+  const selectedPlan = useMemo(
+    () => plans.find((plan) => plan.id === selectedPlanId) ?? null,
+    [plans, selectedPlanId]
+  );
+
+  const {
+    data: selectedPlanObjectives = [],
+    isLoading: selectedObjectivesLoading,
+  } = usePlanGoals(selectedPlanId || '', { includeMetrics: false });
 
   // Get user display name
   const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
@@ -108,7 +131,7 @@ export function UserDashboard() {
               <ArrowRight size={14} />
             </Link>
             <button
-              onClick={() => navigate(`${basePath}/plans/create`)}
+              onClick={() => navigateToDistrictAdmin('/admin/plans/create')}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 text-white rounded-lg transition-colors font-medium text-sm"
               style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary-hover)'; }}
@@ -144,7 +167,7 @@ export function UserDashboard() {
               Create your first strategic plan to organize your objectives.
             </p>
             <button
-              onClick={() => navigate(`${basePath}/plans/create`)}
+              onClick={() => navigateToDistrictAdmin('/admin/plans/create')}
               className="inline-flex items-center gap-2 px-4 py-2.5 text-white rounded-lg font-semibold text-sm"
               style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
             >
@@ -158,9 +181,9 @@ export function UserDashboard() {
               <PlanRow
                 key={plan.id}
                 plan={plan}
-                basePath={basePath}
                 isSelected={selectedPlanId === plan.id}
                 onClick={() => setSelectedPlanId(plan.id)}
+                onNavigateDetail={() => navigateToDistrictAdmin(`/admin/plans/${plan.id}`, plan.district_id)}
               />
             ))}
           </div>
@@ -174,16 +197,32 @@ export function UserDashboard() {
             className="text-lg font-medium mb-4"
             style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--editorial-text-primary)' }}
           >
-            Plan Overview: {plans[0]?.name}
+            {selectedPlan ? `Plan Overview: ${selectedPlan.name}` : 'Plan Overview'}
           </h2>
 
           <div
             className="rounded-xl overflow-hidden"
             style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}
           >
-            {goalsByPlan[planIds[0]]?.length ? (
+            {!selectedPlan ? (
+              <div className="p-6 text-center">
+                <p className="text-sm" style={{ color: 'var(--editorial-text-muted)' }}>
+                  Select a plan above to preview its objectives.
+                </p>
+              </div>
+            ) : selectedObjectivesLoading ? (
+              <div className="space-y-2 p-4">
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className="h-11 rounded animate-pulse"
+                    style={{ backgroundColor: 'var(--editorial-surface-alt)' }}
+                  />
+                ))}
+              </div>
+            ) : selectedPlanObjectives.length ? (
               <div className="divide-y" style={{ borderColor: 'var(--editorial-border-light)' }}>
-                {goalsByPlan[planIds[0]].map((objective) => (
+                {selectedPlanObjectives.map((objective) => (
                   <ObjectiveRow
                     key={objective.id}
                     objective={objective}
@@ -239,14 +278,12 @@ function StatCard({ label, value, icon, hidden }: { label: string; value: string
   );
 }
 
-function PlanRow({ plan, basePath, isSelected, onClick }: {
+function PlanRow({ plan, isSelected, onClick, onNavigateDetail }: {
   plan: PlanWithSummary;
-  basePath: string;
   isSelected: boolean;
   onClick: () => void;
+  onNavigateDetail: () => void;
 }) {
-  const navigate = useNavigate();
-
   return (
     <div
       className="rounded-xl px-5 py-4 flex items-center justify-between cursor-pointer transition-all"
@@ -291,7 +328,7 @@ function PlanRow({ plan, basePath, isSelected, onClick }: {
       <button
         onClick={(e) => {
           e.stopPropagation();
-          navigate(`${basePath}/plans/${plan.id}`);
+          onNavigateDetail();
         }}
         className="p-2 rounded-lg transition-colors"
         style={{ color: 'var(--editorial-text-muted)' }}

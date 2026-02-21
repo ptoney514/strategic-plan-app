@@ -4,6 +4,7 @@ import { StatusBadge, calculateStatus } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { formatMetricValue } from '../../lib/utils/formatMetricValue';
+import { safeNumber } from '../../lib/utils/safeNumber';
 
 interface MetricCardProps {
   metric: Metric;
@@ -46,7 +47,7 @@ export function MetricCard({ metric, index }: MetricCardProps) {
     if (metric.ytd_value != null && metric.ytd_value !== 0) return true;
 
     // Check visualization_config.dataPoints
-    if (vizDataPoints.length > 0 && vizDataPoints.some(dp => dp.value > 0)) return true;
+    if (vizDataPoints.length > 0 && vizDataPoints.some(dp => safeNumber(dp.value) > 0)) return true;
 
     // Check time series
     if (chartData && chartData.length > 0 && chartData.some(d => d.actual != null && d.actual !== 0)) return true;
@@ -72,9 +73,9 @@ export function MetricCard({ metric, index }: MetricCardProps) {
     // Check visualization_config.dataPoints (primary source for this schema)
     if (vizDataPoints.length > 0) {
       // Calculate average of non-zero values, or return latest value
-      const nonZeroValues = vizDataPoints.filter(dp => dp.value > 0);
+      const nonZeroValues = vizDataPoints.filter(dp => safeNumber(dp.value) > 0);
       if (nonZeroValues.length > 0) {
-        const sum = nonZeroValues.reduce((acc, dp) => acc + dp.value, 0);
+        const sum = nonZeroValues.reduce((acc, dp) => acc + safeNumber(dp.value), 0);
         return sum / nonZeroValues.length;
       }
     }
@@ -104,7 +105,7 @@ export function MetricCard({ metric, index }: MetricCardProps) {
   // Get target value with fallback to visualization_config
   const getTargetValue = (): number | null => {
     if (metric.target_value != null) return metric.target_value;
-    if (vizTargetValue != null) return vizTargetValue;
+    if (vizTargetValue != null) return safeNumber(vizTargetValue);
     return null;
   };
 
@@ -199,10 +200,10 @@ export function MetricCard({ metric, index }: MetricCardProps) {
     if (vizDataPoints.length > 0) {
       // Primary source: visualization_config.dataPoints (e.g., [{label: "2023", value: 3.78}])
       data = vizDataPoints
-        .filter(dp => dp.value > 0) // Filter out zero values for cleaner chart
+        .filter(dp => safeNumber(dp.value) > 0) // Filter out zero values for cleaner chart
         .map(dp => ({
           label: dp.label,
-          value: dp.value,
+          value: safeNumber(dp.value),
           isTarget: false,
         }));
       // Add target bar if available from viz config or metric

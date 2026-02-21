@@ -1,0 +1,208 @@
+name: Preview Database
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  NEON_PROJECT_ID: ${{ vars.NEON_PROJECT_ID }}
+
+jobs:
+  setup-preview-db:
+    name: Preview Database Setup
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install neonctl
+        run: npm install -g neonctl
+
+      - name: Find Neon branch
+        id: find-branch
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Looking for Neon branch matching: $BRANCH_NAME"
+          echo "branch_found=false" >> "$GITHUB_OUTPUT"
+
+          # Poll for up to 90 seconds — the Neon-Vercel integration creates
+          # the branch asynchronously after the preview deployment starts
+          for i in $(seq 1 18); do
+            BRANCH_ID=$(neonctl branches list \
+              --project-id "$NEON_PROJECT_ID" \
+              --output json 2>/dev/null \
+              | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .id" \
+              || true)
+
+            if [ -n "$BRANCH_ID" ]; then
+              echo "Found Neon branch: $BRANCH_ID"
+              echo "branch_id=$BRANCH_ID" >> "$GITHUB_OUTPUT"
+              echo "branch_found=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+
+            echo "Branch not found yet, waiting 5s... (attempt $i/18)"
+            sleep 5
+          done
+
+          echo "::warning::Neon branch not found after 90s. Skipping preview DB setup for this PR run."
+          exit 0
+
+      - name: Get connection string
+        if: steps.find-branch.outputs.branch_found == 'true'
+        id: connection
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          CONNECTION_STRING=$(neonctl connection-string \
+            --project-id "$NEON_PROJECT_ID" \
+            --branch "${{ steps.find-branch.outputs.branch_id }}" \
+            --database-name strategic-plan-db)
+          echo "::add-mask::$CONNECTION_STRING"
+          echo "database_url=$CONNECTION_STRING" >> "$GITHUB_OUTPUT"
+
+      - name: Run Drizzle migrations
+        if: steps.find-branch.outputs.branch_found == 'true'
+        env:
+          DATABASE_URL: ${{ steps.connection.outputs.database_url }}
+        run: npx drizzle-kit migrate
+
+      - name: Apply trigger SQL
+        if: steps.find-branch.outputs.branch_found == 'true'
+        env:
+          DATABASE_URL: ${{ steps.connection.outputs.database_url }}
+        run: psql "$DATABASE_URL" -f drizzle/custom/0001_updated_at_trigger.sql
+
+      - name: Seed preview database
+        if: steps.find-branch.outputs.branch_found == 'true'
+        env:
+          DATABASE_URL: ${{ steps.connection.outputs.database_url }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+        run: npx tsx scripts/seed.ts
+
+      - name: Comment on PR
+        if: steps.find-branch.outputs.branch_found == 'true'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              '## Preview Database Ready',
+              '',
+              'Neon branch created and configured for this PR.',
+              '',
+              '**Test credentials:**',
+              '| Account | Email | Password |',
+              '|---------|-------|----------|',
+              '| System Admin | `sysadmin@stratadash.com` | `Stratadash123!` |',
+              '| Westside Admin | `admin@westside66.org` | `Westside123!` |',
+              '| Eastside Admin | `admin@eastside.edu` | `Eastside123!` |',
+              '',
+              'Login at the Vercel preview URL `/login` page.',
+            ].join('\n');
+
+            // Update existing comment or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Preview Database Ready')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Comment on PR (preview DB skipped)
+        if: steps.find-branch.outputs.branch_found != 'true'
+        continue-on-error: true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = [
+              '## Preview Database Skipped',
+              '',
+              'No matching Neon branch was detected for this PR within the polling window.',
+              'Preview deployment can still proceed; database setup was skipped for this run.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const botComment = comments.find(c =>
+              c.user.type === 'Bot' && c.body.includes('Preview Database Skipped')
+            );
+
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+  cleanup-preview-db:
+    name: Preview Database Cleanup
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install neonctl
+        run: npm install -g neonctl
+
+      - name: Delete Neon branch
+        env:
+          NEON_API_KEY: ${{ secrets.NEON_API_KEY }}
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          echo "Cleaning up Neon branch: $BRANCH_NAME"
+
+          BRANCH_ID=$(neonctl branches list \
+            --project-id "$NEON_PROJECT_ID" \
+            --output json 2>/dev/null \
+            | jq -r ".[] | select(.name == \"$BRANCH_NAME\") | .id" \
+            || true)
+
+          if [ -n "$BRANCH_ID" ]; then
+            neonctl branches delete "$BRANCH_ID" \
+              --project-id "$NEON_PROJECT_ID"
+            echo "Deleted Neon branch: $BRANCH_ID"
+          else
+            echo "No Neon branch found for $BRANCH_NAME (may have been deleted already)"
+          fi

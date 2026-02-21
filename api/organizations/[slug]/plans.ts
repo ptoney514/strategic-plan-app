@@ -1,8 +1,8 @@
 import { eq, and, asc } from "drizzle-orm";
-import { db } from "../../lib/db";
-import { organizations, plans } from "../../lib/schema/index";
-import { requireAuth, requireOrgMember } from "../../lib/middleware/auth";
-import { jsonOk, jsonError, parsePagination } from "../../lib/response";
+import { db } from "../../lib/db.js";
+import { organizations, plans } from "../../lib/schema/index.js";
+import { requireAuth, requireOrgMember } from "../../lib/middleware/auth.js";
+import { jsonOk, jsonError, parsePagination } from "../../lib/response.js";
 
 /** Map a Drizzle plan row to snake_case for the frontend */
 function planToSnakeCase(plan: typeof plans.$inferSelect) {

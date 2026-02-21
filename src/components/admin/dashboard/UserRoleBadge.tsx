@@ -21,10 +21,16 @@ const roleConfig: Record<UserRole, { label: string; classes: string }> = {
     label: 'Editor',
     classes: 'bg-gray-100 text-gray-600 border-gray-200',
   },
+  viewer: {
+    label: 'Viewer',
+    classes: 'bg-slate-100 text-slate-500 border-slate-200',
+  },
 };
 
+const defaultConfig = { label: 'Unknown', classes: 'bg-slate-100 text-slate-500 border-slate-200' };
+
 export function UserRoleBadge({ role }: UserRoleBadgeProps) {
-  const config = roleConfig[role];
+  const config = roleConfig[role] ?? defaultConfig;
 
   return (
     <span

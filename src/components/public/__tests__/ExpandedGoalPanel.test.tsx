@@ -567,6 +567,89 @@ describe('ExpandedGoalPanel', () => {
     });
   });
 
+  describe('string values in visualization_config (JSONB coercion)', () => {
+    it('does not crash when dataPoints values are strings from JSONB', () => {
+      const metricWithStringValues: Metric = {
+        ...mockMetric,
+        current_value: undefined,
+        target_value: undefined,
+        visualization_config: {
+          chartType: 'bar',
+          dataPoints: [
+            { label: '2023', value: '3.78' as unknown as number },
+            { label: '2024', value: '4.12' as unknown as number },
+          ],
+          targetValue: '4.50' as unknown as number,
+        },
+      };
+
+      // Should not throw TypeError: e.toFixed is not a function
+      expect(() => {
+        render(
+          <ExpandedGoalPanel
+            goal={mockGoal}
+            metrics={[metricWithStringValues]}
+            colorClass="bg-district-red"
+            onClose={mockOnClose}
+          />
+        );
+      }).not.toThrow();
+    });
+
+    it('renders correct values when dataPoints are strings', () => {
+      const metricWithStringValues: Metric = {
+        ...mockMetric,
+        current_value: undefined,
+        target_value: undefined,
+        visualization_config: {
+          chartType: 'bar',
+          dataPoints: [
+            { label: '2023', value: '3.78' as unknown as number },
+            { label: '2024', value: '4.12' as unknown as number },
+          ],
+          targetValue: '4.50' as unknown as number,
+        },
+      };
+
+      render(
+        <ExpandedGoalPanel
+          goal={mockGoal}
+          metrics={[metricWithStringValues]}
+          colorClass="bg-district-red"
+          onClose={mockOnClose}
+        />
+      );
+
+      // Should display the formatted average value (3.95 = (3.78 + 4.12) / 2)
+      expect(screen.getByText('3.95')).toBeInTheDocument();
+    });
+
+    it('does not crash with donut chart and string values', () => {
+      const metricWithDonutStrings: Metric = {
+        ...mockMetric,
+        current_value: undefined,
+        visualization_config: {
+          chartType: 'donut',
+          dataPoints: [
+            { label: 'Category A', value: '25.5' as unknown as number },
+            { label: 'Category B', value: '74.5' as unknown as number },
+          ],
+        },
+      };
+
+      expect(() => {
+        render(
+          <ExpandedGoalPanel
+            goal={mockGoal}
+            metrics={[metricWithDonutStrings]}
+            colorClass="bg-district-red"
+            onClose={mockOnClose}
+          />
+        );
+      }).not.toThrow();
+    });
+  });
+
   describe('Sub-Goals Section', () => {
     const mockSubGoals: HierarchicalGoal[] = [
       {

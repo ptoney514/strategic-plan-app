@@ -60,9 +60,9 @@ export function RecentUsersTable({ users, isLoading }: RecentUsersTableProps) {
                       <User className="h-4 w-4 text-[#8a8a8a]" />
                     </div>
                     <div className="min-w-0">
-                      <code className="text-xs text-[#4a4a4a] font-mono truncate block">
-                        {user.user_id.slice(0, 8)}...
-                      </code>
+                      <span className="text-sm font-medium text-[#1a1a1a] truncate block">
+                        {user.name || user.email || user.user_id?.slice(0, 8) || user.id.slice(0, 8)}
+                      </span>
                     </div>
                   </div>
                 </td>

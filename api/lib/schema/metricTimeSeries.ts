@@ -8,8 +8,8 @@ import {
   index,
   unique,
 } from "drizzle-orm/pg-core";
-import { metrics } from "./goals";
-import { organizations } from "./organizations";
+import { metrics } from "./goals.js";
+import { organizations } from "./organizations.js";
 
 export const metricTimeSeries = pgTable(
   "metric_time_series",

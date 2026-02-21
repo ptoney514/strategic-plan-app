@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Users, ChevronRight } from 'lucide-react';
 import { UserRoleBadge } from './UserRoleBadge';
+import type { UserRole } from '../../../lib/services/systemAdmin.service';
 
 interface User {
   id: string;
   email: string;
-  role: 'district_admin' | 'school_admin' | 'editor';
+  role: UserRole;
   name?: string;
   isPending?: boolean;
 }

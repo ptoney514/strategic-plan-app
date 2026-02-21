@@ -3,6 +3,7 @@ import { PieChart, Pie, Cell, RadialBarChart, RadialBar, PolarAngleAxis, Respons
 import type { Metric } from '../../../../lib/types';
 import type { ReactNode } from 'react';
 import { AnimatedCounter } from '../../../common/AnimatedCounter';
+import { safeNumber } from '../../../../lib/utils/safeNumber';
 
 export type DonutStyleVariant = 'classic' | 'achievement';
 
@@ -38,8 +39,8 @@ export function DonutProgressCard({
   icon,
   accentColor,
 }: DonutProgressCardProps) {
-  const currentValue = metric.current_value ?? metric.actual_value ?? 0;
-  const targetValue = metric.target_value ?? 100;
+  const currentValue = safeNumber(metric.current_value ?? metric.actual_value ?? 0);
+  const targetValue = safeNumber(metric.target_value ?? 100);
   const progress = Math.min((currentValue / targetValue) * 100, 100);
   const remaining = Math.max(100 - progress, 0);
 

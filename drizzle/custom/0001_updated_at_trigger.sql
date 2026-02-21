@@ -11,39 +11,49 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply to all tables with updated_at columns
+-- DROP IF EXISTS ensures idempotency on Neon branches (copy-on-write from main)
 
+DROP TRIGGER IF EXISTS set_updated_at ON "user";
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON "user"
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON "session";
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON "session"
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON organizations;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON organizations
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON organization_members;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON organization_members
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON schools;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON schools
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON plans;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON plans
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON goals;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON goals
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON metrics;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON metrics
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
+DROP TRIGGER IF EXISTS set_updated_at ON contact_submissions;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON contact_submissions
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();

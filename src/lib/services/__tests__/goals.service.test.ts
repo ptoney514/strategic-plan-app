@@ -246,6 +246,38 @@ describe('GoalsService', () => {
       );
       expect(result).toHaveLength(1);
     });
+
+    it('should request lightweight goals when metrics are excluded', async () => {
+      const mockPlanId = 'plan-456';
+      const mockGoals = [
+        {
+          id: 'goal-2',
+          plan_id: mockPlanId,
+          goal_number: '1',
+          title: 'Plan Goal 2',
+          level: 0,
+          parent_id: null,
+          metrics: [],
+        },
+      ];
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve(mockGoals),
+      });
+
+      const result = await GoalsService.getByPlan(mockPlanId, { includeMetrics: false });
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        `http://localhost/api/plans/${mockPlanId}/goals?includeMetrics=false`,
+        expect.objectContaining({
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        })
+      );
+      expect(result).toHaveLength(1);
+    });
   });
 
   describe('getById', () => {

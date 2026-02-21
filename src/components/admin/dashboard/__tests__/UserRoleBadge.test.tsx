@@ -31,6 +31,21 @@ describe('UserRoleBadge', () => {
     expect(badge).toHaveClass('bg-gray-100', 'text-gray-600');
   });
 
+  it('renders viewer badge with correct label and styling', () => {
+    render(<UserRoleBadge role="viewer" />);
+    const badge = screen.getByText('Viewer');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('bg-slate-100', 'text-slate-500');
+  });
+
+  it('renders unknown role with fallback styling instead of crashing', () => {
+    // @ts-expect-error — testing runtime safety for unexpected role values
+    render(<UserRoleBadge role="unexpected_role" />);
+    const badge = screen.getByText('Unknown');
+    expect(badge).toBeInTheDocument();
+    expect(badge).toHaveClass('bg-slate-100', 'text-slate-500');
+  });
+
   it('applies common badge styles', () => {
     render(<UserRoleBadge role="system_admin" />);
     const badge = screen.getByText('System Admin');

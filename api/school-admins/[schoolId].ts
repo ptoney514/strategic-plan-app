@@ -1,8 +1,8 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../lib/db";
-import { organizations, schoolAdmins, schools, user } from "../lib/schema/index";
-import { requireOrgMember } from "../lib/middleware/auth";
-import { jsonOk, jsonError } from "../lib/response";
+import { db } from "../lib/db.js";
+import { organizations, schoolAdmins, schools, user } from "../lib/schema/index.js";
+import { requireOrgMember } from "../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 /** Map a school admin + user join to snake_case for the frontend */
 function adminWithUserToSnake(row: {

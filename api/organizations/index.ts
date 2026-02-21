@@ -1,14 +1,14 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../lib/db";
+import { db } from "../lib/db.js";
 import {
   organizations,
   organizationMembers,
-} from "../lib/schema/index";
+} from "../lib/schema/index.js";
 import {
   requireAuth,
   requireSystemAdmin,
-} from "../lib/middleware/auth";
-import { jsonOk, jsonError, parsePagination } from "../lib/response";
+} from "../lib/middleware/auth.js";
+import { jsonOk, jsonError, parsePagination } from "../lib/response.js";
 
 /** Map a Drizzle organization row to snake_case for the frontend */
 function toSnakeCase(org: typeof organizations.$inferSelect) {
@@ -47,7 +47,7 @@ function slugify(name: string): string {
 
 /**
  * GET /api/organizations
- * - ?id={uuid}     -> return single org by ID (requires auth)
+ * - ?id={uuid}     -> return single org by ID (public orgs: no auth; private: requires auth)
  * - ?public=true   -> return only public, active orgs (no auth required)
  * - otherwise      -> require auth; return user's orgs (or all for sysadmin)
  */
@@ -59,14 +59,18 @@ export async function GET(req: Request) {
     const { limit, offset } = parsePagination(url);
 
     // Single org lookup by ID
+    // Mirror the same public-access pattern used by GET /api/organizations/[slug]:
+    // look up first, return without auth if the org is public.
     if (idParam) {
-      await requireAuth(req);
       const [org] = await db
         .select()
         .from(organizations)
         .where(eq(organizations.id, idParam))
         .limit(1);
       if (!org) return jsonError("Organization not found", 404);
+      if (org.isPublic) return jsonOk(toSnakeCase(org));
+      // Private org: require auth
+      await requireAuth(req);
       return jsonOk(toSnakeCase(org));
     }
 

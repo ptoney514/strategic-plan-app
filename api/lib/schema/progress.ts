@@ -7,7 +7,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
-import { goals } from "./goals";
+import { goals } from "./goals.js";
 
 export const statusOverrides = pgTable(
   "status_overrides",

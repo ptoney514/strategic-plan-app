@@ -1,11 +1,11 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../lib/db";
-import { schoolAdmins, schools, organizations } from "../lib/schema/index";
+import { db } from "../lib/db.js";
+import { schoolAdmins, schools, organizations } from "../lib/schema/index.js";
 import {
   requireAuth,
   requireOrgMember,
-} from "../lib/middleware/auth";
-import { jsonOk, jsonError } from "../lib/response";
+} from "../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 /** Map a Drizzle school admin row to snake_case for the frontend */
 function schoolAdminToSnake(sa: typeof schoolAdmins.$inferSelect) {

@@ -16,9 +16,14 @@ vi.mock('../useSchools', () => ({
   useSchool: vi.fn(),
 }));
 
+vi.mock('../../contexts/SubdomainContext', () => ({
+  useSubdomain: vi.fn(),
+}));
+
 // Import mocked modules
 import { useDistrict } from '../useDistricts';
 import { useSchools, useSchool } from '../useSchools';
+import { useSubdomain } from '../../contexts/SubdomainContext';
 
 // Mock data
 const mockDistrict: District = {
@@ -61,6 +66,8 @@ function createWrapper(initialPath: string) {
           <Routes>
             <Route path="/:slug/admin/*" element={children} />
             <Route path="/:slug/schools/:schoolSlug/admin/*" element={children} />
+            <Route path="/admin/*" element={children} />
+            <Route path="/schools/:schoolSlug/admin/*" element={children} />
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
@@ -96,6 +103,12 @@ describe('useAdminContext', () => {
       isError: false,
       isSuccess: true,
     } as any);
+
+    vi.mocked(useSubdomain).mockReturnValue({
+      type: 'root',
+      slug: null,
+      hostname: 'stratadash.org',
+    });
   });
 
   it('returns district context type when on district admin route', () => {
@@ -241,6 +254,38 @@ describe('useAdminContext', () => {
 
     expect(result.current.isLoading).toBe(true);
   });
+
+  it('uses subdomain slug when route slug is missing', () => {
+    vi.mocked(useSubdomain).mockReturnValue({
+      type: 'district',
+      slug: 'westside',
+      hostname: 'westside.stratadash.org',
+    });
+
+    const { result } = renderHook(() => useAdminContext(), {
+      wrapper: createWrapper('/admin'),
+    });
+
+    expect(result.current.districtSlug).toBe('westside');
+    expect(result.current.basePath).toBe('/admin');
+    expect(result.current.publicUrl).toBe('/');
+  });
+
+  it('uses subdomain base path for school admin routes', () => {
+    vi.mocked(useSubdomain).mockReturnValue({
+      type: 'district',
+      slug: 'westside',
+      hostname: 'westside.stratadash.org',
+    });
+
+    const { result } = renderHook(() => useAdminContext(), {
+      wrapper: createWrapper('/schools/elementary/admin'),
+    });
+
+    expect(result.current.districtSlug).toBe('westside');
+    expect(result.current.basePath).toBe('/schools/elementary/admin');
+    expect(result.current.publicUrl).toBe('/schools/elementary');
+  });
 });
 
 describe('useContextDisplayName', () => {
@@ -270,6 +315,12 @@ describe('useContextDisplayName', () => {
       isError: false,
       isSuccess: true,
     } as any);
+
+    vi.mocked(useSubdomain).mockReturnValue({
+      type: 'root',
+      slug: null,
+      hostname: 'stratadash.org',
+    });
   });
 
   it('returns district name in district context', () => {
@@ -340,6 +391,12 @@ describe('useIsActiveSection', () => {
       isError: false,
       isSuccess: true,
     } as any);
+
+    vi.mocked(useSubdomain).mockReturnValue({
+      type: 'root',
+      slug: null,
+      hostname: 'stratadash.org',
+    });
   });
 
   it('returns true for overview section on base admin path', () => {

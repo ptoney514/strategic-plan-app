@@ -1,8 +1,8 @@
 import { eq } from "drizzle-orm";
-import { db } from "../../../lib/db";
-import { importSessions, organizations } from "../../../lib/schema/index";
-import { requireOrgMember } from "../../../lib/middleware/auth";
-import { jsonOk, jsonError } from "../../../lib/response";
+import { db } from "../../../lib/db.js";
+import { importSessions, organizations } from "../../../lib/schema/index.js";
+import { requireOrgMember } from "../../../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../../../lib/response.js";
 
 function sessionToSnake(s: typeof importSessions.$inferSelect) {
   return {

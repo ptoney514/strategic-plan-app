@@ -7,6 +7,7 @@ import type { StatusType } from './StatusBadge';
 import { useMetricChartData } from '../../hooks/useMetrics';
 import { NarrativeDisplay } from '../NarrativeDisplay';
 import { formatMetricValue as formatMetricValueUtil } from '../../lib/utils/formatMetricValue';
+import { safeNumber } from '../../lib/utils/safeNumber';
 
 // Filled status badge for expanded panel (pill style for non-narrative)
 function FilledStatusBadge({ status }: { status: StatusType }) {
@@ -73,9 +74,9 @@ function getCurrentValue(metric: Metric): number {
 
   const vizConfig = metric.visualization_config as { dataPoints?: { value: number }[] } | undefined;
   if (vizConfig?.dataPoints?.length) {
-    const nonZero = vizConfig.dataPoints.filter(dp => dp.value > 0);
+    const nonZero = vizConfig.dataPoints.filter(dp => safeNumber(dp.value) > 0);
     if (nonZero.length > 0) {
-      return nonZero.reduce((sum, dp) => sum + dp.value, 0) / nonZero.length;
+      return nonZero.reduce((sum, dp) => sum + safeNumber(dp.value), 0) / nonZero.length;
     }
   }
 
@@ -85,7 +86,7 @@ function getCurrentValue(metric: Metric): number {
 function getTargetValue(metric: Metric): number | null {
   if (metric.target_value != null) return metric.target_value;
   const vizConfig = metric.visualization_config as { targetValue?: number } | undefined;
-  if (vizConfig?.targetValue != null) return vizConfig.targetValue;
+  if (vizConfig?.targetValue != null) return safeNumber(vizConfig.targetValue);
   return null;
 }
 
@@ -206,8 +207,8 @@ function MetricChart({ metric, chartColor }: { metric: Metric; chartColor: strin
 
       if (vizDataPoints.length > 0) {
         data = vizDataPoints
-          .filter(dp => dp.value > 0)
-          .map(dp => ({ label: dp.label, value: dp.value, isTarget: false }));
+          .filter(dp => safeNumber(dp.value) > 0)
+          .map(dp => ({ label: dp.label, value: safeNumber(dp.value), isTarget: false }));
       } else if (chartData && chartData.length > 0) {
         data = chartData
           .filter(d => d.actual != null)

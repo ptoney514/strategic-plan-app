@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "NODE_OPTIONS='--import tsx' vercel dev --listen 5174",
     "build": "vite build",
     "build:staging": "vite build --mode staging",
     "build:check": "tsc -b && vite build",

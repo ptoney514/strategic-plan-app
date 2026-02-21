@@ -6,8 +6,8 @@ import {
   unique,
   index,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth";
-import { schools } from "./schools";
+import { user } from "./auth.js";
+import { schools } from "./schools.js";
 
 export const schoolAdmins = pgTable(
   "school_admins",

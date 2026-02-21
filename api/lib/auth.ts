@@ -1,10 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { db } from "./db";
-import * as schema from "./schema/index";
+import { db } from "./db.js";
+import * as schema from "./schema/index.js";
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
   secret: process.env.BETTER_AUTH_SECRET,
   database: drizzleAdapter(db, {
     provider: "pg",
@@ -36,6 +36,8 @@ export const auth = betterAuth({
       "http://localhost:5173",
       "http://localhost:5174",
       "http://lvh.me:5174",
+      "https://stratadash.org",
+      "https://www.stratadash.org",
     ];
     if (process.env.VITE_APP_URL) {
       origins.push(process.env.VITE_APP_URL);
@@ -45,9 +47,23 @@ export const auth = betterAuth({
     if (origin && /^https?:\/\/.*\.lvh\.me:5174$/.test(origin)) {
       origins.push(origin);
     }
+    // Allow any subdomain of stratadash.org for production
+    if (origin && /^https:\/\/.*\.stratadash\.org$/.test(origin)) {
+      origins.push(origin);
+    }
+    // Allow this project's Vercel preview deployment URLs
+    if (process.env.VERCEL_URL) {
+      origins.push(`https://${process.env.VERCEL_URL}`);
+    }
+    if (process.env.VERCEL_BRANCH_URL) {
+      origins.push(`https://${process.env.VERCEL_BRANCH_URL}`);
+    }
     return origins;
   },
   advanced: {
+    database: {
+      generateId: () => crypto.randomUUID(),
+    },
     crossSubDomainCookies: {
       enabled: true,
       domain: process.env.BETTER_AUTH_COOKIE_DOMAIN,

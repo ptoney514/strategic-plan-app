@@ -1,5 +1,5 @@
 import { eq, and, asc } from "drizzle-orm";
-import { db } from "../../../lib/db";
+import { db } from "../../../lib/db.js";
 import {
   importSessions,
   stagedGoals,
@@ -8,9 +8,9 @@ import {
   metrics,
   plans,
   organizations,
-} from "../../../lib/schema/index";
-import { requireOrgMember } from "../../../lib/middleware/auth";
-import { jsonOk, jsonError } from "../../../lib/response";
+} from "../../../lib/schema/index.js";
+import { requireOrgMember } from "../../../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../../../lib/response.js";
 
 function extractSessionId(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");

@@ -1,12 +1,33 @@
-import { desc } from "drizzle-orm";
-import { db } from "../lib/db";
-import { user } from "../lib/schema/index";
-import { requireSystemAdmin } from "../lib/middleware/auth";
-import { jsonOk, jsonError } from "../lib/response";
+import { desc, eq } from "drizzle-orm";
+import { db } from "../lib/db.js";
+import { user } from "../lib/schema/index.js";
+import { organizations, organizationMembers } from "../lib/schema/index.js";
+import { requireSystemAdmin } from "../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../lib/response.js";
+
+/**
+ * Maps backend org roles to frontend display roles.
+ * Backend org roles (viewer, editor, admin, owner) don't map 1:1
+ * to frontend UserRole values used by UserRoleBadge.
+ */
+export function toDisplayRole(isSystemAdmin: boolean, memberRole: string | null): string {
+  if (isSystemAdmin) return "system_admin";
+  if (!memberRole) return "viewer";
+  switch (memberRole) {
+    case "owner":
+    case "admin":
+      return "district_admin";
+    case "editor":
+      return "editor";
+    case "viewer":
+    default:
+      return "viewer";
+  }
+}
 
 /**
  * GET /api/admin/recent-users
- * Get recent users. Requires system admin.
+ * Get recent users with their org membership info. Requires system admin.
  */
 export async function GET(req: Request) {
   try {
@@ -18,23 +39,48 @@ export async function GET(req: Request) {
       100,
     );
 
-    const users = await db
-      .select()
+    // Fetch recent users with their first org membership
+    const rows = await db
+      .select({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        image: user.image,
+        isSystemAdmin: user.isSystemAdmin,
+        createdAt: user.createdAt,
+        memberRole: organizationMembers.role,
+        orgName: organizations.name,
+      })
       .from(user)
+      .leftJoin(organizationMembers, eq(user.id, organizationMembers.userId))
+      .leftJoin(
+        organizations,
+        eq(organizationMembers.organizationId, organizations.id),
+      )
       .orderBy(desc(user.createdAt))
       .limit(limit);
 
-    return jsonOk(
-      users.map((u) => ({
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        image: u.image,
-        is_system_admin: u.isSystemAdmin,
-        created_at: u.createdAt,
-        updated_at: u.updatedAt,
-      })),
-    );
+    // Deduplicate users who have multiple memberships (keep first row)
+    const seen = new Set<string>();
+    const result = [];
+    for (const row of rows) {
+      if (seen.has(row.id)) continue;
+      seen.add(row.id);
+
+      const role = toDisplayRole(row.isSystemAdmin ?? false, row.memberRole);
+
+      result.push({
+        id: row.id,
+        user_id: row.id,
+        name: row.name,
+        email: row.email,
+        role,
+        district_name: row.orgName ?? undefined,
+        created_at: row.createdAt,
+      });
+    }
+
+    return jsonOk(result);
   } catch (error) {
     if (error instanceof Response) return error;
     return jsonError(

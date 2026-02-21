@@ -8,7 +8,7 @@ import {
   index,
   unique,
 } from "drizzle-orm/pg-core";
-import { organizations } from "./organizations";
+import { organizations } from "./organizations.js";
 
 export const schools = pgTable(
   "schools",

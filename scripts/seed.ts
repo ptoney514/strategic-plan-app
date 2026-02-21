@@ -68,6 +68,12 @@ const auth = betterAuth({
       },
     },
   },
+  advanced: {
+    generateId: () => crypto.randomUUID(),
+    database: {
+      generateId: () => crypto.randomUUID(),
+    },
+  },
 });
 
 // ---------------------------------------------------------------------------
@@ -91,7 +97,7 @@ async function seed() {
   // Section 1: TRUNCATE all tables (CASCADE) — clean slate
   // -------------------------------------------------------------------------
   console.log("1. Truncating all tables...");
-  await neonSql`TRUNCATE TABLE
+  await db.execute(sql`TRUNCATE TABLE
       stock_photos,
       status_overrides,
       staged_metrics,
@@ -111,7 +117,7 @@ async function seed() {
       account,
       verification,
       "user"
-    CASCADE`;
+    CASCADE`);
   console.log("   Done.\n");
 
   // -------------------------------------------------------------------------

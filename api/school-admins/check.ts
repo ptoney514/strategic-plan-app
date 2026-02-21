@@ -1,13 +1,13 @@
 import { eq, and } from "drizzle-orm";
-import { db } from "../lib/db";
+import { db } from "../lib/db.js";
 import {
   organizations,
   organizationMembers,
   schoolAdmins,
   schools,
-} from "../lib/schema/index";
-import { requireAuth } from "../lib/middleware/auth";
-import { jsonOk, jsonError } from "../lib/response";
+} from "../lib/schema/index.js";
+import { requireAuth } from "../lib/middleware/auth.js";
+import { jsonOk, jsonError } from "../lib/response.js";
 
 /**
  * GET /api/school-admins/check?district=slug&school=slug

@@ -22,11 +22,14 @@ import {
   FileText,
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
-import { useGoals, useCreateGoal } from '../../../hooks/useGoals';
+import { useCreateGoal } from '../../../hooks/useGoals';
 import { usePlansBySlug } from '../../../hooks/usePlans';
 import { GoalEditor, type GoalFormData, type MetricFormData } from '../../../components/admin/GoalEditor';
 import { SlideoverPanel } from '../../../components/ui/SlideoverPanel';
 import { Target } from 'lucide-react';
+import { MetricsService } from '../../../lib/services/metrics.service';
+import { ApiError } from '../../../lib/api';
+import { toast } from '../../../components/Toast';
 
 // Stored goal with all its data
 interface StoredGoal {
@@ -45,7 +48,6 @@ export function CreateObjective() {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: district } = useDistrict(slug || '');
-  const { data: existingGoals } = useGoals(district?.id || '');
   const { data: plans } = usePlansBySlug(slug || '');
   const createGoal = useCreateGoal();
 
@@ -77,11 +79,11 @@ export function CreateObjective() {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
 
   // Date state
-  const [quarter, setQuarter] = useState('Q4 2025');
-  const [startDate, setStartDate] = useState('2025-10-01');
-  const [endDate, setEndDate] = useState('2025-12-31');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleBadgeTypeChange = (type: 'on-target' | 'needs-attention' | 'off-target') => {
     setBadgeType(type);
@@ -134,8 +136,86 @@ export function CreateObjective() {
     setGoals(goals.filter((_, i) => i !== index));
   };
 
+  const buildMetricPayload = (
+    goalId: string,
+    districtId: string,
+    metric: MetricFormData,
+  ) => ({
+    goal_id: goalId,
+    district_id: districtId,
+    metric_name: metric.name.trim(),
+    name: metric.name.trim(),
+    description: metric.description?.trim() || undefined,
+    metric_type: metric.metric_type,
+    current_value: metric.current_value ?? undefined,
+    target_value: metric.target_value ?? undefined,
+    unit: metric.unit || '',
+    visualization_type: metric.visualization_type,
+    visualization_config: metric.visualization_config,
+    frequency: 'quarterly' as const,
+    aggregation_method: 'latest' as const,
+  });
+
+  const syncGoalMetrics = async (
+    goalId: string,
+    districtId: string,
+    metrics: MetricFormData[],
+  ) => {
+    const existingMetrics = await MetricsService.getByGoal(goalId);
+    const existingById = new Map(existingMetrics.map((m) => [m.id, m]));
+    const persistedMetricIds = new Set<string>();
+
+    for (const metric of metrics) {
+      const payload = buildMetricPayload(goalId, districtId, metric);
+      const shouldUpdate = !!metric.id && existingById.has(metric.id);
+
+      if (shouldUpdate && metric.id) {
+        await MetricsService.update(metric.id, payload);
+        persistedMetricIds.add(metric.id);
+      } else {
+        const created = await MetricsService.create(payload);
+        persistedMetricIds.add(created.id);
+      }
+    }
+
+    for (const existingMetric of existingMetrics) {
+      if (!persistedMetricIds.has(existingMetric.id)) {
+        await MetricsService.delete(existingMetric.id);
+      }
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!title.trim() || !district?.id || !selectedPlanId) return;
+    const trimmedTitle = title.trim();
+    setFormError(null);
+
+    if (!district?.id) {
+      const message = 'District context was not loaded. Refresh and try again.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (!selectedPlanId) {
+      const message = 'Select a strategic plan before saving this objective.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (!trimmedTitle) {
+      const message = 'Objective title is required.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (startDate && endDate && startDate > endDate) {
+      const message = 'End date must be on or after the start date.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -143,13 +223,13 @@ export function CreateObjective() {
       const newObjective = await createGoal.mutateAsync({
         district_id: district.id,
         plan_id: selectedPlanId,
-        title: title.trim(),
+        title: trimmedTitle,
         description: description.trim() || undefined,
         level: 0,
         parent_id: null,
         is_public: visibility === 'public',
-        indicator_text: customBadgeText,
-        indicator_color: badgeColor,
+        indicator_text: showVisualBadge ? customBadgeText : undefined,
+        indicator_color: showVisualBadge ? badgeColor : undefined,
         show_progress_bar: showProgressBar,
         start_date: startDate || undefined,
         end_date: endDate || undefined,
@@ -160,7 +240,8 @@ export function CreateObjective() {
         const goal = goals[i];
         const childGoal = await createGoal.mutateAsync({
           district_id: district.id,
-          title: goal.data.title,
+          plan_id: selectedPlanId,
+          title: goal.data.title.trim(),
           description: goal.data.description || undefined,
           level: 1,
           parent_id: newObjective.id,
@@ -172,16 +253,21 @@ export function CreateObjective() {
           end_date: goal.data.end_date || undefined,
         });
 
-        // TODO: Create metrics for this goal
-        // This would require a useCreateMetric hook
-        // For now, metrics are stored but not persisted
-        console.log('Goal created with metrics:', childGoal.id, goal.metrics);
+        await syncGoalMetrics(childGoal.id, district.id, goal.metrics);
       }
 
+      toast.success(
+        `Objective created successfully${goals.length > 0 ? ` with ${goals.length} goal${goals.length === 1 ? '' : 's'}` : ''}.`,
+      );
       // Navigate to the objectives list (preserves subdomain query param on localhost)
       navigate('/admin/objectives' + location.search);
     } catch (error) {
       console.error('Failed to create objective:', error);
+      const message = error instanceof ApiError
+        ? error.message
+        : 'Failed to create objective. Please try again.';
+      setFormError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -215,7 +301,7 @@ export function CreateObjective() {
           </h1>
           <p className="text-[14px] text-[#6a6a6a]">
             To create strategic objectives with more advanced settings, go to the{' '}
-            <Link to={`/admin/settings/objectives${location.search}`} className="text-[#4a6fa5] hover:underline">
+            <Link to={`/admin/settings${location.search}`} className="text-[#4a6fa5] hover:underline">
               Strategic objectives settings page
             </Link>.
           </p>
@@ -235,7 +321,10 @@ export function CreateObjective() {
               </label>
               <select
                 value={selectedPlanId}
-                onChange={(e) => setSelectedPlanId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedPlanId(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 className={`w-full px-4 py-3 text-[14px] border rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors ${
                   !selectedPlanId ? 'border-[#e8e6e1] text-[#8a8a8a]' : 'border-[#e8e6e1] text-[#1a1a1a]'
                 }`}
@@ -249,7 +338,7 @@ export function CreateObjective() {
               </select>
               {plans && plans.length === 0 && (
                 <p className="text-[12px] text-[#f59e0b] mt-2">
-                  No plans found. <Link to="/admin/plans/create" className="text-[#10b981] hover:underline">Create a plan</Link> first.
+                  No plans found. <Link to={`/admin/plans/create${location.search}`} className="text-[#10b981] hover:underline">Create a plan</Link> first.
                 </p>
               )}
             </div>
@@ -263,7 +352,10 @@ export function CreateObjective() {
               <input
                 type="text"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 placeholder="e.g., Student Achievement & Well-being"
                 className="w-full px-4 py-3 text-[14px] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors"
               />
@@ -311,6 +403,9 @@ export function CreateObjective() {
 
               {goalsExpanded && (
                 <div className="px-6 pb-6 border-t border-[#e8e6e1]">
+                  <div className="mt-4 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] px-3 py-2 text-[12px] text-[#1d4ed8]">
+                    Add level-1 goals now. Sub-goals can be added after this objective is saved.
+                  </div>
                   <div className="flex flex-col gap-3 mt-4">
                     {/* Existing Goals List */}
                     {goals.map((goal, index) => (
@@ -356,7 +451,7 @@ export function CreateObjective() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                           <button
                             onClick={() => handleEditGoal(index)}
                             className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#e5e8ed] hover:text-[#5c6578] transition-colors"
@@ -544,23 +639,15 @@ export function CreateObjective() {
                 When does this strategic objective start and end?
               </label>
               <div className="flex gap-3">
-                <select
-                  value={quarter}
-                  onChange={(e) => setQuarter(e.target.value)}
-                  className="px-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg bg-white text-[#4a4a4a] focus:outline-none focus:border-[#10b981]"
-                >
-                  <option>Q1 2025</option>
-                  <option>Q2 2025</option>
-                  <option>Q3 2025</option>
-                  <option>Q4 2025</option>
-                  <option>Q1 2026</option>
-                </select>
                 <div className="relative flex-1">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a8a8a]" />
                   <input
                     type="date"
                     value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
                     className="w-full pl-10 pr-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg focus:outline-none focus:border-[#10b981]"
                   />
                 </div>
@@ -569,7 +656,10 @@ export function CreateObjective() {
                   <input
                     type="date"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
                     className="w-full pl-10 pr-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg focus:outline-none focus:border-[#10b981]"
                   />
                 </div>
@@ -577,6 +667,11 @@ export function CreateObjective() {
             </div>
 
             {/* Action Buttons */}
+            {formError && (
+              <div className="rounded-lg border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[13px] text-[#b91c1c]">
+                {formError}
+              </div>
+            )}
             <div className="flex items-center gap-3 pt-4">
               <button
                 onClick={() => navigate('/admin/objectives' + location.search)}
@@ -603,8 +698,14 @@ export function CreateObjective() {
                 <h3 className="text-[14px] font-semibold text-[#1a1a1a]">Protip</h3>
               </div>
               <p className="text-[13px] text-[#4a4a4a] leading-relaxed">
-                We recommend creating strategic objectives that are qualitative and aspirational. 3-5 district-wide objectives per quarter is a good place to start. Need help? Here are some{' '}
-                <a href="#" className="text-[#10b981] hover:underline">examples</a>.
+                We recommend creating strategic objectives that are qualitative and aspirational. 3-5 district-wide objectives per quarter is a good place to start. Need help?{' '}
+                <button
+                  type="button"
+                  className="text-[#10b981] hover:underline"
+                  onClick={() => toast.info('Objective examples will be added to the Help section soon.')}
+                >
+                  View examples guidance
+                </button>.
               </p>
             </div>
           </div>
@@ -627,58 +728,59 @@ export function CreateObjective() {
         }
         width="xl"
       >
-        <GoalEditor
-          districtId={district?.id || ''}
-          parentObjectiveTitle={title || 'New Objective'}
-          existingGoals={existingGoals || []}
-          existingGoal={
-            editingGoalIndex !== null
-              ? {
-                  id: goals[editingGoalIndex].id,
-                  district_id: district?.id || '',
-                  parent_id: null,
-                  goal_number: '',
-                  title: goals[editingGoalIndex].data.title,
-                  description: goals[editingGoalIndex].data.description,
-                  level: 1,
-                  order_position: editingGoalIndex,
-                  created_at: '',
-                  updated_at: '',
-                  indicator_text: goals[editingGoalIndex].data.indicator_text,
-                  indicator_color: goals[editingGoalIndex].data.indicator_color,
-                  start_date: goals[editingGoalIndex].data.start_date,
-                  end_date: goals[editingGoalIndex].data.end_date,
-                  show_progress_bar: goals[editingGoalIndex].data.show_progress_bar,
-                  is_public: goals[editingGoalIndex].data.is_public,
-                  metrics: goals[editingGoalIndex].metrics.map((m, i) => ({
-                    id: m.id || `temp-${i}`,
-                    goal_id: goals[editingGoalIndex].id,
+        {showGoalEditor && (
+          <GoalEditor
+            parentObjectiveTitle={title || 'New Objective'}
+            allowParentSelection={false}
+            existingGoal={
+              editingGoalIndex !== null
+                ? {
+                    id: goals[editingGoalIndex].id,
                     district_id: district?.id || '',
-                    metric_name: m.name,
-                    name: m.name,
-                    description: m.description,
-                    metric_type: m.metric_type,
-                    current_value: m.current_value ?? undefined,
-                    target_value: m.target_value ?? undefined,
-                    unit: m.unit,
-                    visualization_type: m.visualization_type,
-                    visualization_config: m.visualization_config,
-                    frequency: 'quarterly',
-                    aggregation_method: 'latest',
-                  })),
-                }
-              : undefined
-          }
-          onSave={async (goalData, metrics) => {
-            await handleSaveGoal(goalData, metrics);
-            setShowGoalEditor(false);
-            setEditingGoalIndex(null);
-          }}
-          onCancel={() => {
-            setShowGoalEditor(false);
-            setEditingGoalIndex(null);
-          }}
-        />
+                    parent_id: null,
+                    goal_number: '',
+                    title: goals[editingGoalIndex].data.title,
+                    description: goals[editingGoalIndex].data.description,
+                    level: 1,
+                    order_position: editingGoalIndex,
+                    created_at: '',
+                    updated_at: '',
+                    indicator_text: goals[editingGoalIndex].data.indicator_text,
+                    indicator_color: goals[editingGoalIndex].data.indicator_color,
+                    start_date: goals[editingGoalIndex].data.start_date,
+                    end_date: goals[editingGoalIndex].data.end_date,
+                    show_progress_bar: goals[editingGoalIndex].data.show_progress_bar,
+                    is_public: goals[editingGoalIndex].data.is_public,
+                    metrics: goals[editingGoalIndex].metrics.map((m, i) => ({
+                      id: m.id || `temp-${i}`,
+                      goal_id: goals[editingGoalIndex].id,
+                      district_id: district?.id || '',
+                      metric_name: m.name,
+                      name: m.name,
+                      description: m.description,
+                      metric_type: m.metric_type,
+                      current_value: m.current_value ?? undefined,
+                      target_value: m.target_value ?? undefined,
+                      unit: m.unit,
+                      visualization_type: m.visualization_type,
+                      visualization_config: m.visualization_config,
+                      frequency: 'quarterly',
+                      aggregation_method: 'latest',
+                    })),
+                  }
+                : undefined
+            }
+            onSave={async (goalData, metrics) => {
+              await handleSaveGoal(goalData, metrics);
+              setShowGoalEditor(false);
+              setEditingGoalIndex(null);
+            }}
+            onCancel={() => {
+              setShowGoalEditor(false);
+              setEditingGoalIndex(null);
+            }}
+          />
+        )}
       </SlideoverPanel>
     </div>
   );

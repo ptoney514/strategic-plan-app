@@ -18,8 +18,6 @@ import { MetricEditor } from './MetricEditor';
 type BadgePreset = 'on-target' | 'needs-attention' | 'off-target' | 'custom';
 
 interface GoalEditorProps {
-  /** District ID for the goal */
-  districtId: string;
   /** Parent objective ID (level 0 goal) */
   parentObjectiveId?: string;
   /** Parent objective title for breadcrumb */
@@ -28,6 +26,8 @@ interface GoalEditorProps {
   existingGoals?: HierarchicalGoal[];
   /** Existing goal data if editing */
   existingGoal?: Goal;
+  /** Whether selecting parent goals (sub-goal creation) is allowed */
+  allowParentSelection?: boolean;
   /** Callback when goal is saved */
   onSave: (goalData: GoalFormData, metrics: MetricFormData[]) => Promise<void>;
   /** Callback when cancelled */
@@ -84,11 +84,11 @@ const BADGE_PRESETS: Record<BadgePreset, { text: string; color: string }> = {
 };
 
 export function GoalEditor({
-  districtId: _districtId,
   parentObjectiveId,
   parentObjectiveTitle,
   existingGoals = [],
   existingGoal,
+  allowParentSelection = true,
   onSave,
   onCancel,
   isSaving = false,
@@ -317,29 +317,33 @@ export function GoalEditor({
         <div className="border-t border-[#eef0f4]" />
 
         {/* Parent Goal */}
-        <div>
-          <label className="block text-[13px] font-semibold text-[#1a1f2e] mb-1.5">
-            Parent Goal <span className="text-[#8b93a5] font-normal">(makes this a sub-goal)</span>
-          </label>
-          <select
-            value={parentId || ''}
-            onChange={(e) => setParentId(e.target.value || null)}
-            className="w-full px-3 py-2.5 text-[14px] border border-[#dfe2e8] rounded-md bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-all appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b93a5%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_10px_center]"
-          >
-            <option value="">None — this is a top-level goal</option>
-            {parentOptions.map((opt) => (
-              <option key={opt.id} value={opt.id}>
-                {'  '.repeat(opt.level)}{opt.label}
-              </option>
-            ))}
-          </select>
-          <p className="text-[11px] text-[#8b93a5] mt-1.5">
-            Select a parent to nest this as a sub-goal (e.g., 1.1.1)
-          </p>
-        </div>
+        {allowParentSelection && (
+          <>
+            <div>
+              <label className="block text-[13px] font-semibold text-[#1a1f2e] mb-1.5">
+                Parent Goal <span className="text-[#8b93a5] font-normal">(makes this a sub-goal)</span>
+              </label>
+              <select
+                value={parentId || ''}
+                onChange={(e) => setParentId(e.target.value || null)}
+                className="w-full px-3 py-2.5 text-[14px] border border-[#dfe2e8] rounded-md bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-all appearance-none bg-[url('data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b93a5%22%20stroke-width%3D%222%22%3E%3Cpath%20d%3D%22m6%209%206%206%206-6%22%2F%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[right_10px_center]"
+              >
+                <option value="">None — this is a top-level goal</option>
+                {parentOptions.map((opt) => (
+                  <option key={opt.id} value={opt.id}>
+                    {'  '.repeat(opt.level)}{opt.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-[11px] text-[#8b93a5] mt-1.5">
+                Select a parent to nest this as a sub-goal (e.g., 1.1.1)
+              </p>
+            </div>
 
-        {/* Divider */}
-        <div className="border-t border-[#eef0f4]" />
+            {/* Divider */}
+            <div className="border-t border-[#eef0f4]" />
+          </>
+        )}
 
         {/* Visual Badge Section */}
         <div>
@@ -489,7 +493,7 @@ export function GoalEditor({
                       )}
                     </div>
                   </div>
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleEditMetric(index)}
                       className="w-8 h-8 flex items-center justify-center rounded text-[#8b93a5] hover:bg-[#e5e8ed] hover:text-[#5c6578] transition-colors"
@@ -652,13 +656,9 @@ export function GoalEditor({
 
       {/* Footer */}
       <div className="flex items-center justify-between px-6 py-4 bg-[#f8f9fb] border-t border-[#e5e8ed]">
-        <label className="flex items-center gap-2 text-[13px] text-[#5c6578] cursor-pointer">
-          <input
-            type="checkbox"
-            className="w-4 h-4 rounded border-[#dfe2e8] text-[#10b981] focus:ring-[#10b981]"
-          />
-          Create another after saving
-        </label>
+        <span className="text-[12px] text-[#8b93a5]">
+          Save this goal, then continue editing from the list.
+        </span>
         <div className="flex items-center gap-2">
           <button
             onClick={onCancel}

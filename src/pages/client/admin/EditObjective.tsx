@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import {
@@ -22,16 +22,23 @@ import {
   Loader2
 } from 'lucide-react';
 import { useDistrict } from '../../../hooks/useDistricts';
-import { useGoal, useGoals, useUpdateGoal, useChildGoals } from '../../../hooks/useGoals';
+import { useGoal, useUpdateGoal, useChildGoals } from '../../../hooks/useGoals';
 import { GoalEditor, type GoalFormData, type MetricFormData } from '../../../components/admin/GoalEditor';
 import { SlideoverPanel } from '../../../components/ui/SlideoverPanel';
 import { Target } from 'lucide-react';
+import { GoalsService } from '../../../lib/services/goals.service';
+import { MetricsService } from '../../../lib/services/metrics.service';
+import { ApiError } from '../../../lib/api';
+import { toast } from '../../../components/Toast';
+import type { Goal, HierarchicalGoal } from '../../../lib/types';
+import { ConfirmDialog } from '../../../components/Modal';
 
 // Stored goal with all its data
 interface StoredGoal {
   id: string;
   data: GoalFormData;
   metrics: MetricFormData[];
+  level: 1 | 2;
   isExisting?: boolean; // Track if this was an existing child goal
 }
 
@@ -46,7 +53,6 @@ export function EditObjective() {
   const navigate = useNavigate();
   const location = useLocation();
   const { data: district } = useDistrict(slug || '');
-  const { data: existingGoals } = useGoals(district?.id || '');
   const { data: objective, isLoading: objectiveLoading, error: objectiveError } = useGoal(objectiveId || '');
   const { data: childGoals } = useChildGoals(objectiveId || '');
   const updateGoal = useUpdateGoal();
@@ -60,6 +66,8 @@ export function EditObjective() {
   const [goals, setGoals] = useState<StoredGoal[]>([]);
   const [showGoalEditor, setShowGoalEditor] = useState(false);
   const [editingGoalIndex, setEditingGoalIndex] = useState<number | null>(null);
+  const [preferredParentId, setPreferredParentId] = useState<string | null>(null);
+  const [goalPendingDelete, setGoalPendingDelete] = useState<StoredGoal | null>(null);
 
   // Visual Badge state
   const [showVisualBadge, setShowVisualBadge] = useState(true);
@@ -74,11 +82,11 @@ export function EditObjective() {
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
 
   // Date state
-  const [quarter, setQuarter] = useState('Q4 2025');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Load existing objective data when it's fetched
   useEffect(() => {
@@ -108,37 +116,70 @@ export function EditObjective() {
     }
   }, [objective]);
 
-  // Load existing child goals
+  const mapGoalToStoredGoal = (goal: Goal, level: 1 | 2): StoredGoal => ({
+    id: goal.id,
+    level,
+    isExisting: true,
+    data: {
+      title: goal.title,
+      description: goal.description || '',
+      parent_id: goal.parent_id,
+      indicator_text: goal.indicator_text || 'On Target',
+      indicator_color: goal.indicator_color || '#22c55e',
+      start_date: goal.start_date || '',
+      end_date: goal.end_date || '',
+      show_progress_bar: goal.show_progress_bar ?? true,
+      is_public: goal.is_public ?? true,
+    },
+    metrics: (goal.metrics || []).map((m) => ({
+      id: m.id,
+      name: m.name || m.metric_name || '',
+      description: m.description || '',
+      metric_type: (m.metric_type as 'rating' | 'number' | 'percent') || 'number',
+      visualization_type: (m.visualization_type as 'likert' | 'number' | 'progress') || 'number',
+      current_value: m.current_value ?? null,
+      target_value: m.target_value ?? null,
+      unit: m.unit || '',
+      visualization_config: (m.visualization_config as MetricFormData['visualization_config']) || {},
+    })),
+  });
+
+  // Load existing level-1 goals and level-2 sub-goals
   useEffect(() => {
-    if (childGoals && childGoals.length > 0) {
-      const storedGoals: StoredGoal[] = childGoals.map((child) => ({
-        id: child.id,
-        isExisting: true,
-        data: {
-          title: child.title,
-          description: child.description || '',
-          parent_id: child.parent_id,
-          indicator_text: child.indicator_text || 'On Target',
-          indicator_color: child.indicator_color || '#22c55e',
-          start_date: child.start_date || '',
-          end_date: child.end_date || '',
-          show_progress_bar: child.show_progress_bar ?? true,
-          is_public: child.is_public ?? true,
-        },
-        metrics: (child.metrics || []).map((m) => ({
-          id: m.id,
-          name: m.name || m.metric_name || '',
-          description: m.description || '',
-          metric_type: (m.metric_type as 'rating' | 'number' | 'percent') || 'number',
-          visualization_type: (m.visualization_type as 'likert' | 'number' | 'progress') || 'number',
-          current_value: m.current_value ?? null,
-          target_value: m.target_value ?? null,
-          unit: m.unit || '',
-          visualization_config: (m.visualization_config as MetricFormData['visualization_config']) || {},
-        })),
-      }));
-      setGoals(storedGoals);
-    }
+    let cancelled = false;
+
+    const loadGoalsAndSubGoals = async () => {
+      if (!childGoals || childGoals.length === 0) {
+        if (!cancelled) setGoals([]);
+        return;
+      }
+
+      const storedGoals: StoredGoal[] = [];
+
+      for (const childGoal of childGoals) {
+        storedGoals.push(mapGoalToStoredGoal(childGoal, 1));
+
+        const subGoals = await GoalsService.getChildren(childGoal.id);
+        subGoals.forEach((subGoal) => {
+          storedGoals.push(mapGoalToStoredGoal(subGoal, 2));
+        });
+      }
+
+      if (!cancelled) {
+        setGoals(storedGoals);
+      }
+    };
+
+    loadGoalsAndSubGoals().catch((error) => {
+      console.error('Failed to load goal hierarchy:', error);
+      if (!cancelled) {
+        toast.error('Failed to load all sub-goals. Refresh and try again.');
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, [childGoals]);
 
   const handleBadgeTypeChange = (type: 'on-target' | 'needs-attention' | 'off-target') => {
@@ -157,12 +198,23 @@ export function EditObjective() {
 
   // Handle saving a goal from the GoalEditor
   const handleSaveGoal = async (goalData: GoalFormData, metrics: MetricFormData[]) => {
+    const normalizedParentId = goalData.parent_id || objectiveId || null;
+    if (!normalizedParentId) {
+      toast.error('Parent objective is missing. Refresh and try again.');
+      return;
+    }
+    const level: 1 | 2 = normalizedParentId === objectiveId ? 1 : 2;
+
     if (editingGoalIndex !== null) {
       // Update existing goal
       const updated = [...goals];
       updated[editingGoalIndex] = {
         ...updated[editingGoalIndex],
-        data: goalData,
+        level,
+        data: {
+          ...goalData,
+          parent_id: normalizedParentId,
+        },
         metrics,
       };
       setGoals(updated);
@@ -173,27 +225,141 @@ export function EditObjective() {
         ...goals,
         {
           id: crypto.randomUUID(),
-          data: goalData,
+          level,
+          data: {
+            ...goalData,
+            parent_id: normalizedParentId,
+          },
           metrics,
         },
       ]);
     }
+    setPreferredParentId(null);
     setShowGoalEditor(false);
   };
 
   // Handle editing a goal
   const handleEditGoal = (index: number) => {
     setEditingGoalIndex(index);
+    setPreferredParentId(null);
     setShowGoalEditor(true);
   };
 
   // Handle removing a goal
   const handleRemoveGoal = (index: number) => {
-    setGoals(goals.filter((_, i) => i !== index));
+    const goalToRemove = goals[index];
+    if (!goalToRemove) return;
+
+    if (goalToRemove.level === 1) {
+      const childSubGoalCount = goals.filter(
+        (goal) => goal.data.parent_id === goalToRemove.id,
+      ).length;
+      if (childSubGoalCount > 0) {
+        setGoalPendingDelete(goalToRemove);
+        return;
+      }
+    }
+
+    setGoalPendingDelete(null);
+
+    setGoals((previousGoals) => {
+      if (goalToRemove.level === 1) {
+        return previousGoals.filter(
+          (goal) => goal.id !== goalToRemove.id && goal.data.parent_id !== goalToRemove.id,
+        );
+      }
+
+      return previousGoals.filter((goal) => goal.id !== goalToRemove.id);
+    });
+  };
+
+  const buildMetricPayload = (
+    goalId: string,
+    districtId: string,
+    metric: MetricFormData,
+  ) => ({
+    goal_id: goalId,
+    district_id: districtId,
+    metric_name: metric.name.trim(),
+    name: metric.name.trim(),
+    description: metric.description?.trim() || undefined,
+    metric_type: metric.metric_type,
+    current_value: metric.current_value ?? undefined,
+    target_value: metric.target_value ?? undefined,
+    unit: metric.unit || '',
+    visualization_type: metric.visualization_type,
+    visualization_config: metric.visualization_config,
+    frequency: 'quarterly' as const,
+    aggregation_method: 'latest' as const,
+  });
+
+  const syncGoalMetrics = async (
+    goalId: string,
+    districtId: string,
+    metrics: MetricFormData[],
+  ) => {
+    const existingMetrics = await MetricsService.getByGoal(goalId);
+    const existingById = new Map(existingMetrics.map((m) => [m.id, m]));
+    const persistedMetricIds = new Set<string>();
+
+    for (const metric of metrics) {
+      const payload = buildMetricPayload(goalId, districtId, metric);
+      const shouldUpdate = !!metric.id && existingById.has(metric.id);
+
+      if (shouldUpdate && metric.id) {
+        await MetricsService.update(metric.id, payload);
+        persistedMetricIds.add(metric.id);
+      } else {
+        const created = await MetricsService.create(payload);
+        persistedMetricIds.add(created.id);
+      }
+    }
+
+    for (const existingMetric of existingMetrics) {
+      if (!persistedMetricIds.has(existingMetric.id)) {
+        await MetricsService.delete(existingMetric.id);
+      }
+    }
   };
 
   const handleSubmit = async () => {
-    if (!title.trim() || !objectiveId) return;
+    const trimmedTitle = title.trim();
+    setFormError(null);
+
+    if (!objectiveId) {
+      const message = 'Objective identifier is missing. Refresh and try again.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (!trimmedTitle) {
+      const message = 'Objective title is required.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (!district?.id) {
+      const message = 'District context was not loaded. Refresh and try again.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (!objective?.plan_id) {
+      const message = 'Objective is not attached to a plan. Re-open this objective and try again.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
+
+    if (startDate && endDate && startDate > endDate) {
+      const message = 'End date must be on or after the start date.';
+      setFormError(message);
+      toast.error(message);
+      return;
+    }
 
     setIsSubmitting(true);
     try {
@@ -201,25 +367,154 @@ export function EditObjective() {
       await updateGoal.mutateAsync({
         id: objectiveId,
         updates: {
-          title: title.trim(),
+          title: trimmedTitle,
           description: description.trim() || undefined,
           is_public: visibility === 'public',
-          indicator_text: customBadgeText,
-          indicator_color: badgeColor,
+          indicator_text: showVisualBadge ? customBadgeText : undefined,
+          indicator_color: showVisualBadge ? badgeColor : undefined,
           show_progress_bar: showProgressBar,
           start_date: startDate || undefined,
           end_date: endDate || undefined,
         },
       });
 
-      // TODO: Handle child goal updates
-      // For now, child goals would need to be updated individually
-      // This could be enhanced to handle creates/updates/deletes of children
+      // Snapshot current persisted hierarchy for non-destructive sync.
+      const currentLevel1Goals = await GoalsService.getChildren(objectiveId);
+      const currentLevel1ById = new Map(currentLevel1Goals.map((goal) => [goal.id, goal]));
+      const currentLevel2ByParent = new Map<string, Goal[]>();
+      for (const level1Goal of currentLevel1Goals) {
+        const currentSubGoals = await GoalsService.getChildren(level1Goal.id);
+        currentLevel2ByParent.set(level1Goal.id, currentSubGoals);
+      }
+
+      // Normalize goal parent + level from local editor state.
+      const normalizedGoals = goals.map((goal) => {
+        const parentId = goal.data.parent_id || objectiveId;
+        const level: 1 | 2 = parentId === objectiveId ? 1 : 2;
+        return {
+          ...goal,
+          level,
+          data: {
+            ...goal.data,
+            parent_id: parentId,
+          },
+        };
+      });
+
+      const localLevel1Goals = normalizedGoals.filter((goal) => goal.level === 1);
+      const localLevel2Goals = normalizedGoals.filter((goal) => goal.level === 2);
+
+      const localToPersistedLevel1Id = new Map<string, string>();
+      const keptLevel1Ids = new Set<string>();
+
+      // Upsert level-1 goals first.
+      for (const goal of localLevel1Goals) {
+        const goalPayload: Partial<Goal> = {
+          district_id: district.id,
+          plan_id: objective.plan_id,
+          parent_id: objectiveId,
+          level: 1,
+          title: goal.data.title.trim(),
+          description: goal.data.description?.trim() || undefined,
+          indicator_text: goal.data.indicator_text,
+          indicator_color: goal.data.indicator_color,
+          show_progress_bar: goal.data.show_progress_bar,
+          is_public: goal.data.is_public,
+          start_date: goal.data.start_date || undefined,
+          end_date: goal.data.end_date || undefined,
+        };
+
+        let persistedGoalId: string;
+        if (goal.isExisting && currentLevel1ById.has(goal.id)) {
+          await GoalsService.update(goal.id, goalPayload);
+          persistedGoalId = goal.id;
+        } else {
+          const created = await GoalsService.create(goalPayload);
+          persistedGoalId = created.id;
+        }
+
+        localToPersistedLevel1Id.set(goal.id, persistedGoalId);
+        keptLevel1Ids.add(persistedGoalId);
+        await syncGoalMetrics(persistedGoalId, district.id, goal.metrics);
+      }
+
+      const keptLevel2IdsByParent = new Map<string, Set<string>>();
+
+      // Upsert level-2 goals.
+      for (const subGoal of localLevel2Goals) {
+        const localParentId = subGoal.data.parent_id;
+        if (!localParentId) continue;
+
+        const resolvedParentId = localToPersistedLevel1Id.get(localParentId) || localParentId;
+        if (!keptLevel1Ids.has(resolvedParentId)) {
+          continue;
+        }
+
+        const goalPayload: Partial<Goal> = {
+          district_id: district.id,
+          plan_id: objective.plan_id,
+          parent_id: resolvedParentId,
+          level: 2,
+          title: subGoal.data.title.trim(),
+          description: subGoal.data.description?.trim() || undefined,
+          indicator_text: subGoal.data.indicator_text,
+          indicator_color: subGoal.data.indicator_color,
+          show_progress_bar: subGoal.data.show_progress_bar,
+          is_public: subGoal.data.is_public,
+          start_date: subGoal.data.start_date || undefined,
+          end_date: subGoal.data.end_date || undefined,
+        };
+
+        const persistedCurrentSubGoalIds = new Set(
+          (currentLevel2ByParent.get(resolvedParentId) || []).map((goal) => goal.id),
+        );
+
+        let persistedSubGoalId: string;
+        if (subGoal.isExisting && persistedCurrentSubGoalIds.has(subGoal.id)) {
+          await GoalsService.update(subGoal.id, goalPayload);
+          persistedSubGoalId = subGoal.id;
+        } else {
+          const created = await GoalsService.create(goalPayload);
+          persistedSubGoalId = created.id;
+        }
+
+        if (!keptLevel2IdsByParent.has(resolvedParentId)) {
+          keptLevel2IdsByParent.set(resolvedParentId, new Set<string>());
+        }
+        keptLevel2IdsByParent.get(resolvedParentId)!.add(persistedSubGoalId);
+        await syncGoalMetrics(persistedSubGoalId, district.id, subGoal.metrics);
+      }
+
+      // Delete removed level-2 goals for parents that still exist.
+      for (const [parentId, currentSubGoals] of currentLevel2ByParent.entries()) {
+        if (!keptLevel1Ids.has(parentId)) continue;
+
+        const keptSubGoalIds = keptLevel2IdsByParent.get(parentId) || new Set<string>();
+        for (const persistedSubGoal of currentSubGoals) {
+          if (!keptSubGoalIds.has(persistedSubGoal.id)) {
+            await GoalsService.delete(persistedSubGoal.id);
+          }
+        }
+      }
+
+      // Delete removed level-1 goals (sub-goals cascade).
+      for (const persistedLevel1Goal of currentLevel1Goals) {
+        if (!keptLevel1Ids.has(persistedLevel1Goal.id)) {
+          await GoalsService.delete(persistedLevel1Goal.id);
+        }
+      }
+
+      toast.success('Objective, goals, and sub-goals saved successfully.');
 
       // Navigate back to the objective detail view (preserves subdomain query param on localhost)
       navigate(`/admin/objectives/${objectiveId}${location.search}`);
     } catch (error) {
       console.error('Failed to update objective:', error);
+      const message = error instanceof ApiError
+        ? error.message
+        : 'Failed to save changes. Please try again.';
+      setFormError(message);
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -233,6 +528,74 @@ export function EditObjective() {
     { hex: '#8b5cf6', name: 'purple' },
     { hex: '#6b7280', name: 'gray' },
   ];
+
+  const level1Goals = useMemo(
+    () => goals.filter((goal) => (goal.data.parent_id || objectiveId) === objectiveId),
+    [goals, objectiveId],
+  );
+  const subGoalCount = goals.length - level1Goals.length;
+
+  const subGoalsByParent = useMemo(() => {
+    const map = new Map<string, StoredGoal[]>();
+
+    goals.forEach((goal) => {
+      const parentId = goal.data.parent_id;
+      if (!parentId || parentId === objectiveId) return;
+
+      const existing = map.get(parentId) || [];
+      existing.push(goal);
+      map.set(parentId, existing);
+    });
+
+    return map;
+  }, [goals, objectiveId]);
+
+  const parentSelectionGoals = useMemo<HierarchicalGoal[]>(() => {
+    if (!objectiveId || !objective) return [];
+
+    // Only include persisted level-1 goals as valid parents for new sub-goals.
+    const persistedLevel1Goals = level1Goals
+      .filter((goal) => goal.isExisting)
+      .map((goal) => {
+        const existingChildGoal = childGoals?.find((child) => child.id === goal.id);
+        if (existingChildGoal) {
+          return {
+            ...existingChildGoal,
+            children: [],
+          } as HierarchicalGoal;
+        }
+
+        return {
+          id: goal.id,
+          district_id: district?.id || objective.district_id,
+          school_id: null,
+          plan_id: objective.plan_id,
+          parent_id: objectiveId,
+          goal_number: '',
+          title: goal.data.title,
+          description: goal.data.description || '',
+          level: 1 as const,
+          order_position: 0,
+          created_at: '',
+          updated_at: '',
+          indicator_text: goal.data.indicator_text,
+          indicator_color: goal.data.indicator_color,
+          start_date: goal.data.start_date || undefined,
+          end_date: goal.data.end_date || undefined,
+          show_progress_bar: goal.data.show_progress_bar,
+          is_public: goal.data.is_public,
+          metrics: [],
+          children: [],
+        } as HierarchicalGoal;
+      });
+
+    return [
+      {
+        ...(objective as HierarchicalGoal),
+        children: persistedLevel1Goals,
+      },
+    ];
+  }, [childGoals, district?.id, level1Goals, objective, objectiveId]);
 
   // Loading state
   if (objectiveLoading) {
@@ -301,7 +664,10 @@ export function EditObjective() {
               <input
                 type="text"
                 value={title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (formError) setFormError(null);
+                }}
                 placeholder="e.g., Student Achievement & Well-being"
                 className="w-full px-4 py-3 text-[14px] border border-[#e8e6e1] rounded-lg bg-white focus:outline-none focus:border-[#10b981] focus:ring-2 focus:ring-[#d1fae5] transition-colors"
               />
@@ -337,7 +703,7 @@ export function EditObjective() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[13px] text-[#8a8a8a] bg-[#f5f3ef] px-2 py-0.5 rounded">
-                    {goals.length} goals
+                    {level1Goals.length} goals{subGoalCount > 0 ? ` • ${subGoalCount} sub-goals` : ''}
                   </span>
                   {goalsExpanded ? (
                     <ChevronUp className="h-4 w-4 text-[#8a8a8a]" />
@@ -349,77 +715,168 @@ export function EditObjective() {
 
               {goalsExpanded && (
                 <div className="px-6 pb-6 border-t border-[#e8e6e1]">
+                  <div className="mt-4 rounded-lg bg-[#eff6ff] border border-[#bfdbfe] px-3 py-2 text-[12px] text-[#1d4ed8]">
+                    Create and edit goals and sub-goals here. Sub-goals can be nested under saved level-1 goals.
+                  </div>
+
                   <div className="flex flex-col gap-3 mt-4">
-                    {/* Existing Goals List */}
-                    {goals.map((goal, index) => (
-                      <div
-                        key={goal.id}
-                        className="flex items-center gap-3 px-4 py-3 bg-[#f8f9fb] border border-[#e5e8ed] rounded-lg group hover:border-[#dfe2e8] transition-colors"
-                      >
-                        <GripVertical className="h-4 w-4 text-[#d4d1cb] cursor-grab flex-shrink-0" />
+                    {level1Goals.map((level1Goal) => {
+                      const level1Index = goals.findIndex((goal) => goal.id === level1Goal.id);
+                      const level2Goals = subGoalsByParent.get(level1Goal.id) || [];
 
-                        {/* Goal Icon */}
-                        <div className="w-10 h-10 flex items-center justify-center bg-[#d1fae5] rounded-md text-[#10b981] flex-shrink-0">
-                          {goal.metrics.length > 0 ? (
-                            goal.metrics[0].visualization_type === 'likert' ? (
-                              <BarChart3 className="h-5 w-5" />
-                            ) : (
-                              <Hash className="h-5 w-5" />
-                            )
-                          ) : (
-                            <div className="w-5 h-5 rounded-full border-2 border-[#10b981]" />
-                          )}
-                        </div>
+                      return (
+                        <div key={level1Goal.id} className="space-y-2">
+                          <div className="flex items-center gap-3 px-4 py-3 bg-[#f8f9fb] border border-[#e5e8ed] rounded-lg group hover:border-[#dfe2e8] transition-colors">
+                            <GripVertical className="h-4 w-4 text-[#d4d1cb] cursor-grab flex-shrink-0" />
 
-                        {/* Goal Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="text-[14px] font-semibold text-[#1a1a1a] truncate">
-                            {goal.data.title}
-                          </div>
-                          <div className="flex items-center gap-3 text-[12px] text-[#8a8a8a]">
-                            {goal.metrics.length > 0 && (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#e5e8ed] rounded text-[10px] font-semibold uppercase tracking-wide">
-                                {goal.metrics.length} metric{goal.metrics.length !== 1 ? 's' : ''}
-                              </span>
-                            )}
-                            {goal.data.indicator_text && (
-                              <span
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-white"
-                                style={{ backgroundColor: goal.data.indicator_color }}
+                            <div className="w-10 h-10 flex items-center justify-center bg-[#d1fae5] rounded-md text-[#10b981] flex-shrink-0">
+                              {level1Goal.metrics.length > 0 ? (
+                                level1Goal.metrics[0].visualization_type === 'likert' ? (
+                                  <BarChart3 className="h-5 w-5" />
+                                ) : (
+                                  <Hash className="h-5 w-5" />
+                                )
+                              ) : (
+                                <div className="w-5 h-5 rounded-full border-2 border-[#10b981]" />
+                              )}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold bg-[#d1fae5] text-[#047857]">
+                                  Goal
+                                </span>
+                                <div className="text-[14px] font-semibold text-[#1a1a1a] truncate">
+                                  {level1Goal.data.title}
+                                </div>
+                              </div>
+                              <div className="flex items-center gap-3 text-[12px] text-[#8a8a8a]">
+                                {level1Goal.metrics.length > 0 && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#e5e8ed] rounded text-[10px] font-semibold uppercase tracking-wide">
+                                    {level1Goal.metrics.length} metric{level1Goal.metrics.length !== 1 ? 's' : ''}
+                                  </span>
+                                )}
+                                {level1Goal.data.indicator_text && (
+                                  <span
+                                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-white"
+                                    style={{ backgroundColor: level1Goal.data.indicator_color }}
+                                  >
+                                    {level1Goal.data.indicator_text}
+                                  </span>
+                                )}
+                                {level1Goal.isExisting && (
+                                  <span className="text-[10px] text-[#8a8a8a]">
+                                    (saved)
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                              <button
+                                onClick={() => {
+                                  if (!level1Goal.isExisting) return;
+                                  setEditingGoalIndex(null);
+                                  setPreferredParentId(level1Goal.id);
+                                  setShowGoalEditor(true);
+                                }}
+                                disabled={!level1Goal.isExisting}
+                                className="px-2.5 h-8 rounded text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50 text-[#0f766e] bg-[#ccfbf1] hover:bg-[#99f6e4]"
+                                title={level1Goal.isExisting ? 'Add Sub-goal' : 'Save first to add sub-goals'}
                               >
-                                {goal.data.indicator_text}
-                              </span>
-                            )}
-                            {goal.isExisting && (
-                              <span className="text-[10px] text-[#8a8a8a]">
-                                (existing)
-                              </span>
-                            )}
+                                + Sub-goal
+                              </button>
+                              <button
+                                onClick={() => handleEditGoal(level1Index)}
+                                className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#e5e8ed] hover:text-[#5c6578] transition-colors"
+                                title="Edit Goal"
+                              >
+                                <Edit2 className="h-4 w-4" />
+                              </button>
+                              <button
+                                onClick={() => handleRemoveGoal(level1Index)}
+                                className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#fee2e2] hover:text-[#ef4444] transition-colors"
+                                title="Delete Goal"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Actions */}
-                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleEditGoal(index)}
-                            className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#e5e8ed] hover:text-[#5c6578] transition-colors"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleRemoveGoal(index)}
-                            className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#fee2e2] hover:text-[#ef4444] transition-colors"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
+                          {level2Goals.map((subGoal) => {
+                            const subGoalIndex = goals.findIndex((goal) => goal.id === subGoal.id);
+
+                            return (
+                              <div
+                                key={subGoal.id}
+                                className="ml-8 flex items-center gap-3 px-4 py-3 bg-white border border-[#e5e8ed] rounded-lg group hover:border-[#dfe2e8] transition-colors"
+                              >
+                                <div className="w-9 h-9 flex items-center justify-center bg-[#f0fdf4] rounded-md text-[#15803d] flex-shrink-0">
+                                  {subGoal.metrics.length > 0 ? (
+                                    subGoal.metrics[0].visualization_type === 'likert' ? (
+                                      <BarChart3 className="h-4 w-4" />
+                                    ) : (
+                                      <Hash className="h-4 w-4" />
+                                    )
+                                  ) : (
+                                    <div className="w-4 h-4 rounded-full border-2 border-[#15803d]" />
+                                  )}
+                                </div>
+
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold bg-[#dcfce7] text-[#166534]">
+                                      Sub-goal
+                                    </span>
+                                    <div className="text-[13px] font-semibold text-[#1a1a1a] truncate">
+                                      {subGoal.data.title}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-3 text-[12px] text-[#8a8a8a]">
+                                    {subGoal.metrics.length > 0 && (
+                                      <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#e5e8ed] rounded text-[10px] font-semibold uppercase tracking-wide">
+                                        {subGoal.metrics.length} metric{subGoal.metrics.length !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+                                    {subGoal.data.indicator_text && (
+                                      <span
+                                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold text-white"
+                                        style={{ backgroundColor: subGoal.data.indicator_color }}
+                                      >
+                                        {subGoal.data.indicator_text}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                                  <button
+                                    onClick={() => handleEditGoal(subGoalIndex)}
+                                    className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#e5e8ed] hover:text-[#5c6578] transition-colors"
+                                    title="Edit Sub-goal"
+                                  >
+                                    <Edit2 className="h-4 w-4" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleRemoveGoal(subGoalIndex)}
+                                    className="w-8 h-8 flex items-center justify-center rounded text-[#8a8a8a] hover:bg-[#fee2e2] hover:text-[#ef4444] transition-colors"
+                                    title="Delete Sub-goal"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
 
                     {/* Add Goal Button */}
                     <button
                       onClick={() => {
                         setEditingGoalIndex(null);
+                        setPreferredParentId(objectiveId || null);
                         setShowGoalEditor(true);
                       }}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3.5 border-2 border-dashed border-[#e8e6e1] rounded-lg text-[13px] font-medium text-[#8a8a8a] hover:border-[#10b981] hover:text-[#10b981] hover:bg-[#f0fdf4] transition-colors"
@@ -587,23 +1044,15 @@ export function EditObjective() {
                 When does this strategic objective start and end?
               </label>
               <div className="flex gap-3">
-                <select
-                  value={quarter}
-                  onChange={(e) => setQuarter(e.target.value)}
-                  className="px-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg bg-white text-[#4a4a4a] focus:outline-none focus:border-[#10b981]"
-                >
-                  <option>Q1 2025</option>
-                  <option>Q2 2025</option>
-                  <option>Q3 2025</option>
-                  <option>Q4 2025</option>
-                  <option>Q1 2026</option>
-                </select>
                 <div className="relative flex-1">
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#8a8a8a]" />
                   <input
                     type="date"
                     value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
+                    onChange={(e) => {
+                      setStartDate(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
                     className="w-full pl-10 pr-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg focus:outline-none focus:border-[#10b981]"
                   />
                 </div>
@@ -612,7 +1061,10 @@ export function EditObjective() {
                   <input
                     type="date"
                     value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
+                    onChange={(e) => {
+                      setEndDate(e.target.value);
+                      if (formError) setFormError(null);
+                    }}
                     className="w-full pl-10 pr-3 py-2.5 text-[13px] border border-[#e8e6e1] rounded-lg focus:outline-none focus:border-[#10b981]"
                   />
                 </div>
@@ -620,6 +1072,11 @@ export function EditObjective() {
             </div>
 
             {/* Action Buttons */}
+            {formError && (
+              <div className="rounded-lg border border-[#fecaca] bg-[#fef2f2] px-4 py-3 text-[13px] text-[#b91c1c]">
+                {formError}
+              </div>
+            )}
             <div className="flex items-center gap-3 pt-4">
               <button
                 onClick={() => navigate('/admin/objectives' + location.search)}
@@ -646,9 +1103,8 @@ export function EditObjective() {
                 <h3 className="text-[14px] font-semibold text-[#1a1a1a]">Editing Tips</h3>
               </div>
               <p className="text-[13px] text-[#4a4a4a] leading-relaxed">
-                You can update the title, description, and display settings for this objective.
-                Changes to child goals will be saved separately. Need to add more goals?
-                Use the "Add Goal" button in the Goals section.
+                You can update objective details and directly create, edit, or remove goals and sub-goals in this page.
+                Use "Add Goal" for level-1 goals and "+ Sub-goal" from a saved goal card.
               </p>
             </div>
           </div>
@@ -661,6 +1117,7 @@ export function EditObjective() {
         onClose={() => {
           setShowGoalEditor(false);
           setEditingGoalIndex(null);
+          setPreferredParentId(null);
         }}
         title={editingGoalIndex !== null ? 'Edit Goal' : 'Add New Goal'}
         subtitle={`Under: ${title || 'Objective'}`}
@@ -671,59 +1128,88 @@ export function EditObjective() {
         }
         width="xl"
       >
-        <GoalEditor
-          districtId={district?.id || ''}
-          parentObjectiveTitle={title || 'Objective'}
-          existingGoals={existingGoals || []}
-          existingGoal={
-            editingGoalIndex !== null
-              ? {
-                  id: goals[editingGoalIndex].id,
-                  district_id: district?.id || '',
-                  parent_id: objectiveId || null,
-                  goal_number: '',
-                  title: goals[editingGoalIndex].data.title,
-                  description: goals[editingGoalIndex].data.description,
-                  level: 1,
-                  order_position: editingGoalIndex,
-                  created_at: '',
-                  updated_at: '',
-                  indicator_text: goals[editingGoalIndex].data.indicator_text,
-                  indicator_color: goals[editingGoalIndex].data.indicator_color,
-                  start_date: goals[editingGoalIndex].data.start_date,
-                  end_date: goals[editingGoalIndex].data.end_date,
-                  show_progress_bar: goals[editingGoalIndex].data.show_progress_bar,
-                  is_public: goals[editingGoalIndex].data.is_public,
-                  metrics: goals[editingGoalIndex].metrics.map((m, i) => ({
-                    id: m.id || `temp-${i}`,
-                    goal_id: goals[editingGoalIndex].id,
+        {showGoalEditor && (
+          <GoalEditor
+            parentObjectiveId={preferredParentId || objectiveId}
+            parentObjectiveTitle={title || 'Objective'}
+            existingGoals={parentSelectionGoals}
+            existingGoal={
+              editingGoalIndex !== null
+                ? {
+                    id: goals[editingGoalIndex].id,
                     district_id: district?.id || '',
-                    metric_name: m.name,
-                    name: m.name,
-                    description: m.description,
-                    metric_type: m.metric_type,
-                    current_value: m.current_value ?? undefined,
-                    target_value: m.target_value ?? undefined,
-                    unit: m.unit,
-                    visualization_type: m.visualization_type,
-                    visualization_config: m.visualization_config,
-                    frequency: 'quarterly',
-                    aggregation_method: 'latest',
-                  })),
-                }
-              : undefined
-          }
-          onSave={async (goalData, metrics) => {
-            await handleSaveGoal(goalData, metrics);
-            setShowGoalEditor(false);
-            setEditingGoalIndex(null);
-          }}
-          onCancel={() => {
-            setShowGoalEditor(false);
-            setEditingGoalIndex(null);
-          }}
-        />
+                    parent_id: goals[editingGoalIndex].data.parent_id || objectiveId || null,
+                    goal_number: '',
+                    title: goals[editingGoalIndex].data.title,
+                    description: goals[editingGoalIndex].data.description,
+                    level: goals[editingGoalIndex].level,
+                    order_position: editingGoalIndex,
+                    created_at: '',
+                    updated_at: '',
+                    indicator_text: goals[editingGoalIndex].data.indicator_text,
+                    indicator_color: goals[editingGoalIndex].data.indicator_color,
+                    start_date: goals[editingGoalIndex].data.start_date,
+                    end_date: goals[editingGoalIndex].data.end_date,
+                    show_progress_bar: goals[editingGoalIndex].data.show_progress_bar,
+                    is_public: goals[editingGoalIndex].data.is_public,
+                    metrics: goals[editingGoalIndex].metrics.map((m, i) => ({
+                      id: m.id || `temp-${i}`,
+                      goal_id: goals[editingGoalIndex].id,
+                      district_id: district?.id || '',
+                      metric_name: m.name,
+                      name: m.name,
+                      description: m.description,
+                      metric_type: m.metric_type,
+                      current_value: m.current_value ?? undefined,
+                      target_value: m.target_value ?? undefined,
+                      unit: m.unit,
+                      visualization_type: m.visualization_type,
+                      visualization_config: m.visualization_config,
+                      frequency: 'quarterly',
+                      aggregation_method: 'latest',
+                    })),
+                  }
+                : undefined
+            }
+            onSave={async (goalData, metrics) => {
+              await handleSaveGoal(goalData, metrics);
+              setShowGoalEditor(false);
+              setEditingGoalIndex(null);
+              setPreferredParentId(null);
+            }}
+            onCancel={() => {
+              setShowGoalEditor(false);
+              setEditingGoalIndex(null);
+              setPreferredParentId(null);
+            }}
+          />
+        )}
       </SlideoverPanel>
+
+      <ConfirmDialog
+        isOpen={!!goalPendingDelete}
+        onClose={() => setGoalPendingDelete(null)}
+        onConfirm={() => {
+          if (!goalPendingDelete) return;
+          setGoals((previousGoals) =>
+            previousGoals.filter(
+              (goal) =>
+                goal.id !== goalPendingDelete.id &&
+                goal.data.parent_id !== goalPendingDelete.id,
+            ),
+          );
+          toast.info('Goal and its sub-goals removed from this draft. Save changes to persist.');
+        }}
+        title="Delete goal and sub-goals?"
+        message={
+          goalPendingDelete
+            ? `"${goalPendingDelete.data.title}" has nested sub-goals. Deleting it will also remove all nested sub-goals from this objective.`
+            : ''
+        }
+        confirmText="Delete Goal & Sub-goals"
+        cancelText="Keep Goal"
+        variant="danger"
+      />
     </div>
   );
 }

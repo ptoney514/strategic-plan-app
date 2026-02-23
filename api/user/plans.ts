@@ -1,4 +1,4 @@
-import { eq, inArray, desc } from "drizzle-orm";
+import { eq, and, inArray, desc } from "drizzle-orm";
 import { requireAuth } from "../lib/middleware/auth.js";
 import { db } from "../lib/db.js";
 import {
@@ -44,11 +44,12 @@ export async function GET(request: Request) {
 
       orgIds = orgs.map((o) => o.id);
     } else {
-      // Regular user: orgs via membership
+      // Regular user: orgs via membership (only active orgs)
       const memberships = await db
         .select({ organizationId: organizationMembers.organizationId })
         .from(organizationMembers)
-        .where(eq(organizationMembers.userId, user.id));
+        .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
+        .where(and(eq(organizationMembers.userId, user.id), eq(organizations.isActive, true)));
 
       orgIds = memberships.map((m) => m.organizationId);
     }

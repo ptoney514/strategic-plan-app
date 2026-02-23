@@ -58,6 +58,7 @@ vi.mock('../../pages/dashboard', () => ({
   UserDashboard: () => <div>User Dashboard</div>,
   PlaceholderPage: () => <div>Placeholder</div>,
   DashboardPlansPage: () => <div>Plans</div>,
+  DashboardDistrictsPage: () => <div>Districts</div>,
 }));
 vi.mock('../../pages/client/public/Dashboard', () => ({
   Dashboard: () => <div>Dashboard</div>,

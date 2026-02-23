@@ -63,6 +63,7 @@ describe('DashboardSidebar', () => {
     render(<DashboardSidebar basePath="/" />);
 
     expect(screen.getByText('Home')).toBeInTheDocument();
+    expect(screen.getByText('Districts')).toBeInTheDocument();
     expect(screen.getByText('Strategic plans')).toBeInTheDocument();
     expect(screen.getByText('Objectives & goals')).toBeInTheDocument();
     expect(screen.getByText('Metrics')).toBeInTheDocument();

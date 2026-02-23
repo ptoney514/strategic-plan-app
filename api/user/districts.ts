@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { requireAuth } from "../lib/middleware/auth.js";
 import { db } from "../lib/db.js";
 import { organizations, organizationMembers } from "../lib/schema/index.js";
@@ -50,7 +50,7 @@ export async function GET(request: Request) {
         organizations,
         eq(organizationMembers.organizationId, organizations.id),
       )
-      .where(eq(organizationMembers.userId, user.id))
+      .where(and(eq(organizationMembers.userId, user.id), eq(organizations.isActive, true)))
       .orderBy(organizations.name);
 
     return jsonOk(rows.map((r) => orgToSnake(r.org)));

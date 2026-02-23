@@ -8,7 +8,7 @@ import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
 import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { DashboardLayout } from '../layouts/DashboardLayout';
-import { UserDashboard, PlaceholderPage, DashboardPlansPage } from '../pages/dashboard';
+import { UserDashboard, PlaceholderPage, DashboardPlansPage, DashboardDistrictsPage } from '../pages/dashboard';
 import { useAuth } from '../contexts/AuthContext';
 
 // Public District Layout and Pages
@@ -60,6 +60,7 @@ export function RootRouter() {
         }
       >
         <Route index element={<UserDashboard />} />
+        <Route path="districts" element={<DashboardDistrictsPage />} />
         <Route path="plans" element={<DashboardPlansPage />} />
         <Route path="plans/*" element={<DashboardPlansPage />} />
         <Route path="objectives" element={<PlaceholderPage title="Objectives & Goals" description="Track and manage your strategic objectives and goals." />} />

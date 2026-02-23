@@ -1,13 +1,13 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { FileText, Target, TrendingUp, ArrowRight, Plus, ChevronRight } from 'lucide-react';
+import { Building2, FileText, Target, TrendingUp, ArrowRight, Plus, ChevronRight, Settings, ExternalLink, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useUserDashboardStats, useUserDistricts } from '../../hooks/useUserDistricts';
+import { useUserDashboardStats, useUserDistrictsWithStats } from '../../hooks/useUserDistricts';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
 import { usePlanGoals } from '../../hooks/useGoals';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
 import type { HierarchicalGoal, PlanWithSummary } from '../../lib/types';
-import type { District } from '../../lib/types';
+import type { UserDistrictWithStats } from '../../lib/services/userDashboard.service';
 
 export function UserDashboard() {
   const navigate = useNavigate();
@@ -19,19 +19,19 @@ export function UserDashboard() {
   const isDistrictAdmin = location.pathname.startsWith('/admin');
   const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
 
-  // Fetch stats, plans, and districts
+  // Fetch stats, districts with stats, and plans
   const { data: stats, isLoading: statsLoading } = useUserDashboardStats();
+  const { data: districtsWithStats = [], isLoading: districtsLoading } = useUserDistrictsWithStats();
   const { data: plans = [], isLoading: plansLoading } = useUserPlansWithCounts();
-  const { data: districts = [] } = useUserDistricts();
 
-  // Build district lookup for cross-domain navigation on root domain
+  // Build district lookup for plan section navigation
   const districtMap = useMemo(() => {
-    const map = new Map<string, District>();
-    for (const d of districts) {
+    const map = new Map<string, UserDistrictWithStats>();
+    for (const d of districtsWithStats) {
       map.set(d.id, d);
     }
     return map;
-  }, [districts]);
+  }, [districtsWithStats]);
 
   // Navigate to district admin page (cross-domain on root, in-app on district admin)
   const navigateToDistrictAdmin = (path: string, districtId?: string | null) => {
@@ -40,7 +40,7 @@ export function UserDashboard() {
       return;
     }
     // Root domain: redirect to district subdomain
-    const district = districtId ? districtMap.get(districtId) : districts[0];
+    const district = districtId ? districtMap.get(districtId) : districtsWithStats[0];
     if (district) {
       window.location.href = buildSubdomainUrlWithPath('district', path, district.slug);
     }
@@ -90,6 +90,12 @@ export function UserDashboard() {
       {/* Stats Row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
+          label="Districts"
+          value={statsLoading ? '...' : String(stats?.district_count || 0)}
+          icon={<Building2 size={20} />}
+          hidden={isDistrictAdmin}
+        />
+        <StatCard
           label="Plans"
           value={statsLoading ? '...' : String(stats?.plan_count || 0)}
           icon={<FileText size={20} />}
@@ -104,13 +110,67 @@ export function UserDashboard() {
           value={statsLoading ? '...' : String(stats?.metric_count || 0)}
           icon={<TrendingUp size={20} />}
         />
-        <StatCard
-          label="Districts"
-          value={statsLoading ? '...' : String(stats?.district_count || 0)}
-          icon={<FileText size={20} />}
-          hidden={isDistrictAdmin}
-        />
       </div>
+
+      {/* Districts Section */}
+      {!isDistrictAdmin && (
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2
+              className="text-lg font-medium"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif", color: 'var(--editorial-text-primary)' }}
+            >
+              Your Districts
+            </h2>
+            {districtsWithStats.length > 2 && (
+              <Link
+                to={`${basePath}/districts`}
+                className="text-sm font-medium flex items-center gap-1 transition-colors"
+                style={{ color: 'var(--editorial-accent-link)' }}
+              >
+                View all districts
+                <ArrowRight size={14} />
+              </Link>
+            )}
+          </div>
+
+          {districtsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="animate-pulse rounded-xl h-48"
+                  style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}
+                />
+              ))}
+            </div>
+          ) : districtsWithStats.length === 0 ? (
+            <div
+              className="rounded-xl p-8 text-center"
+              style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}
+            >
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                style={{ backgroundColor: 'var(--editorial-surface-alt)' }}
+              >
+                <Building2 className="h-6 w-6" style={{ color: 'var(--editorial-text-muted)' }} />
+              </div>
+              <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--editorial-text-primary)' }}>
+                No districts yet
+              </h3>
+              <p className="text-sm" style={{ color: 'var(--editorial-text-muted)' }}>
+                You don't have access to any districts yet.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {districtsWithStats.map((district) => (
+                <DistrictCard key={district.id} district={district} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Plans Section */}
       <div>
@@ -177,15 +237,20 @@ export function UserDashboard() {
           </div>
         ) : (
           <div className="space-y-3">
-            {plans.map((plan) => (
-              <PlanRow
-                key={plan.id}
-                plan={plan}
-                isSelected={selectedPlanId === plan.id}
-                onClick={() => setSelectedPlanId(plan.id)}
-                onNavigateDetail={() => navigateToDistrictAdmin(`/admin/plans/${plan.id}`, plan.district_id)}
-              />
-            ))}
+            {plans.map((plan) => {
+              const district = districtMap.get(plan.district_id || '');
+              return (
+                <PlanRow
+                  key={plan.id}
+                  plan={plan}
+                  districtName={district?.name}
+                  districtColor={district?.primary_color}
+                  isSelected={selectedPlanId === plan.id}
+                  onClick={() => setSelectedPlanId(plan.id)}
+                  onNavigateDetail={() => navigateToDistrictAdmin(`/admin/plans/${plan.id}`, plan.district_id)}
+                />
+              );
+            })}
           </div>
         )}
       </div>
@@ -278,8 +343,119 @@ function StatCard({ label, value, icon, hidden }: { label: string; value: string
   );
 }
 
-function PlanRow({ plan, isSelected, onClick, onNavigateDetail }: {
+function DistrictCard({ district }: { district: UserDistrictWithStats }) {
+  const adminUrl = buildSubdomainUrlWithPath('district', '/admin', district.slug);
+  const publicUrl = buildSubdomainUrlWithPath('district', '/', district.slug);
+
+  return (
+    <div
+      className="rounded-xl overflow-hidden"
+      style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}
+    >
+      {/* Color accent strip */}
+      <div className="h-1.5" style={{ backgroundColor: district.primary_color || '#6B8F71' }} />
+
+      <div className="p-5">
+        {/* District info */}
+        <div className="flex items-start gap-4 mb-4">
+          {district.logo_url ? (
+            <img
+              src={district.logo_url}
+              alt=""
+              className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+            />
+          ) : (
+            <div
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+              style={{ backgroundColor: district.primary_color || '#D97706' }}
+            >
+              {district.name.substring(0, 2).toUpperCase()}
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-sm truncate" style={{ color: 'var(--editorial-text-primary)' }}>
+              {district.name}
+            </h3>
+            {district.tagline && (
+              <p className="text-xs mt-0.5 line-clamp-1" style={{ color: 'var(--editorial-text-muted)' }}>
+                {district.tagline}
+              </p>
+            )}
+            <span
+              className="inline-flex items-center mt-1.5 text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full"
+              style={
+                district.is_public
+                  ? { backgroundColor: 'rgba(107, 143, 113, 0.15)', color: 'var(--editorial-accent-success)' }
+                  : { backgroundColor: 'var(--editorial-surface-alt)', color: 'var(--editorial-text-muted)' }
+              }
+            >
+              {district.is_public ? 'Public' : 'Private'}
+            </span>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <MiniStat icon={<FileText size={14} />} label="Plans" value={district.plan_count} />
+          <MiniStat icon={<Target size={14} />} label="Objectives" value={district.objective_count} />
+          <MiniStat icon={<Users size={14} />} label="Users" value={district.user_count} />
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2">
+          <a
+            href={adminUrl}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 text-white rounded-lg transition-colors font-medium text-sm"
+            style={{ backgroundColor: 'var(--editorial-accent-primary)' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary-hover)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-accent-primary)'; }}
+          >
+            <Settings size={14} />
+            Open Admin
+          </a>
+          <a
+            href={publicUrl}
+            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg transition-colors font-medium text-sm"
+            style={{
+              border: '1px solid var(--editorial-border)',
+              color: 'var(--editorial-text-secondary)',
+              backgroundColor: 'var(--editorial-surface)',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-surface-alt)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'var(--editorial-surface)'; }}
+          >
+            <ExternalLink size={14} />
+            View Public
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MiniStat({ icon, label, value }: { icon: React.ReactNode; label: string; value: number }) {
+  return (
+    <div
+      className="rounded-lg px-3 py-2 text-center"
+      style={{ backgroundColor: 'var(--editorial-surface-alt)' }}
+    >
+      <div className="flex items-center justify-center gap-1 mb-0.5" style={{ color: 'var(--editorial-text-muted)' }}>
+        {icon}
+      </div>
+      <div className="text-lg font-semibold" style={{ color: 'var(--editorial-text-primary)' }}>
+        {value}
+      </div>
+      <div className="text-[10px] font-medium uppercase tracking-wider" style={{ color: 'var(--editorial-text-muted)' }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
+function PlanRow({ plan, districtName, districtColor, isSelected, onClick, onNavigateDetail }: {
   plan: PlanWithSummary;
+  districtName?: string;
+  districtColor?: string;
   isSelected: boolean;
   onClick: () => void;
   onNavigateDetail: () => void;
@@ -305,6 +481,17 @@ function PlanRow({ plan, isSelected, onClick, onNavigateDetail }: {
             {plan.name}
           </div>
           <div className="flex items-center gap-3 mt-0.5">
+            {districtName && (
+              <span
+                className="inline-flex items-center text-xs px-2 py-0.5 rounded-full"
+                style={{
+                  backgroundColor: districtColor ? `${districtColor}20` : 'var(--editorial-surface-alt)',
+                  color: districtColor || 'var(--editorial-text-secondary)',
+                }}
+              >
+                {districtName}
+              </span>
+            )}
             {plan.type_label && (
               <span className="text-xs" style={{ color: 'var(--editorial-text-muted)' }}>
                 {plan.type_label}

@@ -41,11 +41,12 @@ export async function GET(request: Request) {
       });
     }
 
-    // Regular user: scope to their org memberships
+    // Regular user: scope to their active org memberships
     const memberships = await db
       .select({ organizationId: organizationMembers.organizationId })
       .from(organizationMembers)
-      .where(eq(organizationMembers.userId, user.id));
+      .innerJoin(organizations, eq(organizationMembers.organizationId, organizations.id))
+      .where(and(eq(organizationMembers.userId, user.id), eq(organizations.isActive, true)));
 
     const orgIds = [...new Set(memberships.map((m) => m.organizationId))];
 

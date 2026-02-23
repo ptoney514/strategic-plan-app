@@ -8,12 +8,25 @@ export interface UserDashboardStats {
   metric_count: number;
 }
 
+export interface UserDistrictWithStats extends District {
+  plan_count: number;
+  objective_count: number;
+  user_count: number;
+}
+
 export class UserDashboardService {
   /**
    * Get all districts the current user has admin access to
    */
   static async getUserDistricts(): Promise<District[]> {
     return apiGet<District[]>('/user/districts');
+  }
+
+  /**
+   * Get districts with per-district aggregate stats
+   */
+  static async getUserDistrictsWithStats(): Promise<UserDistrictWithStats[]> {
+    return apiGet<UserDistrictWithStats[]>('/user/districts-with-stats');
   }
 
   /**

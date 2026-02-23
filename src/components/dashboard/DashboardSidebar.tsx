@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home,
+  Building2,
   FileText,
   Target,
   BarChart3,
@@ -32,6 +33,7 @@ interface NavItem {
 
 const mainNavItems: NavItem[] = [
   { label: 'Home', icon: <Home size={20} />, path: '' },
+  { label: 'Districts', icon: <Building2 size={20} />, path: 'districts' },
   { label: 'Strategic plans', icon: <FileText size={20} />, path: 'plans' },
   { label: 'Objectives & goals', icon: <Target size={20} />, path: 'objectives' },
   { label: 'Metrics', icon: <BarChart3 size={20} />, path: 'metrics' },

@@ -17,6 +17,20 @@ export function useUserDistricts() {
 }
 
 /**
+ * Hook to fetch districts with per-district aggregate stats
+ */
+export function useUserDistrictsWithStats() {
+  const { user } = useAuth();
+
+  return useQuery({
+    queryKey: ['user-districts-with-stats', user?.id],
+    queryFn: () => UserDashboardService.getUserDistrictsWithStats(),
+    enabled: !!user,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+}
+
+/**
  * Hook to fetch dashboard statistics for the welcome banner
  */
 export function useUserDashboardStats() {

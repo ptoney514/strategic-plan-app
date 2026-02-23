@@ -6,6 +6,7 @@ import { UserAvatarMenu } from '../common/UserAvatarMenu';
 // Map routes to page titles
 const routeTitles: Record<string, string> = {
   '/': 'Home',
+  '/districts': 'Districts',
   '/plans': 'Strategic Plans',
   '/objectives': 'Objectives & Goals',
   '/metrics': 'Metrics',

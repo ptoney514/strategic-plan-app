@@ -2,6 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { MarketingLanding } from '../pages/marketing/Landing';
 import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
+import { ForgotPassword } from '../pages/ForgotPassword';
+import { ResetPassword } from '../pages/ResetPassword';
 import { Welcome } from '../pages/Welcome';
 import { AcceptInvitation } from '../pages/AcceptInvitation';
 import { DistrictRedirect } from '../components/DistrictRedirect';
@@ -76,6 +78,8 @@ export function RootRouter() {
       {/* Auth pages */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route
         path="/welcome"
         element={

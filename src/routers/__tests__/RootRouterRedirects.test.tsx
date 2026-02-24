@@ -37,6 +37,12 @@ vi.mock('../../pages/Login', () => ({
 vi.mock('../../pages/Signup', () => ({
   Signup: () => <div>Signup</div>,
 }));
+vi.mock('../../pages/ForgotPassword', () => ({
+  ForgotPassword: () => <div>Forgot Password</div>,
+}));
+vi.mock('../../pages/ResetPassword', () => ({
+  ResetPassword: () => <div>Reset Password</div>,
+}));
 vi.mock('../../pages/Welcome', () => ({
   Welcome: () => <div>Welcome</div>,
 }));

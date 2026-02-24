@@ -3,6 +3,9 @@ import { db } from "../../../../lib/db.js";
 import { organizationInvitations } from "../../../../lib/schema/index.js";
 import { requireOrgMember } from "../../../../lib/middleware/auth.js";
 import { jsonOk, jsonError } from "../../../../lib/response.js";
+import { sendEmail } from "../../../../lib/email.js";
+import { invitationEmailHtml } from "../../../../lib/email-templates.js";
+import { getAppBaseUrl } from "../../../../lib/url.js";
 
 function getSlugFromUrl(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");
@@ -55,6 +58,19 @@ export async function POST(req: Request) {
       .set({ token: newToken, expiresAt: newExpiry })
       .where(eq(organizationInvitations.id, id))
       .returning();
+
+    // Fire-and-forget resend invitation email
+    const acceptUrl = `${getAppBaseUrl()}/invite/${updated.token}`;
+    void sendEmail({
+      to: updated.email,
+      subject: `You've been invited to ${organization.name} on StrataDash`,
+      html: invitationEmailHtml(
+        organization.name,
+        "An administrator",
+        updated.role,
+        acceptUrl,
+      ),
+    });
 
     return jsonOk({
       id: updated.id,

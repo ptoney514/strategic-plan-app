@@ -8,6 +8,9 @@ import {
 } from "../../../lib/schema/index.js";
 import { requireOrgMember } from "../../../lib/middleware/auth.js";
 import { jsonOk, jsonError } from "../../../lib/response.js";
+import { sendEmail } from "../../../lib/email.js";
+import { invitationEmailHtml } from "../../../lib/email-templates.js";
+import { getAppBaseUrl } from "../../../lib/url.js";
 
 function getSlugFromUrl(req: Request): string {
   const segments = new URL(req.url).pathname.split("/");
@@ -156,6 +159,19 @@ export async function POST(req: Request) {
         expiresAt,
       })
       .returning();
+
+    // Fire-and-forget invitation email
+    const acceptUrl = `${getAppBaseUrl()}/invite/${token}`;
+    void sendEmail({
+      to: normalizedEmail,
+      subject: `You've been invited to ${organization.name} on StrataDash`,
+      html: invitationEmailHtml(
+        organization.name,
+        currentUser.name ?? "An administrator",
+        role,
+        acceptUrl,
+      ),
+    });
 
     return jsonOk(
       {

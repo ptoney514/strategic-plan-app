@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { User, Globe, GraduationCap, ChevronDown, Settings } from 'lucide-react';
 
 interface PreviewHeaderProps {
@@ -17,6 +18,8 @@ export function PreviewHeader({
   tagline = 'Community. Innovation. Excellence.',
   logoUrl,
 }: PreviewHeaderProps) {
+  const [imgError, setImgError] = useState(false);
+
   return (
     <header>
       {/* Top Navigation Bar */}
@@ -50,12 +53,13 @@ export function PreviewHeader({
           <div className="flex justify-between items-center py-4">
             {/* Logo and District Name */}
             <div className="flex items-center space-x-4">
-              {logoUrl ? (
+              {logoUrl && !imgError ? (
                 <div className="w-16 h-16 bg-white rounded-lg p-2 flex items-center justify-center">
                   <img
                     src={logoUrl}
                     alt={`${districtName} Logo`}
                     className="w-full h-full object-contain"
+                    onError={() => setImgError(true)}
                   />
                 </div>
               ) : (

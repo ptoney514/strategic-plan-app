@@ -145,8 +145,7 @@ async function seed() {
       slug: "westside",
       entityType: "district",
       entityLabel: "District",
-      logoUrl:
-        "https://www.westside66.org/cms/lib/NE50000555/Centricity/Template/GlobalAssets/images//logos/Westside District STAR BOX.png",
+      logoUrl: "",
       primaryColor: "#C03537",
       secondaryColor: "#000000",
       adminEmail: "admin@westside.edu",

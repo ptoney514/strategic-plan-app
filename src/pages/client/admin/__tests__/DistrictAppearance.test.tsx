@@ -6,6 +6,23 @@ import { SubdomainProvider } from '../../../../contexts/SubdomainContext';
 import { DistrictAppearance } from '../DistrictAppearance';
 import type { District } from '../../../../lib/types';
 
+// Mock framer-motion to avoid animation timing issues in tests
+vi.mock('framer-motion', async () => {
+  const React = await import('react');
+  return {
+    motion: new Proxy({}, {
+      get: (_target: unknown, prop: string) => {
+        return React.forwardRef((props: Record<string, unknown>, ref: unknown) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { initial, animate, exit, transition, whileHover, whileTap, layout, ...rest } = props;
+          return React.createElement(prop as string, { ...rest, ref });
+        });
+      },
+    }),
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
+  };
+});
+
 // Mock the SubdomainContext
 vi.mock('../../../../contexts/SubdomainContext', async () => {
   const actual = await vi.importActual('../../../../contexts/SubdomainContext');
@@ -68,10 +85,10 @@ vi.mock('../../../../hooks/useUpload', () => ({
   })),
 }));
 
-// Mock TemplateRegistry
-vi.mock('../../../../components/public/templates/TemplateRegistry', () => ({
-  getAllTemplates: () => [
-    {
+// Mock TemplateRegistry — include getMergedConfig used by new components
+vi.mock('../../../../components/public/templates/TemplateRegistry', () => {
+  const templates: Record<string, unknown> = {
+    hierarchical: {
       id: 'hierarchical',
       name: 'Hierarchical',
       description: 'Traditional layout',
@@ -83,7 +100,7 @@ vi.mock('../../../../components/public/templates/TemplateRegistry', () => ({
         cardVariant: 'default',
       },
     },
-    {
+    'metrics-grid': {
       id: 'metrics-grid',
       name: 'Metrics Grid',
       description: 'Flat grid',
@@ -95,7 +112,7 @@ vi.mock('../../../../components/public/templates/TemplateRegistry', () => ({
         cardVariant: 'compact',
       },
     },
-    {
+    'launch-traction': {
       id: 'launch-traction',
       name: 'Launch Traction',
       description: 'Animated dashboard',
@@ -107,49 +124,18 @@ vi.mock('../../../../components/public/templates/TemplateRegistry', () => ({
         cardVariant: 'rich',
       },
     },
-  ],
-  getTemplateInfo: (templateId: string) => {
-    const templates: Record<string, unknown> = {
-      hierarchical: {
-        id: 'hierarchical',
-        name: 'Hierarchical',
-        description: 'Traditional layout',
-        defaultConfig: {
-          showSidebar: true,
-          showNarrativeHero: true,
-          gridColumns: 3,
-          enableAnimations: false,
-          cardVariant: 'default',
-        },
-      },
-      'metrics-grid': {
-        id: 'metrics-grid',
-        name: 'Metrics Grid',
-        description: 'Flat grid',
-        defaultConfig: {
-          showSidebar: true,
-          showNarrativeHero: true,
-          gridColumns: 3,
-          enableAnimations: true,
-          cardVariant: 'compact',
-        },
-      },
-      'launch-traction': {
-        id: 'launch-traction',
-        name: 'Launch Traction',
-        description: 'Animated dashboard',
-        defaultConfig: {
-          showSidebar: false,
-          showNarrativeHero: false,
-          gridColumns: 4,
-          enableAnimations: true,
-          cardVariant: 'rich',
-        },
-      },
-    };
-    return templates[templateId] || templates.hierarchical;
-  },
-}));
+  };
+
+  return {
+    getAllTemplates: () => Object.values(templates),
+    getTemplateInfo: (templateId: string) => templates[templateId] || templates.hierarchical,
+    getMergedConfig: (templateId: string, customConfig?: Record<string, unknown>) => {
+      const info = templates[templateId] || templates.hierarchical;
+      const defaults = (info as { defaultConfig: Record<string, unknown> }).defaultConfig;
+      return { ...defaults, ...customConfig };
+    },
+  };
+});
 
 // Import after mocking
 import { useDistrict, useUpdateDistrict } from '../../../../hooks/useDistricts';
@@ -174,12 +160,17 @@ const renderComponent = () => {
   );
 };
 
+/** Expand a collapsed config section by clicking its header */
+function expandSection(sectionTitle: string) {
+  const button = screen.getByText(sectionTitle).closest('button');
+  if (button) fireEvent.click(button);
+}
+
 describe('DistrictAppearance', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockMutateAsync.mockResolvedValue(mockDistrict);
 
-    // Reset mock implementations to default
     vi.mocked(useDistrict).mockReturnValue({
       data: mockDistrict,
       isLoading: false,
@@ -203,7 +194,6 @@ describe('DistrictAppearance', () => {
 
       renderComponent();
 
-      // Should show loading skeleton (animate-pulse class)
       const skeleton = document.querySelector('.animate-pulse');
       expect(skeleton).toBeInTheDocument();
     });
@@ -241,7 +231,7 @@ describe('DistrictAppearance', () => {
     it('displays Colors section', () => {
       renderComponent();
 
-      expect(screen.getByText('Colors')).toBeInTheDocument();
+      expect(screen.getByText('Brand Colors')).toBeInTheDocument();
       expect(screen.getByText('Primary Color')).toBeInTheDocument();
       expect(screen.getByText('Secondary Color')).toBeInTheDocument();
     });
@@ -261,39 +251,30 @@ describe('DistrictAppearance', () => {
   });
 
   describe('Preview section', () => {
-    it('shows preview section', () => {
+    it('shows live preview label', () => {
       renderComponent();
 
-      expect(screen.getByTestId('appearance-preview')).toBeInTheDocument();
-      expect(screen.getByText('Preview')).toBeInTheDocument();
+      expect(screen.getByText('Live Preview')).toBeInTheDocument();
     });
 
-    it('shows district name in preview header', () => {
+    it('shows district name in preview', () => {
       renderComponent();
 
-      // District name appears in the preview header
-      const preview = screen.getByTestId('appearance-preview');
-      expect(preview).toHaveTextContent('Test District');
+      const matches = screen.getAllByText('Test District');
+      expect(matches.length).toBeGreaterThanOrEqual(1);
     });
 
-    it('shows Homepage and Dashboard tabs', () => {
+    it('shows Desktop and Mobile device toggles', () => {
       renderComponent();
 
-      expect(screen.getByText('Homepage')).toBeInTheDocument();
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      expect(screen.getByTitle('Desktop preview')).toBeInTheDocument();
+      expect(screen.getByTitle('Mobile preview')).toBeInTheDocument();
     });
 
     it('shows browser chrome with district URL', () => {
       renderComponent();
 
-      // Preview shows a mock browser URL
-      expect(screen.getByText(/testdistrict\.stratadash\.com/i)).toBeInTheDocument();
-    });
-
-    it('shows helper text about real-time updates', () => {
-      renderComponent();
-
-      expect(screen.getByText(/Changes are reflected in real-time/i)).toBeInTheDocument();
+      expect(screen.getByText(/test-district\.stratadash\.com/i)).toBeInTheDocument();
     });
 
     it('shows logo in preview when logoUrl is set', () => {
@@ -310,7 +291,6 @@ describe('DistrictAppearance', () => {
 
       renderComponent();
 
-      // Find any image with the logo URL in the preview
       const logoImages = screen.getAllByRole('img');
       const logoImage = logoImages.find(img => img.getAttribute('src') === 'https://example.com/logo.png');
       expect(logoImage).toBeInTheDocument();
@@ -336,59 +316,63 @@ describe('DistrictAppearance', () => {
       expect(secondaryInput).toHaveValue('#00FF00');
     });
 
-    it('preview updates when color changes', () => {
+    it('shows unsaved indicator when color changes', () => {
       renderComponent();
 
       const primaryInput = screen.getByTestId('color-primary-input');
       fireEvent.change(primaryInput, { target: { value: '#FF0000' } });
 
-      // The preview contains elements styled with the primary color
-      // Check that the preview container is still visible (real-time update)
-      const preview = screen.getByTestId('appearance-preview');
-      expect(preview).toBeInTheDocument();
+      expect(screen.getByText('Unsaved')).toBeInTheDocument();
     });
   });
 
   describe('Template selection', () => {
-    it('can select a different template', () => {
+    it('can select a different template', async () => {
       renderComponent();
 
       const metricsGridOption = screen.getByTestId('template-option-metrics-grid');
       fireEvent.click(metricsGridOption);
 
-      expect(metricsGridOption).toHaveClass('border-amber-500');
+      await waitFor(() => {
+        expect(screen.getByTestId('template-option-metrics-grid')).toHaveClass('border-amber-500');
+      });
     });
   });
 
   describe('Template config', () => {
     it('can toggle sidebar visibility', () => {
       renderComponent();
+      expandSection('Layout Options');
 
       const sidebarToggle = screen.getByTestId('config-show-sidebar') as HTMLInputElement;
       const initialChecked = sidebarToggle.checked;
-
       fireEvent.click(sidebarToggle);
 
-      // State should have changed
       expect(sidebarToggle.checked).toBe(!initialChecked);
     });
 
-    it('can change grid columns', () => {
+    it('can change grid columns', async () => {
       renderComponent();
+      expandSection('Grid Density');
 
       const grid4Button = screen.getByTestId('config-grid-4');
       fireEvent.click(grid4Button);
 
-      expect(grid4Button).toHaveClass('bg-amber-500');
+      await waitFor(() => {
+        expect(screen.getByTestId('config-grid-4')).toHaveStyle({ backgroundColor: 'var(--editorial-accent-primary)' });
+      });
     });
 
-    it('can change card style', () => {
+    it('can change card style', async () => {
       renderComponent();
+      expandSection('Card Style');
 
       const richButton = screen.getByTestId('config-card-rich');
       fireEvent.click(richButton);
 
-      expect(richButton).toHaveClass('bg-amber-500');
+      await waitFor(() => {
+        expect(screen.getByTestId('config-card-rich')).toHaveStyle({ backgroundColor: 'var(--editorial-accent-primary)' });
+      });
     });
   });
 
@@ -403,14 +387,12 @@ describe('DistrictAppearance', () => {
     it('calls updateDistrict with all form values on save', async () => {
       renderComponent();
 
-      // Make some changes
       const primaryInput = screen.getByTestId('color-primary-input');
       fireEvent.change(primaryInput, { target: { value: '#FF0000' } });
 
       const metricsGridOption = screen.getByTestId('template-option-metrics-grid');
       fireEvent.click(metricsGridOption);
 
-      // Click save
       const saveButton = screen.getByTestId('appearance-save-btn');
       fireEvent.click(saveButton);
 
@@ -473,6 +455,7 @@ describe('DistrictAppearance', () => {
       } as unknown as ReturnType<typeof useUpdateDistrict>);
 
       renderComponent();
+      expandSection('Layout Options');
 
       expect(screen.getByTestId('config-show-sidebar')).toBeDisabled();
       expect(screen.getByTestId('config-show-hero')).toBeDisabled();
@@ -512,7 +495,7 @@ describe('DistrictAppearance', () => {
         dashboard_config: {
           showSidebar: false,
           showNarrativeHero: true,
-          gridColumns: 4,
+          gridColumns: 4 as const,
           enableAnimations: true,
           cardVariant: 'compact' as const,
         },
@@ -525,10 +508,11 @@ describe('DistrictAppearance', () => {
       } as ReturnType<typeof useDistrict>);
 
       renderComponent();
+      expandSection('Grid Density');
+      expandSection('Card Style');
 
-      // Check that config values are reflected
-      expect(screen.getByTestId('config-grid-4')).toHaveClass('bg-amber-500');
-      expect(screen.getByTestId('config-card-compact')).toHaveClass('bg-amber-500');
+      expect(screen.getByTestId('config-grid-4')).toHaveStyle({ backgroundColor: 'var(--editorial-accent-primary)' });
+      expect(screen.getByTestId('config-card-compact')).toHaveStyle({ backgroundColor: 'var(--editorial-accent-primary)' });
     });
   });
 });

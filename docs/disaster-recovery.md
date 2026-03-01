@@ -20,6 +20,58 @@
 
 ---
 
+## Infrastructure Overview
+
+| Service    | Purpose                                            | Dashboard            |
+| ---------- | -------------------------------------------------- | -------------------- |
+| Vercel     | Hosting, serverless functions, preview deployments | vercel.com/dashboard |
+| Neon       | PostgreSQL database (serverless)                   | console.neon.tech    |
+| GitHub     | Source code, CI/CD, weekly backup artifacts        | github.com           |
+| Sentry     | Error monitoring (API + frontend)                  | sentry.io            |
+| Resend     | Transactional email (password reset)               | resend.com           |
+| Cloudflare | DNS for stratadash.org                             | dash.cloudflare.com  |
+
+---
+
+## RTO / RPO Targets
+
+| Scenario                         | RTO     | RPO                          |
+| -------------------------------- | ------- | ---------------------------- |
+| Bad deploy (Vercel rollback)     | <5 min  | 0                            |
+| DB corruption within PITR window | <15 min | Up to 7 days (free tier)     |
+| DB corruption outside PITR       | <30 min | Up to 7 days (weekly backup) |
+| Full infrastructure rebuild      | <1 hour | Up to 7 days                 |
+
+**Definitions:** RTO = Recovery Time Objective (how fast we restore service). RPO = Recovery Point Objective (maximum acceptable data loss).
+
+---
+
+## Backup Strategy
+
+Three layers of protection:
+
+1. **Neon PITR (Point-in-Time Recovery)** — Automatic, 7-day window (free tier). Fastest restore for recent data accidents.
+2. **GitHub Actions weekly backup** — `pg_dump` runs every Sunday 3 AM UTC, stored as a 30-day artifact. See `.github/workflows/backup.yml`.
+3. **Local macOS backup (launchd)** — `pg_dump` runs every Sunday 3 AM local time via `com.stratadash.db-backup.plist`. Stored in `~/backups/stratadash/`, auto-cleaned after 30 days.
+
+### Launchd monitoring
+
+```bash
+# Check if the agent is loaded
+launchctl list | grep stratadash
+
+# View recent backup log
+cat /tmp/stratadash-backup.log
+
+# Manually trigger a backup
+launchctl start com.stratadash.db-backup
+
+# Install the agent
+npm run db:backup:install
+```
+
+---
+
 ## Step 1 — Assess the Damage
 
 Before restoring, determine what happened:

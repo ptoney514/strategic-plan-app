@@ -32,6 +32,7 @@
     "db:dev:migrate": "node --env-file=.env.local ./node_modules/.bin/drizzle-kit migrate",
     "db:sync-prod": "bash scripts/sync-prod-to-dev.sh",
     "db:backup": "bash scripts/backup-db.sh",
+    "db:backup:install": "cp scripts/com.stratadash.db-backup.plist ~/Library/LaunchAgents/ && launchctl load ~/Library/LaunchAgents/com.stratadash.db-backup.plist",
     "prepare": "husky"
   },
   "lint-staged": {

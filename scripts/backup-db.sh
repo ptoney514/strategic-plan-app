@@ -24,3 +24,9 @@ pg_dump "$PROD_URL" --format=custom --no-acl --no-owner -f "$OUTPUT_DIR/$FILENAM
 echo "✓ Saved to: $OUTPUT_DIR/$FILENAME"
 echo ""
 echo "To verify: pg_restore --list $OUTPUT_DIR/$FILENAME | head -20"
+
+# Clean up backups older than 30 days
+DELETED=$(find "$OUTPUT_DIR" -name "backup-*.dump" -mtime +30 -print -delete | wc -l | tr -d ' ')
+if [ "$DELETED" -gt 0 ]; then
+  echo "♻ Cleaned up $DELETED backup(s) older than 30 days"
+fi

@@ -3,21 +3,35 @@ import { organizations } from "./lib/schema/index.js";
 
 export async function GET() {
   try {
-    const result = await db.select().from(organizations).limit(1);
+    const start = Date.now();
+    await db.select().from(organizations).limit(1);
+    const latencyMs = Date.now() - start;
+
     return Response.json({
       status: "ok",
-      database: "connected",
-      runtime: "nodejs",
-      tables: result.length >= 0 ? "accessible" : "error",
       timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      checks: {
+        database: {
+          status: "ok",
+          latencyMs,
+        },
+      },
     });
   } catch (error) {
     return Response.json(
       {
         status: "error",
-        message: error instanceof Error ? error.message : "Unknown error",
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+        checks: {
+          database: {
+            status: "error",
+            error: error instanceof Error ? error.message : "Unknown error",
+          },
+        },
       },
-      { status: 500 },
+      { status: 503 },
     );
   }
 }

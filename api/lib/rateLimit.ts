@@ -29,3 +29,13 @@ export async function checkRateLimit(
 export function getClientIp(request: Request): string {
   return request.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'unknown';
 }
+
+/**
+ * Return a 429 JSON response for rate-limited requests.
+ */
+export function rateLimitResponse(): Response {
+  return new Response(
+    JSON.stringify({ error: 'Too many requests' }),
+    { status: 429, headers: { 'Content-Type': 'application/json' } },
+  );
+}

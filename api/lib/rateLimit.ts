@@ -3,7 +3,7 @@ import { Redis } from '@upstash/redis';
 
 // Returns null if Upstash env vars not set — callers degrade gracefully
 function createLimiter(requests: number, window: string): Ratelimit | null {
-  if (!process.env.UPSTASH_REDIS_REST_URL) return null;
+  if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
   return new Ratelimit({
     redis: Redis.fromEnv(),
     limiter: Ratelimit.slidingWindow(requests, window as `${number} ${'ms' | 's' | 'm' | 'h' | 'd'}`),

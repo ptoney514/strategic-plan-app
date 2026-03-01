@@ -12,19 +12,17 @@ read -p "Continue? (y/N): " confirm
 PROD_URL="${DATABASE_URL_PROD:?Set DATABASE_URL_PROD env var to the production connection string}"
 DEV_URL="${DATABASE_URL:?Set DATABASE_URL in .env.local to the dev branch connection string}"
 
-# Guard: ensure DEV_URL is not the same as PROD_URL
-if [ "$DEV_URL" = "$PROD_URL" ]; then
-  echo "🛑 ABORT: DATABASE_URL and DATABASE_URL_PROD are identical."
+# Extract hostname from a Neon connection string (strip query params, user, port)
+prod_host() { echo "$1" | sed -E 's|^.*@([^:/]+).*|\1|'; }
+
+PROD_HOST=$(prod_host "$PROD_URL")
+DEV_HOST=$(prod_host "$DEV_URL")
+
+# Guard: ensure DEV_URL host is different from PROD_URL host
+if [ "$DEV_HOST" = "$PROD_HOST" ]; then
+  echo "🛑 ABORT: DATABASE_URL points to the same host as DATABASE_URL_PROD ($PROD_HOST)."
   echo "   This would restore production data back onto itself with --clean."
   echo "   Set DATABASE_URL to a Neon dev branch and try again."
-  exit 1
-fi
-
-# Guard: ensure DEV_URL doesn't point to the production endpoint
-PROD_ENDPOINT="${NEON_PRODUCTION_ENDPOINT:-}"
-if [ -n "$PROD_ENDPOINT" ] && echo "$DEV_URL" | grep -q "$PROD_ENDPOINT"; then
-  echo "🛑 ABORT: DATABASE_URL contains the production endpoint ($PROD_ENDPOINT)."
-  echo "   This script should only restore to a dev branch."
   exit 1
 fi
 DUMP_FILE="/tmp/prod-backup-$(date +%Y%m%d-%H%M%S).dump"

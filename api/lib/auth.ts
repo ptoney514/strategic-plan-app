@@ -42,12 +42,15 @@ export const auth = betterAuth({
   },
   trustedOrigins: (request) => {
     const origins = [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://lvh.me:5174",
       "https://stratadash.org",
       "https://www.stratadash.org",
     ];
+
+    // Dev-only origins — not in production
+    if (!process.env.VERCEL || process.env.VERCEL_ENV === 'development') {
+      origins.push("http://localhost:5173", "http://localhost:5174", "http://lvh.me:5174");
+    }
+
     if (process.env.VITE_APP_URL) {
       origins.push(process.env.VITE_APP_URL);
     }

@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react';
 import { BrowserRouter } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { useSubdomain } from './contexts/SubdomainContext';
@@ -28,7 +29,7 @@ function AppRouter() {
 
 function App() {
   return (
-    <ErrorBoundary>
+    <ErrorBoundary onError={(err) => Sentry.captureException(err)}>
       <BrowserRouter>
         <AppRouter />
       </BrowserRouter>

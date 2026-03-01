@@ -1,6 +1,9 @@
+import * as Sentry from '@sentry/react'
 import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/react'
 import { AuthProvider } from './contexts/AuthContext'
 import { SubdomainProvider } from './contexts/SubdomainContext'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -8,6 +11,16 @@ import { UserjotWidget } from './components/feedback/UserjotWidget'
 import '../app.css'
 import './theme.css'
 import App from './App.tsx'
+
+if (import.meta.env.VITE_SENTRY_DSN) {
+  Sentry.init({
+    dsn: import.meta.env.VITE_SENTRY_DSN,
+    environment: import.meta.env.VITE_ENVIRONMENT ?? 'development',
+    integrations: [Sentry.browserTracingIntegration()],
+    tracesSampleRate: 0.1,
+    replaysOnErrorSampleRate: 1.0,
+  });
+}
 
 const ReactQueryDevtools = import.meta.env.DEV
   ? lazy(async () => {
@@ -33,6 +46,8 @@ createRoot(document.getElementById('root')!).render(
           <AuthProvider>
             <App />
             <UserjotWidget />
+            <Analytics />
+            <SpeedInsights />
           </AuthProvider>
         </SubdomainProvider>
       </ThemeProvider>

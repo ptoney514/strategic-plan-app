@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.stratadash.db-backup</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>-c</string>
+        <string>source ~/.zprofile 2>/dev/null; source ~/.zshrc 2>/dev/null; cd ~/Projects/strategic-plan-app &amp;&amp; DATABASE_URL_PROD="$(grep DATABASE_URL_PROD .env.local 2>/dev/null | cut -d= -f2-)" bash scripts/backup-db.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Weekday</key>
+        <integer>0</integer>
+        <key>Hour</key>
+        <integer>3</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/stratadash-backup.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/stratadash-backup.log</string>
+</dict>
+</plist>

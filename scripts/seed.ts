@@ -11,12 +11,16 @@
  * Requires .env.local with DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL
  */
 
+import { guardAgainstProduction } from "./lib/db-guard.js";
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sql, count } from "drizzle-orm";
 import * as schema from "../api/lib/schema/index.js";
+
+// Abort early if DATABASE_URL points to production
+guardAgainstProduction();
 
 // ---------------------------------------------------------------------------
 // Section 0: Standalone DB + Auth setup

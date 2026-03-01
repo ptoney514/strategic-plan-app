@@ -1,8 +1,10 @@
+import "../lib/sentry.js";
 import { desc } from "drizzle-orm";
 import { db } from "../lib/db.js";
 import { contactSubmissions } from "../lib/schema/index.js";
 import { requireSystemAdmin } from "../lib/middleware/auth.js";
 import { jsonOk, jsonError, parsePagination } from "../lib/response.js";
+import { contactLimiter, checkRateLimit, getClientIp, rateLimitResponse } from "../lib/rateLimit.js";
 
 /** Map a Drizzle contact submission row to snake_case for the frontend */
 function contactToSnake(c: typeof contactSubmissions.$inferSelect) {
@@ -28,6 +30,10 @@ function contactToSnake(c: typeof contactSubmissions.$inferSelect) {
  */
 export async function POST(req: Request) {
   try {
+    const ip = getClientIp(req);
+    const { success } = await checkRateLimit(contactLimiter, ip);
+    if (!success) return rateLimitResponse();
+
     const body = await req.json();
 
     const { email, message } = body;

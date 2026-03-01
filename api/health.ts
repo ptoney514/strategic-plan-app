@@ -1,3 +1,4 @@
+import "./lib/sentry.js";
 import { db } from "./lib/db.js";
 import { organizations } from "./lib/schema/index.js";
 

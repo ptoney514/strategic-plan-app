@@ -1,3 +1,4 @@
+import "../lib/sentry.js";
 import { desc } from "drizzle-orm";
 import { db } from "../lib/db.js";
 import { contactSubmissions } from "../lib/schema/index.js";

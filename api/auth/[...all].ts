@@ -1,3 +1,4 @@
+import "../lib/sentry.js";
 import { auth } from "../lib/auth.js";
 import { authLimiter, checkRateLimit, getClientIp, rateLimitResponse } from "../lib/rateLimit.js";
 

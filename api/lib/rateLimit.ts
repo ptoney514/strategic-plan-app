@@ -19,7 +19,12 @@ export async function checkRateLimit(
   identifier: string,
 ): Promise<{ success: boolean; limit?: number; remaining?: number; reset?: number }> {
   if (!limiter) return { success: true };
-  return limiter.limit(identifier);
+  try {
+    return await limiter.limit(identifier);
+  } catch {
+    // Fail open — if Redis is down, allow the request through
+    return { success: true };
+  }
 }
 
 /**

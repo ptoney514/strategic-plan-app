@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -55,6 +56,19 @@ import { AcceptInvitation } from '../pages/AcceptInvitation';
 
 // Dashboard Pages
 import { DistrictAdminDashboard } from '../pages/client/admin/DistrictAdminDashboard';
+
+// V2 Lazy-loaded Pages
+const V2PublicLayout = lazy(() => import('../components/v2/layout/V2PublicLayout').then(m => ({ default: m.V2PublicLayout })));
+const V2AdminLayout = lazy(() => import('../components/v2/layout/V2AdminLayout').then(m => ({ default: m.V2AdminLayout })));
+const V2GoalsOverview = lazy(() => import('../pages/v2/public/V2GoalsOverview').then(m => ({ default: m.V2GoalsOverview })));
+const V2GoalDrillDown = lazy(() => import('../pages/v2/public/V2GoalDrillDown').then(m => ({ default: m.V2GoalDrillDown })));
+const V2LaunchTraction = lazy(() => import('../pages/v2/public/V2LaunchTraction').then(m => ({ default: m.V2LaunchTraction })));
+const V2AdminDashboard = lazy(() => import('../pages/v2/admin/V2AdminDashboard').then(m => ({ default: m.V2AdminDashboard })));
+const V2PlanEditor = lazy(() => import('../pages/v2/admin/V2PlanEditor').then(m => ({ default: m.V2PlanEditor })));
+const V2Appearance = lazy(() => import('../pages/v2/admin/V2Appearance').then(m => ({ default: m.V2Appearance })));
+const V2Team = lazy(() => import('../pages/v2/admin/V2Team').then(m => ({ default: m.V2Team })));
+const V2WidgetBuilder = lazy(() => import('../pages/v2/admin/V2WidgetBuilder').then(m => ({ default: m.V2WidgetBuilder })));
+const V2Import = lazy(() => import('../pages/v2/admin/V2Import').then(m => ({ default: m.V2Import })));
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
@@ -182,6 +196,32 @@ export function DistrictRouter() {
       {/* Redirect /admin2 to /admin for backwards compatibility */}
       <Route path="/admin2" element={<Navigate to="/admin" replace />} />
       <Route path="/admin2/*" element={<Navigate to="/admin" replace />} />
+
+      {/* V2 Public Routes */}
+      <Route path="/v2" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2PublicLayout /></Suspense>}>
+        <Route index element={<Suspense fallback={null}><V2GoalsOverview /></Suspense>} />
+        <Route path="goals/:goalId" element={<Suspense fallback={null}><V2GoalDrillDown /></Suspense>} />
+        <Route path="launch" element={<Suspense fallback={null}><V2LaunchTraction /></Suspense>} />
+      </Route>
+
+      {/* V2 Admin Routes */}
+      <Route
+        path="/v2/admin"
+        element={
+          <ClientAdminGuard districtSlug={slug}>
+            <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}>
+              <V2AdminLayout />
+            </Suspense>
+          </ClientAdminGuard>
+        }
+      >
+        <Route index element={<Suspense fallback={null}><V2AdminDashboard /></Suspense>} />
+        <Route path="plans" element={<Suspense fallback={null}><V2PlanEditor /></Suspense>} />
+        <Route path="appearance" element={<Suspense fallback={null}><V2Appearance /></Suspense>} />
+        <Route path="team" element={<Suspense fallback={null}><V2Team /></Suspense>} />
+        <Route path="widgets" element={<Suspense fallback={null}><V2WidgetBuilder /></Suspense>} />
+        <Route path="import" element={<Suspense fallback={null}><V2Import /></Suspense>} />
+      </Route>
 
       {/* Catch-all redirects to district dashboard */}
       <Route path="*" element={<Navigate to="/" replace />} />

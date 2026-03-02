@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { MarketingLanding } from '../pages/marketing/Landing';
 import { Login } from '../pages/Login';
@@ -18,6 +19,12 @@ import { PublicDistrictLayout } from '../layouts/PublicDistrictLayout';
 import { Dashboard } from '../pages/client/public/Dashboard';
 import { ObjectiveDetail } from '../pages/client/public/ObjectiveDetail';
 import { GoalDetailNew } from '../pages/client/public/GoalDetailNew';
+
+// V2 Lazy-loaded Pages
+const V2MarketingLayout = lazy(() => import('../components/v2/layout/V2MarketingLayout').then(m => ({ default: m.V2MarketingLayout })));
+const V2Landing = lazy(() => import('../pages/v2/marketing/V2Landing').then(m => ({ default: m.V2Landing })));
+const V2Pricing = lazy(() => import('../pages/v2/marketing/V2Pricing').then(m => ({ default: m.V2Pricing })));
+const V2OnboardingWizard = lazy(() => import('../pages/v2/onboarding/V2OnboardingWizard').then(m => ({ default: m.V2OnboardingWizard })));
 
 /**
  * RequireAuth - Wrapper to protect routes that require authentication
@@ -104,6 +111,13 @@ export function RootRouter() {
           </RequireAuth>
         }
       />
+
+      {/* V2 Routes */}
+      <Route path="/v2" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2MarketingLayout /></Suspense>}>
+        <Route index element={<Suspense fallback={null}><V2Landing /></Suspense>} />
+        <Route path="pricing" element={<Suspense fallback={null}><V2Pricing /></Suspense>} />
+        <Route path="onboard/*" element={<Suspense fallback={null}><V2OnboardingWizard /></Suspense>} />
+      </Route>
 
       {/* Public District Views - path-based access (no auth required) */}
       {/* URL pattern: stratadash.org/district/:slug */}

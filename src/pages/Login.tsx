@@ -24,14 +24,16 @@ export function Login() {
   useEffect(() => {
     if (isAuthenticated) {
       const from = (location.state as LocationState)?.from;
+      const searchParams = new URLSearchParams(location.search);
+      const redirectParam = searchParams.get('redirect');
 
       // On non-root subdomains, redirect to root domain dashboard
-      if (subdomainType !== 'root' && !from) {
+      if (subdomainType !== 'root' && !from && !redirectParam) {
         window.location.href = getSubdomainUrl('root') + '/dashboard';
         return;
       }
 
-      const redirectUrl = from ? from + location.search : '/dashboard';
+      const redirectUrl = from ? from + location.search : redirectParam || '/dashboard';
       navigate(redirectUrl, { replace: true });
     }
   }, [isAuthenticated, location.state, location.search, navigate, subdomainType]);
@@ -74,14 +76,16 @@ export function Login() {
       // Redirect to the intended destination or /dashboard
       // Users can access admin pages from the avatar menu
       const from = (location.state as LocationState)?.from;
+      const searchParams = new URLSearchParams(location.search);
+      const redirectParam = searchParams.get('redirect');
 
       // On non-root subdomains (district), redirect to root domain dashboard
-      if (subdomainType !== 'root' && !from) {
+      if (subdomainType !== 'root' && !from && !redirectParam) {
         window.location.href = getSubdomainUrl('root') + '/dashboard';
         return;
       }
 
-      const redirectUrl = from ? from + location.search : '/dashboard';
+      const redirectUrl = from ? from + location.search : redirectParam || '/dashboard';
       navigate(redirectUrl, { replace: true });
     } catch (err) {
       console.error('[Login] Error:', err);

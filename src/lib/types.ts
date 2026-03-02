@@ -28,6 +28,10 @@ export interface District {
   // Dashboard template configuration
   dashboard_template?: DashboardTemplate;
   dashboard_config?: DashboardConfig;
+  // Onboarding fields
+  onboarding_completed?: boolean;
+  template_mode?: string;
+  created_by?: string;
   // Computed fields (populated by service layer)
   goals_count?: number;
   metrics_count?: number;

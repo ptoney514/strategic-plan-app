@@ -42,7 +42,9 @@ export function Signup() {
         return;
       }
 
-      navigate('/welcome', { replace: true });
+      const searchParams = new URLSearchParams(window.location.search);
+      const redirectTo = searchParams.get('redirect') || '/welcome';
+      navigate(redirectTo, { replace: true });
     } catch (err) {
       console.error('[Signup] Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to create account. Please try again.');

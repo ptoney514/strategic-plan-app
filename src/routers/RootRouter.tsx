@@ -13,6 +13,7 @@ import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { UserDashboard, PlaceholderPage, DashboardPlansPage, DashboardDistrictsPage } from '../pages/dashboard';
 import { useAuth } from '../contexts/AuthContext';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 // Public District Layout and Pages
 import { PublicDistrictLayout } from '../layouts/PublicDistrictLayout';
@@ -113,10 +114,16 @@ export function RootRouter() {
       />
 
       {/* V2 Routes */}
-      <Route path="/v2" element={<Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2MarketingLayout /></Suspense>}>
-        <Route index element={<Suspense fallback={null}><V2Landing /></Suspense>} />
-        <Route path="pricing" element={<Suspense fallback={null}><V2Pricing /></Suspense>} />
-        <Route path="onboard/*" element={<Suspense fallback={null}><V2OnboardingWizard /></Suspense>} />
+      <Route path="/v2" element={
+        <ErrorBoundary>
+          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}>
+            <V2MarketingLayout />
+          </Suspense>
+        </ErrorBoundary>
+      }>
+        <Route index element={<Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2Landing /></Suspense>} />
+        <Route path="pricing" element={<Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2Pricing /></Suspense>} />
+        <Route path="onboard/*" element={<RequireAuth><Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2OnboardingWizard /></Suspense></RequireAuth>} />
       </Route>
 
       {/* Public District Views - path-based access (no auth required) */}

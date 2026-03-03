@@ -56,7 +56,11 @@ export function V2Import() {
 
   const { validCount, fixableCount, errorCount, importableCount } = useMemo(() => {
     const valid = stagedGoals.filter((g) => g.validation_status === 'valid').length;
-    const fixable = stagedGoals.filter((g) => g.validation_status === 'fixable').length;
+    // Staging converts 'fixable' to 'warning' — detect fixable by checking for auto_fix_suggestions
+    const fixable = stagedGoals.filter(
+      (g) => (g.validation_status === 'fixable' || g.validation_status === 'warning') &&
+        g.auto_fix_suggestions && g.auto_fix_suggestions.length > 0
+    ).length;
     const err = stagedGoals.filter((g) => g.validation_status === 'error').length;
     const importable = stagedGoals.filter(
       (g) => g.action !== 'skip' && g.validation_status !== 'error'
@@ -91,23 +95,40 @@ export function V2Import() {
     }
   }, [selectedFile, district]);
 
-  const handleToggleImport = useCallback((goalId: string, shouldImport: boolean) => {
-    setStagedGoals((prev) =>
-      prev.map((g) =>
-        g.id === goalId ? { ...g, action: shouldImport ? 'create' : 'skip' } : g
-      )
-    );
+  const handleToggleImport = useCallback(async (goalId: string, shouldImport: boolean) => {
+    const newAction = shouldImport ? 'create' : 'skip';
+    try {
+      await ImportService.updateStagedGoal(goalId, { action: newAction } as Partial<StagedGoal>);
+      setStagedGoals((prev) =>
+        prev.map((g) =>
+          g.id === goalId ? { ...g, action: newAction } : g
+        )
+      );
+    } catch {
+      toast.error('Failed to update goal');
+    }
   }, []);
 
-  const handleToggleImportAll = useCallback((shouldImport: boolean) => {
-    setStagedGoals((prev) =>
-      prev.map((g) =>
-        g.validation_status === 'error'
-          ? g
-          : { ...g, action: shouldImport ? 'create' : 'skip' }
-      )
-    );
-  }, []);
+  const handleToggleImportAll = useCallback(async (shouldImport: boolean) => {
+    const newAction = shouldImport ? 'create' : 'skip';
+    const toggleable = stagedGoals.filter((g) => g.validation_status !== 'error');
+    try {
+      await Promise.all(
+        toggleable.map((g) =>
+          ImportService.updateStagedGoal(g.id, { action: newAction } as Partial<StagedGoal>)
+        )
+      );
+      setStagedGoals((prev) =>
+        prev.map((g) =>
+          g.validation_status === 'error'
+            ? g
+            : { ...g, action: newAction }
+        )
+      );
+    } catch {
+      toast.error('Failed to update goals');
+    }
+  }, [stagedGoals]);
 
   // TODO: Apply suggestion-specific fixes (create-parent, merge-duplicate, fix-format)
   // Currently marks goal as valid — full auto-fix logic deferred to import service v2
@@ -125,7 +146,8 @@ export function V2Import() {
   const handleBulkAutoFix = useCallback(() => {
     setStagedGoals((prev) =>
       prev.map((g) =>
-        g.validation_status === 'fixable'
+        (g.validation_status === 'fixable' || g.validation_status === 'warning') &&
+          g.auto_fix_suggestions && g.auto_fix_suggestions.length > 0
           ? { ...g, validation_status: 'valid', validation_messages: [], auto_fix_suggestions: [] }
           : g
       )
@@ -136,7 +158,12 @@ export function V2Import() {
     if (!district || !sessionId) return;
     setStep('importing');
     try {
-      const result = await ImportService.executeImport(sessionId, district.id);
+      const result = await ImportService.executeImport(
+        sessionId,
+        district.id,
+        undefined,
+        selectedPlanId || undefined
+      );
       setImportResult(result);
       setStep('summary');
     } catch (err) {
@@ -144,7 +171,7 @@ export function V2Import() {
       toast.error(message);
       setStep('review');
     }
-  }, [district, sessionId]);
+  }, [district, sessionId, selectedPlanId]);
 
   const handleReset = useCallback(() => {
     setStep('upload');
@@ -276,8 +303,8 @@ export function V2Import() {
       {/* Step 4: Summary */}
       {step === 'summary' && importResult && (
         <ImportSummaryCard
-          goalsImported={importResult.goals_created + importResult.goals_updated}
-          goalsSkipped={Math.max(0, stagedGoals.length - (importResult.goals_created + importResult.goals_updated))}
+          goalsImported={(importResult.goals_created ?? 0) + (importResult.goals_updated ?? 0)}
+          goalsSkipped={Math.max(0, stagedGoals.length - ((importResult.goals_created ?? 0) + (importResult.goals_updated ?? 0)))}
           planName={selectedPlan?.name || 'Unknown Plan'}
           onViewGoals={() => navigate(`/${slug}/v2/admin/plans`)}
           onImportAnother={handleReset}

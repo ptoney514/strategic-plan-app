@@ -38,7 +38,8 @@ export function V2Appearance() {
         updates: {
           primary_color: state.primaryColor,
           secondary_color: state.secondaryColor,
-          logo_url: state.logoUrl || undefined,
+          // Send null to clear logo in DB; undefined means "no change"
+          logo_url: (state.logoUrl === '' ? null : state.logoUrl || undefined) as string | undefined,
           dashboard_template: state.dashboardTemplate,
           tagline,
           is_public: isPublic,

@@ -137,7 +137,8 @@ export class ImportService {
   static async executeImport(
     sessionId: string,
     districtId: string,
-    onProgress?: (progress: ImportProgress) => void
+    onProgress?: (progress: ImportProgress) => void,
+    planId?: string
   ): Promise<ImportSummary> {
     // Show loading state via onProgress
     if (onProgress) {
@@ -151,6 +152,7 @@ export class ImportService {
 
     return apiPost<ImportSummary>(`/imports/sessions/${sessionId}/execute`, {
       district_id: districtId,
+      plan_id: planId,
     });
   }
 

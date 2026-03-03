@@ -101,10 +101,16 @@ export function V2Import() {
 
   const handleToggleImportAll = useCallback((shouldImport: boolean) => {
     setStagedGoals((prev) =>
-      prev.map((g) => ({ ...g, action: shouldImport ? 'create' : 'skip' }))
+      prev.map((g) =>
+        g.validation_status === 'error'
+          ? g
+          : { ...g, action: shouldImport ? 'create' : 'skip' }
+      )
     );
   }, []);
 
+  // TODO: Apply suggestion-specific fixes (create-parent, merge-duplicate, fix-format)
+  // Currently marks goal as valid — full auto-fix logic deferred to import service v2
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleFix = useCallback((goal: StagedGoal, _suggestion: AutoFixSuggestion) => {
     setStagedGoals((prev) =>
@@ -271,7 +277,7 @@ export function V2Import() {
       {step === 'summary' && importResult && (
         <ImportSummaryCard
           goalsImported={importResult.goals_created + importResult.goals_updated}
-          goalsSkipped={stagedGoals.length - (importResult.goals_created + importResult.goals_updated)}
+          goalsSkipped={Math.max(0, stagedGoals.length - (importResult.goals_created + importResult.goals_updated))}
           planName={selectedPlan?.name || 'Unknown Plan'}
           onViewGoals={() => navigate(`/${slug}/v2/admin/plans`)}
           onImportAnother={handleReset}

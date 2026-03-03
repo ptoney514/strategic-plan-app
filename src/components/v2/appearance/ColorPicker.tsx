@@ -42,7 +42,11 @@ export function ColorPicker({
           key={value}
           onBlur={handleTextChange}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') handleTextChange(e as unknown as React.ChangeEvent<HTMLInputElement>);
+            if (e.key === 'Enter') {
+              const raw = (e.currentTarget as HTMLInputElement).value;
+              const hex = raw.startsWith('#') ? raw : `#${raw}`;
+              if (HEX_REGEX.test(hex)) onChange(hex);
+            }
           }}
           placeholder="#000000"
           maxLength={7}

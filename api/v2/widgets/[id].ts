@@ -18,6 +18,7 @@ function toResponse(w: typeof widgets.$inferSelect) {
     id: w.id,
     organizationId: w.organizationId,
     planId: w.planId,
+    goalId: w.goalId,
     type: w.type,
     title: w.title,
     subtitle: w.subtitle,

@@ -1,34 +1,30 @@
-import { eq, and } from "drizzle-orm";
+import { inArray, and, eq } from "drizzle-orm";
 import { db } from "../../lib/db.js";
-import { widgets, organizations } from "../../lib/schema/index.js";
+import { widgets } from "../../lib/schema/index.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
 
 /**
- * GET /api/v2/widgets/public?orgSlug=xxx
- * List active widgets for a public organization. No auth required.
- * Only returns widgets for orgs that have is_public=true.
+ * GET /api/v2/widgets/by-goals?ids=id1,id2,id3
+ * Batch fetch active widgets for multiple goals. No auth required (public endpoint).
+ * Avoids N+1 queries on drill-down pages.
  */
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const orgSlug = url.searchParams.get("orgSlug");
+    const idsParam = url.searchParams.get("ids");
 
-    if (!orgSlug) {
-      return jsonError("orgSlug is required", 400);
+    if (!idsParam) {
+      return jsonError("ids parameter is required", 400);
     }
 
-    const [org] = await db
-      .select()
-      .from(organizations)
-      .where(eq(organizations.slug, orgSlug))
-      .limit(1);
+    const goalIds = idsParam.split(",").filter(Boolean);
 
-    if (!org) {
-      return jsonError("Organization not found", 404);
+    if (goalIds.length === 0) {
+      return jsonOk([]);
     }
 
-    if (!org.isPublic) {
-      return jsonError("Organization is not public", 403);
+    if (goalIds.length > 100) {
+      return jsonError("Maximum 100 goal IDs allowed", 400);
     }
 
     const rows = await db
@@ -36,7 +32,7 @@ export async function GET(req: Request) {
       .from(widgets)
       .where(
         and(
-          eq(widgets.organizationId, org.id),
+          inArray(widgets.goalId, goalIds),
           eq(widgets.isActive, true),
         ),
       )
@@ -60,7 +56,7 @@ export async function GET(req: Request) {
     return jsonOk(mapped);
   } catch (error) {
     if (error instanceof Response) return error;
-    console.error("[widgets public GET] Error:", error);
+    console.error("[widgets by-goals GET] Error:", error);
     return jsonError("Internal server error", 500);
   }
 }

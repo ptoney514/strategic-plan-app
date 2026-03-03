@@ -43,6 +43,7 @@ export async function GET(req: Request) {
       id: w.id,
       organizationId: w.organizationId,
       planId: w.planId,
+      goalId: w.goalId,
       type: w.type,
       title: w.title,
       subtitle: w.subtitle,

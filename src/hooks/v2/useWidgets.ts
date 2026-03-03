@@ -58,3 +58,20 @@ export function useReorderWidgets(orgSlug: string) {
     },
   });
 }
+
+export function useWidgetsByGoal(goalId: string) {
+  return useQuery({
+    queryKey: ['widgets', 'goal', goalId],
+    queryFn: () => WidgetService.getByGoal(goalId),
+    enabled: !!goalId,
+  });
+}
+
+export function useWidgetsByGoals(goalIds: string[]) {
+  const key = goalIds.sort().join(',');
+  return useQuery({
+    queryKey: ['widgets', 'goals', key],
+    queryFn: () => WidgetService.getByGoals(goalIds),
+    enabled: goalIds.length > 0,
+  });
+}

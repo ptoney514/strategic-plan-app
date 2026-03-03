@@ -68,6 +68,9 @@ export function V2GoalsOverview() {
               childCount={goal.children?.length || 0}
               status={goal.status_detail}
               primaryColor={district?.primary_color}
+              description={goal.description}
+              overallProgress={goal.overall_progress}
+              progressDisplayMode={goal.overall_progress_display_mode}
               onClick={() => navigate('/v2/goals/' + goal.id)}
             />
           ))}

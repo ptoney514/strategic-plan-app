@@ -1,10 +1,14 @@
+import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { GoalsService } from '../../../lib/services/goals.service';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { usePlansBySlug } from '../../../hooks/v2/usePlans';
-import { GoalRow, GoalStatusBadge, Breadcrumb } from '../../../components/v2/public';
+import { useWidgetsByGoals } from '../../../hooks/v2/useWidgets';
+import { GoalCard, ExpandedGoalCard, ProgressRing, GoalStatusBadge, Breadcrumb } from '../../../components/v2/public';
+import type { Widget } from '../../../lib/types/v2';
 
 export function V2GoalDrillDown() {
   const { goalId } = useParams<{ goalId: string }>();
@@ -13,6 +17,21 @@ export function V2GoalDrillDown() {
   const { data: plans } = usePlansBySlug(slug || '');
 
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
+  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
+
+  const prevExpandedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (expandedGoalId && expandedGoalId !== prevExpandedRef.current) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(`goal-card-${expandedGoalId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 150);
+      return () => clearTimeout(timer);
+    }
+    prevExpandedRef.current = expandedGoalId;
+  }, [expandedGoalId]);
 
   const { data: goal, isLoading: goalLoading } = useQuery({
     queryKey: ['goal', goalId],
@@ -25,6 +44,12 @@ export function V2GoalDrillDown() {
     queryFn: () => GoalsService.getChildren(goalId!),
     enabled: !!goalId,
   });
+
+  const childIds = children?.map((c) => c.id) || [];
+  const { data: goalWidgets } = useWidgetsByGoals(childIds);
+
+  const getWidgetsForGoal = (id: string): Widget[] =>
+    goalWidgets?.filter((w) => w.goalId === id) || [];
 
   const isLoading = goalLoading || childrenLoading;
 
@@ -82,7 +107,12 @@ export function V2GoalDrillDown() {
             )}
           </div>
         </div>
-        <GoalStatusBadge status={goal.status_detail} />
+        <div className="flex items-center gap-3">
+          {goal.overall_progress != null && goal.overall_progress_display_mode !== 'hidden' && (
+            <ProgressRing progress={goal.overall_progress} size={40} strokeWidth={3} />
+          )}
+          <GoalStatusBadge status={goal.status_detail} />
+        </div>
       </div>
 
       {/* Children section */}
@@ -99,18 +129,51 @@ export function V2GoalDrillDown() {
             No goals defined for this objective yet.
           </p>
         ) : (
-          <div className="space-y-3">
-            {children.map((child) => (
-              <GoalRow
-                key={child.id}
-                goalNumber={child.goal_number}
-                title={child.title}
-                description={child.description}
-                status={child.status_detail}
-                primaryColor={district?.primary_color}
-              />
-            ))}
-          </div>
+          <LayoutGroup>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              <AnimatePresence mode="popLayout">
+                {children.map((child) => {
+                  const isExpanded = expandedGoalId === child.id;
+                  const childWidgets = getWidgetsForGoal(child.id);
+                  return (
+                    <motion.div
+                      key={child.id}
+                      id={`goal-card-${child.id}`}
+                      layout
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{
+                        layout: { duration: 0.3, ease: 'easeInOut' },
+                        opacity: { duration: 0.2 },
+                      }}
+                      className={isExpanded ? 'md:col-span-2' : ''}
+                    >
+                      {isExpanded ? (
+                        <ExpandedGoalCard
+                          goal={child}
+                          widgets={childWidgets}
+                          onClose={() => setExpandedGoalId(null)}
+                          primaryColor={district?.primary_color}
+                        />
+                      ) : (
+                        <GoalCard
+                          goalNumber={child.goal_number}
+                          title={child.title}
+                          description={child.description}
+                          status={child.status_detail}
+                          widgets={childWidgets}
+                          primaryColor={district?.primary_color}
+                          isExpanded={false}
+                          onClick={() => setExpandedGoalId(expandedGoalId === child.id ? null : child.id)}
+                        />
+                      )}
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </LayoutGroup>
         )}
       </div>
     </div>

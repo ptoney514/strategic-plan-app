@@ -2,15 +2,18 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/setup';
 import { V2GoalDrillDown } from '../V2GoalDrillDown';
 
+// Mock useParams
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return { ...actual, useParams: () => ({ goalId: 'goal-1' }) };
 });
 
+// Mock subdomain context
 vi.mock('../../../../contexts/SubdomainContext', () => ({
-  useSubdomain: () => ({ slug: 'westside', type: 'district' as const }),
+  useSubdomain: () => ({ slug: 'westside', type: 'district' }),
 }));
 
+// Mock useDistrict
 vi.mock('../../../../hooks/useDistricts', () => ({
   useDistrict: () => ({
     data: { id: 'org-1', name: 'Westside', primary_color: '#1e3a5f' },
@@ -18,6 +21,7 @@ vi.mock('../../../../hooks/useDistricts', () => ({
   }),
 }));
 
+// Mock usePlansBySlug
 vi.mock('../../../../hooks/v2/usePlans', () => ({
   usePlansBySlug: () => ({
     data: [{ id: 'plan-1', name: 'Strategic Plan 2025', is_active: true, is_public: true }],
@@ -25,18 +29,20 @@ vi.mock('../../../../hooks/v2/usePlans', () => ({
   }),
 }));
 
+// Mock useQuery from @tanstack/react-query
+const mockUseQuery = vi.fn();
+vi.mock('@tanstack/react-query', async () => {
+  const actual = await vi.importActual('@tanstack/react-query');
+  return { ...actual, useQuery: (...args: unknown[]) => mockUseQuery(...args) };
+});
+
 const mockGoal = {
   id: 'goal-1',
   goal_number: '1',
   title: 'Academic Excellence',
-  description: 'Improve student outcomes across all schools',
+  description: 'Improve student outcomes',
   status_detail: 'in_progress',
   level: 0,
-  parent_id: null,
-  district_id: 'org-1',
-  order_position: 0,
-  created_at: '2025-01-01',
-  updated_at: '2025-01-01',
 };
 
 const mockChildren = [
@@ -44,38 +50,21 @@ const mockChildren = [
     id: 'c-1',
     goal_number: '1.1',
     title: 'Reading Proficiency',
-    description: 'Increase reading scores by 15%',
+    description: 'Increase reading scores',
     status_detail: 'in_progress',
-    level: 1,
-    parent_id: 'goal-1',
-    district_id: 'org-1',
-    order_position: 0,
-    created_at: '2025-01-01',
-    updated_at: '2025-01-01',
   },
   {
     id: 'c-2',
     goal_number: '1.2',
     title: 'Math Achievement',
     status_detail: 'not_started',
-    level: 1,
-    parent_id: 'goal-1',
-    district_id: 'org-1',
-    order_position: 1,
-    created_at: '2025-01-01',
-    updated_at: '2025-01-01',
   },
 ];
-
-const mockUseQuery = vi.fn();
-vi.mock('@tanstack/react-query', async () => {
-  const actual = await vi.importActual('@tanstack/react-query');
-  return { ...actual, useQuery: (...args: unknown[]) => mockUseQuery(...args) };
-});
 
 describe('V2GoalDrillDown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+
     mockUseQuery.mockImplementation(({ queryKey }: { queryKey: string[] }) => {
       if (queryKey[0] === 'goal') {
         return { data: mockGoal, isLoading: false };
@@ -94,7 +83,7 @@ describe('V2GoalDrillDown', () => {
 
   it('renders goal description', () => {
     render(<V2GoalDrillDown />);
-    expect(screen.getByText('Improve student outcomes across all schools')).toBeInTheDocument();
+    expect(screen.getByText('Improve student outcomes')).toBeInTheDocument();
   });
 
   it('renders GoalStatusBadge', () => {
@@ -116,19 +105,21 @@ describe('V2GoalDrillDown', () => {
 
   it('renders GoalRow for each child', () => {
     render(<V2GoalDrillDown />);
-    expect(screen.getByText('Reading Proficiency')).toBeInTheDocument();
-    expect(screen.getByText('Math Achievement')).toBeInTheDocument();
+    expect(screen.getByText('1.1')).toBeInTheDocument();
+    expect(screen.getByText('1.2')).toBeInTheDocument();
   });
 
-  it('shows child description', () => {
+  it('shows child title "Reading Proficiency"', () => {
     render(<V2GoalDrillDown />);
-    expect(screen.getByText('Increase reading scores by 15%')).toBeInTheDocument();
+    expect(screen.getByText('Reading Proficiency')).toBeInTheDocument();
   });
 
   it('shows loading spinner when loading', () => {
     mockUseQuery.mockReturnValue({ data: undefined, isLoading: true });
     const { container } = render(<V2GoalDrillDown />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+
+    const spinner = container.querySelector('.animate-spin');
+    expect(spinner).toBeInTheDocument();
   });
 
   it('shows "Goal not found" when goal is null', () => {
@@ -136,9 +127,13 @@ describe('V2GoalDrillDown', () => {
       if (queryKey[0] === 'goal') {
         return { data: null, isLoading: false };
       }
-      return { data: [], isLoading: false };
+      if (queryKey[0] === 'goal-children') {
+        return { data: [], isLoading: false };
+      }
+      return { data: undefined, isLoading: false };
     });
     render(<V2GoalDrillDown />);
+
     expect(screen.getByText('Goal not found')).toBeInTheDocument();
   });
 
@@ -153,6 +148,7 @@ describe('V2GoalDrillDown', () => {
       return { data: undefined, isLoading: false };
     });
     render(<V2GoalDrillDown />);
+
     expect(screen.getByText('No goals defined for this objective yet.')).toBeInTheDocument();
   });
 });

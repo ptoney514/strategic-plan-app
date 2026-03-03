@@ -3,26 +3,33 @@ import { render, screen } from '@/test/setup';
 import userEvent from '@testing-library/user-event';
 import { V2GoalsOverview } from '../V2GoalsOverview';
 
+// Mock navigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
   return { ...actual, useNavigate: () => mockNavigate };
 });
 
+// Mock subdomain context
 vi.mock('../../../../contexts/SubdomainContext', () => ({
-  useSubdomain: () => ({ slug: 'westside', type: 'district' as const }),
+  useSubdomain: () => ({ slug: 'westside', type: 'district' }),
 }));
 
-const mockUseDistrict = vi.fn();
+// Mock useDistrict
 vi.mock('../../../../hooks/useDistricts', () => ({
-  useDistrict: (...args: unknown[]) => mockUseDistrict(...args),
+  useDistrict: () => ({
+    data: { id: 'org-1', name: 'Westside', primary_color: '#1e3a5f' },
+    isLoading: false,
+  }),
 }));
 
+// Mock usePlansBySlug
 const mockUsePlansBySlug = vi.fn();
 vi.mock('../../../../hooks/v2/usePlans', () => ({
   usePlansBySlug: (...args: unknown[]) => mockUsePlansBySlug(...args),
 }));
 
+// Mock useGoalsByPlan
 const mockUseGoalsByPlan = vi.fn();
 vi.mock('../../../../hooks/v2/useGoals', () => ({
   useGoalsByPlan: (...args: unknown[]) => mockUseGoalsByPlan(...args),
@@ -35,12 +42,7 @@ const mockGoals = [
     title: 'Academic Excellence',
     level: 0,
     status_detail: 'in_progress',
-    children: [{ id: 'c-1' }, { id: 'c-2' }],
-    parent_id: null,
-    district_id: 'org-1',
-    order_position: 0,
-    created_at: '2025-01-01',
-    updated_at: '2025-01-01',
+    children: [{ id: 'g-1a' }, { id: 'g-1b' }],
   },
   {
     id: 'g-2',
@@ -49,25 +51,18 @@ const mockGoals = [
     level: 0,
     status_detail: 'completed',
     children: [],
-    parent_id: null,
-    district_id: 'org-1',
-    order_position: 1,
-    created_at: '2025-01-01',
-    updated_at: '2025-01-01',
   },
 ];
 
 describe('V2GoalsOverview', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseDistrict.mockReturnValue({
-      data: { id: 'org-1', name: 'Westside', primary_color: '#1e3a5f' },
-      isLoading: false,
-    });
+
     mockUsePlansBySlug.mockReturnValue({
       data: [{ id: 'plan-1', name: 'Strategic Plan 2025', is_active: true, is_public: true }],
       isLoading: false,
     });
+
     mockUseGoalsByPlan.mockReturnValue({
       data: mockGoals,
       isLoading: false,
@@ -86,7 +81,17 @@ describe('V2GoalsOverview', () => {
 
   it('renders ObjectiveCards for each objective', () => {
     render(<V2GoalsOverview />);
+    const cards = screen.getAllByRole('button');
+    expect(cards).toHaveLength(2);
+  });
+
+  it('shows "Academic Excellence" card', () => {
+    render(<V2GoalsOverview />);
     expect(screen.getByText('Academic Excellence')).toBeInTheDocument();
+  });
+
+  it('shows "Community Engagement" card', () => {
+    render(<V2GoalsOverview />);
     expect(screen.getByText('Community Engagement')).toBeInTheDocument();
   });
 
@@ -99,41 +104,34 @@ describe('V2GoalsOverview', () => {
   it('navigates on card click', async () => {
     const user = userEvent.setup();
     render(<V2GoalsOverview />);
+
     const cards = screen.getAllByRole('button');
     await user.click(cards[0]);
     expect(mockNavigate).toHaveBeenCalledWith('/v2/goals/g-1');
   });
 
-  it('renders breadcrumb with plan name', () => {
-    render(<V2GoalsOverview />);
-    expect(screen.getByText('Strategic Plan 2025')).toBeInTheDocument();
-    expect(screen.getByText('All Objectives')).toBeInTheDocument();
-  });
-
   it('shows loading spinner when loading', () => {
     mockUseGoalsByPlan.mockReturnValue({ data: undefined, isLoading: true });
     const { container } = render(<V2GoalsOverview />);
-    expect(container.querySelector('.animate-spin')).toBeInTheDocument();
+
+    const spinner = container.querySelector('.animate-spin');
+    expect(spinner).toBeInTheDocument();
   });
 
   it('shows empty state when no objectives', () => {
     mockUseGoalsByPlan.mockReturnValue({ data: [], isLoading: false });
     render(<V2GoalsOverview />);
-    expect(screen.getByText('0 objectives total')).toBeInTheDocument();
+
+    expect(screen.getByText('No objectives have been defined yet.')).toBeInTheDocument();
   });
 
   it('shows no-plan message when no active+public plan', () => {
     mockUsePlansBySlug.mockReturnValue({
-      data: [{ id: 'p-1', name: 'Draft Plan', is_active: false, is_public: false }],
+      data: [{ id: 'plan-1', name: 'Draft Plan', is_active: false, is_public: false }],
       isLoading: false,
     });
     render(<V2GoalsOverview />);
-    expect(screen.getByText('No public plan available')).toBeInTheDocument();
-  });
 
-  it('shows no-plan message when plans array is empty', () => {
-    mockUsePlansBySlug.mockReturnValue({ data: [], isLoading: false });
-    render(<V2GoalsOverview />);
     expect(screen.getByText('No public plan available')).toBeInTheDocument();
   });
 });

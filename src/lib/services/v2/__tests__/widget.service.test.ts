@@ -57,6 +57,26 @@ describe('WidgetService', () => {
     });
   });
 
+  describe('listPublic', () => {
+    it('calls correct public URL with orgSlug query param', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: () => Promise.resolve([]),
+      });
+
+      await WidgetService.listPublic('westside');
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://localhost/api/v2/widgets/public?orgSlug=westside',
+        expect.objectContaining({
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+    });
+  });
+
   describe('get', () => {
     it('calls correct URL with widget id', async () => {
       mockFetch.mockResolvedValueOnce({

@@ -13,25 +13,25 @@ const VALID_TYPES = [
   "pie-breakdown",
 ];
 
-function toSnakeCase(w: typeof widgets.$inferSelect) {
+function toResponse(w: typeof widgets.$inferSelect) {
   return {
     id: w.id,
-    organization_id: w.organizationId,
-    plan_id: w.planId,
+    organizationId: w.organizationId,
+    planId: w.planId,
     type: w.type,
     title: w.title,
     subtitle: w.subtitle,
     config: w.config,
     position: w.position,
-    is_active: w.isActive,
-    created_at: w.createdAt,
-    updated_at: w.updatedAt,
+    isActive: w.isActive,
+    createdAt: w.createdAt,
+    updatedAt: w.updatedAt,
   };
 }
 
 /**
  * GET /api/v2/widgets/[id]
- * Get a single widget by ID.
+ * Get a single widget by ID (requires org membership).
  */
 export async function GET(req: Request) {
   try {
@@ -51,7 +51,20 @@ export async function GET(req: Request) {
       return jsonError("Widget not found", 404);
     }
 
-    return jsonOk(toSnakeCase(widget));
+    // Auth: look up org and verify membership
+    const [org] = await db
+      .select()
+      .from(organizations)
+      .where(eq(organizations.id, widget.organizationId))
+      .limit(1);
+
+    if (!org) {
+      return jsonError("Organization not found", 404);
+    }
+
+    await requireOrgMember(req, org.slug);
+
+    return jsonOk(toResponse(widget));
   } catch (error) {
     if (error instanceof Response) return error;
     console.error("[widget GET] Error:", error);
@@ -124,7 +137,7 @@ export async function PUT(req: Request) {
       .where(eq(widgets.id, id))
       .returning();
 
-    return jsonOk(toSnakeCase(updated));
+    return jsonOk(toResponse(updated));
   } catch (error) {
     if (error instanceof Response) return error;
     console.error("[widget PUT] Error:", error);

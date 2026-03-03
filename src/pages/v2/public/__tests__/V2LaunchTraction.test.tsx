@@ -13,10 +13,10 @@ vi.mock('../../../../hooks/useDistricts', () => ({
   useDistrict: (...args: unknown[]) => mockUseDistrict(...args),
 }));
 
-// Mock useWidgets
-const mockUseWidgets = vi.fn();
+// Mock usePublicWidgets
+const mockUsePublicWidgets = vi.fn();
 vi.mock('../../../../hooks/v2/useWidgets', () => ({
-  useWidgets: (...args: unknown[]) => mockUseWidgets(...args),
+  usePublicWidgets: (...args: unknown[]) => mockUsePublicWidgets(...args),
 }));
 
 describe('V2LaunchTraction', () => {
@@ -33,7 +33,7 @@ describe('V2LaunchTraction', () => {
       isLoading: false,
     });
 
-    mockUseWidgets.mockReturnValue({
+    mockUsePublicWidgets.mockReturnValue({
       data: [
         {
           id: 'w-1',
@@ -113,7 +113,7 @@ describe('V2LaunchTraction', () => {
   });
 
   it('shows loading spinner when loading', () => {
-    mockUseWidgets.mockReturnValue({ data: undefined, isLoading: true });
+    mockUsePublicWidgets.mockReturnValue({ data: undefined, isLoading: true });
     const { container } = render(<V2LaunchTraction />);
 
     const spinner = container.querySelector('.animate-spin');

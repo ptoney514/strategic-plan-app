@@ -70,24 +70,32 @@ describe('GET /api/v2/widgets/[id]', () => {
     mockDb.select.mockReturnThis();
     mockDb.from.mockReturnThis();
     mockDb.where.mockReturnThis();
-    mockDb.limit.mockResolvedValue([]);
+
+    // Default: first limit call returns widget, second returns org
+    let limitCallCount = 0;
+    mockDb.limit.mockImplementation(() => {
+      limitCallCount++;
+      if (limitCallCount === 1) return Promise.resolve([sampleWidget]);
+      if (limitCallCount === 2) return Promise.resolve([sampleOrg]);
+      return Promise.resolve([]);
+    });
   });
 
   it('should return a widget by ID', async () => {
-    mockDb.limit.mockResolvedValueOnce([sampleWidget]);
-
     const req = new Request('http://localhost/api/v2/widgets/w-1');
     const res = await GET(req);
     const data = await res.json();
 
     expect(res.status).toBe(200);
     expect(data.id).toBe('w-1');
-    expect(data.organization_id).toBe('org-1');
+    expect(data.organizationId).toBe('org-1');
     expect(data.type).toBe('donut');
+    expect(mockRequireOrgMember).toHaveBeenCalledWith(req, 'test-org');
   });
 
   it('should return 404 when widget not found', async () => {
-    mockDb.limit.mockResolvedValueOnce([]);
+    mockDb.limit.mockReset();
+    mockDb.limit.mockResolvedValue([]);
 
     const req = new Request('http://localhost/api/v2/widgets/nonexistent');
     const res = await GET(req);

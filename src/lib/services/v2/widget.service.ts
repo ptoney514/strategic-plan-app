@@ -2,8 +2,14 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../../api';
 import type { Widget, CreateWidgetPayload, UpdateWidgetPayload, ReorderWidgetPayload } from '../../types/v2';
 
 export class WidgetService {
+  /** List widgets (authenticated, for admin pages) */
   static async list(orgSlug: string): Promise<Widget[]> {
     return apiGet<Widget[]>('/v2/widgets', { orgSlug });
+  }
+
+  /** List active widgets (public, no auth required) */
+  static async listPublic(orgSlug: string): Promise<Widget[]> {
+    return apiGet<Widget[]>('/v2/widgets/public', { orgSlug });
   }
 
   static async get(id: string): Promise<Widget> {

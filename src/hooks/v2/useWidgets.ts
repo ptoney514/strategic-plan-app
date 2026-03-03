@@ -10,6 +10,14 @@ export function useWidgets(orgSlug: string) {
   });
 }
 
+export function usePublicWidgets(orgSlug: string) {
+  return useQuery({
+    queryKey: ['widgets', 'public', orgSlug],
+    queryFn: () => WidgetService.listPublic(orgSlug),
+    enabled: !!orgSlug,
+  });
+}
+
 export function useCreateWidget(orgSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({

@@ -41,16 +41,16 @@ export async function GET(req: Request) {
 
     const mapped = rows.map((w) => ({
       id: w.id,
-      organization_id: w.organizationId,
-      plan_id: w.planId,
+      organizationId: w.organizationId,
+      planId: w.planId,
       type: w.type,
       title: w.title,
       subtitle: w.subtitle,
       config: w.config,
       position: w.position,
-      is_active: w.isActive,
-      created_at: w.createdAt,
-      updated_at: w.updatedAt,
+      isActive: w.isActive,
+      createdAt: w.createdAt,
+      updatedAt: w.updatedAt,
     }));
 
     return jsonOk(mapped);
@@ -119,16 +119,16 @@ export async function POST(req: Request) {
     return jsonOk(
       {
         id: created.id,
-        organization_id: created.organizationId,
-        plan_id: created.planId,
+        organizationId: created.organizationId,
+        planId: created.planId,
         type: created.type,
         title: created.title,
         subtitle: created.subtitle,
         config: created.config,
         position: created.position,
-        is_active: created.isActive,
-        created_at: created.createdAt,
-        updated_at: created.updatedAt,
+        isActive: created.isActive,
+        createdAt: created.createdAt,
+        updatedAt: created.updatedAt,
       },
       201,
     );

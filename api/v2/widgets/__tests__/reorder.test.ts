@@ -53,6 +53,15 @@ describe('PUT /api/v2/widgets/reorder', () => {
   });
 
   it('should reorder widgets and return 200', async () => {
+    // Mock the ownership verification query to return matching widget IDs
+    mockDb.select.mockReturnThis();
+    mockDb.from.mockReturnThis();
+    mockDb.where.mockResolvedValueOnce([
+      { id: 'w-1' },
+      { id: 'w-2' },
+      { id: 'w-3' },
+    ]);
+
     const req = new Request('http://localhost/api/v2/widgets/reorder', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

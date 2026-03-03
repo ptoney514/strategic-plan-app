@@ -9,6 +9,19 @@ import { requireAuth } from "../../lib/middleware/auth.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
 
 const SLUG_REGEX = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
+const RESERVED_SLUGS = new Set([
+  "admin",
+  "api",
+  "app",
+  "www",
+  "login",
+  "signup",
+  "dashboard",
+  "v2",
+  "settings",
+  "support",
+  "help",
+]);
 
 /** Generate a URL-friendly slug from a name */
 function slugify(name: string): string {
@@ -59,6 +72,10 @@ export async function POST(req: Request) {
         "Slug must contain only lowercase letters, numbers, and hyphens",
         400,
       );
+    }
+
+    if (RESERVED_SLUGS.has(slug)) {
+      return jsonError("This slug is reserved", 400);
     }
 
     // Check slug uniqueness

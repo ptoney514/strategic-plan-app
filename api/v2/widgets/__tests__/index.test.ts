@@ -81,7 +81,7 @@ describe('GET /api/v2/widgets', () => {
     expect(res.status).toBe(200);
     expect(data).toHaveLength(1);
     expect(data[0].id).toBe('w-1');
-    expect(data[0].organization_id).toBe('org-1');
+    expect(data[0].organizationId).toBe('org-1');
     expect(data[0].type).toBe('donut');
   });
 

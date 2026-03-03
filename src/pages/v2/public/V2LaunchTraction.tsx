@@ -1,12 +1,12 @@
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
-import { useWidgets } from '../../../hooks/v2/useWidgets';
+import { usePublicWidgets } from '../../../hooks/v2/useWidgets';
 import { WidgetGrid } from '../../../components/v2/widgets/WidgetGrid';
 
 export function V2LaunchTraction() {
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
-  const { data: widgets, isLoading } = useWidgets(slug || '');
+  const { data: widgets, isLoading } = usePublicWidgets(slug || '');
 
   const activeWidgets = (widgets || [])
     .filter((w) => w.isActive)

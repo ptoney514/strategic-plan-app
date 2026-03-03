@@ -121,8 +121,7 @@ describe('V2LaunchTraction', () => {
   });
 
   it('dark header has correct background color', () => {
-    const { container } = render(<V2LaunchTraction />);
-    // Verify the page renders with district styling
+    render(<V2LaunchTraction />);
     expect(screen.getByText(/WESTSIDE/i)).toBeInTheDocument();
   });
 });

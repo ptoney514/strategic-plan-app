@@ -4,15 +4,48 @@ export type WidgetType = 'donut' | 'big-number' | 'bar-chart' | 'area-line' | 'p
 
 export type TemplateMode = 'hierarchical' | 'launch-traction';
 
+export interface WidgetDataPoint {
+  label: string;
+  value?: number;
+  values?: number[];
+  color?: string;
+}
+
 export interface WidgetConfig {
   value?: number;
   target?: number;
   unit?: string;
   label?: string;
-  trend?: number;
+  trend?: string;
   trendDirection?: 'up' | 'down' | 'flat';
-  dataPoints?: { label: string; value: number; color?: string }[];
-  legend?: { label: string; color: string }[];
+  dataPoints?: WidgetDataPoint[];
+  legend?: string[];
+  breakdownItems?: { label: string; value: number; color: string }[];
+  colors?: string[];
+}
+
+export interface CreateWidgetPayload {
+  type: WidgetType;
+  title: string;
+  subtitle?: string;
+  config?: WidgetConfig;
+  plan_id?: string;
+  position?: number;
+}
+
+export interface UpdateWidgetPayload {
+  title?: string;
+  subtitle?: string;
+  type?: WidgetType;
+  config?: WidgetConfig;
+  plan_id?: string;
+  position?: number;
+  is_active?: boolean;
+}
+
+export interface ReorderWidgetPayload {
+  orgSlug: string;
+  widgets: { id: string; position: number }[];
 }
 
 export interface Widget {

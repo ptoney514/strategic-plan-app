@@ -1,0 +1,28 @@
+import { apiGet, apiPost, apiPut, apiDelete } from '../../api';
+import type { Widget, CreateWidgetPayload, UpdateWidgetPayload, ReorderWidgetPayload } from '../../types/v2';
+
+export class WidgetService {
+  static async list(orgSlug: string): Promise<Widget[]> {
+    return apiGet<Widget[]>('/v2/widgets', { orgSlug });
+  }
+
+  static async get(id: string): Promise<Widget> {
+    return apiGet<Widget>(`/v2/widgets/${id}`);
+  }
+
+  static async create(orgSlug: string, data: CreateWidgetPayload): Promise<Widget> {
+    return apiPost<Widget>(`/v2/widgets?orgSlug=${orgSlug}`, data);
+  }
+
+  static async update(id: string, data: UpdateWidgetPayload): Promise<Widget> {
+    return apiPut<Widget>(`/v2/widgets/${id}`, data);
+  }
+
+  static async delete(id: string): Promise<void> {
+    return apiDelete(`/v2/widgets/${id}`);
+  }
+
+  static async reorder(data: ReorderWidgetPayload): Promise<void> {
+    return apiPut(`/v2/widgets/reorder`, data);
+  }
+}

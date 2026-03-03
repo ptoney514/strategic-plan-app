@@ -1,0 +1,52 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { WidgetService } from '../../lib/services/v2/widget.service';
+import type { CreateWidgetPayload, UpdateWidgetPayload, ReorderWidgetPayload } from '../../lib/types/v2';
+
+export function useWidgets(orgSlug: string) {
+  return useQuery({
+    queryKey: ['widgets', orgSlug],
+    queryFn: () => WidgetService.list(orgSlug),
+    enabled: !!orgSlug,
+  });
+}
+
+export function useCreateWidget(orgSlug: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: CreateWidgetPayload) => WidgetService.create(orgSlug, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+    },
+  });
+}
+
+export function useUpdateWidget(orgSlug: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateWidgetPayload }) =>
+      WidgetService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+    },
+  });
+}
+
+export function useDeleteWidget(orgSlug: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => WidgetService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+    },
+  });
+}
+
+export function useReorderWidgets(orgSlug: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: ReorderWidgetPayload) => WidgetService.reorder(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+    },
+  });
+}

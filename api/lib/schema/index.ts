@@ -17,3 +17,4 @@ export {
 } from "./imports.js";
 export { statusOverrides } from "./progress.js";
 export { stockPhotos } from "./stockPhotos.js";
+export { widgets } from "./widgets.js";

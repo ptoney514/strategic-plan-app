@@ -1,6 +1,5 @@
 import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { MarketingLanding } from '../pages/marketing/Landing';
 import { Login } from '../pages/Login';
 import { Signup } from '../pages/Signup';
 import { ForgotPassword } from '../pages/ForgotPassword';
@@ -41,17 +40,47 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+const SuspensePage = (
+  <div className="flex-1 flex items-center justify-center py-20">
+    <div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" />
+  </div>
+);
+
+const SuspenseFullPage = (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" />
+  </div>
+);
+
 /**
  * Router for the root domain (stratadash.org)
- * - Marketing landing page at /
- * - User dashboard at /dashboard (requires authentication)
- * - V2 marketing pages at /v2
+ * - Marketing pages at / and /pricing
+ * - Onboarding at /onboard (requires auth)
+ * - User dashboard at /dashboard (requires auth)
  */
 export function RootRouter() {
   return (
     <Routes>
-      {/* Marketing landing page - always visible */}
-      <Route path="/" element={<MarketingLanding />} />
+      {/* Marketing pages with V2 layout */}
+      <Route path="/" element={
+        <ErrorBoundary>
+          <Suspense fallback={SuspenseFullPage}>
+            <V2MarketingLayout />
+          </Suspense>
+        </ErrorBoundary>
+      }>
+        <Route index element={<Suspense fallback={SuspensePage}><V2Landing /></Suspense>} />
+        <Route path="pricing" element={<Suspense fallback={SuspensePage}><V2Pricing /></Suspense>} />
+      </Route>
+
+      {/* Onboarding wizard (requires auth, no marketing layout) */}
+      <Route path="/onboard/*" element={
+        <RequireAuth>
+          <Suspense fallback={SuspenseFullPage}>
+            <V2OnboardingWizard />
+          </Suspense>
+        </RequireAuth>
+      } />
 
       {/* Dashboard - requires authentication */}
       <Route
@@ -106,18 +135,10 @@ export function RootRouter() {
         }
       />
 
-      {/* V2 Routes */}
-      <Route path="/v2" element={
-        <ErrorBoundary>
-          <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}>
-            <V2MarketingLayout />
-          </Suspense>
-        </ErrorBoundary>
-      }>
-        <Route index element={<Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2Landing /></Suspense>} />
-        <Route path="pricing" element={<Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2Pricing /></Suspense>} />
-        <Route path="onboard/*" element={<RequireAuth><Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2OnboardingWizard /></Suspense></RequireAuth>} />
-      </Route>
+      {/* Legacy /v2 redirects */}
+      <Route path="/v2" element={<Navigate to="/" replace />} />
+      <Route path="/v2/pricing" element={<Navigate to="/pricing" replace />} />
+      <Route path="/v2/onboard/*" element={<Navigate to="/onboard" replace />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -38,13 +38,13 @@ export function V2Landing() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              to="/signup?redirect=/v2/onboard"
+              to="/signup?redirect=/onboard"
               className="w-full sm:w-auto text-center font-medium text-white bg-blue-500 rounded-lg px-8 py-3 hover:bg-blue-600 transition-colors"
             >
               Get Started Free
             </Link>
             <Link
-              to="/v2/pricing"
+              to="/pricing"
               className="w-full sm:w-auto text-center font-medium text-gray-700 border border-gray-300 rounded-lg px-8 py-3 hover:bg-gray-50 transition-colors"
             >
               View Pricing

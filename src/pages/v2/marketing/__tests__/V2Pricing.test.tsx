@@ -65,6 +65,6 @@ describe('V2Pricing', () => {
     render(<V2Pricing />);
 
     const getStartedLink = screen.getByText('Get Started');
-    expect(getStartedLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/v2/onboard');
+    expect(getStartedLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/onboard');
   });
 });

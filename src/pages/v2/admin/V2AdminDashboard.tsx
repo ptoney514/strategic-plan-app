@@ -16,7 +16,7 @@ function countGoals(goals: HierarchicalGoal[]): { total: number; completed: numb
   function walk(nodes: HierarchicalGoal[]) {
     for (const g of nodes) {
       total++;
-      if (g.status_detail === 'completed') completed++;
+      if (g.status === 'completed') completed++;
       if (g.children) walk(g.children);
     }
   }
@@ -72,7 +72,7 @@ export function V2AdminDashboard() {
       is_public: false,
       order_position: (plans?.length || 0) + 1,
     });
-    navigate(`/v2/admin/plans?planId=${newPlan.id}`);
+    navigate(`/admin/plans?planId=${newPlan.id}`);
   }
 
   if (isLoading) {
@@ -148,7 +148,7 @@ export function V2AdminDashboard() {
                     style={{ borderBottom: '1px solid var(--editorial-border)' }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--editorial-bg)')}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    onClick={() => navigate(`/v2/admin/plans?planId=${plan.id}`)}
+                    onClick={() => navigate(`/admin/plans?planId=${plan.id}`)}
                   >
                     <td className="px-5 py-4">
                       <span className="font-medium text-sm" style={{ color: 'var(--editorial-text-primary)' }}>{plan.name}</span>
@@ -165,7 +165,7 @@ export function V2AdminDashboard() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/v2/admin/plans?planId=${plan.id}`); }}
+                        onClick={(e) => { e.stopPropagation(); navigate(`/admin/plans?planId=${plan.id}`); }}
                       >
                         Edit
                       </Button>

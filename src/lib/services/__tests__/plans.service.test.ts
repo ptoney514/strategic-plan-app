@@ -235,26 +235,13 @@ describe('PlansService', () => {
       expect(result.id).toBe('plan-new');
     });
 
-    it('should throw error when both district_id and school_id are provided', async () => {
-      const plan = {
-        district_id: 'district-123',
-        school_id: 'school-123',
-        name: 'Invalid Plan',
-      };
-
-      await expect(PlansService.create(plan)).rejects.toThrow(
-        'Plan cannot belong to both district and school'
-      );
-      expect(mockFetch).not.toHaveBeenCalled();
-    });
-
-    it('should throw error when neither district_id nor school_id is provided', async () => {
+    it('should throw error when district_id is not provided', async () => {
       const plan = {
         name: 'Invalid Plan',
       };
 
       await expect(PlansService.create(plan)).rejects.toThrow(
-        'Plan must belong to either a district or a school'
+        'Plan must belong to a district'
       );
       expect(mockFetch).not.toHaveBeenCalled();
     });

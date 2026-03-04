@@ -228,7 +228,7 @@ export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, prim
                 return (
                   <Link
                     key={child.id}
-                    to={`/v2/goals/${child.id}`}
+                    to={`/goals/${child.id}`}
                     className="flex items-center gap-3 p-3 rounded-lg transition-colors"
                     style={{ backgroundColor: 'var(--editorial-surface-alt, var(--editorial-border))' }}
                     onMouseEnter={(e) => {

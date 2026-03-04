@@ -19,14 +19,6 @@ export class PlansService {
   }
 
   /**
-   * Get all plans for a school by school ID
-   */
-  static async getBySchoolId(schoolId: string): Promise<Plan[]> {
-    // Use the school-specific plans endpoint
-    return apiGet<Plan[]>(`/schools/${schoolId}/plans`);
-  }
-
-  /**
    * Get a single plan by ID
    */
   static async getById(id: string): Promise<Plan | null> {
@@ -74,12 +66,8 @@ export class PlansService {
    * Create a new plan
    */
   static async create(plan: Partial<Plan>): Promise<Plan> {
-    // Validate mutual exclusivity
-    if (plan.district_id && plan.school_id) {
-      throw new Error('Plan cannot belong to both district and school');
-    }
-    if (!plan.district_id && !plan.school_id) {
-      throw new Error('Plan must belong to either a district or a school');
+    if (!plan.district_id) {
+      throw new Error('Plan must belong to a district');
     }
 
     // Generate slug if not provided
@@ -99,7 +87,6 @@ export class PlansService {
       start_date: plan.start_date,
       end_date: plan.end_date,
       order_position: plan.order_position,
-      school_id: plan.school_id,
     });
   }
 

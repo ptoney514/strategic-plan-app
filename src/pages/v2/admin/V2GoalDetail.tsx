@@ -153,7 +153,7 @@ export function V2GoalDetail() {
     return (
       <div className="p-6 max-w-5xl mx-auto">
         <button
-          onClick={() => navigate('/v2/admin/plans')}
+          onClick={() => navigate('/admin/plans')}
           className="flex items-center gap-1.5 text-sm mb-6 hover:underline"
           style={{ color: 'var(--editorial-text-secondary)' }}
         >
@@ -167,14 +167,14 @@ export function V2GoalDetail() {
     );
   }
 
-  const goalStatus = (goal as unknown as { status?: string }).status || goal.status_detail || 'not_started';
+  const goalStatus = goal.status || 'not_started';
   const goalPriority = (goal as unknown as { priority?: string }).priority || '';
 
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-8">
       {/* Back link */}
       <button
-        onClick={() => navigate('/v2/admin/plans')}
+        onClick={() => navigate('/admin/plans')}
         className="flex items-center gap-1.5 text-sm hover:underline"
         style={{ color: 'var(--editorial-text-secondary)' }}
       >

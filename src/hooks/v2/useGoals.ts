@@ -5,7 +5,7 @@ import type { Goal } from '../../lib/types';
 export function useGoalsByPlan(planId: string) {
   return useQuery({
     queryKey: ['goals', planId],
-    queryFn: () => GoalsService.getByPlan(planId, { includeMetrics: false }),
+    queryFn: () => GoalsService.getByPlan(planId),
     enabled: !!planId,
   });
 }

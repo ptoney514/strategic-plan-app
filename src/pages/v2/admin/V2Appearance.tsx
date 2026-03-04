@@ -6,7 +6,7 @@ import { toast } from '../../../components/Toast';
 import { ColorPicker } from '../../../components/v2/appearance/ColorPicker';
 import { AppearancePreview } from '../../../components/v2/appearance/AppearancePreview';
 import { TemplateModeSelector } from '../../../components/v2/appearance/TemplateModeSelector';
-import { LogoUpload } from '../../../components/admin/LogoUpload';
+import { LogoUpload } from '../../../components/v2/LogoUpload';
 import type { DashboardTemplate } from '../../../lib/types';
 
 export function V2Appearance() {

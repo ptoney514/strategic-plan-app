@@ -129,7 +129,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
 
         {/* Status dropdown */}
         <select
-          value={(goal as unknown as { status?: string }).status || goal.status_detail || 'not_started'}
+          value={goal.status || 'not_started'}
           onChange={handleStatusChange}
           className="text-xs rounded px-2 py-1 cursor-pointer outline-none"
           style={{
@@ -145,7 +145,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
 
         {/* Detail page link */}
         <button
-          onClick={() => navigate(`/v2/admin/goals/${goal.id}`)}
+          onClick={() => navigate(`/admin/goals/${goal.id}`)}
           className="opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity"
           style={{ color: 'var(--editorial-text-secondary)' }}
           title="View goal details"

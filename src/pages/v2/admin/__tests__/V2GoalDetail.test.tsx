@@ -50,7 +50,7 @@ vi.mock('@/hooks/v2/useGoals', () => ({
         description: 'Focus on academic outcomes',
         level: 0,
         order_position: 1,
-        status_detail: 'in_progress',
+        status: 'in_progress',
         children: [
           {
             id: 'goal-1-1',
@@ -60,7 +60,7 @@ vi.mock('@/hooks/v2/useGoals', () => ({
             title: 'Reading Proficiency',
             level: 1,
             order_position: 1,
-            status_detail: 'not_started',
+            status: 'not_started',
             children: [],
           },
         ],
@@ -141,7 +141,7 @@ describe('V2GoalDetail', () => {
     render(<V2GoalDetail />);
 
     await user.click(screen.getByText('Back to Plans & Goals'));
-    expect(mockNavigate).toHaveBeenCalledWith('/v2/admin/plans');
+    expect(mockNavigate).toHaveBeenCalledWith('/admin/plans');
   });
 
   it('renders status dropdown', () => {

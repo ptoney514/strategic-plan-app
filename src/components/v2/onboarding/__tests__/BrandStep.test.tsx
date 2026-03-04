@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { BrandStep } from '../BrandStep';
 
 // Mock LogoUpload since it has its own upload logic
-vi.mock('@/components/admin/LogoUpload', () => ({
+vi.mock('@/components/v2/LogoUpload', () => ({
   LogoUpload: ({ label, helpText }: { label?: string; helpText?: string }) => (
     <div data-testid="logo-upload">
       {label && <span>{label}</span>}

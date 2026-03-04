@@ -109,7 +109,7 @@ describe('V2GoalsOverview', () => {
 
     const cards = screen.getAllByRole('button');
     await user.click(cards[0]);
-    expect(mockNavigate).toHaveBeenCalledWith('/v2/goals/g-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/goals/g-1');
   });
 
   it('shows loading spinner when loading', () => {

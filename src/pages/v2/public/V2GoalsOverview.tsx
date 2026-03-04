@@ -66,12 +66,12 @@ export function V2GoalsOverview() {
               goalNumber={goal.goal_number}
               title={goal.title}
               childCount={goal.children?.length || 0}
-              status={goal.status_detail}
+              status={goal.status}
               primaryColor={district?.primary_color}
               description={goal.description}
               overallProgress={goal.overall_progress}
               progressDisplayMode={goal.overall_progress_display_mode}
-              onClick={() => navigate('/v2/goals/' + goal.id)}
+              onClick={() => navigate('/goals/' + goal.id)}
             />
           ))}
         </div>

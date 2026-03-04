@@ -33,11 +33,6 @@ CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON organization_members
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
-DROP TRIGGER IF EXISTS set_updated_at ON schools;
-CREATE TRIGGER set_updated_at
-  BEFORE UPDATE ON schools
-  FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
-
 DROP TRIGGER IF EXISTS set_updated_at ON plans;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON plans
@@ -46,11 +41,6 @@ CREATE TRIGGER set_updated_at
 DROP TRIGGER IF EXISTS set_updated_at ON goals;
 CREATE TRIGGER set_updated_at
   BEFORE UPDATE ON goals
-  FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
-
-DROP TRIGGER IF EXISTS set_updated_at ON metrics;
-CREATE TRIGGER set_updated_at
-  BEFORE UPDATE ON metrics
   FOR EACH ROW EXECUTE FUNCTION trigger_set_updated_at();
 
 DROP TRIGGER IF EXISTS set_updated_at ON contact_submissions;

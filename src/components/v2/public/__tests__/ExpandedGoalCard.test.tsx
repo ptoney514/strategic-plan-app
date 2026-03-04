@@ -48,7 +48,7 @@ const mockGoal: Goal = {
   overall_progress: 65,
   owner_name: 'Dr. Smith',
   priority: 'high',
-  status_detail: 'in_progress',
+  status: 'in_progress',
   children: [
     {
       id: 'child-1',
@@ -61,7 +61,7 @@ const mockGoal: Goal = {
       order_position: 0,
       created_at: '2025-01-01T00:00:00Z',
       updated_at: '2025-01-01T00:00:00Z',
-      status_detail: 'in_progress',
+      status: 'in_progress',
     },
     {
       id: 'child-2',
@@ -73,7 +73,7 @@ const mockGoal: Goal = {
       order_position: 1,
       created_at: '2025-01-01T00:00:00Z',
       updated_at: '2025-01-01T00:00:00Z',
-      status_detail: 'not_started',
+      status: 'not_started',
     },
   ],
 };
@@ -300,8 +300,8 @@ describe('ExpandedGoalCard', () => {
     render(<ExpandedGoalCard goal={mockGoal} widgets={[]} onClose={onClose} />);
     const link1 = screen.getByRole('link', { name: /K-2 Reading Program/i });
     const link2 = screen.getByRole('link', { name: /Grade 3-5 Comprehension/i });
-    expect(link1).toHaveAttribute('href', '/v2/goals/child-1');
-    expect(link2).toHaveAttribute('href', '/v2/goals/child-2');
+    expect(link1).toHaveAttribute('href', '/goals/child-1');
+    expect(link2).toHaveAttribute('href', '/goals/child-2');
   });
 
   it('shows inline widget preview when subGoalWidgets provided', () => {
@@ -329,7 +329,7 @@ describe('ExpandedGoalCard', () => {
   it('renders sub-goal as link even without widget preview', () => {
     render(<ExpandedGoalCard goal={mockGoal} widgets={[]} subGoalWidgets={{}} onClose={onClose} />);
     const link = screen.getByRole('link', { name: /K-2 Reading Program/i });
-    expect(link).toHaveAttribute('href', '/v2/goals/child-1');
+    expect(link).toHaveAttribute('href', '/goals/child-1');
     // No widget preview text for child-2
     expect(screen.queryByText(/· VALUE/)).not.toBeInTheDocument();
   });

@@ -77,12 +77,13 @@ export function V2Import() {
       const session = await ImportService.createSession(district.id, selectedFile.name, selectedFile.size);
       const hierarchicalGoals = await GoalsService.getByDistrict(district.id);
       const existingGoals = flattenHierarchy(hierarchicalGoals);
-      const { stagedGoals: staged } = await ImportService.stageData(
+      await ImportService.stageData(
         session.id,
         district.id,
         parsed,
         existingGoals
       );
+      const { goals: staged } = await ImportService.getStagedData(session.id);
       setStagedGoals(staged);
       setSessionId(session.id);
       setStep('review');
@@ -207,7 +208,7 @@ export function V2Import() {
               <p className="text-sm text-yellow-800">
                 No plans found. Create a plan first.{' '}
                 <button
-                  onClick={() => navigate(`/${slug}/v2/admin/plans`)}
+                  onClick={() => navigate('/admin/plans')}
                   className="font-medium text-blue-600 underline hover:text-blue-800"
                 >
                   Go to Plans
@@ -306,7 +307,7 @@ export function V2Import() {
           goalsImported={(importResult.goals_created ?? 0) + (importResult.goals_updated ?? 0)}
           goalsSkipped={Math.max(0, stagedGoals.length - ((importResult.goals_created ?? 0) + (importResult.goals_updated ?? 0)))}
           planName={selectedPlan?.name || 'Unknown Plan'}
-          onViewGoals={() => navigate(`/${slug}/v2/admin/plans`)}
+          onViewGoals={() => navigate('/admin/plans')}
           onImportAnother={handleReset}
         />
       )}

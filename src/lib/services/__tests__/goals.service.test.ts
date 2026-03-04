@@ -53,12 +53,10 @@ describe('GoalsService', () => {
         {
           id: 'goal-1',
           district_id: mockDistrictId,
-          school_id: null,
           goal_number: '1',
           title: 'District Goal 1',
           level: 0,
           parent_id: null,
-          metrics: [],
         },
       ];
 
@@ -139,81 +137,6 @@ describe('GoalsService', () => {
     });
   });
 
-  describe('getBySchool', () => {
-    it('should fetch goals for a specific school', async () => {
-      const mockSchoolId = 'school-123';
-      const mockGoals = [
-        {
-          id: 'goal-1',
-          district_id: null,
-          school_id: mockSchoolId,
-          goal_number: '1',
-          title: 'School Goal 1',
-          level: 0,
-          parent_id: null,
-          metrics: [],
-        },
-        {
-          id: 'goal-2',
-          district_id: null,
-          school_id: mockSchoolId,
-          goal_number: '1.1',
-          title: 'School Goal 1.1',
-          level: 1,
-          parent_id: 'goal-1',
-          metrics: [],
-        },
-      ];
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(mockGoals),
-      });
-
-      const result = await GoalsService.getBySchool(mockSchoolId);
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        `http://localhost/api/schools/${mockSchoolId}/goals`,
-        expect.objectContaining({
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
-      expect(result).toBeDefined();
-      expect(result).toHaveLength(1); // Parent only (child is nested)
-      expect(result[0].children).toBeDefined();
-      expect(result[0].children).toHaveLength(1);
-    });
-
-    it('should return empty array for school with no goals', async () => {
-      const mockSchoolId = 'school-empty';
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve([]),
-      });
-
-      const result = await GoalsService.getBySchool(mockSchoolId);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should throw error on API failure', async () => {
-      const mockSchoolId = 'school-123';
-
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        statusText: 'Internal Server Error',
-        json: () => Promise.resolve({ error: 'Database error' }),
-      });
-
-      await expect(GoalsService.getBySchool(mockSchoolId)).rejects.toThrow();
-    });
-  });
-
   describe('getByPlan', () => {
     it('should fetch goals for a specific plan', async () => {
       const mockPlanId = 'plan-123';
@@ -225,7 +148,6 @@ describe('GoalsService', () => {
           title: 'Plan Goal 1',
           level: 0,
           parent_id: null,
-          metrics: [],
         },
       ];
 
@@ -247,37 +169,6 @@ describe('GoalsService', () => {
       expect(result).toHaveLength(1);
     });
 
-    it('should request lightweight goals when metrics are excluded', async () => {
-      const mockPlanId = 'plan-456';
-      const mockGoals = [
-        {
-          id: 'goal-2',
-          plan_id: mockPlanId,
-          goal_number: '1',
-          title: 'Plan Goal 2',
-          level: 0,
-          parent_id: null,
-          metrics: [],
-        },
-      ];
-
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve(mockGoals),
-      });
-
-      const result = await GoalsService.getByPlan(mockPlanId, { includeMetrics: false });
-
-      expect(mockFetch).toHaveBeenCalledWith(
-        `http://localhost/api/plans/${mockPlanId}/goals?includeMetrics=false`,
-        expect.objectContaining({
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
-      expect(result).toHaveLength(1);
-    });
   });
 
   describe('getById', () => {
@@ -355,7 +246,6 @@ describe('GoalsService', () => {
         id: 'goal-new',
         ...mockGoal,
         goal_number: '1',
-        school_id: null,
       };
 
       // First call: GET existing goals to calculate goal number
@@ -396,56 +286,7 @@ describe('GoalsService', () => {
       expect(result).toEqual(createdGoal);
     });
 
-    it('should create a goal for a school', async () => {
-      const mockGoal = {
-        plan_id: 'plan-123',
-        school_id: 'school-123',
-        title: 'New School Goal',
-        level: 0 as const,
-      };
-
-      const createdGoal = {
-        id: 'goal-new',
-        ...mockGoal,
-        goal_number: '1',
-        district_id: null,
-      };
-
-      // First call: GET existing goals
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: () => Promise.resolve([]),
-      });
-
-      // Second call: POST to create
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 201,
-        json: () => Promise.resolve(createdGoal),
-      });
-
-      const result = await GoalsService.create(mockGoal);
-
-      expect(result).toEqual(createdGoal);
-    });
-
-    it('should throw error when both district_id and school_id are provided', async () => {
-      const mockGoal = {
-        plan_id: 'plan-123',
-        district_id: 'district-123',
-        school_id: 'school-123',
-        title: 'Invalid Goal',
-        level: 0 as const,
-      };
-
-      await expect(GoalsService.create(mockGoal)).rejects.toThrow(
-        'Goal cannot belong to both district and school'
-      );
-      expect(mockFetch).not.toHaveBeenCalled();
-    });
-
-    it('should throw error when neither district_id nor school_id is provided', async () => {
+    it('should throw error when district_id is missing', async () => {
       const mockGoal = {
         plan_id: 'plan-123',
         title: 'Invalid Goal',
@@ -453,7 +294,7 @@ describe('GoalsService', () => {
       };
 
       await expect(GoalsService.create(mockGoal)).rejects.toThrow(
-        'Goal must belong to either a district or a school'
+        'Goal must belong to a district'
       );
       expect(mockFetch).not.toHaveBeenCalled();
     });
@@ -506,38 +347,10 @@ describe('GoalsService', () => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             district_id: options.districtId,
-            school_id: undefined,
             parent_id: parentId,
           }),
         })
       );
-    });
-
-    it('should throw error when both districtId and schoolId are provided', async () => {
-      // This validation is done in the API route, not the service
-      // The service will send the request, but the API will reject it
-      const options = { districtId: 'dist-1', schoolId: 'school-1' };
-
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        json: () => Promise.resolve({ error: 'Cannot renumber with both districtId and schoolId' }),
-      });
-
-      await expect(
-        GoalsService.renumberGoals(options, null)
-      ).rejects.toThrow();
-    });
-
-    it('should throw error when neither districtId nor schoolId is provided', async () => {
-      // This validation is done in the API route
-      mockFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 400,
-        json: () => Promise.resolve({ error: 'Must provide either districtId or schoolId' }),
-      });
-
-      await expect(GoalsService.renumberGoals({}, null)).rejects.toThrow();
     });
   });
 });

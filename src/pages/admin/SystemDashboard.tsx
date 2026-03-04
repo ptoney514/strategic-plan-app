@@ -14,7 +14,7 @@ import {
   useSystemAdminStats,
   useRecentUsers,
 } from '../../hooks/useSystemAdminStats';
-import { UserRoleBadge } from '../../components/admin/dashboard';
+import { UserRoleBadge } from '../../components/system-admin/dashboard';
 import { formatDistanceToNow } from '../../lib/utils/formatTime';
 
 const statsConfig = [

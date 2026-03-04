@@ -7,19 +7,12 @@ import { ForgotPassword } from '../pages/ForgotPassword';
 import { ResetPassword } from '../pages/ResetPassword';
 import { Welcome } from '../pages/Welcome';
 import { AcceptInvitation } from '../pages/AcceptInvitation';
-import { DistrictRedirect } from '../components/DistrictRedirect';
 import { AccountSettings } from '../pages/AccountSettings';
 import { AboutPage, PrivacyPage, TermsPage } from '../pages/legal';
 import { DashboardLayout } from '../layouts/DashboardLayout';
 import { UserDashboard, PlaceholderPage, DashboardPlansPage, DashboardDistrictsPage } from '../pages/dashboard';
 import { useAuth } from '../contexts/AuthContext';
 import { ErrorBoundary } from '../components/ErrorBoundary';
-
-// Public District Layout and Pages
-import { PublicDistrictLayout } from '../layouts/PublicDistrictLayout';
-import { Dashboard } from '../pages/client/public/Dashboard';
-import { ObjectiveDetail } from '../pages/client/public/ObjectiveDetail';
-import { GoalDetailNew } from '../pages/client/public/GoalDetailNew';
 
 // V2 Lazy-loaded Pages
 const V2MarketingLayout = lazy(() => import('../components/v2/layout/V2MarketingLayout').then(m => ({ default: m.V2MarketingLayout })));
@@ -50,9 +43,9 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 
 /**
  * Router for the root domain (stratadash.org)
- * - Marketing landing page at / (always visible, logged in or not)
+ * - Marketing landing page at /
  * - User dashboard at /dashboard (requires authentication)
- * - Redirects legacy district paths to subdomains
+ * - V2 marketing pages at /v2
  */
 export function RootRouter() {
   return (
@@ -125,26 +118,6 @@ export function RootRouter() {
         <Route path="pricing" element={<Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2Pricing /></Suspense>} />
         <Route path="onboard/*" element={<RequireAuth><Suspense fallback={<div className="flex-1 flex items-center justify-center py-20"><div className="animate-spin w-8 h-8 border-4 border-gray-300 border-t-gray-900 rounded-full" /></div>}><V2OnboardingWizard /></Suspense></RequireAuth>} />
       </Route>
-
-      {/* Public District Views - path-based access (no auth required) */}
-      {/* URL pattern: stratadash.org/district/:slug */}
-      <Route path="/district/:slug" element={<PublicDistrictLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="overview" element={<Dashboard />} />
-        <Route path="objective/:goalId" element={<ObjectiveDetail />} />
-        <Route path="goal/:goalId" element={<GoalDetailNew />} />
-      </Route>
-
-      {/* Path-based district access: stratadash.org/:slug */}
-      <Route path="/:slug" element={<PublicDistrictLayout />}>
-        <Route index element={<Dashboard />} />
-        <Route path="overview" element={<Dashboard />} />
-        <Route path="objective/:goalId" element={<ObjectiveDetail />} />
-        <Route path="goal/:goalId" element={<GoalDetailNew />} />
-      </Route>
-
-      {/* Redirect other /:slug/* paths (goals, admin, schools) to subdomain */}
-      <Route path="/:slug/*" element={<DistrictRedirect />} />
 
       {/* Catch-all */}
       <Route path="*" element={<Navigate to="/" replace />} />

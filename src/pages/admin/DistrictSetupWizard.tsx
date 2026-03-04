@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { useCreateDistrict } from '../../hooks/useDistricts';
 import { InvitationService } from '../../lib/services/invitation.service';
-import { NameStep } from '../../components/admin/wizard/NameStep';
-import { BrandStep } from '../../components/admin/wizard/BrandStep';
-import { TeamStep } from '../../components/admin/wizard/TeamStep';
-import { FinishStep } from '../../components/admin/wizard/FinishStep';
-import type { WizardState } from '../../components/admin/wizard/NameStep';
+import { NameStep } from '../../components/system-admin/wizard/NameStep';
+import { BrandStep } from '../../components/system-admin/wizard/BrandStep';
+import { TeamStep } from '../../components/system-admin/wizard/TeamStep';
+import { FinishStep } from '../../components/system-admin/wizard/FinishStep';
+import type { WizardState } from '../../components/system-admin/wizard/NameStep';
 
 const steps = ['Name & Details', 'Branding', 'Invite Team', 'Finish'];
 

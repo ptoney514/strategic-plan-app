@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { UserPlus, Search, Loader2, Shield, ChevronDown } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { InviteUserModal } from '../../components/admin/InviteUserModal';
+import { InviteUserModal } from '../../components/system-admin/InviteUserModal';
 import { apiGet, apiPut } from '../../lib/api';
 
 interface UserMembership {

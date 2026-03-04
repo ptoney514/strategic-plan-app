@@ -18,8 +18,8 @@ import { useDistrictsWithStats } from '../../hooks/useSystemAdminStats';
 import { useUpdateDistrict, useDeleteDistrict } from '../../hooks/useDistricts';
 import { useQueryClient } from '@tanstack/react-query';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
-import { DistrictFormModal } from '../../components/admin/DistrictFormModal';
-import { DistrictActionsMenu } from '../../components/admin/DistrictActionsMenu';
+import { DistrictFormModal } from '../../components/system-admin/DistrictFormModal';
+import { DistrictActionsMenu } from '../../components/system-admin/DistrictActionsMenu';
 import type { DistrictWithStats } from '../../lib/services/systemAdmin.service';
 import type { District } from '../../lib/types';
 

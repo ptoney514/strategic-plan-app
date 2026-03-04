@@ -131,7 +131,7 @@ describe('V2AdminDashboard', () => {
     const editButtons = screen.getAllByRole('button', { name: /edit/i });
     await user.click(editButtons[0]);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/v2/admin/plans?planId=plan-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/admin/plans?planId=plan-1');
   });
 
   it('shows table headers', () => {

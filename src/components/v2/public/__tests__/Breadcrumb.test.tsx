@@ -3,8 +3,8 @@ import { render, screen } from '@/test/setup';
 import { Breadcrumb } from '../Breadcrumb';
 
 const items = [
-  { label: 'Strategic Plan 2025', href: '/v2' },
-  { label: 'Academic Excellence', href: '/v2/goals/g-1' },
+  { label: 'Strategic Plan 2025', href: '/' },
+  { label: 'Academic Excellence', href: '/goals/g-1' },
   { label: 'Reading Proficiency' },
 ];
 
@@ -21,10 +21,10 @@ describe('Breadcrumb', () => {
     render(<Breadcrumb items={items} />);
 
     const planLink = screen.getByText('Strategic Plan 2025');
-    expect(planLink.closest('a')).toHaveAttribute('href', '/v2');
+    expect(planLink.closest('a')).toHaveAttribute('href', '/');
 
     const goalLink = screen.getByText('Academic Excellence');
-    expect(goalLink.closest('a')).toHaveAttribute('href', '/v2/goals/g-1');
+    expect(goalLink.closest('a')).toHaveAttribute('href', '/goals/g-1');
   });
 
   it('renders plain text for items without href', () => {

@@ -4,7 +4,6 @@ import {
   organizations,
   plans,
   goals,
-  metrics,
   organizationMembers,
 } from "../lib/schema/index.js";
 import { requireSystemAdmin } from "../lib/middleware/auth.js";
@@ -32,12 +31,6 @@ export async function GET(req: Request) {
           .from(goals)
           .where(eq(goals.organizationId, org.id));
 
-        const [metricCount] = await db
-          .select({ count: sql<number>`count(*)::int` })
-          .from(metrics)
-          .innerJoin(goals, eq(metrics.goalId, goals.id))
-          .where(eq(goals.organizationId, org.id));
-
         const [adminCount] = await db
           .select({ count: sql<number>`count(*)::int` })
           .from(organizationMembers)
@@ -61,7 +54,6 @@ export async function GET(req: Request) {
           updated_at: org.updatedAt,
           plan_count: planCount.count,
           goal_count: goalCount.count,
-          metric_count: metricCount.count,
           admin_count: adminCount.count,
         };
       }),

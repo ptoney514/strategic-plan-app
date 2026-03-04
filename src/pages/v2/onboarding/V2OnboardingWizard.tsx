@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { WizardStepIndicator } from '../../../components/v2/onboarding/WizardStepIndicator';
 import { OrgCreationStep, type OrgCreationData } from '../../../components/v2/onboarding/OrgCreationStep';
@@ -17,7 +16,6 @@ interface OnboardingState {
 }
 
 export function V2OnboardingWizard() {
-  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [data, setData] = useState<OnboardingState>({
     orgId: '',
@@ -63,8 +61,11 @@ export function V2OnboardingWizard() {
         logo_url: data.logoUrl || undefined,
         dashboard_template: data.template,
       });
-      // Navigate to the V2 admin dashboard
-      navigate(`/${data.orgSlug}/v2/admin`, { replace: true });
+      // Redirect to the new org's subdomain admin dashboard
+      const host = window.location.hostname;
+      const port = window.location.port ? `:${window.location.port}` : '';
+      const baseDomain = host.includes('lvh.me') ? 'lvh.me' : host.includes('localhost') ? 'localhost' : 'stratadash.org';
+      window.location.href = `${window.location.protocol}//${data.orgSlug}.${baseDomain}${port}/admin`;
     } catch {
       // Error handled by mutation
     }

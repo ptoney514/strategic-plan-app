@@ -36,7 +36,7 @@ function makeGoal(overrides: Partial<HierarchicalGoal> = {}): HierarchicalGoal {
     order_position: 1,
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
-    status_detail: 'in_progress',
+    status: 'in_progress',
     children: [],
     ...overrides,
   };
@@ -196,6 +196,6 @@ describe('GoalTreeItem', () => {
     render(<GoalTreeItem goal={makeGoal()} {...defaultProps} />);
 
     await user.click(screen.getByTitle('View goal details'));
-    expect(mockNavigate).toHaveBeenCalledWith('/v2/admin/goals/goal-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/admin/goals/goal-1');
   });
 });

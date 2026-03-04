@@ -84,7 +84,7 @@ export function V2GoalDrillDown() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       <Breadcrumb
         items={[
-          { label: activePlan?.name || 'Plan', href: '/v2' },
+          { label: activePlan?.name || 'Plan', href: '/' },
           { label: goal.goal_number + ' ' + goal.title },
         ]}
       />
@@ -185,7 +185,7 @@ export function V2GoalDrillDown() {
                           goalNumber={child.goal_number}
                           title={child.title}
                           description={child.description}
-                          status={child.status_detail}
+                          status={child.status}
                           widgets={childWidgets}
                           primaryColor={district?.primary_color}
                           isExpanded={false}

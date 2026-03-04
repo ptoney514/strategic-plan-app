@@ -6,13 +6,12 @@ import {
   text,
   integer,
   boolean,
-  decimal,
   jsonb,
   index,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import { organizations } from "./organizations.js";
-import { goals, metrics } from "./goals.js";
+import { goals } from "./goals.js";
 
 export const importSessions = pgTable(
   "import_sessions",
@@ -74,44 +73,5 @@ export const stagedGoals = pgTable(
   },
   (table) => [
     index("staged_goals_session_id_idx").on(table.importSessionId),
-  ],
-);
-
-export const stagedMetrics = pgTable(
-  "staged_metrics",
-  {
-    id: uuid("id").primaryKey().defaultRandom(),
-    stagedGoalId: uuid("staged_goal_id")
-      .notNull()
-      .references(() => stagedGoals.id, { onDelete: "cascade" }),
-    importSessionId: uuid("import_session_id")
-      .notNull()
-      .references(() => importSessions.id, { onDelete: "cascade" }),
-    metricName: text("metric_name").notNull(),
-    measureDescription: text("measure_description"),
-    metricType: text("metric_type"),
-    dataSource: text("data_source"),
-    frequency: text("frequency"),
-    baselineValue: decimal("baseline_value"),
-    timeSeriesData: jsonb("time_series_data"),
-    unit: text("unit"),
-    symbol: text("symbol"),
-    validationStatus: text("validation_status").default("valid"),
-    validationMessages: text("validation_messages")
-      .array()
-      .default(sql`'{}'::text[]`),
-    isMapped: boolean("is_mapped").default(false),
-    mappedToMetricId: uuid("mapped_to_metric_id").references(() => metrics.id, {
-      onDelete: "set null",
-    }),
-    action: text("action").default("create"),
-    createdAt: timestamp("created_at").defaultNow(),
-    updatedAt: timestamp("updated_at")
-      .defaultNow()
-      .$onUpdate(() => new Date()),
-  },
-  (table) => [
-    index("staged_metrics_goal_id_idx").on(table.stagedGoalId),
-    index("staged_metrics_session_id_idx").on(table.importSessionId),
   ],
 );

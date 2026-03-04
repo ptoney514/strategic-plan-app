@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Building2, FileText, Target, TrendingUp, ArrowRight, Plus, ChevronRight, Settings, ExternalLink, Users } from 'lucide-react';
+import { Building2, FileText, Target, ArrowRight, Plus, ChevronRight, Settings, ExternalLink, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserDashboardStats, useUserDistrictsWithStats } from '../../hooks/useUserDistricts';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
@@ -54,7 +54,7 @@ export function UserDashboard() {
   const {
     data: selectedPlanObjectives = [],
     isLoading: selectedObjectivesLoading,
-  } = usePlanGoals(selectedPlanId || '', { includeMetrics: false });
+  } = usePlanGoals(selectedPlanId || '');
 
   // Get user display name
   const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
@@ -88,7 +88,7 @@ export function UserDashboard() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
           label="Districts"
           value={statsLoading ? '...' : String(stats?.district_count || 0)}
@@ -104,11 +104,6 @@ export function UserDashboard() {
           label="Objectives"
           value={statsLoading ? '...' : String(stats?.objective_count || 0)}
           icon={<Target size={20} />}
-        />
-        <StatCard
-          label="Metrics"
-          value={statsLoading ? '...' : String(stats?.metric_count || 0)}
-          icon={<TrendingUp size={20} />}
         />
       </div>
 
@@ -526,6 +521,21 @@ function PlanRow({ plan, districtName, districtColor, isSelected, onClick, onNav
   );
 }
 
+function getStatusColor(status?: string): string {
+  switch (status) {
+    case 'in_progress': return '#3b82f6';
+    case 'completed': return '#22c55e';
+    case 'on_hold': return '#f59e0b';
+    case 'not_started': return '#9ca3af';
+    default: return '#9ca3af';
+  }
+}
+
+function formatStatus(status?: string): string {
+  if (!status) return 'Not Started';
+  return status.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; basePath: string }) {
   const [expanded, setExpanded] = useState(false);
   const hasChildren = objective.children && objective.children.length > 0;
@@ -570,10 +580,10 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md flex-shrink-0" style={{ border: '1px solid var(--editorial-border)' }}>
           <span
             className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: objective.indicator_color || 'var(--editorial-accent-success)' }}
+            style={{ backgroundColor: getStatusColor(objective.status) }}
           />
           <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--editorial-text-secondary)' }}>
-            {objective.indicator_text || 'On Target'}
+            {formatStatus(objective.status)}
           </span>
         </div>
       </div>
@@ -598,10 +608,10 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
               <div className="flex items-center gap-1 flex-shrink-0">
                 <span
                   className="w-1.5 h-1.5 rounded-full"
-                  style={{ backgroundColor: child.indicator_color || 'var(--editorial-accent-success)' }}
+                  style={{ backgroundColor: getStatusColor(child.status) }}
                 />
                 <span className="text-[10px] font-semibold uppercase" style={{ color: 'var(--editorial-text-muted)' }}>
-                  {child.indicator_text || 'On Target'}
+                  {formatStatus(child.status)}
                 </span>
               </div>
             </div>

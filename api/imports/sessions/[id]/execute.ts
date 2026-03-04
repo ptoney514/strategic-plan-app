@@ -1,11 +1,9 @@
-import { eq, and, asc } from "drizzle-orm";
+import { eq, asc } from "drizzle-orm";
 import { db } from "../../../lib/db.js";
 import {
   importSessions,
   stagedGoals,
-  stagedMetrics,
   goals,
-  metrics,
   plans,
   organizations,
 } from "../../../lib/schema/index.js";
@@ -92,7 +90,6 @@ export async function POST(req: Request) {
     // Map staged goal IDs to created goal IDs for parent-child resolution
     const stagedIdToGoalId = new Map<string, string>();
     let goalsCreated = 0;
-    let metricsCreated = 0;
 
     for (const sg of staged) {
       if (sg.action !== "create") continue;
@@ -122,41 +119,11 @@ export async function POST(req: Request) {
           level: sg.level ?? 0,
           parentId,
           ownerName: sg.ownerName,
-          department: sg.department,
         })
         .returning();
 
       stagedIdToGoalId.set(sg.id, created.id);
       goalsCreated++;
-
-      // Insert staged metrics for this goal (scoped to this session)
-      const goalMetrics = await db
-        .select()
-        .from(stagedMetrics)
-        .where(
-          and(
-            eq(stagedMetrics.stagedGoalId, sg.id),
-            eq(stagedMetrics.importSessionId, sessionId),
-          ),
-        );
-
-      for (const sm of goalMetrics) {
-        if (sm.action !== "create") continue;
-
-        await db.insert(metrics).values({
-          goalId: created.id,
-          name: sm.metricName,
-          metricName: sm.metricName,
-          metricType: sm.metricType ?? "quantitative",
-          dataSource: sm.dataSource,
-          frequency: sm.frequency,
-          baselineValue: sm.baselineValue,
-          unit: sm.unit,
-          description: sm.measureDescription,
-        });
-
-        metricsCreated++;
-      }
     }
 
     // Update session status to 'completed'
@@ -165,13 +132,12 @@ export async function POST(req: Request) {
       .set({
         status: "completed",
         completedAt: new Date(),
-        importSummary: { goals_created: goalsCreated, metrics_created: metricsCreated },
+        importSummary: { goals_created: goalsCreated },
       })
       .where(eq(importSessions.id, sessionId));
 
     return jsonOk({
       goals_created: goalsCreated,
-      metrics_created: metricsCreated,
     });
   } catch (error) {
     if (error instanceof Response) return error;

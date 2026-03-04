@@ -31,4 +31,15 @@ export class WidgetService {
   static async reorder(data: ReorderWidgetPayload): Promise<void> {
     return apiPut(`/v2/widgets/reorder`, data);
   }
+
+  /** Fetch active widgets for a single goal, scoped to org (public, no auth) */
+  static async getByGoal(orgSlug: string, goalId: string): Promise<Widget[]> {
+    return apiGet<Widget[]>('/v2/widgets/by-goal', { orgSlug, goalId });
+  }
+
+  /** Batch fetch active widgets for multiple goals (public, no auth) */
+  static async getByGoals(orgSlug: string, goalIds: string[]): Promise<Widget[]> {
+    if (goalIds.length === 0) return [];
+    return apiGet<Widget[]>(`/v2/widgets/by-goals?orgSlug=${encodeURIComponent(orgSlug)}&ids=${goalIds.join(',')}`);
+  }
 }

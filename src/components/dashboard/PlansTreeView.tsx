@@ -14,10 +14,11 @@ interface PlansTreeViewProps {
 type GoalStatus = 'on-track' | 'at-risk' | 'critical' | 'no-data';
 
 function getGoalStatus(goal: HierarchicalGoal): GoalStatus {
-  if (goal.calculated_status) {
-    if (goal.calculated_status === 'on-target') return 'on-track';
-    if (goal.calculated_status === 'at-risk') return 'at-risk';
-    if (goal.calculated_status === 'critical' || goal.calculated_status === 'off-target') return 'critical';
+  if (goal.status) {
+    if (goal.status === 'on-target') return 'on-track';
+    if (goal.status === 'at-risk') return 'at-risk';
+    if (goal.status === 'critical' || goal.status === 'off-target') return 'critical';
+    if (goal.status === 'not-started') return 'no-data';
     return 'no-data';
   }
 

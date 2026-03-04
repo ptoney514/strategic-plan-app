@@ -10,7 +10,6 @@ function planToSnakeCase(plan: typeof plans.$inferSelect) {
     id: plan.id,
     organization_id: plan.organizationId,
     district_id: plan.organizationId,
-    school_id: plan.schoolId,
     name: plan.name,
     slug: plan.slug,
     type_label: plan.typeLabel,
@@ -118,7 +117,7 @@ export async function GET(req: Request) {
  * POST /api/organizations/[slug]/plans
  * Create a new plan under this organization.
  * Body (snake_case): { name, slug?, type_label?, description?, cover_image_url?,
- *   is_public?, is_active?, start_date?, end_date?, order_position?, school_id? }
+ *   is_public?, is_active?, start_date?, end_date?, order_position? }
  * Requires auth + org membership (editor role minimum).
  */
 export async function POST(req: Request) {
@@ -174,7 +173,6 @@ export async function POST(req: Request) {
         startDate: body.start_date ?? undefined,
         endDate: body.end_date ?? undefined,
         orderPosition: body.order_position ?? 0,
-        schoolId: body.school_id ?? undefined,
       })
       .returning();
 

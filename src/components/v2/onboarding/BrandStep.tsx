@@ -1,4 +1,4 @@
-import { LogoUpload } from '../../admin/LogoUpload';
+import { LogoUpload } from '../LogoUpload';
 
 const PRESET_COLORS = [
   '#0099CC',

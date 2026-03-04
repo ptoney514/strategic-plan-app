@@ -2,7 +2,6 @@ import { apiGet, apiPost, apiPut, apiDelete } from '../api';
 import type {
   ImportSession,
   StagedGoal,
-  StagedMetric,
   ParsedExcelData,
   ImportSummary,
   ImportProgress
@@ -41,7 +40,7 @@ export class ImportService {
     _districtId: string,
     parsedData: ParsedExcelData,
     existingGoals: Goal[]
-  ): Promise<{ stagedGoals: StagedGoal[]; stagedMetrics: StagedMetric[] }> {
+  ): Promise<{ goals_count: number }> {
     // Validate all goals client-side
     const validationResults = ValidationService.validateAllGoals(parsedData.goals, existingGoals);
 
@@ -73,33 +72,10 @@ export class ImportService {
       };
     });
 
-    // Prepare staged metrics
-    const stagedMetricsToInsert: Record<string, unknown>[] = [];
-    parsedData.goals.forEach((goal) => {
-      goal.metrics.forEach(metric => {
-        const validation = ValidationService.validateMetric(metric);
-
-        stagedMetricsToInsert.push({
-          metric_name: metric.name,
-          measure_description: metric.measure_description,
-          frequency: metric.frequency,
-          baseline_value: metric.baseline_value,
-          time_series_data: metric.time_series,
-          symbol: metric.symbol,
-          validation_status: validation.status,
-          validation_messages: validation.messages,
-          is_mapped: false,
-          action: 'create',
-          // The server will match these to staged goals by row_number
-          _row_number: goal.row_number,
-        });
-      });
-    });
-
     // Send to server for staging
-    return apiPost<{ stagedGoals: StagedGoal[]; stagedMetrics: StagedMetric[] }>(
+    return apiPost<{ goals_count: number }>(
       `/imports/sessions/${sessionId}/stage`,
-      { goals: stagedGoalsToInsert, metrics: stagedMetricsToInsert }
+      { goals: stagedGoalsToInsert }
     );
   }
 
@@ -108,7 +84,6 @@ export class ImportService {
    */
   static async getStagedData(sessionId: string): Promise<{
     goals: StagedGoal[];
-    metrics: StagedMetric[];
   }> {
     return apiGet(`/imports/sessions/${sessionId}/staged`);
   }

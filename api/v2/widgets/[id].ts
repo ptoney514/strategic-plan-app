@@ -18,6 +18,7 @@ function toResponse(w: typeof widgets.$inferSelect) {
     id: w.id,
     organizationId: w.organizationId,
     planId: w.planId,
+    goalId: w.goalId,
     type: w.type,
     title: w.title,
     subtitle: w.subtitle,
@@ -127,6 +128,9 @@ export async function PUT(req: Request) {
 
     const planId = body.plan_id ?? body.planId;
     if (planId !== undefined) updates.planId = planId;
+
+    const goalId = body.goal_id ?? body.goalId;
+    if (goalId !== undefined) updates.goalId = goalId;
 
     const isActive = body.is_active ?? body.isActive;
     if (isActive !== undefined) updates.isActive = isActive;

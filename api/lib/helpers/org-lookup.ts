@@ -3,7 +3,6 @@ import { db } from "../db.js";
 import {
   goals,
   importSessions,
-  metrics,
   plans,
   organizations,
 } from "../schema/index.js";
@@ -41,28 +40,6 @@ export async function getOrgSlugForPlan(planId: string) {
     .from(plans)
     .innerJoin(organizations, eq(plans.organizationId, organizations.id))
     .where(eq(plans.id, planId))
-    .limit(1);
-
-  return row ?? null;
-}
-
-/**
- * Look up the organization for a metric via metric → goal → plan → organization.
- */
-export async function getOrgSlugForMetric(metricId: string) {
-  const [row] = await db
-    .select({
-      metricId: metrics.id,
-      goalId: goals.id,
-      planId: plans.id,
-      orgId: organizations.id,
-      orgSlug: organizations.slug,
-    })
-    .from(metrics)
-    .innerJoin(goals, eq(metrics.goalId, goals.id))
-    .innerJoin(plans, eq(goals.planId, plans.id))
-    .innerJoin(organizations, eq(plans.organizationId, organizations.id))
-    .where(eq(metrics.id, metricId))
     .limit(1);
 
   return row ?? null;

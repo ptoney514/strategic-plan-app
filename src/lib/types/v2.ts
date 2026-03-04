@@ -14,10 +14,14 @@ export interface WidgetDataPoint {
 export interface WidgetConfig {
   value?: number;
   target?: number;
+  baseline?: number;
   unit?: string;
   label?: string;
   trend?: string;
   trendDirection?: 'up' | 'down' | 'flat';
+  isHigherBetter?: boolean;
+  indicatorText?: string;
+  indicatorColor?: 'red' | 'green' | 'amber' | 'gray';
   dataPoints?: WidgetDataPoint[];
   legend?: string[];
   breakdownItems?: { label: string; value: number; color: string }[];
@@ -30,6 +34,7 @@ export interface CreateWidgetPayload {
   subtitle?: string;
   config?: WidgetConfig;
   plan_id?: string;
+  goal_id?: string;
   position?: number;
 }
 
@@ -39,6 +44,7 @@ export interface UpdateWidgetPayload {
   type?: WidgetType;
   config?: WidgetConfig;
   plan_id?: string;
+  goal_id?: string;
   position?: number;
   is_active?: boolean;
 }
@@ -52,6 +58,7 @@ export interface Widget {
   id: string;
   organizationId: string;
   planId: string;
+  goalId?: string;
   type: WidgetType;
   title: string;
   subtitle?: string;

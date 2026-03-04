@@ -21,7 +21,7 @@ function makeGoal(overrides: Partial<HierarchicalGoal> = {}): HierarchicalGoal {
     order_position: 1,
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
-    status_detail: 'not_started',
+    status: 'not_started',
     children: [],
     ...overrides,
   };

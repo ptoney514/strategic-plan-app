@@ -1,5 +1,3 @@
-import { GoalStatusBadge } from './GoalStatusBadge';
-
 export interface GoalRowProps {
   goalNumber: string;
   title: string;
@@ -12,7 +10,6 @@ export function GoalRow({
   goalNumber,
   title,
   description,
-  status,
   primaryColor = '#1e293b',
 }: GoalRowProps) {
   return (
@@ -45,7 +42,6 @@ export function GoalRow({
           </div>
         )}
       </div>
-      <GoalStatusBadge status={status} />
     </div>
   );
 }

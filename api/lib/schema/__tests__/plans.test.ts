@@ -14,7 +14,6 @@ describe("plans schema", () => {
     const expected = [
       "id",
       "organization_id",
-      "school_id",
       "name",
       "slug",
       "type_label",

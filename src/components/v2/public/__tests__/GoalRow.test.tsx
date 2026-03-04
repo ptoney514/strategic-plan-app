@@ -31,11 +31,6 @@ describe('GoalRow', () => {
     expect(screen.queryByText('Improve reading scores across all grade levels')).not.toBeInTheDocument();
   });
 
-  it('renders GoalStatusBadge with status', () => {
-    render(<GoalRow {...defaultProps} status="in_progress" />);
-    expect(screen.getByText('In Progress')).toBeInTheDocument();
-  });
-
   it('applies primaryColor to badge', () => {
     render(<GoalRow {...defaultProps} primaryColor="#ff0000" />);
     const badge = screen.getByText('1.1');

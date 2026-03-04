@@ -4,8 +4,8 @@ import {
   Search,
   Plus,
   Building2,
+  FileText,
   Target,
-  GraduationCap,
   Users,
   Loader2,
   MoreVertical,
@@ -18,8 +18,8 @@ import { useDistrictsWithStats } from '../../hooks/useSystemAdminStats';
 import { useUpdateDistrict, useDeleteDistrict } from '../../hooks/useDistricts';
 import { useQueryClient } from '@tanstack/react-query';
 import { buildSubdomainUrlWithPath } from '../../lib/subdomain';
-import { DistrictFormModal } from '../../components/admin/DistrictFormModal';
-import { DistrictActionsMenu } from '../../components/admin/DistrictActionsMenu';
+import { DistrictFormModal } from '../../components/system-admin/DistrictFormModal';
+import { DistrictActionsMenu } from '../../components/system-admin/DistrictActionsMenu';
 import type { DistrictWithStats } from '../../lib/services/systemAdmin.service';
 import type { District } from '../../lib/types';
 
@@ -302,12 +302,12 @@ export function DistrictsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-4 text-xs text-[#4a4a4a]">
                       <span className="flex items-center gap-1">
-                        <Target className="h-3.5 w-3.5 text-[#8a8a8a]" />
-                        {district.goals_count}
+                        <FileText className="h-3.5 w-3.5 text-[#8a8a8a]" />
+                        {district.plan_count}
                       </span>
                       <span className="flex items-center gap-1">
-                        <GraduationCap className="h-3.5 w-3.5 text-[#8a8a8a]" />
-                        {district.schools_count}
+                        <Target className="h-3.5 w-3.5 text-[#8a8a8a]" />
+                        {district.goals_count}
                       </span>
                       <span className="flex items-center gap-1">
                         <Users className="h-3.5 w-3.5 text-[#8a8a8a]" />

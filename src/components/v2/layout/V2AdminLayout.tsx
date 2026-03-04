@@ -20,7 +20,7 @@ export function V2AdminLayout() {
   const { user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const basePath = '/v2/admin';
+  const basePath = '/admin';
 
   if (isLoading) {
     return (

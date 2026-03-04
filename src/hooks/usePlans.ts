@@ -36,17 +36,6 @@ export function usePlansWithCounts(districtId: string) {
 }
 
 /**
- * Get all plans for a school by school ID
- */
-export function useSchoolPlans(schoolId: string) {
-  return useQuery({
-    queryKey: ['plans', 'school', schoolId],
-    queryFn: () => PlansService.getBySchoolId(schoolId),
-    enabled: !!schoolId && schoolId.length > 0,
-  });
-}
-
-/**
  * Get a single plan by ID
  */
 export function usePlan(planId: string) {
@@ -111,9 +100,6 @@ export function useCreatePlan() {
     mutationFn: (plan: Partial<Plan>) => PlansService.create(plan),
     onSuccess: (data) => {
       // Invalidate relevant queries
-      if (data.school_id) {
-        queryClient.invalidateQueries({ queryKey: ['plans', 'school', data.school_id] });
-      }
       if (data.district_id) {
         queryClient.invalidateQueries({ queryKey: ['plans', 'district', data.district_id] });
         queryClient.invalidateQueries({ queryKey: ['plans', 'with-counts', data.district_id] });

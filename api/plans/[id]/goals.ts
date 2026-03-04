@@ -1,9 +1,8 @@
 import { eq, asc } from "drizzle-orm";
 import { db } from "../../lib/db.js";
-import { plans, goals, metrics, organizations } from "../../lib/schema/index.js";
+import { plans, goals, organizations } from "../../lib/schema/index.js";
 import { requireOrgMember } from "../../lib/middleware/auth.js";
 import { getOrgSlugForPlan, isPublicOrg } from "../../lib/helpers/org-lookup.js";
-import { toNumberOrNull } from "../../lib/helpers/number.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -13,7 +12,6 @@ function goalToSnake(row: any) {
     plan_id: row.planId,
     organization_id: row.organizationId,
     district_id: row.organizationId,
-    school_id: row.schoolId,
     parent_id: row.parentId,
     goal_number: row.goalNumber,
     title: row.title,
@@ -21,66 +19,10 @@ function goalToSnake(row: any) {
     level: row.level,
     order_position: row.orderPosition,
     status: row.status,
-    calculated_status: row.calculatedStatus,
-    status_source: row.statusSource,
     overall_progress: row.overallProgress,
-    overall_progress_override: row.overallProgressOverride,
     overall_progress_display_mode: row.overallProgressDisplayMode,
-    overall_progress_source: row.overallProgressSource,
-    image_url: row.imageUrl,
-    header_color: row.headerColor,
-    cover_photo_url: row.coverPhotoUrl,
-    cover_photo_alt: row.coverPhotoAlt,
-    color: row.color,
-    show_progress_bar: row.showProgressBar,
     owner_name: row.ownerName,
-    department: row.department,
-    start_date: row.startDate,
-    end_date: row.endDate,
     priority: row.priority,
-    executive_summary: row.executiveSummary,
-    indicator_text: row.indicatorText,
-    indicator_color: row.indicatorColor,
-    created_at: row.createdAt,
-    updated_at: row.updatedAt,
-  };
-}
-
-function metricToSnake(row: any) {
-  return {
-    id: row.id,
-    goal_id: row.goalId,
-    name: row.name,
-    metric_name: row.metricName,
-    metric_category: row.metricCategory,
-    description: row.description,
-    metric_type: row.metricType,
-    data_source: row.dataSource,
-    current_value: toNumberOrNull(row.currentValue),
-    target_value: toNumberOrNull(row.targetValue),
-    unit: row.unit,
-    status: row.status,
-    chart_type: row.chartType,
-    display_options: row.displayOptions,
-    order_position: row.orderPosition,
-    display_width: row.displayWidth,
-    display_value: row.displayValue,
-    display_label: row.displayLabel,
-    display_sublabel: row.displaySublabel,
-    visualization_type: row.visualizationType,
-    visualization_config: row.visualizationConfig,
-    show_target_line: row.showTargetLine,
-    show_trend: row.showTrend,
-    frequency: row.frequency,
-    aggregation_method: row.aggregationMethod,
-    decimal_places: row.decimalPlaces,
-    is_percentage: row.isPercentage,
-    is_higher_better: row.isHigherBetter,
-    ytd_value: toNumberOrNull(row.ytdValue),
-    eoy_projection: toNumberOrNull(row.eoyProjection),
-    last_actual_period: row.lastActualPeriod,
-    baseline_value: toNumberOrNull(row.baselineValue),
-    trend_direction: row.trendDirection,
     created_at: row.createdAt,
     updated_at: row.updatedAt,
   };
@@ -88,15 +30,13 @@ function metricToSnake(row: any) {
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 /**
- * GET /api/plans/[id]/goals - Get all goals for a plan with optional metrics
- * Query param: includeMetrics=false to skip metric payload for lighter list views.
+ * GET /api/plans/[id]/goals - Get all goals for a plan
  * Returns a flat list ordered by goal_number; frontend builds hierarchy.
  */
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const id = url.pathname.split("/")[3];
-    const includeMetrics = url.searchParams.get("includeMetrics") !== "false";
     if (!id) return jsonError("Plan ID is required", 400);
 
     // Verify plan exists
@@ -124,32 +64,7 @@ export async function GET(req: Request) {
       .where(eq(goals.planId, id))
       .orderBy(asc(goals.goalNumber));
 
-    let planMetrics: (typeof metrics.$inferSelect)[] = [];
-    if (includeMetrics && planGoals.length > 0) {
-      planMetrics = await db
-        .select()
-        .from(metrics)
-        .innerJoin(goals, eq(metrics.goalId, goals.id))
-        .where(eq(goals.planId, id))
-        .orderBy(asc(metrics.orderPosition))
-        .then((rows) => rows.map((r) => r.metrics));
-    }
-
-    // Group metrics by goal_id
-    const metricsByGoalId = new Map<string, (typeof metrics.$inferSelect)[]>();
-    for (const metric of planMetrics) {
-      const existing = metricsByGoalId.get(metric.goalId) || [];
-      existing.push(metric);
-      metricsByGoalId.set(metric.goalId, existing);
-    }
-
-    // Assemble response: each goal with its metrics
-    const result = planGoals.map((goal) => ({
-      ...goalToSnake(goal),
-      metrics: (metricsByGoalId.get(goal.id) || []).map(metricToSnake),
-    }));
-
-    return jsonOk(result);
+    return jsonOk(planGoals.map(goalToSnake));
   } catch (error) {
     if (error instanceof Response) return error;
     return jsonError(
@@ -207,20 +122,8 @@ export async function POST(req: Request) {
       description: body.description ?? null,
       orderPosition: body.order_position ?? 0,
       organizationId: body.organization_id ?? plan.organizationId,
-      schoolId: body.school_id ?? null,
       ownerName: body.owner_name ?? null,
-      department: body.department ?? null,
       priority: body.priority ?? null,
-      startDate: body.start_date ?? null,
-      endDate: body.end_date ?? null,
-      executiveSummary: body.executive_summary ?? null,
-      imageUrl: body.image_url ?? null,
-      headerColor: body.header_color ?? null,
-      coverPhotoUrl: body.cover_photo_url ?? null,
-      coverPhotoAlt: body.cover_photo_alt ?? null,
-      color: body.color ?? null,
-      indicatorText: body.indicator_text ?? null,
-      indicatorColor: body.indicator_color ?? null,
     };
 
     const [created] = await db.insert(goals).values(insertData).returning();

@@ -3,7 +3,6 @@ import { db } from "../lib/db.js";
 import {
   organizations,
   goals,
-  schools,
   user,
 } from "../lib/schema/index.js";
 import { requireSystemAdmin } from "../lib/middleware/auth.js";
@@ -26,10 +25,6 @@ export async function GET(req: Request) {
       .from(goals)
       .where(sql`${goals.level} = 0`);
 
-    const [schoolCount] = await db
-      .select({ count: sql<number>`count(*)::int` })
-      .from(schools);
-
     const [userCount] = await db
       .select({ count: sql<number>`count(*)::int` })
       .from(user);
@@ -38,7 +33,6 @@ export async function GET(req: Request) {
       totalDistricts: districtCount.count,
       totalGoals: objectiveCount.count,
       totalUsers: userCount.count,
-      totalSchools: schoolCount.count,
     });
   } catch (error) {
     if (error instanceof Response) return error;

@@ -40,6 +40,8 @@ const mockGoals = [
     id: 'g-1',
     goal_number: '1',
     title: 'Academic Excellence',
+    description: 'Improve academic outcomes',
+    overall_progress: 72,
     level: 0,
     status_detail: 'in_progress',
     children: [{ id: 'g-1a' }, { id: 'g-1b' }],
@@ -107,7 +109,7 @@ describe('V2GoalsOverview', () => {
 
     const cards = screen.getAllByRole('button');
     await user.click(cards[0]);
-    expect(mockNavigate).toHaveBeenCalledWith('/v2/goals/g-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/goals/g-1');
   });
 
   it('shows loading spinner when loading', () => {
@@ -133,5 +135,16 @@ describe('V2GoalsOverview', () => {
     render(<V2GoalsOverview />);
 
     expect(screen.getByText('No public plan available')).toBeInTheDocument();
+  });
+
+  it('renders description in ObjectiveCard', () => {
+    render(<V2GoalsOverview />);
+    expect(screen.getByText('Improve academic outcomes')).toBeInTheDocument();
+  });
+
+  it('renders "View details" text for each card', () => {
+    render(<V2GoalsOverview />);
+    const viewDetailsLinks = screen.getAllByText('View details');
+    expect(viewDetailsLinks).toHaveLength(2);
   });
 });

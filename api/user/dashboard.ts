@@ -6,7 +6,6 @@ import {
   organizationMembers,
   plans,
   goals,
-  metrics,
 } from "../lib/schema/index.js";
 import { jsonOk, jsonError } from "../lib/response.js";
 
@@ -16,7 +15,7 @@ export async function GET(request: Request) {
 
     if (user.isSystemAdmin) {
       // System admin: aggregate counts in parallel
-      const [[orgCount], [planCount], [goalCount], [metricCount]] = await Promise.all([
+      const [[orgCount], [planCount], [goalCount]] = await Promise.all([
         db
           .select({ value: count() })
           .from(organizations)
@@ -28,16 +27,12 @@ export async function GET(request: Request) {
           .select({ value: count() })
           .from(goals)
           .where(eq(goals.level, 0)),
-        db
-          .select({ value: count() })
-          .from(metrics),
       ]);
 
       return jsonOk({
         district_count: orgCount.value,
         plan_count: planCount.value,
         objective_count: goalCount.value,
-        metric_count: metricCount.value,
       });
     }
 
@@ -55,11 +50,10 @@ export async function GET(request: Request) {
         district_count: 0,
         plan_count: 0,
         objective_count: 0,
-        metric_count: 0,
       });
     }
 
-    const [[planCount], [goalCount], [metricCount]] = await Promise.all([
+    const [[planCount], [goalCount]] = await Promise.all([
       db
         .select({ value: count() })
         .from(plans)
@@ -69,19 +63,12 @@ export async function GET(request: Request) {
         .from(goals)
         .innerJoin(plans, eq(goals.planId, plans.id))
         .where(and(eq(goals.level, 0), inArray(plans.organizationId, orgIds))),
-      db
-        .select({ value: count() })
-        .from(metrics)
-        .innerJoin(goals, eq(metrics.goalId, goals.id))
-        .innerJoin(plans, eq(goals.planId, plans.id))
-        .where(inArray(plans.organizationId, orgIds)),
     ]);
 
     return jsonOk({
       district_count: orgIds.length,
       plan_count: planCount.value,
       objective_count: goalCount.value,
-      metric_count: metricCount.value,
     });
   } catch (error) {
     if (error instanceof Response) return error;

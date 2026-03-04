@@ -1,9 +1,8 @@
 /**
- * Tests for cross-session integrity guards in import stage + execute endpoints.
+ * Tests for import stage + execute endpoints.
  *
- * 1. POST /stage rejects a staged_goal_id that belongs to a different session
- * 2. POST /stage accepts a staged_goal_id that belongs to the current session
- * 3. POST /execute scopes the staged-metrics query to the current session
+ * 1. POST /stage stages goals and returns count
+ * 2. POST /execute creates production goals from staged data
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
@@ -22,17 +21,13 @@ function createMockDb(config: MockDbConfig) {
   let selectIdx = 0;
   let insertIdx = 0;
   let updateIdx = 0;
-  const whereCalls: { type: string; idx: number; args: unknown[] }[] = [];
 
   function makeSelectChain() {
     const idx = selectIdx++;
     const result = config.selectResults[idx] ?? [];
     const chain: Record<string, unknown> = {};
     chain.from = vi.fn(() => chain);
-    chain.where = vi.fn((...args: unknown[]) => {
-      whereCalls.push({ type: "select", idx, args });
-      return chain;
-    });
+    chain.where = vi.fn(() => chain);
     chain.limit = vi.fn(() => Promise.resolve(result));
     chain.orderBy = vi.fn(() => Promise.resolve(result));
     chain.innerJoin = vi.fn(() => chain);
@@ -63,10 +58,7 @@ function createMockDb(config: MockDbConfig) {
     const result = (config.updateResults ?? [])[idx];
     const chain: Record<string, unknown> = {};
     chain.set = vi.fn(() => chain);
-    chain.where = vi.fn((...args: unknown[]) => {
-      whereCalls.push({ type: "update", idx, args });
-      return Promise.resolve(result);
-    });
+    chain.where = vi.fn(() => Promise.resolve(result));
     return chain;
   }
 
@@ -76,7 +68,6 @@ function createMockDb(config: MockDbConfig) {
       insert: vi.fn(() => makeInsertChain()),
       update: vi.fn(() => makeUpdateChain()),
     },
-    whereCalls,
   };
 }
 
@@ -123,57 +114,25 @@ const ORG_ID = "org-111";
 // Tests
 // ---------------------------------------------------------------------------
 
-describe("Import session integrity guards", () => {
+describe("Import session integrity", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   // =========================================================================
-  // 1. Stage: cross-session staged_goal_id rejection
+  // 1. Stage: stages goals and returns count
   // =========================================================================
-  describe("POST /stage — staged_goal_id validation", () => {
-    it("rejects a staged_goal_id that does not belong to the current session", async () => {
-      const foreignGoalId = "staged-goal-from-other-session";
-
+  describe("POST /stage — goal staging", () => {
+    it("stages goals and returns the count", async () => {
       activeMock = createMockDb({
         selectResults: [
           // 1: session lookup
           [{ id: SESSION_ID, organizationId: ORG_ID }],
           // 2: org slug lookup
           [{ slug: "test-org" }],
-          // 3: staged goal ownership check → NOT found
-          [],
-        ],
-      });
-
-      const req = makeRequest(
-        `/api/imports/sessions/${SESSION_ID}/stage`,
-        {
-          goals: [],
-          metrics: [{ staged_goal_id: foreignGoalId, metric_name: "Sneaky" }],
-        },
-      );
-
-      const res = await stagePost(req);
-      const body = await readJson(res);
-
-      expect(res.status).toBe(400);
-      expect(body.error).toContain(foreignGoalId);
-      expect(body.error).toContain("does not belong to this session");
-    });
-
-    it("accepts a staged_goal_id that belongs to the current session", async () => {
-      activeMock = createMockDb({
-        selectResults: [
-          // 1: session lookup
-          [{ id: SESSION_ID, organizationId: ORG_ID }],
-          // 2: org slug lookup
-          [{ slug: "test-org" }],
-          // 3: staged goal ownership check → found
-          [{ id: "sg-valid" }],
         ],
         insertResults: [
-          // 1: staged metrics insert (no .returning() but thenable)
+          // 1: staged goals insert
           [],
         ],
         updateResults: [
@@ -185,8 +144,10 @@ describe("Import session integrity guards", () => {
       const req = makeRequest(
         `/api/imports/sessions/${SESSION_ID}/stage`,
         {
-          goals: [],
-          metrics: [{ staged_goal_id: "sg-valid", metric_name: "Valid" }],
+          goals: [
+            { title: "Goal 1", goal_number: "1.0", level: 0 },
+            { title: "Goal 2", goal_number: "1.1", level: 1 },
+          ],
         },
       );
 
@@ -194,15 +155,15 @@ describe("Import session integrity guards", () => {
       const body = await readJson(res);
 
       expect(res.status).toBe(200);
-      expect(body).toEqual({ goals_count: 0, metrics_count: 1 });
+      expect(body).toEqual({ goals_count: 2 });
     });
   });
 
   // =========================================================================
-  // 2. Execute: session-scoped metric query
+  // 2. Execute: creates production goals
   // =========================================================================
-  describe("POST /execute — session-scoped metric query", () => {
-    it("scopes the staged metrics query to the current session", async () => {
+  describe("POST /execute — goal creation", () => {
+    it("creates production goals from staged data", async () => {
       const stagedGoal = {
         id: "sg-1",
         importSessionId: SESSION_ID,
@@ -227,8 +188,6 @@ describe("Import session integrity guards", () => {
           [{ orgId: ORG_ID }],
           // 4: staged goals fetch (resolved via .orderBy)
           [stagedGoal],
-          // 5: staged metrics for sg-1 (the query under test)
-          [],
         ],
         insertResults: [
           // 1: goal insert
@@ -249,26 +208,7 @@ describe("Import session integrity guards", () => {
       const body = await readJson(res);
 
       expect(res.status).toBe(200);
-      expect(body).toEqual({ goals_created: 1, metrics_created: 0 });
-
-      // Verify the staged-metrics where() call (select index 4) used an
-      // `and(...)` expression — meaning two conditions, not just stagedGoalId.
-      // Drizzle's and() returns a SQL node wrapping its children.
-      const metricsWhere = activeMock.whereCalls.find(
-        (c) => c.type === "select" && c.idx === 4,
-      );
-      expect(metricsWhere).toBeDefined();
-
-      // The arg to where() is `and(eq(stagedMetrics.stagedGoalId, ...), eq(stagedMetrics.importSessionId, ...))`
-      // Drizzle's `and()` returns a SQL object with a `queryChunks` array
-      // holding both eq expressions. Verify it's present (not undefined/null).
-      const andExpr = metricsWhere!.args[0] as Record<string, unknown>;
-      expect(andExpr).toBeDefined();
-      // Drizzle `and()` produces an object with queryChunks containing child expressions
-      expect(andExpr).toHaveProperty("queryChunks");
-      const chunks = andExpr.queryChunks as unknown[];
-      // `and(a, b)` produces chunks: [a, ' and ', b] — at least 3 elements
-      expect(chunks.length).toBeGreaterThanOrEqual(3);
+      expect(body).toEqual({ goals_created: 1 });
     });
   });
 });

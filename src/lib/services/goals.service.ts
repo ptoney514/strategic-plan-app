@@ -23,50 +23,14 @@ export class GoalsService {
   }
 
   /**
-   * Get goals for a specific school
-   */
-  static async getBySchool(schoolId: string): Promise<HierarchicalGoal[]> {
-    log.debug('Fetching goals for school:', schoolId);
-
-    const goals = await apiGet<Goal[]>(`/schools/${schoolId}/goals`);
-
-    log.debug('Raw school goals from API:', goals?.length ?? 0, 'goals');
-
-    const hierarchy = buildGoalHierarchy(goals || []);
-
-    log.debug('After buildGoalHierarchy:', hierarchy.length, 'top-level school goals');
-
-    return hierarchy;
-  }
-
-  /**
    * Get goals (objectives) for a specific plan
    */
-  static async getByPlan(
-    planId: string,
-    options?: { includeMetrics?: boolean }
-  ): Promise<HierarchicalGoal[]> {
+  static async getByPlan(planId: string): Promise<HierarchicalGoal[]> {
     log.debug('Fetching goals for plan:', planId);
-
-    const includeMetrics = options?.includeMetrics ?? true;
-    const params = new URLSearchParams();
-    if (!includeMetrics) {
-      params.set('includeMetrics', 'false');
-    }
-
-    const endpoint = params.size > 0
-      ? `/plans/${planId}/goals?${params.toString()}`
-      : `/plans/${planId}/goals`;
-
-    // The API returns all goals for the plan with metrics nested
-    const goals = await apiGet<Goal[]>(endpoint);
-
+    const goals = await apiGet<Goal[]>(`/plans/${planId}/goals`);
     log.debug('Total goals for plan:', goals?.length ?? 0);
-
     const hierarchy = buildGoalHierarchy(goals || []);
-
     log.debug('After buildGoalHierarchy:', hierarchy.length, 'top-level plan objectives');
-
     return hierarchy;
   }
 
@@ -84,15 +48,11 @@ export class GoalsService {
   }
 
   /**
-   * Create a new goal for district or school
+   * Create a new goal for a district
    */
   static async create(goal: Partial<Goal>): Promise<Goal> {
-    // Validate mutual exclusivity
-    if (goal.district_id && goal.school_id) {
-      throw new Error('Goal cannot belong to both district and school');
-    }
-    if (!goal.district_id && !goal.school_id) {
-      throw new Error('Goal must belong to either a district or a school');
+    if (!goal.district_id) {
+      throw new Error('Goal must belong to a district');
     }
 
     // Get existing goals to calculate next goal number
@@ -129,12 +89,11 @@ export class GoalsService {
    * Renumber goals within a specific parent
    */
   static async renumberGoals(
-    options: { districtId?: string; schoolId?: string },
+    options: { districtId?: string },
     parentId: string | null
   ): Promise<void> {
     await apiPut('/goals/renumber', {
       district_id: options.districtId,
-      school_id: options.schoolId,
       parent_id: parentId,
     });
   }
@@ -143,7 +102,7 @@ export class GoalsService {
    * Reorder goals and automatically renumber them
    */
   static async reorderAndRenumber(
-    options: { districtId?: string; schoolId?: string },
+    options: { districtId?: string },
     parentId: string | null,
     reorderedGoals: { id: string; order_position: number }[]
   ): Promise<void> {

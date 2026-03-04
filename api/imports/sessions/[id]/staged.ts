@@ -4,7 +4,6 @@ import {
   importSessions,
   organizations,
   stagedGoals,
-  stagedMetrics,
 } from "../../../lib/schema/index.js";
 import { requireOrgMember } from "../../../lib/middleware/auth.js";
 import { jsonOk, jsonError } from "../../../lib/response.js";
@@ -31,30 +30,6 @@ function stagedGoalToSnake(sg: typeof stagedGoals.$inferSelect) {
     auto_fix_suggestions: sg.autoFixSuggestions,
     created_at: sg.createdAt,
     updated_at: sg.updatedAt,
-  };
-}
-
-function stagedMetricToSnake(sm: typeof stagedMetrics.$inferSelect) {
-  return {
-    id: sm.id,
-    staged_goal_id: sm.stagedGoalId,
-    import_session_id: sm.importSessionId,
-    metric_name: sm.metricName,
-    measure_description: sm.measureDescription,
-    metric_type: sm.metricType,
-    data_source: sm.dataSource,
-    frequency: sm.frequency,
-    baseline_value: sm.baselineValue,
-    time_series_data: sm.timeSeriesData,
-    unit: sm.unit,
-    symbol: sm.symbol,
-    validation_status: sm.validationStatus,
-    validation_messages: sm.validationMessages,
-    is_mapped: sm.isMapped,
-    mapped_to_metric_id: sm.mappedToMetricId,
-    action: sm.action,
-    created_at: sm.createdAt,
-    updated_at: sm.updatedAt,
   };
 }
 
@@ -99,14 +74,8 @@ export async function GET(req: Request) {
       .where(eq(stagedGoals.importSessionId, sessionId))
       .orderBy(stagedGoals.rowNumber);
 
-    const metricsData = await db
-      .select()
-      .from(stagedMetrics)
-      .where(eq(stagedMetrics.importSessionId, sessionId));
-
     return jsonOk({
       goals: goalsData.map(stagedGoalToSnake),
-      metrics: metricsData.map(stagedMetricToSnake),
     });
   } catch (error) {
     if (error instanceof Response) return error;

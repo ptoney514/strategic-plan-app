@@ -48,7 +48,7 @@ vi.mock('@/components/Toast', () => ({
 }));
 
 // Mock LogoUpload component
-vi.mock('@/components/admin/LogoUpload', () => ({
+vi.mock('@/components/v2/LogoUpload', () => ({
   LogoUpload: () => <div data-testid="logo-upload">Logo Upload</div>,
 }));
 

@@ -10,7 +10,6 @@ function toSnake(row: typeof plans.$inferSelect) {
     id: row.id,
     organization_id: row.organizationId,
     district_id: row.organizationId,
-    school_id: row.schoolId,
     name: row.name,
     slug: row.slug,
     type_label: row.typeLabel,

@@ -4,6 +4,16 @@ import userEvent from '@testing-library/user-event';
 import { GoalTreeItem } from '../GoalTreeItem';
 import type { HierarchicalGoal } from '@/lib/types';
 
+// Mock navigate
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: () => mockNavigate,
+  };
+});
+
 // Mock the goal hooks
 const mockUpdateMutate = vi.fn();
 const mockDeleteMutate = vi.fn();
@@ -26,7 +36,7 @@ function makeGoal(overrides: Partial<HierarchicalGoal> = {}): HierarchicalGoal {
     order_position: 1,
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
-    status_detail: 'in_progress',
+    status: 'in_progress',
     children: [],
     ...overrides,
   };
@@ -173,5 +183,19 @@ describe('GoalTreeItem', () => {
 
     expect(screen.getByText('Improve Academic Achievement')).toBeInTheDocument();
     expect(screen.getByText('Child Goal')).toBeInTheDocument();
+  });
+
+  it('renders goal detail link', () => {
+    render(<GoalTreeItem goal={makeGoal()} {...defaultProps} />);
+
+    expect(screen.getByTitle('View goal details')).toBeInTheDocument();
+  });
+
+  it('navigates to goal detail page when detail link clicked', async () => {
+    const user = userEvent.setup();
+    render(<GoalTreeItem goal={makeGoal()} {...defaultProps} />);
+
+    await user.click(screen.getByTitle('View goal details'));
+    expect(mockNavigate).toHaveBeenCalledWith('/admin/goals/goal-1');
   });
 });

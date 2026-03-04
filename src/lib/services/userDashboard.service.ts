@@ -5,7 +5,6 @@ export interface UserDashboardStats {
   district_count: number;
   plan_count: number;
   objective_count: number;
-  metric_count: number;
 }
 
 export interface UserDistrictWithStats extends District {

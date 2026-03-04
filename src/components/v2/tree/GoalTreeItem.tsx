@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Plus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import type { HierarchicalGoal } from '../../../lib/types';
 import { useUpdateGoal, useDeleteGoal } from '../../../hooks/v2/useGoals';
 import { AddGoalInline } from './AddGoalInline';
@@ -30,6 +31,7 @@ const INDENT: Record<number, string> = {
 };
 
 export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(goal.title);
   const [showAddChild, setShowAddChild] = useState(false);
@@ -127,7 +129,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
 
         {/* Status dropdown */}
         <select
-          value={(goal as unknown as { status?: string }).status || goal.status_detail || 'not_started'}
+          value={goal.status || 'not_started'}
           onChange={handleStatusChange}
           className="text-xs rounded px-2 py-1 cursor-pointer outline-none"
           style={{
@@ -140,6 +142,16 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
         </select>
+
+        {/* Detail page link */}
+        <button
+          onClick={() => navigate(`/admin/goals/${goal.id}`)}
+          className="opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity"
+          style={{ color: 'var(--editorial-text-secondary)' }}
+          title="View goal details"
+        >
+          <ExternalLink className="h-4 w-4" />
+        </button>
 
         {/* Add sub-goal button (only for L0 and L1) */}
         {goal.level < 2 && (

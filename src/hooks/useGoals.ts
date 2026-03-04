@@ -12,31 +12,13 @@ export function useGoals(districtId: string) {
 }
 
 /**
- * Hook to fetch goals for a specific school
- * @param schoolId - The school ID to fetch goals for
- */
-export function useSchoolGoals(schoolId: string) {
-  return useQuery({
-    queryKey: ['goals', 'school', schoolId],
-    queryFn: () => GoalsService.getBySchool(schoolId),
-    enabled: !!schoolId && schoolId.length > 0,
-    retry: false,
-  });
-}
-
-/**
  * Hook to fetch goals (objectives) for a specific plan
  * @param planId - The plan ID to fetch objectives for
  */
-export function usePlanGoals(
-  planId: string,
-  options?: { includeMetrics?: boolean }
-) {
-  const includeMetrics = options?.includeMetrics ?? true;
-
+export function usePlanGoals(planId: string) {
   return useQuery({
-    queryKey: ['goals', 'plan', planId, includeMetrics ? 'with-metrics' : 'without-metrics'],
-    queryFn: () => GoalsService.getByPlan(planId, { includeMetrics }),
+    queryKey: ['goals', 'plan', planId],
+    queryFn: () => GoalsService.getByPlan(planId),
     enabled: !!planId && planId.length > 0,
     retry: false,
   });
@@ -64,10 +46,8 @@ export function useCreateGoal() {
   return useMutation({
     mutationFn: (goal: Partial<Goal>) => GoalsService.create(goal),
     onSuccess: (data) => {
-      // Invalidate the appropriate goals list based on whether it's a district or school goal
-      if (data.school_id) {
-        queryClient.invalidateQueries({ queryKey: ['goals', 'school', data.school_id] });
-      } else if (data.district_id) {
+      // Invalidate the district goals list
+      if (data.district_id) {
         queryClient.invalidateQueries({ queryKey: ['goals', 'district', data.district_id] });
       }
       if (data.parent_id) {
@@ -121,7 +101,6 @@ export function useReorderGoals() {
 
 /**
  * Hook to reorder and renumber goals
- * Supports both district and school contexts
  */
 export function useReorderAndRenumberGoals() {
   const queryClient = useQueryClient();
@@ -129,15 +108,13 @@ export function useReorderAndRenumberGoals() {
   return useMutation({
     mutationFn: ({
       districtId,
-      schoolId,
       parentId,
       reorderedGoals,
     }: {
       districtId?: string;
-      schoolId?: string;
       parentId: string | null;
       reorderedGoals: { id: string; order_position: number }[];
-    }) => GoalsService.reorderAndRenumber({ districtId, schoolId }, parentId, reorderedGoals),
+    }) => GoalsService.reorderAndRenumber({ districtId }, parentId, reorderedGoals),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['goals'] });
     },

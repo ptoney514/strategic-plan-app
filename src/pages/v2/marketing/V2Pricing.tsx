@@ -24,7 +24,7 @@ const tiers: Tier[] = [
       'Community support',
     ],
     cta: 'Get Started',
-    ctaLink: '/signup?redirect=/v2/onboard',
+    ctaLink: '/signup?redirect=/onboard',
   },
   {
     name: 'Pro',
@@ -39,7 +39,7 @@ const tiers: Tier[] = [
       'Excel import',
     ],
     cta: 'Start Free Trial',
-    ctaLink: '/signup?redirect=/v2/onboard',
+    ctaLink: '/signup?redirect=/onboard',
     highlighted: true,
   },
   {

@@ -20,7 +20,7 @@ describe('V2Landing', () => {
 
     const ctaLink = screen.getByText('Get Started Free');
     expect(ctaLink).toBeInTheDocument();
-    expect(ctaLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/v2/onboard');
+    expect(ctaLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/onboard');
   });
 
   it('renders View Pricing link', () => {
@@ -28,7 +28,7 @@ describe('V2Landing', () => {
 
     const pricingLink = screen.getByText('View Pricing');
     expect(pricingLink).toBeInTheDocument();
-    expect(pricingLink.closest('a')).toHaveAttribute('href', '/v2/pricing');
+    expect(pricingLink.closest('a')).toHaveAttribute('href', '/pricing');
   });
 
   it('renders feature sections', () => {

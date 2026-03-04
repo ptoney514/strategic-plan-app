@@ -37,11 +37,6 @@ describe('ObjectiveCard', () => {
     expect(screen.getByText('3 goals')).toBeInTheDocument();
   });
 
-  it('renders GoalStatusBadge with status', () => {
-    render(<ObjectiveCard {...defaultProps} status="in_progress" />);
-    expect(screen.getByText('In Progress')).toBeInTheDocument();
-  });
-
   it('renders fallback description when none provided', () => {
     render(<ObjectiveCard {...defaultProps} />);
     expect(

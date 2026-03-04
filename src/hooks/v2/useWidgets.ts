@@ -23,38 +23,38 @@ export function useCreateWidget(orgSlug: string) {
   return useMutation({
     mutationFn: (data: CreateWidgetPayload) => WidgetService.create(orgSlug, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+      queryClient.invalidateQueries({ queryKey: ['widgets'] });
     },
   });
 }
 
-export function useUpdateWidget(orgSlug: string) {
+export function useUpdateWidget(_orgSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateWidgetPayload }) =>
       WidgetService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+      queryClient.invalidateQueries({ queryKey: ['widgets'] });
     },
   });
 }
 
-export function useDeleteWidget(orgSlug: string) {
+export function useDeleteWidget(_orgSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => WidgetService.delete(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+      queryClient.invalidateQueries({ queryKey: ['widgets'] });
     },
   });
 }
 
-export function useReorderWidgets(orgSlug: string) {
+export function useReorderWidgets(_orgSlug: string) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: ReorderWidgetPayload) => WidgetService.reorder(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['widgets', orgSlug] });
+      queryClient.invalidateQueries({ queryKey: ['widgets'] });
     },
   });
 }

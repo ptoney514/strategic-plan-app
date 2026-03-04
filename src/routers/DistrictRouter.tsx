@@ -69,6 +69,7 @@ const V2Appearance = lazy(() => import('../pages/v2/admin/V2Appearance').then(m 
 const V2Team = lazy(() => import('../pages/v2/admin/V2Team').then(m => ({ default: m.V2Team })));
 const V2WidgetBuilder = lazy(() => import('../pages/v2/admin/V2WidgetBuilder').then(m => ({ default: m.V2WidgetBuilder })));
 const V2Import = lazy(() => import('../pages/v2/admin/V2Import').then(m => ({ default: m.V2Import })));
+const V2GoalDetail = lazy(() => import('../pages/v2/admin/V2GoalDetail').then(m => ({ default: m.V2GoalDetail })));
 
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, loading } = useAuth();
@@ -221,6 +222,7 @@ export function DistrictRouter() {
         <Route path="team" element={<Suspense fallback={null}><V2Team /></Suspense>} />
         <Route path="widgets" element={<Suspense fallback={null}><V2WidgetBuilder /></Suspense>} />
         <Route path="import" element={<Suspense fallback={null}><V2Import /></Suspense>} />
+        <Route path="goals/:goalId" element={<Suspense fallback={null}><V2GoalDetail /></Suspense>} />
       </Route>
 
       {/* Catch-all redirects to district dashboard */}

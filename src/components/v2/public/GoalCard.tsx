@@ -1,5 +1,4 @@
 import type { Widget, WidgetConfig } from '../../../lib/types/v2';
-import { GoalStatusBadge } from './GoalStatusBadge';
 
 const INDICATOR_COLORS: Record<string, { bg: string; text: string; dot: string }> = {
   red: { bg: '#fee2e2', text: '#dc2626', dot: '#dc2626' },
@@ -41,16 +40,17 @@ export interface GoalCardProps {
   primaryColor?: string;
   isExpanded: boolean;
   onClick: () => void;
+  subGoalCount?: number;
 }
 
 export function GoalCard({
   goalNumber,
   title,
-  status,
   widgets = [],
   primaryColor,
   isExpanded,
   onClick,
+  subGoalCount,
 }: GoalCardProps) {
   const primaryWidget = widgets[0];
   const config = primaryWidget?.config;
@@ -138,7 +138,11 @@ export function GoalCard({
               </span>
             )}
           </div>
-          <GoalStatusBadge status={status} />
+          {subGoalCount != null && subGoalCount > 0 && (
+            <span className="text-[10px] font-medium" style={{ color: 'var(--editorial-text-secondary)' }}>
+              {subGoalCount} sub-goal{subGoalCount !== 1 ? 's' : ''}
+            </span>
+          )}
         </div>
       </div>
     </button>

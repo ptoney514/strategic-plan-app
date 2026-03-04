@@ -698,7 +698,7 @@ async function seed() {
   ]);
 
   // =========================================================================
-  // EASTSIDE GOALS (12 total: 4 objectives + 8 strategies)
+  // EASTSIDE GOALS (16 total: 4 objectives + 8 strategies + 4 sub-goals)
   // =========================================================================
 
   // --- Eastside Objective 1: College & Career Readiness ---
@@ -750,6 +750,38 @@ async function seed() {
     },
   ]);
 
+  // Sub-goals for Eastside Goal 1.1 (Graduation Rate)
+  await db.insert(schema.goals).values([
+    {
+      id: "b0001001-0001-0001-0000-000000000000",
+      planId: PLAN_EASTSIDE,
+      organizationId: ORG_EASTSIDE,
+      parentId: "b0001001-0001-0000-0000-000000000000",
+      goalNumber: "1.1.1",
+      title: "9th Grade On-Track Indicator",
+      description:
+        "Monitor and improve 9th grade on-track rates to 90% by identifying at-risk students early",
+      level: 2,
+      orderPosition: 1,
+      status: "in_progress",
+      overallProgress: "78.00",
+    },
+    {
+      id: "b0001001-0001-0002-0000-000000000000",
+      planId: PLAN_EASTSIDE,
+      organizationId: ORG_EASTSIDE,
+      parentId: "b0001001-0001-0000-0000-000000000000",
+      goalNumber: "1.1.2",
+      title: "Credit Recovery Programs",
+      description:
+        "Expand credit recovery and alternative pathway options for students behind on credits",
+      level: 2,
+      orderPosition: 2,
+      status: "in_progress",
+      overallProgress: "65.00",
+    },
+  ]);
+
   // --- Eastside Objective 2: Academic Excellence (NEW) ---
   await db.insert(schema.goals).values({
     id: "b0001002-0000-0000-0000-000000000000",
@@ -798,6 +830,38 @@ async function seed() {
       orderPosition: 2,
       status: "completed",
       overallProgress: "92.00",
+    },
+  ]);
+
+  // Sub-goals for Eastside Goal 2.1 (STEM Education)
+  await db.insert(schema.goals).values([
+    {
+      id: "b0001002-0001-0001-0000-000000000000",
+      planId: PLAN_EASTSIDE,
+      organizationId: ORG_EASTSIDE,
+      parentId: "b0001002-0001-0000-0000-000000000000",
+      goalNumber: "2.1.1",
+      title: "Computer Science Pathways",
+      description:
+        "Launch K-12 computer science curriculum with AP CS offerings at all high schools",
+      level: 2,
+      orderPosition: 1,
+      status: "in_progress",
+      overallProgress: "45.00",
+    },
+    {
+      id: "b0001002-0001-0002-0000-000000000000",
+      planId: PLAN_EASTSIDE,
+      organizationId: ORG_EASTSIDE,
+      parentId: "b0001002-0001-0000-0000-000000000000",
+      goalNumber: "2.1.2",
+      title: "STEM Teacher Development",
+      description:
+        "Provide ongoing STEM professional development and industry partnership opportunities",
+      level: 2,
+      orderPosition: 2,
+      status: "not_started",
+      overallProgress: "0.00",
     },
   ]);
 
@@ -903,7 +967,7 @@ async function seed() {
     },
   ]);
 
-  console.log("   Done (35 goals).\n");
+  console.log("   Done (39 goals).\n");
 
   // -------------------------------------------------------------------------
   // Section 6: Insert metrics

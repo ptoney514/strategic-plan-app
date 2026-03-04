@@ -34,6 +34,7 @@ export interface CreateWidgetPayload {
   subtitle?: string;
   config?: WidgetConfig;
   plan_id?: string;
+  goal_id?: string;
   position?: number;
 }
 
@@ -43,6 +44,7 @@ export interface UpdateWidgetPayload {
   type?: WidgetType;
   config?: WidgetConfig;
   plan_id?: string;
+  goal_id?: string;
   position?: number;
   is_active?: boolean;
 }

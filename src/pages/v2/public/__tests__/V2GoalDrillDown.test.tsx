@@ -68,38 +68,49 @@ vi.mock('../../../../hooks/v2/useWidgets', () => ({
   useWidgetsByGoals: (...args: unknown[]) => mockUseWidgetsByGoals(...args),
 }));
 
-// Mock useQuery from @tanstack/react-query
-const mockUseQuery = vi.fn();
-vi.mock('@tanstack/react-query', async () => {
-  const actual = await vi.importActual('@tanstack/react-query');
-  return { ...actual, useQuery: (...args: unknown[]) => mockUseQuery(...args) };
-});
+// Mock useGoalsByPlan
+const mockUseGoalsByPlan = vi.fn();
+vi.mock('../../../../hooks/v2/useGoals', () => ({
+  useGoalsByPlan: (...args: unknown[]) => mockUseGoalsByPlan(...args),
+}));
 
-const mockGoal = {
-  id: 'goal-1',
-  goal_number: '1',
-  title: 'Academic Excellence',
-  description: 'Improve student outcomes',
-  status_detail: 'in_progress',
-  level: 0,
-  overall_progress: 72,
-};
-
-const mockChildren = [
+const mockHierarchicalGoals = [
   {
-    id: 'c-1',
-    goal_number: '1.1',
-    title: 'Reading Proficiency',
-    description: 'Increase reading scores',
+    id: 'goal-1',
+    goal_number: '1',
+    title: 'Academic Excellence',
+    description: 'Improve student outcomes',
     status_detail: 'in_progress',
-    overall_progress: 65,
-  },
-  {
-    id: 'c-2',
-    goal_number: '1.2',
-    title: 'Math Achievement',
-    status_detail: 'not_started',
-    overall_progress: 30,
+    level: 0,
+    overall_progress: 72,
+    children: [
+      {
+        id: 'c-1',
+        goal_number: '1.1',
+        title: 'Reading Proficiency',
+        description: 'Increase reading scores',
+        status_detail: 'in_progress',
+        overall_progress: 65,
+        children: [
+          {
+            id: 'gc-1',
+            goal_number: '1.1.1',
+            title: 'Phonics Program',
+            status_detail: 'in_progress',
+            level: 2,
+            children: [],
+          },
+        ],
+      },
+      {
+        id: 'c-2',
+        goal_number: '1.2',
+        title: 'Math Achievement',
+        status_detail: 'not_started',
+        overall_progress: 30,
+        children: [],
+      },
+    ],
   },
 ];
 
@@ -135,14 +146,9 @@ describe('V2GoalDrillDown', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    mockUseQuery.mockImplementation(({ queryKey }: { queryKey: string[] }) => {
-      if (queryKey[0] === 'goal') {
-        return { data: mockGoal, isLoading: false };
-      }
-      if (queryKey[0] === 'goal-children') {
-        return { data: mockChildren, isLoading: false };
-      }
-      return { data: undefined, isLoading: false };
+    mockUseGoalsByPlan.mockReturnValue({
+      data: mockHierarchicalGoals,
+      isLoading: false,
     });
 
     mockUseWidgetsByGoals.mockReturnValue({
@@ -159,12 +165,6 @@ describe('V2GoalDrillDown', () => {
   it('renders goal description', () => {
     render(<V2GoalDrillDown />);
     expect(screen.getByText('Improve student outcomes')).toBeInTheDocument();
-  });
-
-  it('renders GoalStatusBadge', () => {
-    render(<V2GoalDrillDown />);
-    const badges = screen.getAllByText('In Progress');
-    expect(badges.length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders breadcrumb with plan name and goal title', () => {
@@ -214,37 +214,35 @@ describe('V2GoalDrillDown', () => {
   });
 
   it('shows loading spinner when loading', () => {
-    mockUseQuery.mockReturnValue({ data: undefined, isLoading: true });
+    mockUseGoalsByPlan.mockReturnValue({ data: undefined, isLoading: true });
     const { container } = render(<V2GoalDrillDown />);
 
     const spinner = container.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
   });
 
-  it('shows "Goal not found" when goal is null', () => {
-    mockUseQuery.mockImplementation(({ queryKey }: { queryKey: string[] }) => {
-      if (queryKey[0] === 'goal') {
-        return { data: null, isLoading: false };
-      }
-      if (queryKey[0] === 'goal-children') {
-        return { data: [], isLoading: false };
-      }
-      return { data: undefined, isLoading: false };
-    });
+  it('shows "Goal not found" when goal is not in hierarchy', () => {
+    mockUseGoalsByPlan.mockReturnValue({ data: [], isLoading: false });
     render(<V2GoalDrillDown />);
 
     expect(screen.getByText('Goal not found')).toBeInTheDocument();
   });
 
   it('shows empty children message when no children', () => {
-    mockUseQuery.mockImplementation(({ queryKey }: { queryKey: string[] }) => {
-      if (queryKey[0] === 'goal') {
-        return { data: mockGoal, isLoading: false };
-      }
-      if (queryKey[0] === 'goal-children') {
-        return { data: [], isLoading: false };
-      }
-      return { data: undefined, isLoading: false };
+    mockUseGoalsByPlan.mockReturnValue({
+      data: [
+        {
+          id: 'goal-1',
+          goal_number: '1',
+          title: 'Academic Excellence',
+          description: 'Improve student outcomes',
+          status_detail: 'in_progress',
+          level: 0,
+          overall_progress: 72,
+          children: [],
+        },
+      ],
+      isLoading: false,
     });
     render(<V2GoalDrillDown />);
 
@@ -291,8 +289,71 @@ describe('V2GoalDrillDown', () => {
     expect(grid).toBeInTheDocument();
   });
 
-  it('passes useWidgetsByGoals the child goal IDs', () => {
+  it('passes useWidgetsByGoals parent ID plus all descendant IDs', () => {
     render(<V2GoalDrillDown />);
-    expect(mockUseWidgetsByGoals).toHaveBeenCalledWith(['c-1', 'c-2']);
+    expect(mockUseWidgetsByGoals).toHaveBeenCalledWith(['goal-1', 'c-1', 'gc-1', 'c-2']);
+  });
+
+  it('shows parent widgets in Metrics section when goal has no children', () => {
+    mockUseGoalsByPlan.mockReturnValue({
+      data: [
+        {
+          id: 'goal-1',
+          goal_number: '1',
+          title: 'Academic Excellence',
+          description: 'Improve student outcomes',
+          status_detail: 'in_progress',
+          level: 0,
+          overall_progress: 72,
+          children: [],
+        },
+      ],
+      isLoading: false,
+    });
+    mockUseWidgetsByGoals.mockReturnValue({
+      data: [
+        {
+          id: 'w-parent',
+          organizationId: 'org-1',
+          planId: 'plan-1',
+          goalId: 'goal-1',
+          type: 'big-number',
+          title: 'Graduation Rate',
+          config: { value: 95, unit: '%' },
+          position: 0,
+          isActive: true,
+          createdAt: '2025-01-01T00:00:00Z',
+          updatedAt: '2025-01-01T00:00:00Z',
+        },
+      ],
+      isLoading: false,
+    });
+    render(<V2GoalDrillDown />);
+
+    expect(screen.getByText('Metrics (1)')).toBeInTheDocument();
+    expect(screen.queryByText('No goals defined for this objective yet.')).not.toBeInTheDocument();
+  });
+
+  it('shows empty state when goal has no children and no widgets', () => {
+    mockUseGoalsByPlan.mockReturnValue({
+      data: [
+        {
+          id: 'goal-1',
+          goal_number: '1',
+          title: 'Academic Excellence',
+          description: 'Improve student outcomes',
+          status_detail: 'in_progress',
+          level: 0,
+          overall_progress: 72,
+          children: [],
+        },
+      ],
+      isLoading: false,
+    });
+    mockUseWidgetsByGoals.mockReturnValue({ data: [], isLoading: false });
+    render(<V2GoalDrillDown />);
+
+    expect(screen.getByText('No goals defined for this objective yet.')).toBeInTheDocument();
+    expect(screen.queryByText(/^Metrics/)).not.toBeInTheDocument();
   });
 });

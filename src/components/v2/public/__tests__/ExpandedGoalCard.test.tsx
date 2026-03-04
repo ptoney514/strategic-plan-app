@@ -176,7 +176,7 @@ describe('ExpandedGoalCard', () => {
     expect(screen.getByText('High')).toBeInTheDocument();
   });
 
-  it('shows sub-goals fallback when no widgets but children exist', () => {
+  it('shows sub-goals when no widgets', () => {
     render(<ExpandedGoalCard goal={mockGoal} widgets={[]} onClose={onClose} />);
     expect(screen.getByText('Sub-Goals (2)')).toBeInTheDocument();
     expect(screen.getByText('K-2 Reading Program')).toBeInTheDocument();
@@ -185,10 +185,20 @@ describe('ExpandedGoalCard', () => {
     expect(screen.getByText('1.1.2')).toBeInTheDocument();
   });
 
-  it('shows GoalStatusBadge', () => {
+  it('shows sub-goals alongside widgets', () => {
     render(<ExpandedGoalCard goal={mockGoal} widgets={mockWidgets} onClose={onClose} />);
-    const badges = screen.getAllByText('In Progress');
-    expect(badges.length).toBeGreaterThanOrEqual(1);
+    // Widget chart should be present
+    expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
+    expect(screen.getByText('72%')).toBeInTheDocument();
+    // Sub-goals should also be present
+    expect(screen.getByText('Sub-Goals (2)')).toBeInTheDocument();
+    expect(screen.getByText('K-2 Reading Program')).toBeInTheDocument();
+    expect(screen.getByText('Grade 3-5 Comprehension')).toBeInTheDocument();
+  });
+
+  it('shows sub-goal description when present', () => {
+    render(<ExpandedGoalCard goal={mockGoal} widgets={[]} onClose={onClose} />);
+    expect(screen.getByText('Early literacy initiative')).toBeInTheDocument();
   });
 
   it('shows goal number in header badge', () => {
@@ -284,5 +294,43 @@ describe('ExpandedGoalCard', () => {
     }];
     render(<ExpandedGoalCard goal={mockGoal} widgets={pieWidgets} onClose={onClose} />);
     expect(screen.getByTestId('pie-chart')).toBeInTheDocument();
+  });
+
+  it('renders sub-goal rows as links with correct href', () => {
+    render(<ExpandedGoalCard goal={mockGoal} widgets={[]} onClose={onClose} />);
+    const link1 = screen.getByRole('link', { name: /K-2 Reading Program/i });
+    const link2 = screen.getByRole('link', { name: /Grade 3-5 Comprehension/i });
+    expect(link1).toHaveAttribute('href', '/v2/goals/child-1');
+    expect(link2).toHaveAttribute('href', '/v2/goals/child-2');
+  });
+
+  it('shows inline widget preview when subGoalWidgets provided', () => {
+    const subGoalWidgets: Record<string, Widget[]> = {
+      'child-1': [{
+        id: 'w-sub-1',
+        organizationId: 'org-1',
+        planId: 'plan-1',
+        goalId: 'child-1',
+        type: 'big-number',
+        title: 'Literacy Rate',
+        config: { value: 88, unit: '%' },
+        position: 0,
+        isActive: true,
+        createdAt: '2025-01-01T00:00:00Z',
+        updatedAt: '2025-01-01T00:00:00Z',
+      }],
+    };
+    render(
+      <ExpandedGoalCard goal={mockGoal} widgets={[]} subGoalWidgets={subGoalWidgets} onClose={onClose} />
+    );
+    expect(screen.getByText('88% · VALUE')).toBeInTheDocument();
+  });
+
+  it('renders sub-goal as link even without widget preview', () => {
+    render(<ExpandedGoalCard goal={mockGoal} widgets={[]} subGoalWidgets={{}} onClose={onClose} />);
+    const link = screen.getByRole('link', { name: /K-2 Reading Program/i });
+    expect(link).toHaveAttribute('href', '/v2/goals/child-1');
+    // No widget preview text for child-2
+    expect(screen.queryByText(/· VALUE/)).not.toBeInTheDocument();
   });
 });

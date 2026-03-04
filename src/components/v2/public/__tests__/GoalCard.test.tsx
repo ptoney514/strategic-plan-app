@@ -90,11 +90,6 @@ describe('GoalCard', () => {
     expect(screen.getByText('No metrics defined')).toBeInTheDocument();
   });
 
-  it('renders GoalStatusBadge with status', () => {
-    render(<GoalCard {...defaultProps} />);
-    expect(screen.getByText('In Progress')).toBeInTheDocument();
-  });
-
   it('calls onClick when clicked', async () => {
     const user = userEvent.setup();
     const onClick = vi.fn();
@@ -193,5 +188,25 @@ describe('GoalCard', () => {
     render(<GoalCard {...defaultProps} widgets={bigNumberWidgets} />);
     expect(screen.getByText('VALUE')).toBeInTheDocument();
     expect(screen.getByText('22 students')).toBeInTheDocument();
+  });
+
+  it('shows sub-goal count when provided', () => {
+    render(<GoalCard {...defaultProps} subGoalCount={3} />);
+    expect(screen.getByText('3 sub-goals')).toBeInTheDocument();
+  });
+
+  it('shows singular sub-goal for count of 1', () => {
+    render(<GoalCard {...defaultProps} subGoalCount={1} />);
+    expect(screen.getByText('1 sub-goal')).toBeInTheDocument();
+  });
+
+  it('does not show sub-goal count when zero', () => {
+    render(<GoalCard {...defaultProps} subGoalCount={0} />);
+    expect(screen.queryByText(/sub-goal/)).not.toBeInTheDocument();
+  });
+
+  it('does not show sub-goal count when undefined', () => {
+    render(<GoalCard {...defaultProps} />);
+    expect(screen.queryByText(/sub-goal/)).not.toBeInTheDocument();
   });
 });

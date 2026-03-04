@@ -84,6 +84,7 @@ export async function POST(req: Request) {
     const subtitle = body.subtitle?.trim() || null;
     const config = body.config || {};
     const planId = body.plan_id || body.planId || null;
+    const goalId = body.goal_id || body.goalId || null;
 
     if (!type || !VALID_TYPES.includes(type)) {
       return jsonError(
@@ -109,6 +110,7 @@ export async function POST(req: Request) {
       .values({
         organizationId: organization.id,
         planId,
+        goalId,
         type,
         title,
         subtitle,
@@ -122,6 +124,7 @@ export async function POST(req: Request) {
         id: created.id,
         organizationId: created.organizationId,
         planId: created.planId,
+        goalId: created.goalId,
         type: created.type,
         title: created.title,
         subtitle: created.subtitle,

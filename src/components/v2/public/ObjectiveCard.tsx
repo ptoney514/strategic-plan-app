@@ -1,5 +1,4 @@
 import { Target, ArrowRight } from 'lucide-react';
-import { GoalStatusBadge } from './GoalStatusBadge';
 
 export interface ObjectiveCardProps {
   goalNumber: string;
@@ -17,7 +16,6 @@ export function ObjectiveCard({
   goalNumber,
   title,
   childCount,
-  status,
   primaryColor = '#1e293b',
   description,
   overallProgress,
@@ -60,7 +58,6 @@ export function ObjectiveCard({
         >
           <Target className="w-[18px] h-[18px]" strokeWidth={1.5} />
         </div>
-        <GoalStatusBadge status={status} />
       </div>
 
       {/* Title with number prefix */}

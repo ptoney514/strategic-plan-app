@@ -1,14 +1,24 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { GoalsService } from '../../../lib/services/goals.service';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { usePlansBySlug } from '../../../hooks/v2/usePlans';
+import { useGoalsByPlan } from '../../../hooks/v2/useGoals';
 import { useWidgetsByGoals } from '../../../hooks/v2/useWidgets';
-import { GoalCard, ExpandedGoalCard, ProgressRing, GoalStatusBadge, Breadcrumb } from '../../../components/v2/public';
+import { GoalCard, ExpandedGoalCard, ProgressRing, Breadcrumb } from '../../../components/v2/public';
+import { WidgetGrid } from '../../../components/v2/widgets/WidgetGrid';
+import type { HierarchicalGoal } from '../../../lib/types';
 import type { Widget } from '../../../lib/types/v2';
+
+function findGoalInHierarchy(goals: HierarchicalGoal[], id: string): HierarchicalGoal | undefined {
+  for (const g of goals) {
+    if (g.id === id) return g;
+    const found = findGoalInHierarchy(g.children, id);
+    if (found) return found;
+  }
+  return undefined;
+}
 
 export function V2GoalDrillDown() {
   const { goalId } = useParams<{ goalId: string }>();
@@ -33,25 +43,21 @@ export function V2GoalDrillDown() {
     prevExpandedRef.current = expandedGoalId;
   }, [expandedGoalId]);
 
-  const { data: goal, isLoading: goalLoading } = useQuery({
-    queryKey: ['goal', goalId],
-    queryFn: () => GoalsService.getById(goalId!),
-    enabled: !!goalId,
-  });
+  const { data: allGoals, isLoading: goalsLoading } = useGoalsByPlan(activePlan?.id || '');
 
-  const { data: children, isLoading: childrenLoading } = useQuery({
-    queryKey: ['goal-children', goalId],
-    queryFn: () => GoalsService.getChildren(goalId!),
-    enabled: !!goalId,
-  });
+  const goal = allGoals && goalId ? findGoalInHierarchy(allGoals, goalId) : undefined;
+  const children: HierarchicalGoal[] = goal?.children || [];
 
-  const childIds = children?.map((c) => c.id) || [];
-  const { data: goalWidgets } = useWidgetsByGoals(childIds);
+  const allGoalIds = [
+    goalId,
+    ...children.flatMap((c) => [c.id, ...(c.children || []).map((gc) => gc.id)]),
+  ].filter(Boolean) as string[];
+  const { data: goalWidgets } = useWidgetsByGoals(allGoalIds);
 
   const getWidgetsForGoal = (id: string): Widget[] =>
     goalWidgets?.filter((w) => w.goalId === id) || [];
 
-  const isLoading = goalLoading || childrenLoading;
+  const isLoading = goalsLoading;
 
   if (isLoading) {
     return (
@@ -107,13 +113,25 @@ export function V2GoalDrillDown() {
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          {goal.overall_progress != null && goal.overall_progress_display_mode !== 'hidden' && (
+        {goal.overall_progress != null && goal.overall_progress_display_mode !== 'hidden' && (
+          <div className="flex items-center gap-3">
             <ProgressRing progress={goal.overall_progress} size={40} strokeWidth={3} />
-          )}
-          <GoalStatusBadge status={goal.status_detail} />
-        </div>
+          </div>
+        )}
       </div>
+
+      {/* Parent widgets section — shown when goal has no children but has widgets */}
+      {children.length === 0 && getWidgetsForGoal(goalId || '').length > 0 && (
+        <div className="space-y-3">
+          <h2
+            className="uppercase tracking-wider text-xs font-semibold"
+            style={{ color: 'var(--editorial-text-secondary)' }}
+          >
+            Metrics ({getWidgetsForGoal(goalId || '').length})
+          </h2>
+          <WidgetGrid widgets={getWidgetsForGoal(goalId || '')} />
+        </div>
+      )}
 
       {/* Children section */}
       <div className="space-y-3">
@@ -124,17 +142,22 @@ export function V2GoalDrillDown() {
           Goals ({children?.length || 0})
         </h2>
 
-        {!children?.length ? (
+        {!children?.length && getWidgetsForGoal(goalId || '').length === 0 ? (
           <p className="text-sm py-6 text-center" style={{ color: 'var(--editorial-text-secondary)' }}>
             No goals defined for this objective yet.
           </p>
-        ) : (
+        ) : children.length > 0 ? (
           <LayoutGroup>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <AnimatePresence mode="popLayout">
                 {children.map((child) => {
                   const isExpanded = expandedGoalId === child.id;
                   const childWidgets = getWidgetsForGoal(child.id);
+                  const subGoalWidgetMap: Record<string, Widget[]> = {};
+                  (child.children || []).forEach((gc) => {
+                    const gcWidgets = getWidgetsForGoal(gc.id);
+                    if (gcWidgets.length > 0) subGoalWidgetMap[gc.id] = gcWidgets;
+                  });
                   return (
                     <motion.div
                       key={child.id}
@@ -153,6 +176,7 @@ export function V2GoalDrillDown() {
                         <ExpandedGoalCard
                           goal={child}
                           widgets={childWidgets}
+                          subGoalWidgets={subGoalWidgetMap}
                           onClose={() => setExpandedGoalId(null)}
                           primaryColor={district?.primary_color}
                         />
@@ -166,6 +190,7 @@ export function V2GoalDrillDown() {
                           primaryColor={district?.primary_color}
                           isExpanded={false}
                           onClick={() => setExpandedGoalId(expandedGoalId === child.id ? null : child.id)}
+                          subGoalCount={child.children?.length}
                         />
                       )}
                     </motion.div>
@@ -174,7 +199,7 @@ export function V2GoalDrillDown() {
               </AnimatePresence>
             </div>
           </LayoutGroup>
-        )}
+        ) : null}
       </div>
     </div>
   );

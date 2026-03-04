@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StrataDash - Simplified SaaS Wireframe</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1e1e1e; }
+
+  /* Nav */
+  .nav { display: flex; justify-content: center; gap: 4px; padding: 12px; background: #1e1e2e; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .nav button { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; background: #2e2e3e; color: #aaa; transition: all 0.2s; }
+  .nav button:hover { background: #3e3e4e; color: #fff; }
+  .nav button.active { background: #4a9eed; color: #fff; }
+  .nav .sep { width: 1px; background: #444; margin: 0 6px; }
+
+  /* Screen container */
+  .screen { display: none; max-width: 1000px; margin: 24px auto; background: #fff; border-radius: 12px; border: 2px solid #ddd; overflow: hidden; }
+  .screen.active { display: block; }
+  .screen-label { background: #1e1e2e; color: #4a9eed; padding: 8px 16px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* Wireframe styles */
+  .wire-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 32px; border-bottom: 1px solid #eee; }
+  .wire-header .logo { font-size: 22px; font-weight: 700; color: #1e1e1e; }
+  .wire-header .logo span { color: #4a9eed; }
+  .wire-header nav { display: flex; gap: 20px; align-items: center; }
+  .wire-header nav a { text-decoration: none; color: #666; font-size: 14px; }
+  .btn { padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-primary { background: #4a9eed; color: #fff; }
+  .btn-outline { background: transparent; border: 2px solid #4a9eed; color: #4a9eed; }
+  .btn-ghost { background: #f0f0f0; color: #333; }
+  .btn-sm { padding: 6px 14px; font-size: 13px; }
+
+  /* Landing */
+  .hero { text-align: center; padding: 60px 32px; }
+  .hero h1 { font-size: 36px; margin-bottom: 12px; line-height: 1.2; }
+  .hero h1 span { color: #4a9eed; }
+  .hero p { font-size: 18px; color: #666; max-width: 500px; margin: 0 auto 24px; }
+  .hero-btns { display: flex; gap: 12px; justify-content: center; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px 32px; background: #f9f9f9; }
+  .feature-card { background: #fff; border-radius: 10px; padding: 24px; border: 1px solid #eee; }
+  .feature-card .icon { font-size: 28px; margin-bottom: 8px; }
+  .feature-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .feature-card p { font-size: 13px; color: #888; }
+
+  /* Pricing */
+  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px 32px; }
+  .price-card { border: 2px solid #eee; border-radius: 12px; padding: 28px; text-align: center; }
+  .price-card.featured { border-color: #4a9eed; position: relative; }
+  .price-card.featured::before { content: 'POPULAR'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #4a9eed; color: #fff; padding: 2px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+  .price-card h3 { font-size: 20px; margin-bottom: 4px; }
+  .price-card .price { font-size: 36px; font-weight: 700; margin: 12px 0; }
+  .price-card .price span { font-size: 14px; color: #888; font-weight: 400; }
+  .price-card ul { list-style: none; text-align: left; margin: 16px 0; }
+  .price-card li { padding: 6px 0; font-size: 14px; color: #555; }
+  .price-card li::before { content: '\2713'; color: #22c55e; margin-right: 8px; font-weight: 700; }
+
+  /* Onboarding wizard */
+  .wizard { padding: 40px 32px; }
+  .wizard-steps { display: flex; gap: 0; margin-bottom: 32px; justify-content: center; }
+  .wizard-step { display: flex; align-items: center; gap: 8px; padding: 10px 18px; font-size: 14px; color: #aaa; }
+  .wizard-step.active { color: #4a9eed; font-weight: 600; }
+  .wizard-step.done { color: #22c55e; }
+  .wizard-step .num { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 2px solid #ddd; }
+  .wizard-step.active .num { border-color: #4a9eed; background: #4a9eed; color: #fff; }
+  .wizard-step.done .num { border-color: #22c55e; background: #22c55e; color: #fff; }
+  .wizard-content { max-width: 500px; margin: 0 auto; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; }
+  .form-group .hint { font-size: 12px; color: #999; margin-top: 4px; }
+  .template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .template-opt { border: 2px solid #eee; border-radius: 10px; padding: 16px; text-align: center; cursor: pointer; }
+  .template-opt.selected { border-color: #4a9eed; background: #f0f7ff; }
+  .template-opt .preview { height: 80px; background: #f5f5f5; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .template-opt p { font-size: 13px; font-weight: 600; }
+
+  /* Admin layout */
+  .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: 600px; }
+  .admin-sidebar { background: #1e1e2e; color: #fff; padding: 20px 0; }
+  .admin-sidebar .org-name { padding: 0 20px 20px; font-size: 16px; font-weight: 700; border-bottom: 1px solid #333; }
+  .admin-sidebar .org-name small { display: block; font-size: 11px; color: #888; font-weight: 400; margin-top: 2px; }
+  .admin-sidebar .menu { margin-top: 12px; }
+  .admin-sidebar .menu a { display: block; padding: 10px 20px; color: #aaa; text-decoration: none; font-size: 14px; }
+  .admin-sidebar .menu a:hover { background: #2e2e3e; color: #fff; }
+  .admin-sidebar .menu a.active { background: #4a9eed22; color: #4a9eed; border-right: 3px solid #4a9eed; }
+  .admin-main { padding: 28px; }
+  .admin-main h2 { font-size: 22px; margin-bottom: 4px; }
+  .admin-main .subtitle { font-size: 14px; color: #888; margin-bottom: 24px; }
+
+  /* Dashboard cards */
+  .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: #f9f9f9; border-radius: 10px; padding: 18px; border: 1px solid #eee; }
+  .stat-card .label { font-size: 12px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+  .plan-list-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; }
+  .plan-list-item h4 { font-size: 15px; }
+  .plan-list-item p { font-size: 13px; color: #888; }
+  .badge { padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #dcfce7; color: #15803d; }
+  .badge-blue { background: #dbeafe; color: #2563eb; }
+
+  /* Plan editor tree */
+  .tree { margin-top: 16px; }
+  .tree-item { padding: 12px 16px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 6px; display: flex; align-items: center; gap: 12px; }
+  .tree-item.l0 { background: #f0f7ff; border-color: #bdd7f5; font-weight: 600; }
+  .tree-item.l1 { margin-left: 28px; }
+  .tree-item.l2 { margin-left: 56px; font-size: 13px; color: #555; }
+  .tree-num { background: #4a9eed; color: #fff; width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .tree-item.l1 .tree-num { background: #8b5cf6; width: 28px; height: 28px; }
+  .tree-item.l2 .tree-num { background: #f59e0b; width: 24px; height: 24px; font-size: 11px; }
+  .tree-actions { margin-left: auto; display: flex; gap: 6px; }
+  .tree-status { padding: 3px 10px; border-radius: 12px; font-size: 11px; background: #f0f0f0; color: #666; margin-left: auto; }
+
+  /* Appearance */
+  .appear-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  .appear-section { border: 1px solid #eee; border-radius: 10px; padding: 20px; }
+  .appear-section h3 { font-size: 16px; margin-bottom: 12px; }
+  .color-row { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+  .color-swatch { width: 36px; height: 36px; border-radius: 8px; border: 2px solid #ddd; }
+  .logo-upload { width: 100%; height: 100px; border: 2px dashed #ddd; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 14px; }
+
+  /* Public view */
+  .pub-header { background: #C03537; color: #fff; padding: 24px 32px; }
+  .pub-header h1 { font-size: 24px; }
+  .pub-header p { font-size: 14px; opacity: 0.8; }
+  .pub-breadcrumb { padding: 12px 32px; font-size: 13px; color: #888; border-bottom: 1px solid #eee; }
+  .pub-content { padding: 32px; }
+  .obj-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .obj-card { border: 1px solid #eee; border-radius: 10px; padding: 20px; cursor: pointer; transition: all 0.2s; }
+  .obj-card:hover { border-color: #4a9eed; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .obj-card .obj-num { width: 36px; height: 36px; border-radius: 8px; background: #C03537; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+  .obj-card h3 { font-size: 15px; margin-bottom: 6px; }
+  .obj-card .meta { font-size: 12px; color: #999; }
+
+  /* Public detail */
+  .obj-detail-header { padding: 32px; border-bottom: 1px solid #eee; }
+  .obj-detail-header h2 { font-size: 24px; display: flex; align-items: center; gap: 12px; }
+  .subgoal-list { padding: 32px; }
+  .subgoal-item { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid #eee; border-radius: 10px; margin-bottom: 10px; }
+  .subgoal-item .sg-num { width: 40px; height: 40px; border-radius: 8px; background: #8b5cf6; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+  .subgoal-item h4 { font-size: 14px; }
+  .subgoal-item p { font-size: 12px; color: #888; }
+
+  .section-title { font-size: 13px; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+
+  .flow-note { background: #fff3bf; border: 1px solid #f59e0b; border-radius: 8px; padding: 12px 16px; margin: 16px 32px; font-size: 13px; color: #92400e; }
+
+  /* Widget catalog */
+  .widget-catalog { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+  .widget-type { border: 2px solid #eee; border-radius: 12px; padding: 18px; cursor: pointer; transition: all 0.2s; text-align: center; }
+  .widget-type:hover { border-color: #4a9eed; background: #f8fbff; }
+  .widget-type .wt-icon { height: 80px; background: #f9f9f9; border-radius: 8px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; }
+  .widget-type h4 { font-size: 14px; margin-bottom: 3px; }
+  .widget-type p { font-size: 12px; color: #999; }
+
+  /* Widget preview shapes */
+  .wt-donut { width: 52px; height: 52px; border-radius: 50%; border: 8px solid #C03537; border-top-color: #eee; border-right-color: #eee; position: relative; }
+  .wt-donut::after { content: '64%'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #333; }
+  .wt-bignum { font-size: 32px; font-weight: 800; color: #1e1e1e; line-height: 1; }
+  .wt-bignum small { display: block; font-size: 10px; font-weight: 500; color: #22c55e; margin-top: 2px; }
+  .wt-bars { display: flex; align-items: flex-end; gap: 4px; height: 50px; }
+  .wt-bars div { width: 14px; background: #C03537; border-radius: 2px 2px 0 0; }
+  .wt-area { width: 80px; height: 44px; position: relative; overflow: hidden; }
+  .wt-area svg { width: 100%; height: 100%; }
+  .wt-progress { width: 80px; }
+  .wt-progress-bar { height: 10px; background: #eee; border-radius: 5px; overflow: hidden; }
+  .wt-progress-bar div { height: 100%; background: #C03537; border-radius: 5px; }
+  .wt-progress span { font-size: 10px; color: #888; margin-top: 3px; display: block; text-align: right; }
+  .wt-pie { width: 52px; height: 52px; border-radius: 50%; background: conic-gradient(#C03537 0% 65%, #333 65% 100%); position: relative; }
+  .wt-pie::after { content: ''; position: absolute; inset: 14px; background: #fff; border-radius: 50%; }
+
+  /* Dashboard builder grid */
+  .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 16px; }
+  .dash-widget { border: 2px solid #eee; border-radius: 12px; padding: 20px; position: relative; min-height: 160px; }
+  .dash-widget .dw-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+  .dash-widget h4 { font-size: 15px; font-weight: 700; }
+  .dash-widget .dw-sub { font-size: 12px; color: #888; }
+  .dash-widget .dw-icon { width: 28px; height: 28px; background: #fef2f2; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #C03537; }
+  .dash-widget .dw-value { font-size: 36px; font-weight: 800; line-height: 1.1; }
+  .dash-widget .dw-trend { font-size: 13px; color: #22c55e; font-weight: 600; margin-top: 4px; }
+  .dash-widget .dw-trend.down { color: #ef4444; }
+  .dash-widget.wide { grid-column: span 1; }
+  .dash-widget .dw-footer { font-size: 11px; color: #999; margin-top: 12px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+  .dash-add { border: 2px dashed #ccc; border-radius: 12px; min-height: 160px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #aaa; font-size: 14px; font-weight: 600; transition: all 0.2s; flex-direction: column; gap: 6px; }
+  .dash-add:hover { border-color: #4a9eed; color: #4a9eed; background: #f8fbff; }
+  .dash-add .plus { font-size: 28px; line-height: 1; }
+
+  /* Widget config panel */
+  .config-panel { border: 2px solid #4a9eed; border-radius: 12px; padding: 24px; background: #f8fbff; margin-top: 20px; }
+  .config-panel h3 { font-size: 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  .config-panel h3 .chip { background: #4a9eed; color: #fff; padding: 2px 10px; border-radius: 10px; font-size: 12px; }
+  .config-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .config-preview { background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; }
+
+  /* Launch traction public */
+  .lt-header { background: #1e1e2e; color: #fff; padding: 28px 32px; display: flex; justify-content: space-between; align-items: center; }
+  .lt-header h1 { font-size: 22px; font-weight: 300; }
+  .lt-header h1 strong { font-weight: 700; }
+  .lt-header p { font-size: 13px; color: #aaa; margin-top: 4px; }
+  .lt-header .lt-badge { background: #22c55e; color: #fff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .lt-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 28px 32px; }
+  .lt-card { border: 1px solid #eee; border-radius: 12px; padding: 24px; background: #fff; }
+  .lt-card .lt-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .lt-card h3 { font-size: 16px; font-weight: 700; }
+  .lt-card .lt-sub { font-size: 12px; color: #999; margin-top: 2px; }
+  .lt-card .lt-val { font-size: 42px; font-weight: 800; line-height: 1; }
+  .lt-card .lt-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+  .lt-card .lt-trend { font-size: 13px; font-weight: 600; margin-top: 8px; }
+  .lt-card .lt-trend.up { color: #22c55e; }
+  .lt-card .lt-trend.down { color: #ef4444; }
+  .lt-donut-wrap { display: flex; align-items: center; gap: 20px; margin-top: 12px; }
+  .lt-donut { width: 100px; height: 100px; border-radius: 50%; border: 14px solid #C03537; border-top-color: #eee; border-right-color: #eee; position: relative; flex-shrink: 0; }
+  .lt-donut-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .lt-donut-inner .val { font-size: 22px; font-weight: 800; }
+  .lt-donut-inner .lbl { font-size: 8px; color: #888; text-transform: uppercase; letter-spacing: 0.3px; }
+  .lt-bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 70px; margin-top: 12px; }
+  .lt-bar-group { display: flex; gap: 2px; align-items: flex-end; }
+  .lt-bar-group .bar { width: 18px; border-radius: 2px 2px 0 0; }
+  .lt-bar-group .bar.primary { background: #C03537; }
+  .lt-bar-group .bar.muted { background: #e5e5e5; }
+  .lt-bar-label { font-size: 10px; color: #888; text-align: center; margin-top: 4px; }
+  .lt-area-mock { height: 80px; background: linear-gradient(180deg, rgba(192,53,55,0.15) 0%, rgba(192,53,55,0.02) 100%); border-radius: 8px; margin-top: 8px; position: relative; overflow: hidden; }
+  .lt-area-mock::after { content: ''; position: absolute; bottom: 20px; left: 0; right: 0; height: 2px; background: #C03537; opacity: 0.5; }
+  .lt-area-mock::before { content: ''; position: absolute; bottom: 30px; left: 10%; right: 10%; height: 2px; background: #666; border-radius: 2px; }
+  .lt-progress { margin-top: 16px; }
+  .lt-progress-bar { height: 12px; background: #eee; border-radius: 6px; overflow: hidden; }
+  .lt-progress-bar div { height: 100%; background: #1e1e1e; border-radius: 6px; }
+  .lt-progress-label { font-size: 12px; color: #888; margin-top: 4px; }
+  .lt-breakdown { margin-top: 12px; }
+  .lt-breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+  .lt-breakdown-row .dot { width: 8px; height: 8px; border-radius: 50%; margin-right: 8px; flex-shrink: 0; }
+  .lt-breakdown-row .br-label { font-size: 13px; }
+  .lt-breakdown-row .br-sub { font-size: 11px; color: #999; }
+  .lt-breakdown-row .br-val { font-size: 16px; font-weight: 700; }
+  .lt-footer { text-align: center; padding: 20px; font-size: 12px; color: #aaa; border-top: 1px solid #eee; margin: 0 32px; }
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <button class="active" onclick="show('landing')">Landing</button>
+  <button onclick="show('pricing')">Pricing</button>
+  <button onclick="show('onboard')">Onboarding</button>
+  <div class="sep"></div>
+  <button onclick="show('dashboard')">Admin: Dashboard</button>
+  <button onclick="show('editor')">Admin: Plan Editor</button>
+  <button onclick="show('appearance')">Admin: Appearance</button>
+  <button onclick="show('team')">Admin: Team</button>
+  <button onclick="show('widgets')">Admin: Widgets</button>
+  <div class="sep"></div>
+  <button onclick="show('public')">Public: Goals</button>
+  <button onclick="show('public-detail')">Public: Drill-down</button>
+  <button onclick="show('public-lt')">Public: Traction</button>
+</div>
+
+<!-- ==================== LANDING ==================== -->
+<div class="screen active" id="landing">
+  <div class="screen-label">Screen 1 of 9 &mdash; Marketing Landing Page</div>
+  <div class="wire-header">
+    <div class="logo">Strata<span>Dash</span></div>
+    <nav>
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+      <a href="#">Examples</a>
+      <button class="btn btn-outline btn-sm" onclick="show('pricing')">Log In</button>
+      <button class="btn btn-primary btn-sm" onclick="show('pricing')">Start Free</button>
+    </nav>
+  </div>
+  <div class="hero">
+    <h1>Share your <span>strategic plan</span><br>with the world</h1>
+    <p>Create beautiful, public-facing dashboards for your organization's goals and objectives. Simple setup, powerful results.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="show('pricing')">Get Started Free</button>
+      <button class="btn btn-ghost">See Examples</button>
+    </div>
+  </div>
+  <div class="features">
+    <div class="feature-card">
+      <div class="icon">&#9776;</div>
+      <h3>Hierarchical Goals</h3>
+      <p>Organize objectives, initiatives, and action items in a clear 3-level structure.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#9998;</div>
+      <h3>Your Brand</h3>
+      <p>Custom logo, colors, and templates. Looks like your site, not ours.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#8682;</div>
+      <h3>Import from Excel</h3>
+      <p>Upload your existing plan from CSV or Excel. Auto-maps your hierarchy.</p>
+    </div>
+  </div>
+  <div class="flow-note">This replaces the current homepage which has no clear CTA or self-serve signup path.</div>
+</div>
+
+<!-- ==================== PRICING ==================== -->
+<div class="screen" id="pricing">
+  <div class="screen-label">Screen 2 of 9 &mdash; Pricing (NEW - doesn't exist today)</div>
+  <div class="wire-header">
+    <div class="logo">Strata<span>Dash</span></div>
+    <nav>
+      <button class="btn btn-outline btn-sm" onclick="show('landing')">Back</button>
+    </nav>
+  </div>
+  <div style="text-align:center;padding:40px 32px 0">
+    <h1 style="font-size:28px">Simple, transparent pricing</h1>
+    <p style="color:#888;font-size:16px">Start free. Upgrade when you need more.</p>
+  </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <h3>Free</h3>
+      <div class="price">$0<span>/mo</span></div>
+      <ul>
+        <li>1 strategic plan</li>
+        <li>Up to 20 goals</li>
+        <li>Public page</li>
+        <li>1 team member</li>
+      </ul>
+      <button class="btn btn-outline" style="width:100%" onclick="show('onboard')">Get Started</button>
+    </div>
+    <div class="price-card featured">
+      <h3>Pro</h3>
+      <div class="price">$29<span>/mo</span></div>
+      <ul>
+        <li>Unlimited plans</li>
+        <li>Unlimited goals</li>
+        <li>CSV/Excel import</li>
+        <li>5 team members</li>
+        <li>Custom domain</li>
+      </ul>
+      <button class="btn btn-primary" style="width:100%" onclick="show('onboard')">Start Free Trial</button>
+    </div>
+    <div class="price-card">
+      <h3>Enterprise</h3>
+      <div class="price">Custom</div>
+      <ul>
+        <li>Everything in Pro</li>
+        <li>Unlimited members</li>
+        <li>SSO / SAML</li>
+        <li>Dedicated support</li>
+      </ul>
+      <button class="btn btn-ghost" style="width:100%">Contact Us</button>
+    </div>
+  </div>
+  <div class="flow-note">This page doesn't exist today. Org creation is system-admin-only. This unblocks self-serve.</div>
+</div>
+
+<!-- ==================== ONBOARDING ==================== -->
+<div class="screen" id="onboard">
+  <div class="screen-label">Screen 3 of 9 &mdash; Onboarding Wizard (NEW - doesn't exist today)</div>
+  <div class="wire-header">
+    <div class="logo">Strata<span>Dash</span></div>
+    <nav></nav>
+  </div>
+  <div class="wizard">
+    <div class="wizard-steps">
+      <div class="wizard-step done"><div class="num">&#10003;</div> Sign Up</div>
+      <div class="wizard-step active"><div class="num">2</div> Your Org</div>
+      <div class="wizard-step"><div class="num">3</div> Template</div>
+      <div class="wizard-step"><div class="num">4</div> Brand</div>
+    </div>
+    <div class="wizard-content">
+      <h2 style="font-size:22px;margin-bottom:20px">Tell us about your organization</h2>
+      <div class="form-group">
+        <label>Organization Name</label>
+        <input type="text" placeholder="e.g. Westside Community Schools" value="Westside Community Schools">
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select>
+          <option>School District</option>
+          <option>School / University</option>
+          <option>Nonprofit</option>
+          <option>Small Business</option>
+          <option>Other</option>
+        </select>
+        <div class="hint">This just changes the labels we use. The tool works the same for everyone.</div>
+      </div>
+      <div class="form-group">
+        <label>Your public URL</label>
+        <input type="text" placeholder="westside" value="westside">
+        <div class="hint">westside.stratadash.org</div>
+      </div>
+
+      <h3 style="font-size:16px;margin:28px 0 12px">Pick a template</h3>
+      <div class="template-grid">
+        <div class="template-opt selected">
+          <div class="preview">&#9783;</div>
+          <p>Hierarchical</p>
+        </div>
+        <div class="template-opt">
+          <div class="preview">&#9638;</div>
+          <p>Metrics Grid</p>
+        </div>
+        <div class="template-opt">
+          <div class="preview">&#9650;</div>
+          <p>Launch Traction</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:28px;justify-content:flex-end">
+        <button class="btn btn-ghost">Back</button>
+        <button class="btn btn-primary" onclick="show('dashboard')">Create Organization &rarr;</button>
+      </div>
+    </div>
+  </div>
+  <div class="flow-note">After this, users go straight to their dashboard and can start building or importing a plan. Replaces the sysadmin-only DistrictSetupWizard.</div>
+</div>
+
+<!-- ==================== ADMIN: DASHBOARD ==================== -->
+<div class="screen" id="dashboard">
+  <div class="screen-label">Screen 4 of 9 &mdash; Admin Dashboard (simplified from ~8 pages to 1)</div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="org-name">Westside<small>westside.stratadash.org</small></div>
+      <div class="menu">
+        <a href="#" class="active" onclick="show('dashboard')">Dashboard</a>
+        <a href="#" onclick="show('editor')">Plans & Goals</a>
+        <a href="#">Import</a>
+        <a href="#" onclick="show('appearance')">Appearance</a>
+        <a href="#" onclick="show('team')">Team</a>
+        <a href="#">Account</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <h2>Dashboard</h2>
+      <div class="subtitle">Welcome back. Here's your overview.</div>
+
+      <div class="stat-row">
+        <div class="stat-card"><div class="label">Plans</div><div class="value">2</div></div>
+        <div class="stat-card"><div class="label">Objectives</div><div class="value">8</div></div>
+        <div class="stat-card"><div class="label">Goals</div><div class="value">34</div></div>
+        <div class="stat-card"><div class="label">Team</div><div class="value">3</div></div>
+      </div>
+
+      <div class="section-title">Your Plans</div>
+      <div class="plan-list-item">
+        <div>
+          <h4>Strategic Plan 2021-2026</h4>
+          <p>8 objectives &middot; 26 goals &middot; Last edited 2 days ago</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-green">Active</span>
+          <button class="btn btn-primary btn-sm" onclick="show('editor')">Edit</button>
+        </div>
+      </div>
+      <div class="plan-list-item">
+        <div>
+          <h4>Technology Roadmap 2025</h4>
+          <p>3 objectives &middot; 8 goals &middot; Last edited 1 week ago</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="badge badge-blue">Draft</span>
+          <button class="btn btn-outline btn-sm" onclick="show('editor')">Edit</button>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <button class="btn btn-primary">+ New Plan</button>
+        <button class="btn btn-ghost" style="margin-left:8px">Import from CSV</button>
+      </div>
+    </div>
+  </div>
+  <div class="flow-note">Replaces: AdminDashboard, PlansList, CreatePlan, MyPlans, ObjectivesOverview. One page does it all.</div>
+</div>
+
+<!-- ==================== ADMIN: PLAN EDITOR ==================== -->
+<div class="screen" id="editor">
+  <div class="screen-label">Screen 5 of 9 &mdash; Plan Editor / Tree View (replaces 8 separate pages)</div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="org-name">Westside<small>westside.stratadash.org</small></div>
+      <div class="menu">
+        <a href="#" onclick="show('dashboard')">Dashboard</a>
+        <a href="#" class="active" onclick="show('editor')">Plans & Goals</a>
+        <a href="#">Import</a>
+        <a href="#" onclick="show('appearance')">Appearance</a>
+        <a href="#" onclick="show('team')">Team</a>
+        <a href="#">Account</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <h2>Strategic Plan 2021-2026</h2>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm">Import Goals</button>
+          <button class="btn btn-primary btn-sm">+ Add Objective</button>
+        </div>
+      </div>
+      <div class="subtitle">Click any item to edit inline. Drag to reorder.</div>
+
+      <div class="tree">
+        <div class="tree-item l0">
+          <div class="tree-num">1</div>
+          <div>Student Achievement & Well-being</div>
+          <div class="tree-status" style="background:#dcfce7;color:#15803d">On Target</div>
+          <div class="tree-actions">
+            <button class="btn btn-ghost btn-sm">+ Sub-goal</button>
+          </div>
+        </div>
+        <div class="tree-item l1">
+          <div class="tree-num">1.1</div>
+          <div>ELA/Reading Proficiency</div>
+          <div class="tree-status">Not Started</div>
+          <div class="tree-actions"><button class="btn btn-ghost btn-sm">+ Sub-goal</button></div>
+        </div>
+        <div class="tree-item l2">
+          <div class="tree-num">1.1.1</div>
+          <div>K-2 Reading Foundation</div>
+          <div class="tree-status">Not Started</div>
+        </div>
+        <div class="tree-item l2">
+          <div class="tree-num">1.1.2</div>
+          <div>Grade 3-5 Reading Comprehension</div>
+          <div class="tree-status">Not Started</div>
+        </div>
+        <div class="tree-item l1">
+          <div class="tree-num">1.2</div>
+          <div>Mathematics Achievement</div>
+          <div class="tree-status">Not Started</div>
+          <div class="tree-actions"><button class="btn btn-ghost btn-sm">+ Sub-goal</button></div>
+        </div>
+        <div class="tree-item l1">
+          <div class="tree-num">1.3</div>
+          <div>Student Engagement</div>
+          <div class="tree-status" style="background:#fef2f2;color:#dc2626">Off Track</div>
+          <div class="tree-actions"><button class="btn btn-ghost btn-sm">+ Sub-goal</button></div>
+        </div>
+
+        <div class="tree-item l0" style="margin-top:12px">
+          <div class="tree-num">2</div>
+          <div>Educational Excellence & Innovation</div>
+          <div class="tree-status" style="background:#dcfce7;color:#15803d">On Target</div>
+          <div class="tree-actions"><button class="btn btn-ghost btn-sm">+ Sub-goal</button></div>
+        </div>
+        <div class="tree-item l1">
+          <div class="tree-num">2.1</div>
+          <div>Instructional Quality</div>
+          <div class="tree-status">Not Started</div>
+        </div>
+        <div class="tree-item l1">
+          <div class="tree-num">2.2</div>
+          <div>Technology Integration</div>
+          <div class="tree-status">Not Started</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flow-note">Replaces: CreateObjective, EditObjective, ObjectiveDetail, ObjectiveBuilder, AdminGoals, AdminGoalsV2, CreateGoal, EditGoal. One tree view with inline editing.</div>
+</div>
+
+<!-- ==================== ADMIN: APPEARANCE ==================== -->
+<div class="screen" id="appearance">
+  <div class="screen-label">Screen 6 of 9 &mdash; Appearance Settings (already exists, keep as-is)</div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="org-name">Westside<small>westside.stratadash.org</small></div>
+      <div class="menu">
+        <a href="#" onclick="show('dashboard')">Dashboard</a>
+        <a href="#" onclick="show('editor')">Plans & Goals</a>
+        <a href="#">Import</a>
+        <a href="#" class="active" onclick="show('appearance')">Appearance</a>
+        <a href="#" onclick="show('team')">Team</a>
+        <a href="#">Account</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <h2>Appearance</h2>
+      <div class="subtitle">Customize how your public page looks.</div>
+
+      <div class="appear-grid">
+        <div class="appear-section">
+          <h3>Logo</h3>
+          <div class="logo-upload">Drop your logo here or click to upload</div>
+        </div>
+        <div class="appear-section">
+          <h3>Colors</h3>
+          <div class="color-row">
+            <div class="color-swatch" style="background:#C03537"></div>
+            <div><strong>Primary</strong><br><span style="font-size:12px;color:#888">#C03537</span></div>
+          </div>
+          <div class="color-row">
+            <div class="color-swatch" style="background:#000"></div>
+            <div><strong>Secondary</strong><br><span style="font-size:12px;color:#888">#000000</span></div>
+          </div>
+        </div>
+        <div class="appear-section">
+          <h3>Template</h3>
+          <div class="template-grid" style="grid-template-columns:1fr 1fr">
+            <div class="template-opt selected">
+              <div class="preview" style="height:60px">&#9783;</div>
+              <p>Hierarchical</p>
+            </div>
+            <div class="template-opt">
+              <div class="preview" style="height:60px">&#9638;</div>
+              <p>Metrics Grid</p>
+            </div>
+          </div>
+        </div>
+        <div class="appear-section">
+          <h3>Details</h3>
+          <div class="form-group">
+            <label>Tagline</label>
+            <input type="text" value="Community. Innovation. Excellence.">
+          </div>
+          <div class="form-group">
+            <label>Custom Domain</label>
+            <input type="text" placeholder="plan.westside66.org">
+            <div class="hint">Pro plan required</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flow-note">This already exists (WYSIWYG editor from PR #150). Keep it. This wireframe shows the simplified settings version.</div>
+</div>
+
+<!-- ==================== ADMIN: TEAM ==================== -->
+<div class="screen" id="team">
+  <div class="screen-label">Screen 7 of 9 &mdash; Team Management (simplified)</div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="org-name">Westside<small>westside.stratadash.org</small></div>
+      <div class="menu">
+        <a href="#" onclick="show('dashboard')">Dashboard</a>
+        <a href="#" onclick="show('editor')">Plans & Goals</a>
+        <a href="#">Import</a>
+        <a href="#" onclick="show('appearance')">Appearance</a>
+        <a href="#" class="active" onclick="show('team')">Team</a>
+        <a href="#">Account</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <h2>Team</h2>
+        <button class="btn btn-primary btn-sm">+ Invite Member</button>
+      </div>
+      <div class="subtitle">Manage who can edit your plans.</div>
+
+      <table style="width:100%;border-collapse:collapse;margin-top:16px">
+        <thead>
+          <tr style="text-align:left;border-bottom:2px solid #eee">
+            <th style="padding:10px;font-size:13px;color:#888">Name</th>
+            <th style="padding:10px;font-size:13px;color:#888">Email</th>
+            <th style="padding:10px;font-size:13px;color:#888">Role</th>
+            <th style="padding:10px;font-size:13px;color:#888"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #f0f0f0">
+            <td style="padding:12px 10px;font-size:14px">Sarah Johnson</td>
+            <td style="padding:12px 10px;font-size:14px;color:#666">admin@westside66.org</td>
+            <td style="padding:12px 10px"><span class="badge badge-blue">Owner</span></td>
+            <td style="padding:12px 10px;font-size:13px;color:#888">You</td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0">
+            <td style="padding:12px 10px;font-size:14px">Mike Chen</td>
+            <td style="padding:12px 10px;font-size:14px;color:#666">mchen@westside66.org</td>
+            <td style="padding:12px 10px"><span class="badge badge-green">Editor</span></td>
+            <td style="padding:12px 10px"><button class="btn btn-ghost btn-sm">Remove</button></td>
+          </tr>
+          <tr style="border-bottom:1px solid #f0f0f0">
+            <td style="padding:12px 10px;font-size:14px;color:#999;font-style:italic">Pending...</td>
+            <td style="padding:12px 10px;font-size:14px;color:#666">jdoe@westside66.org</td>
+            <td style="padding:12px 10px"><span class="badge" style="background:#fff3cd;color:#92400e">Invited</span></td>
+            <td style="padding:12px 10px"><button class="btn btn-ghost btn-sm">Resend</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="flow-note">Replaces: DistrictUsers, TeamMembers, SchoolAdmins, SchoolAdminsList. One simple table with invite flow.</div>
+</div>
+
+<!-- ==================== PUBLIC: OVERVIEW ==================== -->
+<div class="screen" id="public">
+  <div class="screen-label">Screen 8 of 9 &mdash; Public View: Plan Overview (this is what visitors see)</div>
+  <div class="pub-header" style="display:flex;align-items:center;gap:16px">
+    <div style="width:48px;height:48px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#C03537;font-weight:700">W</div>
+    <div>
+      <h1 style="font-size:22px">Westside Community Schools</h1>
+      <p>Strategic Plan 2021-2026</p>
+    </div>
+  </div>
+  <div class="pub-breadcrumb">Strategic Plan &rarr; All Objectives</div>
+  <div class="pub-content">
+    <h2 style="font-size:20px;margin-bottom:4px">Strategic Objectives</h2>
+    <p style="font-size:14px;color:#888;margin-bottom:20px">6 objectives total</p>
+
+    <div class="obj-grid">
+      <div class="obj-card" onclick="show('public-detail')">
+        <div class="obj-num">1</div>
+        <h3>Student Achievement & Well-being</h3>
+        <div class="meta">6 goals &middot; <span style="color:#22c55e">On Target</span></div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">2</div>
+        <h3>Educational Excellence & Innovation</h3>
+        <div class="meta">4 goals &middot; <span style="color:#22c55e">On Target</span></div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">3</div>
+        <h3>Safe & Supportive Environment</h3>
+        <div class="meta">3 goals &middot; <span style="color:#f59e0b">At Risk</span></div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">4</div>
+        <h3>Family & Community Partnerships</h3>
+        <div class="meta">5 goals &middot; <span style="color:#22c55e">On Target</span></div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">5</div>
+        <h3>Operational Excellence</h3>
+        <div class="meta">3 goals &middot; Not Started</div>
+      </div>
+      <div class="obj-card">
+        <div class="obj-num">6</div>
+        <h3>Workforce Development</h3>
+        <div class="meta">4 goals &middot; Not Started</div>
+      </div>
+    </div>
+  </div>
+  <div class="flow-note">This is essentially what you have today (screenshot 1). Keep it. The card grid with numbered objectives works well.</div>
+</div>
+
+<!-- ==================== PUBLIC: DETAIL ==================== -->
+<div class="screen" id="public-detail">
+  <div class="screen-label">Screen 9 of 9 &mdash; Public View: Objective Drill-down</div>
+  <div class="pub-header" style="display:flex;align-items:center;gap:16px">
+    <div style="width:48px;height:48px;background:#fff;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#C03537;font-weight:700">W</div>
+    <div>
+      <h1 style="font-size:22px">Westside Community Schools</h1>
+      <p>Strategic Plan 2021-2026</p>
+    </div>
+  </div>
+  <div class="pub-breadcrumb"><a href="#" onclick="show('public')" style="color:#4a9eed;text-decoration:none">Strategic Plan</a> &rarr; 1 Student Achievement & Well-being</div>
+  <div class="obj-detail-header">
+    <h2><div class="obj-num" style="display:inline-flex">1</div> Student Achievement & Well-being</h2>
+    <p style="color:#888;font-size:14px;margin-top:6px">Ensure all students achieve academic excellence and develop social-emotional well-being</p>
+    <span class="badge badge-green" style="margin-top:10px;display:inline-block">On Target</span>
+  </div>
+  <div class="subgoal-list">
+    <div class="section-title">Goals (6)</div>
+    <div class="subgoal-item">
+      <div class="sg-num">1.1</div>
+      <div style="flex:1">
+        <h4>ELA/Reading Proficiency</h4>
+        <p>All students will meet or exceed state standards in English Language Arts and Reading</p>
+      </div>
+      <div class="tree-status">Not Started</div>
+    </div>
+    <div class="subgoal-item">
+      <div class="sg-num">1.2</div>
+      <div style="flex:1">
+        <h4>Mathematics Achievement</h4>
+        <p>Improve mathematics proficiency across all grade levels</p>
+      </div>
+      <div class="tree-status">Not Started</div>
+    </div>
+    <div class="subgoal-item">
+      <div class="sg-num">1.3</div>
+      <div style="flex:1">
+        <h4>Science Proficiency</h4>
+        <p>Increase science proficiency and STEM participation</p>
+      </div>
+      <div class="tree-status">Not Started</div>
+    </div>
+    <div class="subgoal-item">
+      <div class="sg-num">1.4</div>
+      <div style="flex:1">
+        <h4>Growth Mindset Development</h4>
+        <p>Foster growth mindset and social-emotional learning skills</p>
+      </div>
+      <div class="tree-status">Not Started</div>
+    </div>
+    <div class="subgoal-item">
+      <div class="sg-num">1.5</div>
+      <div style="flex:1">
+        <h4>Student Engagement</h4>
+        <p>Increase student engagement and reduce chronic absenteeism</p>
+      </div>
+      <div class="tree-status" style="background:#fef2f2;color:#dc2626">Off Track</div>
+    </div>
+    <div class="subgoal-item">
+      <div class="sg-num">1.6</div>
+      <div style="flex:1">
+        <h4>Early Childhood Success</h4>
+        <p>Ensure kindergarten readiness and early intervention</p>
+      </div>
+      <div class="tree-status">Not Started</div>
+    </div>
+  </div>
+  <div class="flow-note">This is essentially screenshot 2 (expanded card). Keep the drill-down pattern. Each goal row can expand further to show sub-goals and simple metrics.</div>
+</div>
+
+<!-- ==================== ADMIN: WIDGET BUILDER ==================== -->
+<div class="screen" id="widgets">
+  <div class="screen-label">Screen 10 of 12 &mdash; Widget Dashboard Builder (NEW - for Launch Traction template)</div>
+  <div class="admin-layout">
+    <div class="admin-sidebar">
+      <div class="org-name">Westside<small>westside.stratadash.org</small></div>
+      <div class="menu">
+        <a href="#" onclick="show('dashboard')">Dashboard</a>
+        <a href="#" onclick="show('editor')">Plans & Goals</a>
+        <a href="#">Import</a>
+        <a href="#" onclick="show('appearance')">Appearance</a>
+        <a href="#" onclick="show('team')">Team</a>
+        <a href="#" class="active" onclick="show('widgets')">Widgets</a>
+        <a href="#">Account</a>
+      </div>
+    </div>
+    <div class="admin-main">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <h2>Dashboard Widgets</h2>
+        <button class="btn btn-outline btn-sm" onclick="show('public-lt')">Preview Public Page</button>
+      </div>
+      <div class="subtitle">Build your metrics dashboard. Pick widgets from the catalog and configure them.</div>
+
+      <!-- Current widgets on the dashboard -->
+      <div class="section-title">Your Dashboard (5 widgets)</div>
+      <div class="dash-grid">
+        <div class="dash-widget">
+          <div class="dw-header">
+            <div><h4>Microcredentials Earned</h4><div class="dw-sub">Target: 500 Certifications</div></div>
+            <div class="dw-icon">&#9679;</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="width:64px;height:64px;border-radius:50%;border:8px solid #C03537;border-top-color:#eee;border-right-color:#eee;flex-shrink:0;display:flex;align-items:center;justify-content:center">
+              <span style="font-size:14px;font-weight:800">324</span>
+            </div>
+            <div><div style="font-size:12px;color:#22c55e;font-weight:600">64% to Goal</div></div>
+          </div>
+          <div class="dw-footer">Widget: Donut &middot; <a href="#" style="color:#4a9eed;text-decoration:none">Edit</a> &middot; <a href="#" style="color:#ef4444;text-decoration:none">Remove</a></div>
+        </div>
+
+        <div class="dash-widget">
+          <div class="dw-header">
+            <div><h4>Engagement Momentum</h4><div class="dw-sub">Cumulative Events Hosted</div></div>
+            <div class="dw-icon">&#9650;</div>
+          </div>
+          <div class="lt-area-mock" style="height:60px"></div>
+          <div class="dw-footer">Widget: Area Chart &middot; <a href="#" style="color:#4a9eed;text-decoration:none">Edit</a> &middot; <a href="#" style="color:#ef4444;text-decoration:none">Remove</a></div>
+        </div>
+
+        <div class="dash-widget">
+          <div class="dw-header">
+            <div><h4>Parent Impact</h4><div class="dw-sub">Total Attendance</div></div>
+            <div class="dw-icon">&#9734;</div>
+          </div>
+          <div class="dw-value">480</div>
+          <div class="dw-trend">+12% this month</div>
+          <div class="dw-footer">Widget: Big Number &middot; <a href="#" style="color:#4a9eed;text-decoration:none">Edit</a> &middot; <a href="#" style="color:#ef4444;text-decoration:none">Remove</a></div>
+        </div>
+
+        <div class="dash-widget">
+          <div class="dw-header">
+            <div><h4>Student Challenges</h4><div class="dw-sub">Involvement vs. Placement</div></div>
+            <div class="dw-icon">&#9632;</div>
+          </div>
+          <div class="lt-bar-chart">
+            <div class="lt-bar-group"><div class="bar muted" style="height:25px"></div><div class="bar primary" style="height:12px"></div></div>
+            <div class="lt-bar-group"><div class="bar muted" style="height:32px"></div><div class="bar primary" style="height:18px"></div></div>
+            <div class="lt-bar-group"><div class="bar muted" style="height:45px"></div><div class="bar primary" style="height:22px"></div></div>
+            <div class="lt-bar-group"><div class="bar muted" style="height:55px"></div><div class="bar primary" style="height:30px"></div></div>
+          </div>
+          <div class="dw-footer">Widget: Bar Chart &middot; <a href="#" style="color:#4a9eed;text-decoration:none">Edit</a> &middot; <a href="#" style="color:#ef4444;text-decoration:none">Remove</a></div>
+        </div>
+
+        <div class="dash-widget">
+          <div class="dw-header">
+            <div><h4>College Exposure</h4><div class="dw-sub">Visit Type Breakdown</div></div>
+            <div class="dw-icon">&#9673;</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:52px;height:52px;border-radius:50%;background:conic-gradient(#C03537 0% 65%,#333 65% 100%);position:relative;flex-shrink:0">
+              <div style="position:absolute;inset:12px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800">130</div>
+            </div>
+            <div style="font-size:12px;color:#666;line-height:1.6">In-Person: 85<br>Virtual: 45</div>
+          </div>
+          <div class="dw-footer">Widget: Pie + Breakdown &middot; <a href="#" style="color:#4a9eed;text-decoration:none">Edit</a> &middot; <a href="#" style="color:#ef4444;text-decoration:none">Remove</a></div>
+        </div>
+
+        <div class="dash-add" onclick="document.getElementById('catalog-section').scrollIntoView({behavior:'smooth'})">
+          <div class="plus">+</div>
+          Add Widget
+        </div>
+      </div>
+
+      <!-- Widget catalog -->
+      <div id="catalog-section" style="margin-top:32px">
+        <div class="section-title">Widget Catalog &mdash; Pick a type to add</div>
+        <div class="widget-catalog">
+          <div class="widget-type" onclick="document.getElementById('config-donut').style.display='block'">
+            <div class="wt-icon"><div class="wt-donut"></div></div>
+            <h4>Donut / Ring</h4>
+            <p>Progress toward a target</p>
+          </div>
+          <div class="widget-type">
+            <div class="wt-icon"><div class="wt-bignum">480<small>+12%</small></div></div>
+            <h4>Big Number</h4>
+            <p>Single KPI with trend</p>
+          </div>
+          <div class="widget-type">
+            <div class="wt-icon">
+              <div class="wt-bars">
+                <div style="height:20px"></div><div style="height:30px"></div><div style="height:25px"></div><div style="height:40px"></div><div style="height:50px"></div>
+              </div>
+            </div>
+            <h4>Bar Chart</h4>
+            <p>Compare values over time</p>
+          </div>
+          <div class="widget-type">
+            <div class="wt-icon">
+              <div class="wt-area">
+                <svg viewBox="0 0 80 44" fill="none"><path d="M0 40 L15 30 L30 32 L45 20 L60 15 L80 8 L80 44 L0 44Z" fill="rgba(192,53,55,0.15)"/><path d="M0 40 L15 30 L30 32 L45 20 L60 15 L80 8" stroke="#C03537" stroke-width="2" fill="none"/></svg>
+              </div>
+            </div>
+            <h4>Area / Line Chart</h4>
+            <p>Trends over time</p>
+          </div>
+          <div class="widget-type">
+            <div class="wt-icon">
+              <div class="wt-progress">
+                <div class="wt-progress-bar"><div style="width:75%"></div></div>
+                <span>75%</span>
+              </div>
+            </div>
+            <h4>Progress Bar</h4>
+            <p>Simple completion meter</p>
+          </div>
+          <div class="widget-type">
+            <div class="wt-icon"><div class="wt-pie"></div></div>
+            <h4>Pie + Breakdown</h4>
+            <p>Category split with totals</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Config panel example -->
+      <div class="config-panel" id="config-donut" style="margin-top:24px;display:none">
+        <h3>Configure Widget <span class="chip">Donut / Ring</span> <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="this.closest('.config-panel').style.display='none'">Cancel</button></h3>
+        <div class="config-cols">
+          <div>
+            <div class="form-group">
+              <label>Title</label>
+              <input type="text" value="Microcredentials Earned">
+            </div>
+            <div class="form-group">
+              <label>Subtitle</label>
+              <input type="text" value="Target: 500 Certifications">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div class="form-group">
+                <label>Current Value</label>
+                <input type="number" value="324">
+              </div>
+              <div class="form-group">
+                <label>Target Value</label>
+                <input type="number" value="500">
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Center Label</label>
+              <input type="text" value="EARNED TO DATE">
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px">
+              <button class="btn btn-primary">Save Widget</button>
+              <button class="btn btn-ghost" onclick="this.closest('.config-panel').style.display='none'">Cancel</button>
+            </div>
+          </div>
+          <div class="config-preview">
+            <div style="font-size:13px;color:#888;margin-bottom:12px">Live Preview</div>
+            <div style="width:100px;height:100px;border-radius:50%;border:14px solid #C03537;border-top-color:#eee;border-right-color:#eee;display:flex;align-items:center;justify-content:center;flex-direction:column">
+              <div style="font-size:22px;font-weight:800">324</div>
+              <div style="font-size:7px;color:#888;text-transform:uppercase">Earned to Date</div>
+            </div>
+            <div style="font-size:12px;color:#22c55e;font-weight:600;margin-top:8px">64% to Goal</div>
+          </div>
+        </div>
+        <div class="flow-note" style="margin:16px 0 0">This is the entire config. 5 fields. Compare to the current metrics table which has 50+ columns. The widget type determines the visual automatically.</div>
+      </div>
+
+    </div>
+  </div>
+  <div class="flow-note">NEW screen. When a customer picks the "Launch Traction" template, they get this widget builder instead of the goal tree editor. Pick from 6 widget types, fill in 3-5 fields, done. Stored as simple JSON, not 50-column rows.</div>
+</div>
+
+<!-- ==================== PUBLIC: LAUNCH TRACTION ==================== -->
+<div class="screen" id="public-lt">
+  <div class="screen-label">Screen 11 of 12 &mdash; Public View: Launch Traction Template (matches your screenshot)</div>
+  <div class="lt-header">
+    <div>
+      <h1><strong>WESTSIDE</strong> LAUNCH TRACTION</h1>
+      <p>Real-time tracking of community engagement, student achievement, and partnership growth</p>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <div class="lt-badge">COMING AUGUST 2024</div>
+      <button class="btn btn-ghost btn-sm" style="background:#2e2e3e;color:#fff;border:1px solid #555">Download Report</button>
+    </div>
+  </div>
+
+  <div class="lt-grid">
+    <!-- Widget 1: Donut -->
+    <div class="lt-card">
+      <div class="lt-top">
+        <div><h3>Microcredentials Earned</h3><div class="lt-sub">Target: 500 Certifications</div></div>
+        <div class="dw-icon">&#9679;</div>
+      </div>
+      <div class="lt-donut-wrap">
+        <div class="lt-donut">
+          <div class="lt-donut-inner">
+            <div class="val">324</div>
+            <div class="lbl">Earned to Date</div>
+          </div>
+        </div>
+        <div style="font-size:14px;color:#22c55e;font-weight:600">64% to Goal</div>
+      </div>
+    </div>
+
+    <!-- Widget 2: Area Chart -->
+    <div class="lt-card">
+      <div class="lt-top">
+        <div><h3>Engagement Momentum</h3><div class="lt-sub">Cumulative Events Hosted</div></div>
+        <div class="dw-icon">&#9650;</div>
+      </div>
+      <div class="lt-area-mock" style="height:100px">
+        <div style="position:absolute;top:8px;left:8px;font-size:10px;color:#888">20</div>
+        <div style="position:absolute;bottom:25px;left:8px;font-size:10px;color:#888">0</div>
+        <div style="position:absolute;bottom:4px;left:15%;font-size:10px;color:#888">Aug</div>
+        <div style="position:absolute;bottom:4px;left:38%;font-size:10px;color:#888">Sep</div>
+        <div style="position:absolute;bottom:4px;left:58%;font-size:10px;color:#888">Oct</div>
+        <div style="position:absolute;bottom:4px;left:78%;font-size:10px;color:#888">Nov</div>
+        <div style="position:absolute;bottom:4px;right:4%;font-size:10px;color:#888">Dec</div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:#888">
+        <span><span style="color:#C03537">&#9679;</span> Industry</span>
+        <span><span style="color:#333">&#9679;</span> Community</span>
+      </div>
+    </div>
+
+    <!-- Widget 3: Big Number -->
+    <div class="lt-card">
+      <div class="lt-top">
+        <div><h3>Parent Impact</h3><div class="lt-sub">Total Attendance</div></div>
+        <div class="dw-icon">&#9734;</div>
+      </div>
+      <div class="lt-val">480</div>
+      <div class="lt-trend up">+12% this month</div>
+      <div class="lt-progress" style="margin-top:16px">
+        <div class="lt-progress-bar"><div style="width:75%;background:#1e1e1e"></div></div>
+        <div class="lt-progress-label">75% of Annual Capacity reached</div>
+      </div>
+    </div>
+
+    <!-- Widget 4: Bar Chart -->
+    <div class="lt-card">
+      <div class="lt-top">
+        <div><h3>Student Challenges</h3><div class="lt-sub">Involvement vs. Placement Success</div></div>
+        <div class="dw-icon">&#9632;</div>
+      </div>
+      <div class="lt-bar-chart" style="height:80px">
+        <div style="text-align:center">
+          <div class="lt-bar-group"><div class="bar muted" style="height:30px"></div><div class="bar primary" style="height:14px"></div></div>
+          <div class="lt-bar-label">Q1</div>
+        </div>
+        <div style="text-align:center">
+          <div class="lt-bar-group"><div class="bar muted" style="height:40px"></div><div class="bar primary" style="height:20px"></div></div>
+          <div class="lt-bar-label">Q2</div>
+        </div>
+        <div style="text-align:center">
+          <div class="lt-bar-group"><div class="bar muted" style="height:55px"></div><div class="bar primary" style="height:28px"></div></div>
+          <div class="lt-bar-label">Q3</div>
+        </div>
+        <div style="text-align:center">
+          <div class="lt-bar-group"><div class="bar muted" style="height:65px"></div><div class="bar primary" style="height:38px"></div></div>
+          <div class="lt-bar-label">Q4</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:8px;font-size:11px;color:#888">
+        <span><span style="color:#ddd">&#9632;</span> Involved</span>
+        <span><span style="color:#C03537">&#9632;</span> Placed</span>
+      </div>
+      <div style="background:#fef2f2;border-radius:6px;padding:6px 12px;margin-top:10px;display:flex;justify-content:space-between;font-size:13px">
+        <span style="color:#C03537;font-weight:600">Conversion Rate</span>
+        <span style="font-weight:700">20.8%</span>
+      </div>
+    </div>
+
+    <!-- Widget 5: Pie + Breakdown -->
+    <div class="lt-card">
+      <div class="lt-top">
+        <div><h3>College Exposure</h3><div class="lt-sub">Visit Type Breakdown</div></div>
+        <div class="dw-icon">&#9673;</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div style="width:90px;height:90px;border-radius:50%;background:conic-gradient(#C03537 0% 65%,#333 65% 100%);position:relative;flex-shrink:0">
+          <div style="position:absolute;inset:18px;background:#fff;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:18px;font-weight:800">130</div>
+            <div style="font-size:7px;color:#888;text-transform:uppercase">Total Visits</div>
+          </div>
+        </div>
+        <div style="flex:1">
+          <div class="lt-breakdown">
+            <div class="lt-breakdown-row">
+              <div style="display:flex;align-items:center">
+                <div class="dot" style="background:#C03537"></div>
+                <div><div class="br-label">In-Person Visits</div><div class="br-sub">Campus tours & reps</div></div>
+              </div>
+              <div class="br-val">85</div>
+            </div>
+            <div class="lt-breakdown-row" style="border:none">
+              <div style="display:flex;align-items:center">
+                <div class="dot" style="background:#333"></div>
+                <div><div class="br-label">Virtual Visits</div><div class="br-sub">Online sessions & webinars</div></div>
+              </div>
+              <div class="br-val">45</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lt-footer">Data updated quarterly. Last synchronization: July 15, 2024</div>
+
+  <div class="flow-note">This is the public-facing page for the Launch Traction template. Matches your screenshot. Each card is powered by a simple widget config (5-6 fields), NOT the current 50-column metrics table. Customers build this using the Widget Builder admin screen.</div>
+</div>
+
+<script>
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

@@ -32,9 +32,9 @@ export class WidgetService {
     return apiPut(`/v2/widgets/reorder`, data);
   }
 
-  /** Fetch active widgets for a single goal (public, no auth) */
-  static async getByGoal(goalId: string): Promise<Widget[]> {
-    return apiGet<Widget[]>('/v2/widgets/by-goal', { goalId });
+  /** Fetch active widgets for a single goal, scoped to org (public, no auth) */
+  static async getByGoal(orgSlug: string, goalId: string): Promise<Widget[]> {
+    return apiGet<Widget[]>('/v2/widgets/by-goal', { orgSlug, goalId });
   }
 
   /** Batch fetch active widgets for multiple goals (public, no auth) */

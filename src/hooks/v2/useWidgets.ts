@@ -59,11 +59,11 @@ export function useReorderWidgets(_orgSlug: string) {
   });
 }
 
-export function useWidgetsByGoal(goalId: string) {
+export function useWidgetsByGoal(orgSlug: string, goalId: string) {
   return useQuery({
-    queryKey: ['widgets', 'goal', goalId],
-    queryFn: () => WidgetService.getByGoal(goalId),
-    enabled: !!goalId,
+    queryKey: ['widgets', 'goal', orgSlug, goalId],
+    queryFn: () => WidgetService.getByGoal(orgSlug, goalId),
+    enabled: !!orgSlug && !!goalId,
   });
 }
 

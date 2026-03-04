@@ -52,7 +52,7 @@ export function V2GoalDetail() {
   const { data: allGoals, isLoading: goalsLoading } = useGoalsByPlan(planId);
   const goal = allGoals && goalId ? findGoalInHierarchy(allGoals, goalId) : undefined;
 
-  const { data: goalWidgets, isLoading: widgetsLoading } = useWidgetsByGoal(goalId || '');
+  const { data: goalWidgets, isLoading: widgetsLoading } = useWidgetsByGoal(slug || '', goalId || '');
   const createWidget = useCreateWidget(slug || '');
   const updateWidget = useUpdateWidget(slug || '');
   const deleteWidget = useDeleteWidget(slug || '');

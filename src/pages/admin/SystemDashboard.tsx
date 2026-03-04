@@ -3,7 +3,6 @@ import {
   Building2,
   Target,
   Users,
-  GraduationCap,
   Settings,
   ArrowRight,
   User,
@@ -41,14 +40,6 @@ const statsConfig = [
     bgColor: 'bg-blue-50',
     iconColor: 'text-blue-600',
     field: 'totalGoals' as const,
-  },
-  {
-    key: 'schools',
-    label: 'Total Schools',
-    icon: GraduationCap,
-    bgColor: 'bg-green-50',
-    iconColor: 'text-green-600',
-    field: 'totalSchools' as const,
   },
 ];
 
@@ -96,7 +87,7 @@ export function SystemDashboard() {
       </div>
 
       {/* KPI Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-8">
         {statsConfig.map((stat) => (
           <div
             key={stat.key}

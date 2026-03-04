@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Building2, FileText, Target, TrendingUp, ArrowRight, Plus, ChevronRight, Settings, ExternalLink, Users } from 'lucide-react';
+import { Building2, FileText, Target, ArrowRight, Plus, ChevronRight, Settings, ExternalLink, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserDashboardStats, useUserDistrictsWithStats } from '../../hooks/useUserDistricts';
 import { useUserPlansWithCounts } from '../../hooks/useUserPlans';
@@ -88,7 +88,7 @@ export function UserDashboard() {
       </div>
 
       {/* Stats Row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
         <StatCard
           label="Districts"
           value={statsLoading ? '...' : String(stats?.district_count || 0)}
@@ -104,11 +104,6 @@ export function UserDashboard() {
           label="Objectives"
           value={statsLoading ? '...' : String(stats?.objective_count || 0)}
           icon={<Target size={20} />}
-        />
-        <StatCard
-          label="Metrics"
-          value={statsLoading ? '...' : String(stats?.metric_count || 0)}
-          icon={<TrendingUp size={20} />}
         />
       </div>
 

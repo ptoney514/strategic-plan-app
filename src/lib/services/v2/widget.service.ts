@@ -38,8 +38,8 @@ export class WidgetService {
   }
 
   /** Batch fetch active widgets for multiple goals (public, no auth) */
-  static async getByGoals(goalIds: string[]): Promise<Widget[]> {
+  static async getByGoals(orgSlug: string, goalIds: string[]): Promise<Widget[]> {
     if (goalIds.length === 0) return [];
-    return apiGet<Widget[]>(`/v2/widgets/by-goals?ids=${goalIds.join(',')}`);
+    return apiGet<Widget[]>(`/v2/widgets/by-goals?orgSlug=${encodeURIComponent(orgSlug)}&ids=${goalIds.join(',')}`);
   }
 }

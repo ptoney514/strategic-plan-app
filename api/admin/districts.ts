@@ -53,8 +53,8 @@ export async function GET(req: Request) {
           created_at: org.createdAt,
           updated_at: org.updatedAt,
           plan_count: planCount.count,
-          goal_count: goalCount.count,
-          admin_count: adminCount.count,
+          goals_count: goalCount.count,
+          users_count: adminCount.count,
         };
       }),
     );

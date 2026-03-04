@@ -291,7 +291,7 @@ describe('V2GoalDrillDown', () => {
 
   it('passes useWidgetsByGoals parent ID plus all descendant IDs', () => {
     render(<V2GoalDrillDown />);
-    expect(mockUseWidgetsByGoals).toHaveBeenCalledWith(['goal-1', 'c-1', 'gc-1', 'c-2']);
+    expect(mockUseWidgetsByGoals).toHaveBeenCalledWith('westside', ['goal-1', 'c-1', 'gc-1', 'c-2']);
   });
 
   it('shows parent widgets in Metrics section when goal has no children', () => {

@@ -67,11 +67,11 @@ export function useWidgetsByGoal(goalId: string) {
   });
 }
 
-export function useWidgetsByGoals(goalIds: string[]) {
+export function useWidgetsByGoals(orgSlug: string, goalIds: string[]) {
   const key = goalIds.sort().join(',');
   return useQuery({
-    queryKey: ['widgets', 'goals', key],
-    queryFn: () => WidgetService.getByGoals(goalIds),
-    enabled: goalIds.length > 0,
+    queryKey: ['widgets', 'goals', orgSlug, key],
+    queryFn: () => WidgetService.getByGoals(orgSlug, goalIds),
+    enabled: !!orgSlug && goalIds.length > 0,
   });
 }

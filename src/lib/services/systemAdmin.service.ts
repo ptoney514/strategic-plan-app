@@ -4,7 +4,6 @@ export interface SystemAdminStats {
   totalDistricts: number;
   totalGoals: number;
   totalUsers: number;
-  totalSchools: number;
 }
 
 export interface DistrictWithStats {
@@ -15,8 +14,8 @@ export interface DistrictWithStats {
   logo_url?: string;
   primary_color?: string;
   is_public: boolean;
+  plan_count: number;
   goals_count: number;
-  schools_count: number;
   users_count: number;
   created_at: string;
   updated_at: string;

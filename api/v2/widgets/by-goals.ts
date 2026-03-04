@@ -1,20 +1,41 @@
 import { inArray, and, eq } from "drizzle-orm";
 import { db } from "../../lib/db.js";
-import { widgets } from "../../lib/schema/index.js";
+import { widgets, organizations } from "../../lib/schema/index.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
 
 /**
- * GET /api/v2/widgets/by-goals?ids=id1,id2,id3
- * Batch fetch active widgets for multiple goals. No auth required (public endpoint).
+ * GET /api/v2/widgets/by-goals?orgSlug=xxx&ids=id1,id2,id3
+ * Batch fetch active widgets for multiple goals. No auth required.
+ * Only returns widgets for public organizations.
  * Avoids N+1 queries on drill-down pages.
  */
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
+    const orgSlug = url.searchParams.get("orgSlug");
     const idsParam = url.searchParams.get("ids");
+
+    if (!orgSlug) {
+      return jsonError("orgSlug is required", 400);
+    }
 
     if (!idsParam) {
       return jsonError("ids parameter is required", 400);
+    }
+
+    // Verify org exists and is public
+    const [org] = await db
+      .select()
+      .from(organizations)
+      .where(eq(organizations.slug, orgSlug))
+      .limit(1);
+
+    if (!org) {
+      return jsonError("Organization not found", 404);
+    }
+
+    if (!org.isPublic) {
+      return jsonError("Organization is not public", 403);
     }
 
     const goalIds = idsParam.split(",").filter(Boolean);
@@ -32,6 +53,7 @@ export async function GET(req: Request) {
       .from(widgets)
       .where(
         and(
+          eq(widgets.organizationId, org.id),
           inArray(widgets.goalId, goalIds),
           eq(widgets.isActive, true),
         ),

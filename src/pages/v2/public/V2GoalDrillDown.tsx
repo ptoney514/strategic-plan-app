@@ -52,7 +52,7 @@ export function V2GoalDrillDown() {
     goalId,
     ...children.flatMap((c) => [c.id, ...(c.children || []).map((gc) => gc.id)]),
   ].filter(Boolean) as string[];
-  const { data: goalWidgets } = useWidgetsByGoals(allGoalIds);
+  const { data: goalWidgets } = useWidgetsByGoals(slug || '', allGoalIds);
 
   const getWidgetsForGoal = (id: string): Widget[] =>
     goalWidgets?.filter((w) => w.goalId === id) || [];

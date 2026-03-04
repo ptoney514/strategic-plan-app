@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import { useAuth } from '../contexts/AuthContext';
+import { useDistrict } from '../hooks/useDistricts';
 
 // Guards
 import { ClientAdminGuard } from '../middleware/ClientAdminGuard';
@@ -51,6 +52,30 @@ function RequireAuth({ children }: { children: React.ReactNode }) {
 }
 
 /**
+ * Renders the appropriate public index page based on the district's template_mode.
+ */
+function PublicIndexPage() {
+  const { slug } = useSubdomain();
+  const { data: district, isLoading } = useDistrict(slug || '');
+
+  if (isLoading) return null;
+
+  if (district?.template_mode === 'launch-traction') {
+    return (
+      <Suspense fallback={null}>
+        <V2LaunchTraction />
+      </Suspense>
+    );
+  }
+
+  return (
+    <Suspense fallback={null}>
+      <V2GoalsOverview />
+    </Suspense>
+  );
+}
+
+/**
  * Router for district subdomains (e.g., westside.stratadash.org)
  * The district slug is derived from the subdomain, not URL path.
  */
@@ -72,7 +97,7 @@ export function DistrictRouter() {
 
       {/* Public Routes */}
       <Route path="/" element={<Suspense fallback={SuspenseFallback}><V2PublicLayout /></Suspense>}>
-        <Route index element={<Suspense fallback={null}><V2GoalsOverview /></Suspense>} />
+        <Route index element={<PublicIndexPage />} />
         <Route path="goals/:goalId" element={<Suspense fallback={null}><V2GoalDrillDown /></Suspense>} />
         <Route path="launch" element={<Suspense fallback={null}><V2LaunchTraction /></Suspense>} />
       </Route>

@@ -2,11 +2,12 @@ import { inArray, and, eq } from "drizzle-orm";
 import { db } from "../../lib/db.js";
 import { widgets, organizations } from "../../lib/schema/index.js";
 import { jsonOk, jsonError } from "../../lib/response.js";
+import { requireOrgMember } from "../../lib/middleware/auth.js";
 
 /**
  * GET /api/v2/widgets/by-goals?orgSlug=xxx&ids=id1,id2,id3
- * Batch fetch active widgets for multiple goals. No auth required.
- * Only returns widgets for public organizations.
+ * Batch fetch active widgets for multiple goals, scoped to an organization.
+ * Public orgs: no auth required. Private orgs: requires authenticated org member.
  * Avoids N+1 queries on drill-down pages.
  */
 export async function GET(req: Request) {
@@ -23,7 +24,7 @@ export async function GET(req: Request) {
       return jsonError("ids parameter is required", 400);
     }
 
-    // Verify org exists and is public
+    // Look up the org
     const [org] = await db
       .select()
       .from(organizations)
@@ -34,8 +35,9 @@ export async function GET(req: Request) {
       return jsonError("Organization not found", 404);
     }
 
+    // Private orgs require authenticated org membership
     if (!org.isPublic) {
-      return jsonError("Organization is not public", 403);
+      await requireOrgMember(req, orgSlug);
     }
 
     const goalIds = idsParam.split(",").filter(Boolean);

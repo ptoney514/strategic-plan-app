@@ -134,7 +134,7 @@ function PlanCard({
   const objectives = goals.filter((g) => g.level === 0);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-white border border-slate-200 rounded-lg shadow-xs overflow-hidden">
       {/* Plan Header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}

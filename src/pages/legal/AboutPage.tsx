@@ -21,19 +21,19 @@ export function AboutPage() {
       <section className="pt-32 pb-16 relative">
         {/* Background Decoration */}
         <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[24px_24px]" />
           <div className="absolute left-1/2 -translate-x-1/2 top-0 h-[40vh] w-[50vw] rounded-full bg-indigo-500/10 blur-[120px]" />
         </div>
 
         <div className="max-w-4xl mx-auto px-6 text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-100 bg-indigo-50/80 text-indigo-700 text-xs font-semibold tracking-wide uppercase shadow-sm mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-100 bg-indigo-50/80 text-indigo-700 text-xs font-semibold tracking-wide uppercase shadow-xs mb-6">
             Our Story
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-indigo-900 mb-6 leading-tight tracking-tight">
             About{' '}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+            <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600">
               StrataDash
             </span>
           </h1>
@@ -47,7 +47,7 @@ export function AboutPage() {
       <main className="max-w-4xl mx-auto px-6 pb-20">
         <div className="space-y-16">
           {/* Section 1 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-sm">
+          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
                 <Icon icon="solar:document-text-linear" className="w-5 h-5 text-indigo-600" />
@@ -70,7 +70,7 @@ export function AboutPage() {
           </section>
 
           {/* Section 2 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-sm">
+          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                 <Icon icon="solar:chart-2-linear" className="w-5 h-5 text-blue-600" />
@@ -126,7 +126,7 @@ export function AboutPage() {
           </section>
 
           {/* Section 3 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-sm">
+          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <Icon icon="solar:graduation-cap-linear" className="w-5 h-5 text-emerald-600" />
@@ -146,7 +146,7 @@ export function AboutPage() {
           </section>
 
           {/* Section 4 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-sm">
+          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
                 <Icon icon="solar:wallet-linear" className="w-5 h-5 text-amber-600" />
@@ -166,7 +166,7 @@ export function AboutPage() {
           </section>
 
           {/* CTA Section */}
-          <section className="bg-gradient-to-br from-indigo-900 to-indigo-800 rounded-2xl p-8 md:p-10 text-center">
+          <section className="bg-linear-to-br from-indigo-900 to-indigo-800 rounded-2xl p-8 md:p-10 text-center">
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
               Get Started
             </h2>

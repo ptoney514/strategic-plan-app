@@ -109,7 +109,7 @@ export function OrgCreationStep({ onNext, isSubmitting }: OrgCreationStepProps) 
           placeholder="e.g. Westside School District"
           className={`w-full px-3 py-2 text-sm rounded-lg border ${
             errors.name ? 'border-red-300' : 'border-gray-300'
-          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          } focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
         />
         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
       </div>
@@ -128,7 +128,7 @@ export function OrgCreationStep({ onNext, isSubmitting }: OrgCreationStepProps) 
           }}
           className={`w-full px-3 py-2 text-sm rounded-lg border ${
             errors.entity_type ? 'border-red-300' : 'border-gray-300'
-          } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white`}
+          } focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white`}
         >
           <option value="">Select type...</option>
           {ENTITY_TYPES.map((type) => (
@@ -156,7 +156,7 @@ export function OrgCreationStep({ onNext, isSubmitting }: OrgCreationStepProps) 
               placeholder="your-org"
               className={`w-full px-3 py-2 pr-9 text-sm rounded-lg border ${
                 errors.slug ? 'border-red-300' : slugAvailable ? 'border-green-300' : 'border-gray-300'
-              } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              } focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             />
             {/* Status indicator */}
             <div className="absolute right-2 top-1/2 -translate-y-1/2">

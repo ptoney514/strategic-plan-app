@@ -64,7 +64,7 @@ export function DashboardDistrictsPage() {
             placeholder="Search districts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-hidden"
             style={{
               border: '1px solid var(--editorial-border)',
               backgroundColor: 'var(--editorial-surface)',
@@ -196,14 +196,14 @@ function DistrictAvatar({ district }: { district: UserDistrictWithStats }) {
       <img
         src={district.logo_url}
         alt=""
-        className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+        className="w-10 h-10 rounded-lg object-cover shrink-0"
       />
     );
   }
 
   return (
     <div
-      className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+      className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
       style={{ backgroundColor: district.primary_color || '#D97706' }}
     >
       {district.name.substring(0, 2).toUpperCase()}

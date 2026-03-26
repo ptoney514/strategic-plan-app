@@ -11,7 +11,7 @@ export function SystemAdminLayout() {
   return (
     <div className="min-h-screen bg-background">
       {/* System Admin Header */}
-      <header className="bg-gradient-to-r from-slate-900 to-slate-800 shadow-xl sticky top-0 z-40">
+      <header className="bg-linear-to-r from-slate-900 to-slate-800 shadow-xl sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             {/* Logo and Title */}

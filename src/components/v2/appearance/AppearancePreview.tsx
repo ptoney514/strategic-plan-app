@@ -21,7 +21,7 @@ export function AppearancePreview({
     .toUpperCase();
 
   return (
-    <div className="rounded-lg border border-slate-200 overflow-hidden shadow-sm" data-testid="appearance-preview">
+    <div className="rounded-lg border border-slate-200 overflow-hidden shadow-xs" data-testid="appearance-preview">
       {/* Header bar */}
       <div
         className="px-4 py-3 flex items-center gap-3"

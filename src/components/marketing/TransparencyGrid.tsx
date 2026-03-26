@@ -42,7 +42,7 @@ export function TransparencyGrid() {
           </p>
           <button
             type="button"
-            className="inline-flex items-center justify-center px-8 py-3.5 text-sm font-medium text-white transition-all bg-indigo-600 rounded-full hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600"
+            className="inline-flex items-center justify-center px-8 py-3.5 text-sm font-medium text-white transition-all bg-indigo-600 rounded-full hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-200 hover:-translate-y-0.5 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600"
           >
             Explore Public Portals
             <Icon icon="solar:arrow-right-linear" className="ml-2" width="18" />
@@ -58,9 +58,9 @@ export function TransparencyGrid() {
             >
               {/* Gradient Background Placeholder */}
               <div
-                className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-60 transition-transform duration-700 group-hover:scale-105`}
+                className={`absolute inset-0 bg-linear-to-br ${card.gradient} opacity-60 transition-transform duration-700 group-hover:scale-105`}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+              <div className="absolute inset-0 bg-linear-to-t from-slate-950 via-slate-950/60 to-transparent" />
               <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors duration-500" />
 
               <div className="flex flex-col h-full z-10 p-10 relative justify-end">

@@ -24,7 +24,7 @@ export function DashboardLayout({ basePath = '/' }: DashboardLayoutProps) {
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto relative">
           {/* Decoration gradient */}
-          <div className="absolute top-[72px] inset-x-0 h-40 bg-gradient-to-b from-white to-transparent pointer-events-none ml-[270px]" />
+          <div className="absolute top-[72px] inset-x-0 h-40 bg-linear-to-b from-white to-transparent pointer-events-none ml-[270px]" />
 
           {/* Content wrapper */}
           <div className="relative z-0 p-8 space-y-8">

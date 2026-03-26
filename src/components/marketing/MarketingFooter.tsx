@@ -12,7 +12,7 @@ export function MarketingFooter() {
               <img
                 src="/assets/stratadash-logo.png"
                 alt="StrataDash"
-                className="w-7 h-7 rounded-lg shadow-sm"
+                className="w-7 h-7 rounded-lg shadow-xs"
               />
               <span className="font-bold text-indigo-900">StrataDash</span>
             </div>

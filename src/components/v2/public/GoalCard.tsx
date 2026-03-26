@@ -59,7 +59,7 @@ export function GoalCard({
     <button
       aria-expanded={isExpanded}
       aria-label={`Goal ${goalNumber}: ${title}. ${isExpanded ? 'Expanded' : 'Click to expand'}`}
-      className="w-full text-left rounded-xl p-5 cursor-pointer shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      className="w-full text-left rounded-xl p-5 cursor-pointer shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       style={{
         backgroundColor: 'var(--editorial-surface)',
         border: '1px solid var(--editorial-border)',
@@ -69,7 +69,7 @@ export function GoalCard({
       {/* Header */}
       <div className="flex items-start gap-3 mb-4">
         <div
-          className="w-10 h-10 flex-shrink-0 rounded-lg flex items-center justify-center text-sm font-bold"
+          className="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center text-sm font-bold"
           style={{
             border: `2px solid ${primaryColor || '#1e293b'}`,
             color: primaryColor || '#1e293b',

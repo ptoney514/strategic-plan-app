@@ -6,7 +6,7 @@ import { ArrowLeft } from 'lucide-react';
  */
 export function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-neutral-50 to-white">
+    <div className="min-h-screen bg-linear-to-b from-white via-neutral-50 to-white">
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="container mx-auto px-6 py-4">

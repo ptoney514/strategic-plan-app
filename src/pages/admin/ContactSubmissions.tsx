@@ -173,7 +173,7 @@ export function ContactSubmissions() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+          className="px-4 py-2 border border-border rounded-lg bg-card text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/20"
         >
           <option value="all">All Status</option>
           {STATUS_OPTIONS.map((status) => (
@@ -330,7 +330,7 @@ function SubmissionCard({
               <select
                 value={submission.status}
                 onChange={(e) => onStatusChange(submission.id, e.target.value)}
-                className="px-3 py-1.5 text-sm border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+                className="px-3 py-1.5 text-sm border border-border rounded-lg bg-card text-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/20"
               >
                 {STATUS_OPTIONS.map((status) => (
                   <option key={status} value={status}>

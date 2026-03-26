@@ -67,7 +67,7 @@ export function SlideoverPanel({
     <>
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/40 backdrop-blur-xs z-40 transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={onClose}
@@ -90,7 +90,7 @@ export function SlideoverPanel({
           <div className="flex items-center justify-between px-6 py-4">
             <div className="flex items-center gap-3">
               {icon || (
-                <div className="w-10 h-10 flex items-center justify-center bg-[#d1fae5] rounded-lg">
+                <div className="w-10 h-10 flex items-center justify-center bg-district-green-light rounded-lg">
                   <Target className="h-5 w-5 text-[#10b981]" />
                 </div>
               )}

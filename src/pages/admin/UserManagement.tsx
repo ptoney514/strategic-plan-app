@@ -180,10 +180,10 @@ function UserRow({
         {/* User */}
         <div className="flex items-center gap-3 min-w-0">
           {user.image ? (
-            <img src={user.image} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+            <img src={user.image} alt="" className="w-8 h-8 rounded-full object-cover shrink-0" />
           ) : (
             <div
-              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
               style={{ backgroundColor: 'var(--editorial-accent)', color: '#fff' }}
             >
               {initials}

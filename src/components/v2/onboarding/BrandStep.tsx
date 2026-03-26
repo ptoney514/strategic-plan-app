@@ -59,7 +59,7 @@ export function BrandStep({
               }
             }}
             placeholder="#0099CC"
-            className="w-28 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+            className="w-28 px-3 py-2 text-sm rounded-lg border border-gray-300 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
           />
           {/* Preview swatch */}
           <div
@@ -77,7 +77,7 @@ export function BrandStep({
               onClick={() => onColorChange(color)}
               className={`w-full aspect-square rounded-lg border-2 transition-all ${
                 primaryColor === color
-                  ? 'border-gray-900 scale-110 shadow-sm'
+                  ? 'border-gray-900 scale-110 shadow-xs'
                   : 'border-transparent hover:border-gray-300'
               }`}
               style={{ backgroundColor: color }}

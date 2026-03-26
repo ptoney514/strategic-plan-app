@@ -78,7 +78,7 @@ export function SystemDashboard() {
     <div className="px-6 lg:px-10 py-8 max-w-[1400px] mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="font-['Playfair_Display',_Georgia,_serif] text-[28px] font-medium text-[#1a1a1a] tracking-tight">
+        <h1 className="font-['Playfair_Display',Georgia,serif] text-[28px] font-medium text-[#1a1a1a] tracking-tight">
           Dashboard
         </h1>
         <p className="text-sm text-[#8a8a8a] mt-1">
@@ -101,7 +101,7 @@ export function SystemDashboard() {
                 {statsLoading ? (
                   <div className="h-9 w-16 bg-[#f5f3ef] rounded animate-pulse" />
                 ) : (
-                  <p className="text-3xl font-['Playfair_Display',_Georgia,_serif] font-medium text-[#1a1a1a]">
+                  <p className="text-3xl font-['Playfair_Display',Georgia,serif] font-medium text-[#1a1a1a]">
                     {stats?.[stat.field] ?? 0}
                   </p>
                 )}
@@ -121,7 +121,7 @@ export function SystemDashboard() {
         {/* Growth Chart Placeholder */}
         <div className="bg-white border border-[#e8e6e1] rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-[#e8e6e1]">
-            <h2 className="font-['Playfair_Display',_Georgia,_serif] text-lg font-medium text-[#1a1a1a]">
+            <h2 className="font-['Playfair_Display',Georgia,serif] text-lg font-medium text-[#1a1a1a]">
               Platform Growth
             </h2>
           </div>
@@ -141,7 +141,7 @@ export function SystemDashboard() {
         {/* Quick Actions */}
         <div className="bg-white border border-[#e8e6e1] rounded-xl overflow-hidden">
           <div className="px-6 py-4 border-b border-[#e8e6e1]">
-            <h2 className="font-['Playfair_Display',_Georgia,_serif] text-lg font-medium text-[#1a1a1a]">
+            <h2 className="font-['Playfair_Display',Georgia,serif] text-lg font-medium text-[#1a1a1a]">
               Quick Actions
             </h2>
           </div>
@@ -153,7 +153,7 @@ export function SystemDashboard() {
                 className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-[#faf9f7] transition-colors group"
               >
                 <div
-                  className={`w-10 h-10 rounded-lg ${action.bgColor} flex items-center justify-center flex-shrink-0`}
+                  className={`w-10 h-10 rounded-lg ${action.bgColor} flex items-center justify-center shrink-0`}
                 >
                   <action.icon className={`h-5 w-5 ${action.iconColor}`} />
                 </div>
@@ -175,7 +175,7 @@ export function SystemDashboard() {
       {/* Recent Activity Feed */}
       <div className="bg-white border border-[#e8e6e1] rounded-xl overflow-hidden">
         <div className="px-6 py-4 border-b border-[#e8e6e1] flex items-center justify-between">
-          <h2 className="font-['Playfair_Display',_Georgia,_serif] text-lg font-medium text-[#1a1a1a]">
+          <h2 className="font-['Playfair_Display',Georgia,serif] text-lg font-medium text-[#1a1a1a]">
             Recent Users
           </h2>
           <Link
@@ -204,7 +204,7 @@ export function SystemDashboard() {
                 key={user.id}
                 className="px-6 py-4 flex items-center gap-4 hover:bg-[#faf9f7] transition-colors"
               >
-                <div className="w-9 h-9 rounded-full bg-[#f5f3ef] flex items-center justify-center flex-shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#f5f3ef] flex items-center justify-center shrink-0">
                   <User className="h-4 w-4 text-[#8a8a8a]" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -218,7 +218,7 @@ export function SystemDashboard() {
                     {user.district_name || user.school_name || 'System'}
                   </p>
                 </div>
-                <span className="text-xs text-[#8a8a8a] flex-shrink-0">
+                <span className="text-xs text-[#8a8a8a] shrink-0">
                   {formatDistanceToNow(new Date(user.created_at))}
                 </span>
               </div>

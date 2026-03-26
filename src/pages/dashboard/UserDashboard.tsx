@@ -321,7 +321,7 @@ function StatCard({ label, value, icon, hidden }: { label: string; value: string
       style={{ backgroundColor: 'var(--editorial-surface)', border: '1px solid var(--editorial-border)' }}
     >
       <div
-        className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+        className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
         style={{ backgroundColor: 'var(--editorial-surface-alt)', color: 'var(--editorial-accent-primary)' }}
       >
         {icon}
@@ -357,11 +357,11 @@ function DistrictCard({ district }: { district: UserDistrictWithStats }) {
             <img
               src={district.logo_url}
               alt=""
-              className="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+              className="w-10 h-10 rounded-lg object-cover shrink-0"
             />
           ) : (
             <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
+              className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
               style={{ backgroundColor: district.primary_color || '#D97706' }}
             >
               {district.name.substring(0, 2).toUpperCase()}
@@ -466,7 +466,7 @@ function PlanRow({ plan, districtName, districtColor, isSelected, onClick, onNav
     >
       <div className="flex items-center gap-4">
         <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
           style={{ backgroundColor: 'var(--editorial-surface-alt)', color: 'var(--editorial-text-muted)' }}
         >
           <FileText size={20} />
@@ -550,7 +550,7 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
         onClick={() => hasChildren && setExpanded(!expanded)}
       >
         <button
-          className="w-6 h-6 rounded flex items-center justify-center flex-shrink-0 text-xs"
+          className="w-6 h-6 rounded flex items-center justify-center shrink-0 text-xs"
           style={{
             border: '1px solid var(--editorial-border)',
             color: hasChildren ? 'var(--editorial-text-secondary)' : 'var(--editorial-border)',
@@ -560,7 +560,7 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
         </button>
 
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+          className="w-8 h-8 rounded-full flex items-center justify-center shrink-0"
           style={{ backgroundColor: 'var(--editorial-surface-alt)' }}
         >
           <span className="text-xs font-semibold" style={{ color: 'var(--editorial-text-secondary)' }}>
@@ -577,7 +577,7 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
           {objective.title}
         </Link>
 
-        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md flex-shrink-0" style={{ border: '1px solid var(--editorial-border)' }}>
+        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-md shrink-0" style={{ border: '1px solid var(--editorial-border)' }}>
           <span
             className="w-2 h-2 rounded-full"
             style={{ backgroundColor: getStatusColor(objective.status) }}
@@ -605,7 +605,7 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
               >
                 {child.goal_number} {child.title}
               </Link>
-              <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
                 <span
                   className="w-1.5 h-1.5 rounded-full"
                   style={{ backgroundColor: getStatusColor(child.status) }}

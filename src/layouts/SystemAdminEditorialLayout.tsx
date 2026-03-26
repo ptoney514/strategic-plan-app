@@ -43,13 +43,13 @@ export function SystemAdminEditorialLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#faf9f7] flex font-['Source_Sans_3',_-apple-system,_sans-serif]">
+    <div className="min-h-screen bg-[#faf9f7] flex font-['Source_Sans_3',-apple-system,sans-serif]">
       {/* Desktop Dark Sidebar */}
       <aside className={`hidden lg:flex lg:flex-col ${isSidebarCollapsed ? 'w-16' : 'w-[220px]'} bg-[#1a1a1a] fixed top-0 left-0 bottom-0 z-50 transition-all duration-200`}>
         {/* Sidebar Header */}
         <div className="p-5 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#c9a227] rounded-lg flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 bg-[#c9a227] rounded-lg flex items-center justify-center shrink-0">
               <Shield className="h-5 w-5 text-[#1a1a1a]" />
             </div>
             {!isSidebarCollapsed && (
@@ -190,7 +190,7 @@ export function SystemAdminEditorialLayout() {
             <input
               type="text"
               placeholder="Search districts, users..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#e8e6e1] bg-white text-sm focus:outline-none focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] placeholder:text-[#8a8a8a]"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-[#e8e6e1] bg-white text-sm focus:outline-hidden focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] placeholder:text-[#8a8a8a]"
             />
           </div>
 

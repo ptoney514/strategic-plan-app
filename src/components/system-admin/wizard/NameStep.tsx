@@ -63,7 +63,7 @@ export function NameStep({ data, onChange }: NameStepProps) {
             onChange({ name, slug: generateSlug(name) });
           }}
           placeholder="e.g. Westside Unified School District"
-          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
           style={{
             backgroundColor: 'var(--editorial-surface)',
             borderColor: 'var(--editorial-border)',
@@ -86,7 +86,7 @@ export function NameStep({ data, onChange }: NameStepProps) {
             value={data.slug}
             onChange={(e) => onChange({ slug: generateSlug(e.target.value) })}
             placeholder="westside-unified"
-            className="flex-1 px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+            className="flex-1 px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
             style={{
               backgroundColor: 'var(--editorial-surface)',
               borderColor: 'var(--editorial-border)',
@@ -104,7 +104,7 @@ export function NameStep({ data, onChange }: NameStepProps) {
         <select
           value={data.entityType}
           onChange={(e) => onChange({ entityType: e.target.value })}
-          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
           style={{
             backgroundColor: 'var(--editorial-surface)',
             borderColor: 'var(--editorial-border)',
@@ -129,7 +129,7 @@ export function NameStep({ data, onChange }: NameStepProps) {
           value={data.entityLabel}
           onChange={(e) => onChange({ entityLabel: e.target.value })}
           placeholder="e.g. School, Department, Campus"
-          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
           style={{
             backgroundColor: 'var(--editorial-surface)',
             borderColor: 'var(--editorial-border)',
@@ -151,7 +151,7 @@ export function NameStep({ data, onChange }: NameStepProps) {
           onChange={(e) => onChange({ tagline: e.target.value })}
           placeholder="A short description of the district's mission..."
           rows={3}
-          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1 resize-none"
+          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1 resize-none"
           style={{
             backgroundColor: 'var(--editorial-surface)',
             borderColor: 'var(--editorial-border)',

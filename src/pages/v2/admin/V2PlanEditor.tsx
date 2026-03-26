@@ -79,7 +79,7 @@ export function V2PlanEditor() {
             <select
               value={selectedPlanId}
               onChange={handlePlanChange}
-              className="text-sm rounded-md px-3 py-1.5 outline-none cursor-pointer"
+              className="text-sm rounded-md px-3 py-1.5 outline-hidden cursor-pointer"
               style={{
                 backgroundColor: 'var(--editorial-surface)',
                 border: '1px solid var(--editorial-border)',

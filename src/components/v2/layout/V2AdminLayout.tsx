@@ -72,7 +72,7 @@ export function V2AdminLayout() {
               color: isActive ? 'var(--editorial-accent-primary)' : 'var(--editorial-sidebar-text-muted)',
             })}
           >
-            <Icon className="h-4 w-4 flex-shrink-0" />
+            <Icon className="h-4 w-4 shrink-0" />
             {label}
           </NavLink>
         ))}
@@ -94,7 +94,7 @@ export function V2AdminLayout() {
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: 'var(--editorial-bg)' }}>
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:flex-col w-64 flex-shrink-0" style={{ backgroundColor: 'var(--editorial-sidebar-bg)' }}>
+      <aside className="hidden lg:flex lg:flex-col w-64 shrink-0" style={{ backgroundColor: 'var(--editorial-sidebar-bg)' }}>
         {sidebarHeader}
         {renderNav()}
       </aside>

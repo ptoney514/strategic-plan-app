@@ -87,7 +87,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
       >
         {/* Level badge */}
         <span
-          className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold flex-shrink-0"
+          className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold shrink-0"
           style={{ backgroundColor: badge.bg, color: badge.text }}
         >
           {badge.label}
@@ -95,7 +95,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
 
         {/* Goal number */}
         <span
-          className="font-mono text-xs flex-shrink-0"
+          className="font-mono text-xs shrink-0"
           style={{ color: 'var(--editorial-text-secondary)' }}
         >
           {goal.goal_number}
@@ -110,7 +110,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
             onChange={(e) => setEditTitle(e.target.value)}
             onBlur={handleTitleSave}
             onKeyDown={handleTitleKeyDown}
-            className="flex-1 px-2 py-0.5 rounded text-sm outline-none"
+            className="flex-1 px-2 py-0.5 rounded text-sm outline-hidden"
             style={{
               backgroundColor: 'var(--editorial-bg)',
               border: '1px solid var(--editorial-accent-primary)',
@@ -131,7 +131,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
         <select
           value={goal.status || 'not_started'}
           onChange={handleStatusChange}
-          className="text-xs rounded px-2 py-1 cursor-pointer outline-none"
+          className="text-xs rounded px-2 py-1 cursor-pointer outline-hidden"
           style={{
             backgroundColor: 'var(--editorial-surface)',
             border: '1px solid var(--editorial-border)',

@@ -187,7 +187,7 @@ export function V2GoalDetail() {
         <div className="flex items-start gap-4">
           {/* Goal number badge */}
           <div
-            className="flex items-center justify-center rounded-xl font-bold text-lg text-white flex-shrink-0"
+            className="flex items-center justify-center rounded-xl font-bold text-lg text-white shrink-0"
             style={{
               width: 48,
               height: 48,
@@ -211,7 +211,7 @@ export function V2GoalDetail() {
                     if (e.key === 'Enter') handleTitleSave();
                     if (e.key === 'Escape') setIsEditingTitle(false);
                   }}
-                  className="flex-1 text-2xl font-bold px-2 py-1 rounded outline-none"
+                  className="flex-1 text-2xl font-bold px-2 py-1 rounded outline-hidden"
                   style={{
                     backgroundColor: 'var(--editorial-bg)',
                     border: '1px solid var(--editorial-accent-primary)',
@@ -241,7 +241,7 @@ export function V2GoalDetail() {
                   value={editDesc}
                   onChange={(e) => setEditDesc(e.target.value)}
                   rows={3}
-                  className="flex-1 text-sm px-2 py-1 rounded outline-none resize-none"
+                  className="flex-1 text-sm px-2 py-1 rounded outline-hidden resize-none"
                   style={{
                     backgroundColor: 'var(--editorial-bg)',
                     border: '1px solid var(--editorial-accent-primary)',
@@ -280,7 +280,7 @@ export function V2GoalDetail() {
             <select
               value={goalStatus}
               onChange={handleStatusChange}
-              className="text-xs rounded px-2 py-1 cursor-pointer outline-none"
+              className="text-xs rounded px-2 py-1 cursor-pointer outline-hidden"
               style={{
                 backgroundColor: 'var(--editorial-surface)',
                 border: '1px solid var(--editorial-border)',
@@ -298,7 +298,7 @@ export function V2GoalDetail() {
             <select
               value={goalPriority}
               onChange={handlePriorityChange}
-              className="text-xs rounded px-2 py-1 cursor-pointer outline-none"
+              className="text-xs rounded px-2 py-1 cursor-pointer outline-hidden"
               style={{
                 backgroundColor: 'var(--editorial-surface)',
                 border: '1px solid var(--editorial-border)',

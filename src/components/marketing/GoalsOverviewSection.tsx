@@ -25,7 +25,7 @@ export function GoalsOverviewSection() {
   return (
     <section className="border-y bg-indigo-50/50 border-indigo-100 py-24">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="md:px-12 md:py-24 overflow-hidden bg-gradient-to-br from-indigo-900 via-blue-800 to-indigo-900 rounded-[2.5rem] p-6 py-16 relative shadow-2xl">
+        <div className="md:px-12 md:py-24 overflow-hidden bg-linear-to-br from-indigo-900 via-blue-800 to-indigo-900 rounded-[2.5rem] p-6 py-16 relative shadow-2xl">
           {/* Decorative background effects */}
           <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[500px] h-[500px] rounded-full bg-blue-500/20 blur-[100px] pointer-events-none" />
           <div className="absolute bottom-0 left-0 -ml-40 -mb-40 w-[500px] h-[500px] rounded-full bg-indigo-500/20 blur-[100px] pointer-events-none" />

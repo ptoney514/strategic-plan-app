@@ -14,7 +14,7 @@ export function FinalCTASection({ onDemoClick }: FinalCTASectionProps) {
         {/* Secondary Radial Glow (Center Right) */}
         <div className="absolute top-1/4 -right-[200px] w-[800px] h-[800px] bg-purple-600/20 rounded-full blur-[100px] opacity-40" />
         {/* Linear Base Blend */}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0F0A29]/80 to-[#0F0A29]" />
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-[#0F0A29]/80 to-[#0F0A29]" />
       </div>
 
       {/* Curved Wave Layer (Bottom Right Shape) */}
@@ -68,26 +68,26 @@ export function FinalCTASection({ onDemoClick }: FinalCTASectionProps) {
         </div>
 
         {/* Right Form Card */}
-        <div className="bg-gradient-to-br from-indigo-600/90 to-purple-700/90 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl ring-1 ring-white/10">
+        <div className="bg-linear-to-br from-indigo-600/90 to-purple-700/90 backdrop-blur-xl border border-white/20 p-8 rounded-2xl shadow-2xl ring-1 ring-white/10">
           <div className="space-y-4">
             <div>
               <label className="sr-only">Work Email</label>
               <input
                 type="email"
                 placeholder="Your work email address"
-                className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all shadow-sm"
+                className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-yellow-400 transition-all shadow-xs"
               />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <input
                 type="text"
                 placeholder="Name"
-                className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all shadow-sm"
+                className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-yellow-400 transition-all shadow-xs"
               />
               <input
                 type="text"
                 placeholder="District Name"
-                className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all shadow-sm"
+                className="w-full px-4 py-3 bg-white border border-transparent rounded-lg text-slate-900 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-yellow-400 transition-all shadow-xs"
               />
             </div>
             <button

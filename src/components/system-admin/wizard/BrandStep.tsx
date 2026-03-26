@@ -36,7 +36,7 @@ export function BrandStep({ data, onChange }: BrandStepProps) {
           value={data.logoUrl}
           onChange={(e) => onChange({ logoUrl: e.target.value })}
           placeholder="https://example.com/logo.png"
-          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+          className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
           style={{
             backgroundColor: 'var(--editorial-surface)',
             borderColor: 'var(--editorial-border)',
@@ -75,7 +75,7 @@ export function BrandStep({ data, onChange }: BrandStepProps) {
               type="text"
               value={data.primaryColor}
               onChange={(e) => onChange({ primaryColor: e.target.value })}
-              className="flex-1 px-3 py-2.5 rounded-lg border text-sm font-mono focus:outline-none focus:ring-1"
+              className="flex-1 px-3 py-2.5 rounded-lg border text-sm font-mono focus:outline-hidden focus:ring-1"
               style={{
                 backgroundColor: 'var(--editorial-surface)',
                 borderColor: 'var(--editorial-border)',
@@ -100,7 +100,7 @@ export function BrandStep({ data, onChange }: BrandStepProps) {
               type="text"
               value={data.secondaryColor}
               onChange={(e) => onChange({ secondaryColor: e.target.value })}
-              className="flex-1 px-3 py-2.5 rounded-lg border text-sm font-mono focus:outline-none focus:ring-1"
+              className="flex-1 px-3 py-2.5 rounded-lg border text-sm font-mono focus:outline-hidden focus:ring-1"
               style={{
                 backgroundColor: 'var(--editorial-surface)',
                 borderColor: 'var(--editorial-border)',

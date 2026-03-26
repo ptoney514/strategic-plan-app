@@ -41,7 +41,7 @@ export function PieBreakdownWidget({ config }: PieBreakdownWidgetProps) {
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: number, name: string) => [value.toLocaleString(), name]}
+              formatter={(value, name) => [Number(value).toLocaleString(), String(name)]}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -50,7 +50,7 @@ export function PieBreakdownWidget({ config }: PieBreakdownWidgetProps) {
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-1.5 text-xs">
             <span
-              className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+              className="w-2.5 h-2.5 rounded-full shrink-0"
               style={{ backgroundColor: item.color || DEFAULT_COLORS[i % DEFAULT_COLORS.length] }}
             />
             <span style={{ color: 'var(--editorial-text-secondary)' }}>

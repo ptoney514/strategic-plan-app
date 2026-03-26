@@ -95,7 +95,7 @@ export function V2Pricing() {
               <ul className="flex-1 space-y-3 mb-8">
                 {tier.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-3 text-gray-700">
-                    <Check className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <Check className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                     <span>{feature}</span>
                   </li>
                 ))}

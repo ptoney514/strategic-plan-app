@@ -149,13 +149,13 @@ export function AccountSettings() {
           <form onSubmit={handleUpdateDisplayName}>
             {nameError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <AlertCircle className="w-4 h-4 shrink-0" />
                 {nameError}
               </div>
             )}
             {nameSuccess && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700 text-sm">
-                <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 shrink-0" />
                 Display name updated successfully
               </div>
             )}
@@ -165,7 +165,7 @@ export function AccountSettings() {
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder="Enter your display name"
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors mb-4"
+              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-transparent transition-colors mb-4"
             />
             <button
               type="submit"
@@ -193,13 +193,13 @@ export function AccountSettings() {
           <form onSubmit={handleChangePassword}>
             {passwordError && (
               <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <AlertCircle className="w-4 h-4 shrink-0" />
                 {passwordError}
               </div>
             )}
             {passwordSuccess && (
               <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700 text-sm">
-                <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                <CheckCircle className="w-4 h-4 shrink-0" />
                 Password changed successfully
               </div>
             )}
@@ -215,7 +215,7 @@ export function AccountSettings() {
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="Enter current password"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                   required
                   autoComplete="current-password"
                 />
@@ -230,7 +230,7 @@ export function AccountSettings() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                   required
                   minLength={8}
                 />
@@ -245,7 +245,7 @@ export function AccountSettings() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                   required
                   minLength={8}
                 />

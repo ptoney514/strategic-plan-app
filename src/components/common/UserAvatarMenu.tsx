@@ -93,7 +93,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
       <DropdownMenu.Trigger asChild>
         <button
           className={cn(
-            'rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900',
+            'rounded-full focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-teal focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900',
             className
           )}
           aria-label="User menu"
@@ -133,7 +133,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
                   <DropdownMenu.Item asChild>
                     <a
                       href={buildSubdomainUrlWithPath('admin')}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-none cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors"
                     >
                       <Shield className="w-4 h-4 text-amber-600 dark:text-amber-500" />
                       System Admin
@@ -146,7 +146,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
                   <DropdownMenu.Item key={district.district_slug} asChild>
                     <a
                       href={buildSubdomainUrlWithPath('district', '/admin', district.district_slug)}
-                      className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-none cursor-pointer transition-colors"
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors"
                     >
                       <Building2 className="w-4 h-4 text-brand-teal" />
                       {district.district_name}
@@ -166,7 +166,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
             <DropdownMenu.RadioGroup value={theme} onValueChange={(value) => setTheme(value as 'light' | 'dark' | 'system')}>
               <DropdownMenu.RadioItem
                 value="dark"
-                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-none cursor-pointer transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors"
               >
                 <Moon className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <span className="flex-1">Dark</span>
@@ -176,7 +176,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 value="light"
-                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-none cursor-pointer transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors"
               >
                 <Sun className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <span className="flex-1">Light</span>
@@ -186,7 +186,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
               </DropdownMenu.RadioItem>
               <DropdownMenu.RadioItem
                 value="system"
-                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-none cursor-pointer transition-colors"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors"
               >
                 <Monitor className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                 <span className="flex-1">System</span>
@@ -202,7 +202,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
           <div className="py-1">
             <DropdownMenu.Item
               onSelect={handleLogout}
-              className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-none cursor-pointer transition-colors w-full"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors w-full"
             >
               <LogOut className="w-4 h-4 text-slate-400 dark:text-slate-500" />
               Log out

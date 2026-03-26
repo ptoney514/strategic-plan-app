@@ -8,9 +8,9 @@ Modern web application built with Vite + React for educational district strategi
 
 ## Tech Stack
 
-- **Frontend**: React 18 + TypeScript
+- **Frontend**: React 19 + TypeScript
 - **Build Tool**: Vite 6.x
-- **Styling**: Tailwind CSS 3.x
+- **Styling**: Tailwind CSS 4.x
 - **State Management**: Zustand (client state), React Query (server state)
 - **Routing**: React Router v6
 - **Database**: Neon (PostgreSQL)

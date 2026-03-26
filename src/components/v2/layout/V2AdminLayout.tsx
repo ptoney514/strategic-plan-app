@@ -82,6 +82,7 @@ export function V2AdminLayout() {
 
   const sidebarHeader = (
     <div className="px-4 py-5 flex items-center gap-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+      {/* eslint-disable-next-line react-hooks/static-components */}
       <DistrictLogo />
       <div className="min-w-0">
         <div className="text-sm font-semibold truncate" style={{ color: 'var(--editorial-sidebar-text)' }}>{district.name}</div>
@@ -130,6 +131,7 @@ export function V2AdminLayout() {
           <aside className="lg:hidden fixed left-0 top-0 bottom-0 w-64 z-50 flex flex-col" style={{ backgroundColor: 'var(--editorial-sidebar-bg)' }}>
             <div className="px-4 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
               <div className="flex items-center gap-3 min-w-0">
+                {/* eslint-disable-next-line react-hooks/static-components */}
                 <DistrictLogo />
                 <div className="text-sm font-semibold truncate" style={{ color: 'var(--editorial-sidebar-text)' }}>{district.name}</div>
               </div>

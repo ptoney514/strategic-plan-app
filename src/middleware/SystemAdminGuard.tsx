@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getSubdomainUrl } from '../lib/subdomain';
@@ -20,6 +20,14 @@ export function SystemAdminGuard({ children }: SystemAdminGuardProps) {
   const { isAuthenticated, isSystemAdmin, loading } = useAuth();
   const location = useLocation();
 
+  // Redirect to root domain if not a system admin
+  // Using window.location.href because Navigate would stay on admin subdomain
+  useEffect(() => {
+    if (!loading && isAuthenticated && !isSystemAdmin) {
+      window.location.href = getSubdomainUrl('root');
+    }
+  }, [loading, isAuthenticated, isSystemAdmin]);
+
   // Show loading state while checking auth
   if (loading) {
     return (
@@ -39,10 +47,7 @@ export function SystemAdminGuard({ children }: SystemAdminGuardProps) {
     return <Navigate to={loginPath} state={{ from: '/admin' }} replace />;
   }
 
-  // Redirect to root domain if not a system admin
-  // Using window.location.href because Navigate would stay on admin subdomain
   if (!isSystemAdmin) {
-    window.location.href = getSubdomainUrl('root');
     return null;
   }
 

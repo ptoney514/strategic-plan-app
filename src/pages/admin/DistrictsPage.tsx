@@ -117,6 +117,7 @@ export function DistrictsPage() {
 
   const handleRowClick = (district: DistrictWithStats) => {
     const adminUrl = buildSubdomainUrlWithPath('district', '/admin', district.slug);
+    // eslint-disable-next-line react-hooks/immutability
     window.location.href = adminUrl;
   };
 

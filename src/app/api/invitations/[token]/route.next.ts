@@ -12,7 +12,7 @@ import { jsonOk, jsonError } from "@api/lib/response";
  * Returns invitation details + org info if valid.
  */
 export async function GET(
-  req: Request,
+  _req: Request,
   { params }: { params: Promise<{ token: string }> },
 ) {
   try {

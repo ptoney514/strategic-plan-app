@@ -2,7 +2,7 @@
 
 ## StrataDash — Database Recovery Procedures
 
-**Last reviewed:** 2026-03-01
+**Last reviewed:** 2026-03-13
 
 ---
 
@@ -22,14 +22,21 @@
 
 ## Infrastructure Overview
 
-| Service    | Purpose                                            | Dashboard            |
-| ---------- | -------------------------------------------------- | -------------------- |
-| Vercel     | Hosting, serverless functions, preview deployments | vercel.com/dashboard |
-| Neon       | PostgreSQL database (serverless)                   | console.neon.tech    |
-| GitHub     | Source code, CI/CD, weekly backup artifacts        | github.com           |
-| Sentry     | Error monitoring (API + frontend)                  | sentry.io            |
-| Resend     | Transactional email (password reset)               | resend.com           |
-| Cloudflare | DNS for stratadash.org                             | dash.cloudflare.com  |
+| Service        | Purpose                                            | Dashboard                                                                                                  |
+| -------------- | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Vercel**     | Hosting, serverless functions, preview deployments | [vercel.com/pernells-projects/strategic-plan-app](https://vercel.com/pernells-projects/strategic-plan-app) |
+| **Neon**       | PostgreSQL database (serverless)                   | [console.neon.tech](https://console.neon.tech) — project `small-salad-72814952`                            |
+| **GitHub**     | Source code, CI/CD, weekly backup artifacts        | [github.com/ptoney514/strategic-plan-app](https://github.com/ptoney514/strategic-plan-app)                 |
+| **Sentry**     | Error monitoring (API + frontend)                  | [sentry.io](https://sentry.io) — org `ptcs`, project `javascript-nextjs`                                   |
+| **Resend**     | Transactional email (password reset)               | [resend.com](https://resend.com)                                                                           |
+| **Cloudflare** | DNS for stratadash.org                             | [dash.cloudflare.com](https://dash.cloudflare.com)                                                         |
+
+## Database Branches
+
+| Branch | Purpose                    |
+| ------ | -------------------------- |
+| `main` | Production                 |
+| `dev`  | Development / preview base |
 
 ---
 
@@ -48,27 +55,75 @@
 
 ## Backup Strategy
 
-Three layers of protection:
+Four layers of protection:
 
 1. **Neon PITR (Point-in-Time Recovery)** — Automatic, 7-day window (free tier). Fastest restore for recent data accidents.
 2. **GitHub Actions weekly backup** — `pg_dump` runs every Sunday 3 AM UTC, stored as a 30-day artifact. See `.github/workflows/backup.yml`.
 3. **Local macOS backup (launchd)** — `pg_dump` runs every Sunday 3 AM local time via `com.stratadash.db-backup.plist`. Stored in `~/backups/stratadash/`, auto-cleaned after 30 days.
+4. **Claude scheduled task** — `stratadash-db-backup` runs every Sunday 3:10 AM local time. Runs `npm run db:backup`, checks for `[SUCCESS]`/`[FAILED]` markers, retries on failure.
+
+The backup script retries up to 3 times on transient failures (DNS, timeout) and logs structured `[SUCCESS]`/`[FAILED]` markers for automated monitoring.
+
+### What's Backed Up
+
+| Data                     | Backup method                      | Retention               |
+| ------------------------ | ---------------------------------- | ----------------------- |
+| Database (schema + data) | Neon PITR                          | 7 days rolling          |
+| Database (full dump)     | Weekly local pg_dump               | 30 days                 |
+| Database (full dump)     | Weekly GitHub Actions pg_dump      | 30 days (artifact)      |
+| Source code              | GitHub                             | Permanent (git history) |
+| Deployments              | Vercel                             | Rollback to any deploy  |
+| Environment variables    | Documented in `.env.local.example` | Manual recovery         |
 
 ### Launchd monitoring
 
+**Log file**: `~/backups/stratadash/backup.log`
+
 ```bash
+# Quick health check — scan for pass/fail
+grep -E '\[SUCCESS\]|\[FAILED\]' ~/backups/stratadash/backup.log | tail -5
+
 # Check if the agent is loaded
 launchctl list | grep stratadash
 
 # View recent backup log
-cat /tmp/stratadash-backup.log
+tail -20 ~/backups/stratadash/backup.log
 
 # Manually trigger a backup
 launchctl start com.stratadash.db-backup
 
-# Install the agent
+# Install/reinstall the agent
 npm run db:backup:install
+
+# On-demand backup via npm
+DATABASE_URL_PROD=<prod-url> npm run db:backup
+
+# List recent backups
+ls -lh ~/backups/stratadash/backup-*.dump
 ```
+
+### Always-on machine backup (cron) — optional redundancy
+
+If you have an always-on Mac (e.g., Mac Mini server), set up a cron job as a fallback in case the primary Mac is asleep or powered off during the launchd window.
+
+Prerequisites:
+
+```bash
+brew install libpq && brew link --force libpq
+```
+
+Setup:
+
+1. Clone the repo (or copy `scripts/backup-db.sh` + `.env.local` to a working directory)
+2. Add a cron job:
+
+```bash
+crontab -e
+# Add this line (adjust path to match repo location):
+15 3 * * 0 cd /path/to/strategic-plan-app && DATABASE_URL_PROD="$(grep DATABASE_URL_PROD .env.local | cut -d= -f2-)" bash scripts/backup-db.sh >> ~/backups/stratadash/backup.log 2>&1
+```
+
+3. Verify cron is scheduled: `crontab -l`
 
 ---
 
@@ -236,6 +291,26 @@ DATABASE_URL_PROD=<prod-url> npm run db:backup
 Verify the dump is valid: `pg_restore --list ~/backups/stratadash/backup-YYYYMMDD.dump | head -20`
 
 Log each backup below:
+
+## Maintenance Schedule
+
+| Task                            | Frequency             | How                                                                                         |
+| ------------------------------- | --------------------- | ------------------------------------------------------------------------------------------- |
+| Verify weekly backup runs       | Weekly                | `grep -E '\[SUCCESS\]\|\[FAILED\]' ~/backups/stratadash/backup.log` or check GitHub Actions |
+| Copy backup to NAS/Google Drive | Weekly (after backup) | Copy latest `.dump` from `~/backups/stratadash/`                                            |
+| Test backup restore             | Monthly               | Restore dump to a Neon test branch, verify data                                             |
+| Review Neon PITR window         | Quarterly             | Neon Console → Settings → Instant restore                                                   |
+| Rotate Sentry auth token        | Every 6 months        | Sentry → Settings → Auth Tokens                                                             |
+
+---
+
+## Contacts
+
+| Role                   | Contact           |
+| ---------------------- | ----------------- |
+| Site admin / developer | pernell@gmail.com |
+
+---
 
 ## Backup Log
 

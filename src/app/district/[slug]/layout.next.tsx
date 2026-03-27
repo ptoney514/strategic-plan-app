@@ -1,6 +1,19 @@
 'use client'
+import { use } from 'react'
+import { SubdomainOverrideProvider } from '@/contexts/SubdomainContext'
+import { V2PublicLayout } from '@/components/v2/layout/V2PublicLayout'
 
-// NOTE: V2PublicLayout uses React Router <Outlet>, will be migrated in Phase 3.
-export default function DistrictLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+export default function DistrictLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode
+  params: Promise<{ slug: string }>
+}) {
+  const { slug } = use(params)
+  return (
+    <SubdomainOverrideProvider slug={slug}>
+      <V2PublicLayout>{children}</V2PublicLayout>
+    </SubdomainOverrideProvider>
+  )
 }

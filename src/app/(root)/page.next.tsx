@@ -1,5 +1,6 @@
 'use client'
 import dynamic from 'next/dynamic'
+import { V2MarketingLayout } from '@/components/v2/layout/V2MarketingLayout'
 
 const V2Landing = dynamic(
   () => import('@/pages/v2/marketing/V2Landing').then((m) => ({ default: m.V2Landing })),
@@ -7,5 +8,9 @@ const V2Landing = dynamic(
 )
 
 export default function HomePage() {
-  return <V2Landing />
+  return (
+    <V2MarketingLayout>
+      <V2Landing />
+    </V2MarketingLayout>
+  )
 }

@@ -8,6 +8,25 @@ interface SubdomainProviderProps {
 }
 
 /**
+ * Allows a Next.js [slug] layout segment to override the subdomain slug
+ * derived from hostname detection. Used when routing is path-based
+ * (e.g., /district/westside/admin) rather than subdomain-based.
+ */
+export function SubdomainOverrideProvider({
+  slug,
+  children,
+}: {
+  slug: string;
+  children: ReactNode;
+}) {
+  const value = useMemo<SubdomainInfo>(
+    () => ({ slug, type: 'district', hostname: typeof window !== 'undefined' ? window.location.hostname : '' }),
+    [slug],
+  );
+  return <SubdomainContext.Provider value={value}>{children}</SubdomainContext.Provider>;
+}
+
+/**
  * Provider that detects and provides subdomain information to the app.
  * Must be placed high in the component tree (before Router).
  */

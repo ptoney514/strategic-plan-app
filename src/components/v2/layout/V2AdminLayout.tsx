@@ -1,5 +1,8 @@
+'use client'
 import { useState } from 'react';
-import { Outlet, NavLink } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { LayoutDashboard, FileText, Palette, Users, Grid3X3, Upload, Menu, X } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -14,10 +17,11 @@ const NAV_ITEMS = [
   { label: 'Import', path: '/import', icon: Upload, end: false },
 ];
 
-export function V2AdminLayout() {
+export function V2AdminLayout({ children }: { children?: ReactNode }) {
   const { slug } = useSubdomain();
   const { data: district, isLoading } = useDistrict(slug || '');
   const { user } = useAuth();
+  const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const basePath = '/admin';
@@ -59,23 +63,26 @@ export function V2AdminLayout() {
   function renderNav(onNavigate?: () => void) {
     return (
       <nav className="flex-1 py-4 px-3 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ label, path, icon: Icon, end }) => (
-          <NavLink
-            key={label}
-            to={`${basePath}${path}`}
-            end={end}
-            onClick={onNavigate}
-            className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}`
-            }
-            style={({ isActive }) => ({
-              color: isActive ? 'var(--editorial-accent-primary)' : 'var(--editorial-sidebar-text-muted)',
-            })}
-          >
-            <Icon className="h-4 w-4 shrink-0" />
-            {label}
-          </NavLink>
-        ))}
+        {NAV_ITEMS.map(({ label, path, icon: Icon, end }) => {
+          const href = `${basePath}${path}`;
+          const isActive = end
+            ? pathname === href
+            : (pathname ?? '').startsWith(href) && (pathname !== basePath || path === '');
+          return (
+            <Link
+              key={label}
+              href={href}
+              onClick={onNavigate}
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-white/10' : 'hover:bg-white/5'}`}
+              style={{
+                color: isActive ? 'var(--editorial-accent-primary)' : 'var(--editorial-sidebar-text-muted)',
+              }}
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              {label}
+            </Link>
+          );
+        })}
       </nav>
     );
   }
@@ -120,7 +127,7 @@ export function V2AdminLayout() {
         </header>
 
         <main className="flex-1 overflow-auto" style={{ backgroundColor: 'var(--editorial-bg)' }}>
-          <Outlet />
+          {children}
         </main>
       </div>
 

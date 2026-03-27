@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Minimize2, ChevronRight } from 'lucide-react';
 import type { Goal } from '../../../lib/types';
 import type { Widget, WidgetConfig } from '../../../lib/types/v2';
@@ -228,7 +228,7 @@ export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, prim
                 return (
                   <Link
                     key={child.id}
-                    to={`/goals/${child.id}`}
+                    href={`/goals/${child.id}`}
                     className="flex items-center gap-3 p-3 rounded-lg transition-colors"
                     style={{ backgroundColor: 'var(--editorial-surface-alt, var(--editorial-border))' }}
                     onMouseEnter={(e) => {

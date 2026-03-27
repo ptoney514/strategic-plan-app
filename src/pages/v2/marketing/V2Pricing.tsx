@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Check } from 'lucide-react';
 
 interface Tier {
@@ -114,7 +114,7 @@ export function V2Pricing() {
                 </a>
               ) : (
                 <Link
-                  to={tier.ctaLink}
+                  href={tier.ctaLink}
                   className={`block text-center font-medium rounded-lg px-6 py-3 transition-colors ${
                     tier.highlighted
                       ? 'bg-blue-500 text-white hover:bg-blue-600'

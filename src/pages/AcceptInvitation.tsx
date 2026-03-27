@@ -1,5 +1,7 @@
+'use client'
 import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useValidateInvitation, useAcceptInvitation, useDeclineInvitation } from '../hooks/useInvitations';
 import { authClient } from '../lib/auth-client';
@@ -124,8 +126,9 @@ function AuthForms({ email, onSuccess }: { email: string; onSuccess: () => void 
 }
 
 export function AcceptInvitation() {
-  const { token } = useParams<{ token: string }>();
-  const navigate = useNavigate();
+  const params = useParams<{ token: string }>();
+  const token = Array.isArray(params.token) ? params.token[0] : params.token;
+  const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { data: invitation, isLoading, isError } = useValidateInvitation(token ?? '');
   const accept = useAcceptInvitation();
@@ -149,7 +152,7 @@ export function AcceptInvitation() {
     if (!token) return;
     try {
       await decline.mutateAsync(token);
-      navigate('/dashboard', { replace: true });
+      router.replace('/dashboard');
     } catch (err) {
       console.error('[AcceptInvitation] Decline error:', err);
     }
@@ -172,7 +175,7 @@ export function AcceptInvitation() {
           </div>
           <h1 className="text-xl font-semibold text-slate-900">Invalid Invitation</h1>
           <p className="mt-2 text-sm text-slate-500">This invitation link is invalid or has expired.</p>
-          <Link to="/login" className="inline-block mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-500">
+          <Link href="/login" className="inline-block mt-6 text-sm font-medium text-indigo-600 hover:text-indigo-500">
             Go to Login
           </Link>
         </div>

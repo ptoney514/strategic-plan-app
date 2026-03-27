@@ -1,5 +1,6 @@
+'use client'
 import { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { usePathname } from 'next/navigation';
 import { Search, Bell, Home } from 'lucide-react';
 import { UserAvatarMenu } from '../common/UserAvatarMenu';
 
@@ -17,10 +18,10 @@ const routeTitles: Record<string, string> = {
 };
 
 export function DashboardHeader() {
-  const location = useLocation();
+  const pathname = usePathname();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const pageTitle = routeTitles[location.pathname] || 'Home';
+  const pageTitle = routeTitles[pathname ?? ''] || 'Home';
 
   return (
     <header className="flex items-center justify-between h-[72px] px-8 border-b border-slate-200/60 dark:border-slate-700/60 bg-[#F8FAFC]/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-40">

@@ -3,12 +3,21 @@ import { render, screen } from '@/test/setup';
 import userEvent from '@testing-library/user-event';
 import { V2GoalsOverview } from '../V2GoalsOverview';
 
-// Mock navigate
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useNavigate: () => mockNavigate };
-});
+// Mock next/navigation
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null), toString: vi.fn().mockReturnValue('') }),
+  usePathname: () => '/',
+}));
 
 // Mock subdomain context
 vi.mock('../../../../contexts/SubdomainContext', () => ({
@@ -109,7 +118,7 @@ describe('V2GoalsOverview', () => {
 
     const cards = screen.getAllByRole('button');
     await user.click(cards[0]);
-    expect(mockNavigate).toHaveBeenCalledWith('/goals/g-1');
+    expect(mockPush).toHaveBeenCalledWith('/goals/g-1');
   });
 
   it('shows loading spinner when loading', () => {

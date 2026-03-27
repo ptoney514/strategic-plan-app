@@ -1,17 +1,15 @@
+'use client'
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubdomain } from '../contexts/SubdomainContext';
 import { getSubdomainUrl } from '../lib/subdomain';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
-interface LocationState {
-  from?: string;
-}
-
 export function Login() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { login, isAuthenticated } = useAuth();
   const { type: subdomainType } = useSubdomain();
 
@@ -23,20 +21,18 @@ export function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      const from = (location.state as LocationState)?.from;
-      const searchParams = new URLSearchParams(location.search);
       const redirectParam = searchParams.get('redirect');
 
       // On non-root subdomains, redirect to root domain dashboard
-      if (subdomainType !== 'root' && !from && !redirectParam) {
+      if (subdomainType !== 'root' && !redirectParam) {
         window.location.href = getSubdomainUrl('root') + '/dashboard';
         return;
       }
 
-      const redirectUrl = from ? from + location.search : redirectParam || '/dashboard';
-      navigate(redirectUrl, { replace: true });
+      const redirectUrl = redirectParam || '/dashboard';
+      router.replace(redirectUrl);
     }
-  }, [isAuthenticated, location.state, location.search, navigate, subdomainType]);
+  }, [isAuthenticated, searchParams, router, subdomainType]);
 
   // Show nothing while redirecting
   if (isAuthenticated) {
@@ -66,7 +62,7 @@ export function Login() {
       // On admin subdomain, system admins stay, others go to root
       if (subdomainType === 'admin') {
         if (user.isSystemAdmin) {
-          navigate(`/${location.search}`, { replace: true });
+          router.replace('/');
         } else {
           window.location.href = getSubdomainUrl('root');
         }
@@ -75,18 +71,16 @@ export function Login() {
 
       // Redirect to the intended destination or /dashboard
       // Users can access admin pages from the avatar menu
-      const from = (location.state as LocationState)?.from;
-      const searchParams = new URLSearchParams(location.search);
       const redirectParam = searchParams.get('redirect');
 
       // On non-root subdomains (district), redirect to root domain dashboard
-      if (subdomainType !== 'root' && !from && !redirectParam) {
+      if (subdomainType !== 'root' && !redirectParam) {
         window.location.href = getSubdomainUrl('root') + '/dashboard';
         return;
       }
 
-      const redirectUrl = from ? from + location.search : redirectParam || '/dashboard';
-      navigate(redirectUrl, { replace: true });
+      const redirectUrl = redirectParam || '/dashboard';
+      router.replace(redirectUrl);
     } catch (err) {
       console.error('[Login] Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.');
@@ -201,7 +195,7 @@ export function Login() {
                 </div>
                 <div className="text-sm">
                   <Link
-                    to="/forgot-password"
+                    href="/forgot-password"
                     className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
                   >
                     Forgot password?
@@ -273,7 +267,7 @@ export function Login() {
               <p className="text-sm text-slate-500">
                 Don't have an account?{' '}
                 <Link
-                  to="/signup"
+                  href="/signup"
                   className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
                 >
                   Sign up

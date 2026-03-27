@@ -35,11 +35,20 @@ vi.mock('recharts', () => ({
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = vi.fn();
 
-// Mock useParams
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useParams: () => ({ goalId: 'goal-1' }) };
-});
+// Mock next/navigation
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({ goalId: 'goal-1' }),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null), toString: vi.fn().mockReturnValue('') }),
+  usePathname: () => '/',
+}));
 
 // Mock subdomain context
 vi.mock('../../../../contexts/SubdomainContext', () => ({

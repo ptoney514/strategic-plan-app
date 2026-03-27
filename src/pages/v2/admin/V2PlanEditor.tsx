@@ -1,5 +1,6 @@
+'use client'
 import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Plus, FileText } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -12,7 +13,8 @@ export function V2PlanEditor() {
   const { slug } = useSubdomain();
   const { data: district, isLoading: districtLoading } = useDistrict(slug || '');
   const { data: plans, isLoading: plansLoading } = usePlansBySlug(slug || '');
-  const [searchParams, setSearchParams] = useSearchParams();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [showAddRoot, setShowAddRoot] = useState(false);
 
   const planIdParam = searchParams.get('planId');
@@ -27,7 +29,7 @@ export function V2PlanEditor() {
   const { data: goals, isLoading: goalsLoading } = useGoalsByPlan(selectedPlanId);
 
   function handlePlanChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setSearchParams({ planId: e.target.value });
+    router.push(`?planId=${e.target.value}`);
   }
 
   if (districtLoading || plansLoading) {

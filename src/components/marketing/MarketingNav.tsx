@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserAvatarMenu } from '../common/UserAvatarMenu';
 
@@ -13,7 +13,7 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
     <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-indigo-100">
       <div className="flex h-20 max-w-7xl mx-auto px-6 items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 group cursor-pointer">
+        <Link href="/" className="flex items-center gap-2 group cursor-pointer">
           <img
             src="/assets/stratadash-logo.png"
             alt="StrataDash"
@@ -49,7 +49,7 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
             Resources
           </a>
           <Link
-            to="/about"
+            href="/about"
             className="text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
           >
             About
@@ -63,7 +63,7 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
           ) : isAuthenticated ? (
             <>
               <Link
-                to="/dashboard"
+                href="/dashboard"
                 className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
               >
                 Dashboard
@@ -73,7 +73,7 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
           ) : (
             <>
               <Link
-                to="/login"
+                href="/login"
                 className="hidden sm:block text-sm font-medium text-indigo-600 hover:text-indigo-900 transition-colors"
               >
                 Log in

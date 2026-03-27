@@ -3,12 +3,21 @@ import { render, screen } from '@/test/setup';
 import userEvent from '@testing-library/user-event';
 import { V2AdminDashboard } from '../V2AdminDashboard';
 
-// Mock navigate
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useNavigate: () => mockNavigate };
-});
+// Mock next/navigation router
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null), toString: vi.fn().mockReturnValue('') }),
+  usePathname: () => '/',
+}));
 
 // Mock subdomain context
 vi.mock('@/contexts/SubdomainContext', () => ({
@@ -131,7 +140,7 @@ describe('V2AdminDashboard', () => {
     const editButtons = screen.getAllByRole('button', { name: /edit/i });
     await user.click(editButtons[0]);
 
-    expect(mockNavigate).toHaveBeenCalledWith('/admin/plans?planId=plan-1');
+    expect(mockPush).toHaveBeenCalledWith('/admin/plans?planId=plan-1');
   });
 
   it('shows table headers', () => {

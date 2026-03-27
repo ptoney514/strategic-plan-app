@@ -7,6 +7,31 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SubdomainProvider } from '../contexts/SubdomainContext';
 
+// Mock next/navigation for tests (App Router context is not available in Vitest)
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => ({
+    get: vi.fn().mockReturnValue(null),
+    toString: vi.fn().mockReturnValue(''),
+  }),
+  usePathname: () => '/',
+}));
+
+// Mock next/link for tests
+vi.mock('next/link', () => ({
+  default: ({ href, children, ...props }: { href: string; children: ReactNode; [key: string]: unknown }) => (
+    <a href={href} {...(props as object)}>{children}</a>
+  ),
+}));
+
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
 

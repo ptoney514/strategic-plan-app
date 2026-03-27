@@ -1,6 +1,7 @@
+'use client'
 import type { ReactNode } from 'react';
 import { useEffect, useState } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 
 interface ClientAdminGuardProps {
@@ -26,8 +27,11 @@ interface ClientAdminGuardProps {
 export function ClientAdminGuard({ children, districtSlug }: ClientAdminGuardProps) {
   const params = useParams<{ slug: string }>();
   // Use prop if provided (subdomain routing), otherwise use URL param (path routing)
-  const slug = districtSlug || params.slug;
+  // Next.js useParams returns string | string[] for dynamic segments
+  const paramSlug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
+  const slug = districtSlug || paramSlug;
   const { isAuthenticated, loading: authLoading, hasDistrictAccess } = useAuth();
+  const router = useRouter();
   const [hasAccess, setHasAccess] = useState<boolean | null>(null);
   const [checking, setChecking] = useState(true);
 
@@ -77,12 +81,14 @@ export function ClientAdminGuard({ children, districtSlug }: ClientAdminGuardPro
 
   // Redirect to login if not authenticated
   if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: `/${slug}/admin` }} replace />;
+    router.replace('/login');
+    return null;
   }
 
   // Redirect to public view if no admin access
   if (hasAccess === false) {
-    return <Navigate to={`/${slug}`} replace />;
+    router.replace(`/${slug}`);
+    return null;
   }
 
   return <>{children}</>;

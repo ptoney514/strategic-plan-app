@@ -26,7 +26,8 @@
     /* Path aliases (must match vitest.config.ts resolve.alias) */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@api/*": ["./api/*"]
     },
 
     /* Next.js plugin */

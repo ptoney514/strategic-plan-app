@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@/test/setup';
 import userEvent from '@testing-library/user-event';
-import { BrowserRouter } from 'react-router-dom';
 import { UserAvatarMenu } from '../UserAvatarMenu';
 
 // Mock the AuthContext
@@ -46,10 +45,6 @@ vi.mock('../../../lib/subdomain', () => ({
 // Mock fetch for memberships API
 const mockFetchResponse = vi.fn();
 
-// Wrapper component with Router
-function renderWithRouter(ui: React.ReactElement) {
-  return render(<BrowserRouter>{ui}</BrowserRouter>);
-}
 
 describe('UserAvatarMenu', () => {
   beforeEach(() => {
@@ -74,7 +69,7 @@ describe('UserAvatarMenu', () => {
         isSystemAdmin: false,
       });
 
-      const { container } = renderWithRouter(<UserAvatarMenu />);
+      const { container } = render(<UserAvatarMenu />);
       expect(container).toBeEmptyDOMElement();
     });
   });
@@ -97,13 +92,13 @@ describe('UserAvatarMenu', () => {
     });
 
     it('renders avatar button', () => {
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
       expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
     });
 
     it('opens dropdown menu when avatar is clicked', async () => {
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       const triggerButton = screen.getByRole('button', { name: /user menu/i });
       await user.click(triggerButton);
@@ -117,7 +112,7 @@ describe('UserAvatarMenu', () => {
 
     it('displays user name and role in dropdown header', async () => {
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -129,7 +124,7 @@ describe('UserAvatarMenu', () => {
 
     it('shows theme selector options', async () => {
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -149,7 +144,7 @@ describe('UserAvatarMenu', () => {
       });
 
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -171,7 +166,7 @@ describe('UserAvatarMenu', () => {
       });
 
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -190,7 +185,7 @@ describe('UserAvatarMenu', () => {
       });
 
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -219,7 +214,7 @@ describe('UserAvatarMenu', () => {
       });
 
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -237,7 +232,7 @@ describe('UserAvatarMenu', () => {
 
     it('calls logout when Log out is clicked', async () => {
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -264,7 +259,7 @@ describe('UserAvatarMenu', () => {
       });
 
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       await user.click(screen.getByRole('button', { name: /user menu/i }));
 
@@ -288,13 +283,13 @@ describe('UserAvatarMenu', () => {
     });
 
     it('has accessible button with aria-label', () => {
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
       expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
     });
 
     it('closes menu on Escape key', async () => {
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       // Open menu
       await user.click(screen.getByRole('button', { name: /user menu/i }));
@@ -312,7 +307,7 @@ describe('UserAvatarMenu', () => {
 
     it('supports keyboard navigation', async () => {
       const user = userEvent.setup();
-      renderWithRouter(<UserAvatarMenu />);
+      render(<UserAvatarMenu />);
 
       // Focus and open with Enter
       const button = screen.getByRole('button', { name: /user menu/i });
@@ -339,7 +334,7 @@ describe('UserAvatarMenu', () => {
     });
 
     it('applies custom className to trigger button', () => {
-      renderWithRouter(<UserAvatarMenu className="custom-trigger-class" />);
+      render(<UserAvatarMenu className="custom-trigger-class" />);
       const button = screen.getByRole('button', { name: /user menu/i });
       expect(button).toHaveClass('custom-trigger-class');
     });

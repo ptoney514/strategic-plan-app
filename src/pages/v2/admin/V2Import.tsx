@@ -1,5 +1,6 @@
+'use client'
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -28,7 +29,7 @@ function flattenHierarchy(goals: HierarchicalGoal[]): Goal[] {
 }
 
 export function V2Import() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { slug } = useSubdomain();
   const { data: district, isLoading: districtLoading } = useDistrict(slug || '');
   const { data: plans, isLoading: plansLoading } = usePlansBySlug(slug || '');
@@ -208,7 +209,7 @@ export function V2Import() {
               <p className="text-sm text-yellow-800">
                 No plans found. Create a plan first.{' '}
                 <button
-                  onClick={() => navigate('/admin/plans')}
+                  onClick={() => router.push('/admin/plans')}
                   className="font-medium text-blue-600 underline hover:text-blue-800"
                 >
                   Go to Plans
@@ -307,7 +308,7 @@ export function V2Import() {
           goalsImported={(importResult.goals_created ?? 0) + (importResult.goals_updated ?? 0)}
           goalsSkipped={Math.max(0, stagedGoals.length - ((importResult.goals_created ?? 0) + (importResult.goals_updated ?? 0)))}
           planName={selectedPlan?.name || 'Unknown Plan'}
-          onViewGoals={() => navigate('/admin/plans')}
+          onViewGoals={() => router.push('/admin/plans')}
           onImportAnother={handleReset}
         />
       )}

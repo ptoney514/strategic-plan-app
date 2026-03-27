@@ -1,5 +1,6 @@
+'use client'
 import { type ReactNode, useEffect } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { getSubdomainUrl } from '../lib/subdomain';
 
@@ -18,15 +19,24 @@ interface SystemAdminGuardProps {
  */
 export function SystemAdminGuard({ children }: SystemAdminGuardProps) {
   const { isAuthenticated, isSystemAdmin, loading } = useAuth();
-  const location = useLocation();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Redirect to root domain if not a system admin
-  // Using window.location.href because Navigate would stay on admin subdomain
+  // Using window.location.href because router would stay on admin subdomain
   useEffect(() => {
     if (!loading && isAuthenticated && !isSystemAdmin) {
       window.location.href = getSubdomainUrl('root');
     }
   }, [loading, isAuthenticated, isSystemAdmin]);
+
+  useEffect(() => {
+    if (!loading && !isAuthenticated) {
+      const search = searchParams.toString();
+      const loginPath = `/login${search ? `?${search}` : ''}`;
+      router.replace(loginPath);
+    }
+  }, [loading, isAuthenticated, router, searchParams]);
 
   // Show loading state while checking auth
   if (loading) {
@@ -40,14 +50,7 @@ export function SystemAdminGuard({ children }: SystemAdminGuardProps) {
     );
   }
 
-  // Redirect to login if not authenticated
-  // Preserve query params (important for ?subdomain=admin in local dev)
-  if (!isAuthenticated) {
-    const loginPath = `/login${location.search}`;
-    return <Navigate to={loginPath} state={{ from: '/admin' }} replace />;
-  }
-
-  if (!isSystemAdmin) {
+  if (!isAuthenticated || !isSystemAdmin) {
     return null;
   }
 

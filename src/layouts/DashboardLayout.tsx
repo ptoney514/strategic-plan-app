@@ -1,16 +1,17 @@
-import { Outlet } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { DashboardSidebar } from '../components/dashboard/DashboardSidebar';
 import { DashboardHeader } from '../components/dashboard/DashboardHeader';
 
 interface DashboardLayoutProps {
   basePath?: string; // e.g., '/' for root, '/admin' for district admin
+  children?: ReactNode;
 }
 
 /**
  * DashboardLayout - Layout for authenticated user dashboard
  * Features dark indigo sidebar and sticky header
  */
-export function DashboardLayout({ basePath = '/' }: DashboardLayoutProps) {
+export function DashboardLayout({ basePath = '/', children }: DashboardLayoutProps) {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex">
       {/* Sidebar - Fixed position */}
@@ -28,7 +29,7 @@ export function DashboardLayout({ basePath = '/' }: DashboardLayoutProps) {
 
           {/* Content wrapper */}
           <div className="relative z-0 p-8 space-y-8">
-            <Outlet />
+            {children}
           </div>
         </main>
       </div>

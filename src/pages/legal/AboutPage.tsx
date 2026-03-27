@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Icon } from '@iconify/react';
 import { MarketingNav } from '../../components/marketing/MarketingNav';
 import { MarketingFooter } from '../../components/marketing/MarketingFooter';
@@ -175,7 +175,7 @@ export function AboutPage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
-                to="/login"
+                href="/login"
                 className="group flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-900 h-12 px-6 rounded-full shadow-lg transition-all hover:scale-[1.02]"
               >
                 <span className="font-medium">Get Started Free</span>

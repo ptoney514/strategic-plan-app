@@ -1,12 +1,14 @@
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Building2, Settings, LogOut, Shield, Users } from 'lucide-react';
 
 /**
  * SystemAdminLayout - Layout for system administrator area (/admin)
  * Only accessible to system administrators
  */
-export function SystemAdminLayout() {
-  const navigate = useNavigate();
+export function SystemAdminLayout({ children }: { children?: ReactNode }) {
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-background">
@@ -26,28 +28,28 @@ export function SystemAdminLayout() {
             {/* Navigation */}
             <nav className="flex items-center gap-4">
               <Link
-                to="/"
+                href="/"
                 className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 <Building2 className="h-4 w-4 inline mr-1" />
                 Districts
               </Link>
               <Link
-                to="/users"
+                href="/users"
                 className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 <Users className="h-4 w-4 inline mr-1" />
                 Users
               </Link>
               <Link
-                to="/settings"
+                href="/settings"
                 className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 <Settings className="h-4 w-4 inline mr-1" />
                 Settings
               </Link>
               <button
-                onClick={() => navigate('/')}
+                onClick={() => router.push('/')}
                 className="text-slate-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
               >
                 <LogOut className="h-4 w-4 inline mr-1" />
@@ -60,7 +62,7 @@ export function SystemAdminLayout() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Outlet />
+        {children}
       </main>
     </div>
   );

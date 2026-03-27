@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import {
   Building2,
   Target,
@@ -149,7 +149,7 @@ export function SystemDashboard() {
             {quickActions.map((action) => (
               <Link
                 key={action.to}
-                to={action.to}
+                href={action.to}
                 className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-[#faf9f7] transition-colors group"
               >
                 <div
@@ -179,7 +179,7 @@ export function SystemDashboard() {
             Recent Users
           </h2>
           <Link
-            to="/users"
+            href="/users"
             className="text-sm font-medium text-[#b85c38] hover:underline"
           >
             View all

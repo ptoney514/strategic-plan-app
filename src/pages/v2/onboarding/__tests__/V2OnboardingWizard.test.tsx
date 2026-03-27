@@ -3,12 +3,21 @@ import { render, screen } from '@/test/setup';
 import userEvent from '@testing-library/user-event';
 import { V2OnboardingWizard } from '../V2OnboardingWizard';
 
-// Mock navigate
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useNavigate: () => mockNavigate };
-});
+// Mock next/navigation
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null), toString: vi.fn().mockReturnValue('') }),
+  usePathname: () => '/',
+}));
 
 // Mock the onboarding hooks
 const mockCreateOrgMutateAsync = vi.fn();

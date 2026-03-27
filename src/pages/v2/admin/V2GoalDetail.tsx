@@ -1,5 +1,6 @@
+'use client'
 import { useState, useRef, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Plus, Save } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -40,8 +41,9 @@ const PRIORITY_OPTIONS = [
 type PageState = 'view' | 'catalog' | 'config' | 'edit';
 
 export function V2GoalDetail() {
-  const { goalId } = useParams<{ goalId: string }>();
-  const navigate = useNavigate();
+  const params = useParams<{ goalId: string }>();
+  const goalId = Array.isArray(params.goalId) ? params.goalId[0] : params.goalId;
+  const router = useRouter();
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
   const { data: plans } = usePlansBySlug(slug || '');
@@ -153,7 +155,7 @@ export function V2GoalDetail() {
     return (
       <div className="p-6 max-w-5xl mx-auto">
         <button
-          onClick={() => navigate('/admin/plans')}
+          onClick={() => router.push('/admin/plans')}
           className="flex items-center gap-1.5 text-sm mb-6 hover:underline"
           style={{ color: 'var(--editorial-text-secondary)' }}
         >
@@ -174,7 +176,7 @@ export function V2GoalDetail() {
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-8">
       {/* Back link */}
       <button
-        onClick={() => navigate('/admin/plans')}
+        onClick={() => router.push('/admin/plans')}
         className="flex items-center gap-1.5 text-sm hover:underline"
         style={{ color: 'var(--editorial-text-secondary)' }}
       >

@@ -4,16 +4,21 @@ import userEvent from '@testing-library/user-event';
 import { V2GoalDetail } from '../V2GoalDetail';
 import type { Widget } from '../../../../lib/types/v2';
 
-// Mock react-router-dom
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useParams: () => ({ goalId: 'goal-1' }),
-    useNavigate: () => mockNavigate,
-  };
-});
+// Mock next/navigation
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({ goalId: 'goal-1' }),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null), toString: vi.fn().mockReturnValue('') }),
+  usePathname: () => '/',
+}));
 
 // Mock subdomain context
 vi.mock('@/contexts/SubdomainContext', () => ({
@@ -141,7 +146,7 @@ describe('V2GoalDetail', () => {
     render(<V2GoalDetail />);
 
     await user.click(screen.getByText('Back to Plans & Goals'));
-    expect(mockNavigate).toHaveBeenCalledWith('/admin/plans');
+    expect(mockPush).toHaveBeenCalledWith('/admin/plans');
   });
 
   it('renders status dropdown', () => {

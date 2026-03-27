@@ -1,10 +1,13 @@
+'use client'
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { authClient } from '../lib/auth-client';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
 export function Signup() {
-  const navigate = useNavigate();
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -42,9 +45,8 @@ export function Signup() {
         return;
       }
 
-      const searchParams = new URLSearchParams(window.location.search);
       const redirectTo = searchParams.get('redirect') || '/welcome';
-      navigate(redirectTo, { replace: true });
+      router.replace(redirectTo);
     } catch (err) {
       console.error('[Signup] Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to create account. Please try again.');
@@ -196,7 +198,7 @@ export function Signup() {
               <p className="text-sm text-slate-500">
                 Already have an account?{' '}
                 <Link
-                  to="/login"
+                  href="/login"
                   className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
                 >
                   Sign in

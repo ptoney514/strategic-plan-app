@@ -1,5 +1,6 @@
+'use client'
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
 import { useCreateDistrict } from '../../hooks/useDistricts';
 import { InvitationService } from '../../lib/services/invitation.service';
@@ -16,7 +17,7 @@ function isValidEmail(email: string): boolean {
 }
 
 export function DistrictSetupWizard() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const createDistrict = useCreateDistrict();
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState('');
@@ -90,7 +91,7 @@ export function DistrictSetupWizard() {
         }
       }
 
-      navigate('/districts');
+      router.push('/districts');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create district');
       setIsCreating(false);
@@ -172,7 +173,7 @@ export function DistrictSetupWizard() {
       <div className="flex items-center justify-between">
         <button
           type="button"
-          onClick={currentStep === 0 ? () => navigate('/districts') : handleBack}
+          onClick={currentStep === 0 ? () => router.push('/districts') : handleBack}
           disabled={isCreating}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors hover:opacity-80 disabled:opacity-50"
           style={{ color: 'var(--editorial-text-muted)' }}

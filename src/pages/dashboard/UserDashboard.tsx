@@ -1,5 +1,7 @@
+'use client'
 import { useState, useMemo } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 import { Building2, FileText, Target, ArrowRight, Plus, ChevronRight, Settings, ExternalLink, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useUserDashboardStats, useUserDistrictsWithStats } from '../../hooks/useUserDistricts';
@@ -10,13 +12,13 @@ import type { HierarchicalGoal, PlanWithSummary } from '../../lib/types';
 import type { UserDistrictWithStats } from '../../lib/services/userDashboard.service';
 
 export function UserDashboard() {
-  const navigate = useNavigate();
-  const location = useLocation();
+  const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth();
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
 
   // Detect if we're in district admin context
-  const isDistrictAdmin = location.pathname.startsWith('/admin');
+  const isDistrictAdmin = (pathname ?? '').startsWith('/admin');
   const basePath = isDistrictAdmin ? '/admin' : '/dashboard';
 
   // Fetch stats, districts with stats, and plans
@@ -36,7 +38,7 @@ export function UserDashboard() {
   // Navigate to district admin page (cross-domain on root, in-app on district admin)
   const navigateToDistrictAdmin = (path: string, districtId?: string | null) => {
     if (isDistrictAdmin) {
-      navigate(path);
+      router.push(path);
       return;
     }
     // Root domain: redirect to district subdomain
@@ -119,7 +121,7 @@ export function UserDashboard() {
             </h2>
             {districtsWithStats.length > 2 && (
               <Link
-                to={`${basePath}/districts`}
+                href={`${basePath}/districts`}
                 className="text-sm font-medium flex items-center gap-1 transition-colors"
                 style={{ color: 'var(--editorial-accent-link)' }}
               >
@@ -178,7 +180,7 @@ export function UserDashboard() {
           </h2>
           <div className="flex items-center gap-3">
             <Link
-              to={`${basePath}/plans`}
+              href={`${basePath}/plans`}
               className="text-sm font-medium flex items-center gap-1 transition-colors"
               style={{ color: 'var(--editorial-accent-link)' }}
             >
@@ -296,7 +298,7 @@ export function UserDashboard() {
                   No objectives in this plan yet.
                 </p>
                 <Link
-                  to={`${basePath}/objectives/create`}
+                  href={`${basePath}/objectives/create`}
                   className="inline-flex items-center gap-2 mt-3 text-sm font-medium"
                   style={{ color: 'var(--editorial-accent-primary)' }}
                 >
@@ -569,7 +571,7 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
         </div>
 
         <Link
-          to={`${basePath}/objectives/${objective.id}`}
+          href={`${basePath}/objectives/${objective.id}`}
           className="flex-1 text-sm font-medium transition-colors"
           style={{ color: 'var(--editorial-text-primary)' }}
           onClick={(e) => e.stopPropagation()}
@@ -599,7 +601,7 @@ function ObjectiveRow({ objective, basePath }: { objective: HierarchicalGoal; ba
             >
               <span className="text-xs" style={{ color: 'var(--editorial-border)' }}>├─</span>
               <Link
-                to={`${basePath}/objectives/${child.id}`}
+                href={`${basePath}/objectives/${child.id}`}
                 className="flex-1 text-sm transition-colors"
                 style={{ color: 'var(--editorial-text-secondary)' }}
               >

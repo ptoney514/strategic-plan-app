@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserInvitations, useAcceptInvitation, useDeclineInvitation } from '../hooks/useInvitations';
 import { buildSubdomainUrlWithPath } from '../lib/subdomain';
@@ -138,7 +138,7 @@ export function Welcome() {
           {/* Dashboard Link */}
           <div className="mt-8 text-center">
             <Link
-              to="/dashboard"
+              href="/dashboard"
               className="inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-semibold text-white transition-all hover:shadow-md"
               style={{ background: 'var(--editorial-accent-primary, #4f46e5)' }}
             >

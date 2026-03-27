@@ -1,5 +1,6 @@
+'use client'
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { User, Lock, Mail, ArrowLeft, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { authClient } from '../lib/auth-client';
@@ -13,7 +14,7 @@ import { authClient } from '../lib/auth-client';
  * - Change their password
  */
 export function AccountSettings() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { user } = useAuth();
 
   // Display name form state
@@ -93,7 +94,7 @@ export function AccountSettings() {
   };
 
   if (!user) {
-    navigate('/login');
+    router.push('/login');
     return null;
   }
 
@@ -103,7 +104,7 @@ export function AccountSettings() {
       <header className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-6 py-4">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => router.back()}
             className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />

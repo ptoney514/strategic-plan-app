@@ -1,5 +1,6 @@
+'use client'
 import { useState, useEffect, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'next/navigation';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -21,7 +22,8 @@ function findGoalInHierarchy(goals: HierarchicalGoal[], id: string): Hierarchica
 }
 
 export function V2GoalDrillDown() {
-  const { goalId } = useParams<{ goalId: string }>();
+  const params = useParams<{ goalId: string }>();
+  const goalId = Array.isArray(params.goalId) ? params.goalId[0] : params.goalId;
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
   const { data: plans } = usePlansBySlug(slug || '');

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { authClient } from '../lib/auth-client';
 import { AlertCircle, Loader2, ArrowLeft, CheckCircle } from 'lucide-react';
 
@@ -140,7 +140,7 @@ export function ForgotPassword() {
             {/* Back to Login Link */}
             <div className="mt-8 text-center">
               <Link
-                to="/login"
+                href="/login"
                 className="inline-flex items-center gap-2 text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />

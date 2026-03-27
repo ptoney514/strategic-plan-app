@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { authClient } from '../lib/auth-client';
 import { AlertCircle, Loader2, CheckCircle, KeyRound } from 'lucide-react';
 
@@ -104,14 +104,14 @@ export function ResetPassword() {
 
               <div className="space-y-4">
                 <Link
-                  to="/forgot-password"
+                  href="/forgot-password"
                   className="flex w-full justify-center items-center gap-2 rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-xs hover:bg-slate-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all hover:shadow-md"
                 >
                   Request a new reset link
                 </Link>
                 <div className="text-center">
                   <Link
-                    to="/login"
+                    href="/login"
                     className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
                   >
                     Back to login
@@ -215,7 +215,7 @@ export function ResetPassword() {
                 </div>
 
                 <Link
-                  to="/login"
+                  href="/login"
                   className="flex w-full justify-center items-center gap-2 rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-xs hover:bg-slate-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all hover:shadow-md"
                 >
                   Back to login
@@ -246,7 +246,7 @@ export function ResetPassword() {
                       <p className="text-sm text-red-600 font-medium">Reset Failed</p>
                       <p className="text-sm text-red-500 mt-1">{error}</p>
                       <Link
-                        to="/forgot-password"
+                        href="/forgot-password"
                         className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors mt-2 inline-block"
                       >
                         Request a new reset link
@@ -332,7 +332,7 @@ export function ResetPassword() {
                 {/* Back to Login Link */}
                 <div className="mt-8 text-center">
                   <Link
-                    to="/login"
+                    href="/login"
                     className="text-sm font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
                   >
                     Back to login

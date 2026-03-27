@@ -1,8 +1,8 @@
-import { Outlet } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 
-export function V2PublicLayout() {
+export function V2PublicLayout({ children }: { children?: ReactNode }) {
   const { slug } = useSubdomain();
   const { data: district, isLoading } = useDistrict(slug || '');
 
@@ -40,7 +40,7 @@ export function V2PublicLayout() {
         </div>
       </header>
       <main>
-        <Outlet />
+        {children}
       </main>
     </div>
   );

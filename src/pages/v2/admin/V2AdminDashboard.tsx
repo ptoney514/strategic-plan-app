@@ -1,4 +1,5 @@
-import { useNavigate } from 'react-router-dom';
+'use client'
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { FileText, Target, CheckCircle, Users, Plus } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
@@ -47,7 +48,7 @@ function StatCard({ icon: Icon, label, value, color }: {
 }
 
 export function V2AdminDashboard() {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
   const { data: plans, isLoading: plansLoading } = usePlansBySlug(slug || '');
@@ -72,7 +73,7 @@ export function V2AdminDashboard() {
       is_public: false,
       order_position: (plans?.length || 0) + 1,
     });
-    navigate(`/admin/plans?planId=${newPlan.id}`);
+    router.push(`/admin/plans?planId=${newPlan.id}`);
   }
 
   if (isLoading) {
@@ -148,7 +149,7 @@ export function V2AdminDashboard() {
                     style={{ borderBottom: '1px solid var(--editorial-border)' }}
                     onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--editorial-bg)')}
                     onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'transparent')}
-                    onClick={() => navigate(`/admin/plans?planId=${plan.id}`)}
+                    onClick={() => router.push(`/admin/plans?planId=${plan.id}`)}
                   >
                     <td className="px-5 py-4">
                       <span className="font-medium text-sm" style={{ color: 'var(--editorial-text-primary)' }}>{plan.name}</span>
@@ -165,7 +166,7 @@ export function V2AdminDashboard() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={(e) => { e.stopPropagation(); navigate(`/admin/plans?planId=${plan.id}`); }}
+                        onClick={(e) => { e.stopPropagation(); router.push(`/admin/plans?planId=${plan.id}`); }}
                       >
                         Edit
                       </Button>

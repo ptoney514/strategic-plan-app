@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import {
   Search,
   Plus,
@@ -165,7 +165,7 @@ export function DistrictsPage() {
           </span>
         </div>
         <Link
-          to="/districts/new"
+          href="/districts/new"
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#b85c38] hover:bg-[#a04d2d] text-white text-sm font-medium transition-colors"
         >
           <Plus className="h-4 w-4" />

@@ -1,7 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { FileText, Target, CheckCircle, Users, Plus } from 'lucide-react';
+import { FileText, Target, CheckCircle, Users, Plus, ExternalLink } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { usePlansBySlug, useCreatePlan } from '../../../hooks/v2/usePlans';
@@ -94,10 +94,28 @@ export function V2AdminDashboard() {
             Overview of your strategic plans and progress
           </p>
         </div>
-        <Button onClick={handleCreatePlan} disabled={createPlan.isPending} size="sm">
-          <Plus className="h-4 w-4 mr-1.5" />
-          {createPlan.isPending ? 'Creating...' : 'New Plan'}
-        </Button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+            style={{
+              color: 'var(--editorial-accent-primary)',
+              border: '1px solid var(--editorial-border)',
+              backgroundColor: 'var(--editorial-surface)',
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--editorial-bg)')}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--editorial-surface)')}
+          >
+            <ExternalLink className="h-4 w-4" />
+            View Public Site
+          </a>
+          <Button onClick={handleCreatePlan} disabled={createPlan.isPending} size="sm">
+            <Plus className="h-4 w-4 mr-1.5" />
+            {createPlan.isPending ? 'Creating...' : 'New Plan'}
+          </Button>
+        </div>
       </div>
 
       {/* Stat Cards */}

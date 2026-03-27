@@ -4,7 +4,7 @@ import { authClient } from '../lib/auth-client';
 import { AlertCircle, Loader2, CheckCircle, KeyRound } from 'lucide-react';
 
 export function ResetPassword() {
-  const token = new URLSearchParams(window.location.search).get('token');
+  const token = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('token') : null;
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

@@ -10,7 +10,7 @@
  * Set VITE_ENVIRONMENT in .env.local to control the badge.
  */
 const EnvironmentBadge = () => {
-  const env = import.meta.env.VITE_ENVIRONMENT || 'development';
+  const env = process.env.NEXT_PUBLIC_ENVIRONMENT || 'development';
 
   // Don't show badge in production
   if (env === 'production') return null;

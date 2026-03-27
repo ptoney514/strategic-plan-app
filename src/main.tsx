@@ -12,17 +12,17 @@ import '../app.css'
 import './theme.css'
 import App from './App.tsx'
 
-if (import.meta.env.VITE_SENTRY_DSN) {
+if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
   Sentry.init({
-    dsn: import.meta.env.VITE_SENTRY_DSN,
-    environment: import.meta.env.VITE_ENVIRONMENT ?? 'development',
+    dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+    environment: process.env.NEXT_PUBLIC_ENVIRONMENT ?? 'development',
     integrations: [Sentry.browserTracingIntegration()],
     tracesSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
   });
 }
 
-const ReactQueryDevtools = import.meta.env.DEV
+const ReactQueryDevtools = process.env.NODE_ENV === 'development'
   ? lazy(async () => {
       const mod = await import('@tanstack/react-query-devtools');
       return { default: mod.ReactQueryDevtools };

@@ -15,25 +15,29 @@ afterEach(() => {
   cleanup();
 });
 
-// Mock ResizeObserver for Recharts ResponsiveContainer
-global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
+// Mock ResizeObserver for Recharts ResponsiveContainer (browser-only)
+if (typeof global !== 'undefined' && !global.ResizeObserver) {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
 
-// Mock window.location for subdomain detection
-Object.defineProperty(window, 'location', {
-  value: {
-    hostname: 'localhost',
-    port: '5173',
-    protocol: 'http:',
-    search: '',
-    pathname: '/',
-    href: 'http://localhost:5173/',
-  },
-  writable: true,
-});
+// Mock window.location for subdomain detection (browser-only)
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'location', {
+    value: {
+      hostname: 'localhost',
+      port: '5173',
+      protocol: 'http:',
+      search: '',
+      pathname: '/',
+      href: 'http://localhost:5173/',
+    },
+    writable: true,
+  });
+}
 
 // Create a query client for tests
 function createTestQueryClient() {

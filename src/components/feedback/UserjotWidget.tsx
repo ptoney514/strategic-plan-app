@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 
-const USERJOT_PROJECT_ID = import.meta.env.VITE_USERJOT_PROJECT_ID;
+const USERJOT_PROJECT_ID = process.env.NEXT_PUBLIC_USERJOT_PROJECT_ID;
 
 // Guard against double-initialization in StrictMode/Fast Refresh
 declare global {

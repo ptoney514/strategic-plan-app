@@ -4,7 +4,7 @@
  * Handles file uploads to Cloudflare R2 via the upload worker.
  */
 
-const UPLOAD_WORKER_URL = import.meta.env.VITE_R2_UPLOAD_WORKER_URL || '';
+const UPLOAD_WORKER_URL = process.env.NEXT_PUBLIC_R2_UPLOAD_WORKER_URL || '';
 
 export type UploadFolder = 'district-logos' | 'school-logos';
 

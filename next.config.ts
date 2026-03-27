@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
     resolveAlias: {
-      '@api': path.resolve(__dirname, 'api'),
+      '@api': path.resolve(__dirname, '_api'),
       // Map .js imports within api/lib/ to their .ts counterparts
       // (Turbopack doesn't support extensionAlias, so we map explicitly)
       [path.resolve(__dirname, 'api/lib/auth.js')]: path.resolve(__dirname, 'api/lib/auth.ts'),

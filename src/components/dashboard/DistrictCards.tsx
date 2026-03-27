@@ -53,7 +53,7 @@ function DistrictCard({ district }: { district: District }) {
 
   return (
     <div
-      className="group relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+      className="group relative bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-xs hover:shadow-md transition-shadow"
       data-testid="district-card"
     >
       {/* Color header bar */}
@@ -116,14 +116,14 @@ function DistrictAvatar({ district }: { district: District }) {
       <img
         src={district.logo_url}
         alt=""
-        className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+        className="w-12 h-12 rounded-lg object-cover shrink-0"
       />
     );
   }
 
   return (
     <div
-      className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+      className="w-12 h-12 rounded-lg flex items-center justify-center text-white font-bold text-lg shrink-0"
       style={{ backgroundColor: district.primary_color || '#D97706' }}
     >
       {district.name.substring(0, 2).toUpperCase()}

@@ -78,7 +78,7 @@ export function WidgetCard({ widget, onEdit, onDelete }: WidgetCardProps) {
           )}
         </div>
         <span
-          className="text-[10px] font-medium px-2 py-0.5 rounded-full ml-2 flex-shrink-0"
+          className="text-[10px] font-medium px-2 py-0.5 rounded-full ml-2 shrink-0"
           style={{
             backgroundColor: 'var(--editorial-bg, #f9fafb)',
             color: 'var(--editorial-text-secondary)',

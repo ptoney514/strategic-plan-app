@@ -1,48 +1,109 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer utilities {
-  /* Shimmer animation for progress bars */
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
-  }
+@custom-variant dark (&:is(.dark *));
 
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-  }
+@theme {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: Sora, system-ui, sans-serif;
 
-  /* Modal animations */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
 
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px) scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
 
-  .animate-fadeIn {
-    animation: fadeIn 0.2s ease-out;
-  }
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
 
-  .animate-slideUp {
-    animation: slideUp 0.3s ease-out;
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--color-ring);
+
+  --color-district-red: #b91c1c;
+  --color-district-red-light: #fee2e2;
+  --color-district-blue: #2563eb;
+  --color-district-blue-light: #dbeafe;
+  --color-district-green: #059669;
+  --color-district-green-light: #d1fae5;
+  --color-district-amber: #d97706;
+  --color-district-amber-light: #fef3c7;
+
+  --color-brand-bg: #0b0b12;
+  --color-brand-ink: #061427;
+  --color-brand-navy: #0b1f3a;
+  --color-brand-slate: #0f172a;
+  --color-brand-deepTeal: #1a6f73;
+  --color-brand-teal: #22b8ae;
+  --color-brand-mint: #36d7c3;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
   }
+}
+
+/* Shimmer animation for progress bars */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@utility animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@utility animate-slideUp {
+  animation: slideUp 0.3s ease-out;
 }

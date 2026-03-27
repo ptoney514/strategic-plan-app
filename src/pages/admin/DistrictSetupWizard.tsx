@@ -101,7 +101,7 @@ export function DistrictSetupWizard() {
     <div className="px-6 lg:px-10 py-8 max-w-[720px] mx-auto">
       {/* Header */}
       <h1
-        className="font-['Playfair_Display',_Georgia,_serif] text-[28px] font-medium tracking-tight mb-8"
+        className="font-['Playfair_Display',Georgia,serif] text-[28px] font-medium tracking-tight mb-8"
         style={{ color: 'var(--editorial-text-primary)' }}
       >
         New District
@@ -115,7 +115,7 @@ export function DistrictSetupWizard() {
           return (
             <div key={label} className="flex items-center gap-2 flex-1">
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0 transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium shrink-0 transition-colors"
                 style={{
                   backgroundColor: isActive
                     ? 'var(--editorial-accent-primary)'

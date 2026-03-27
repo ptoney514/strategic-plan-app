@@ -18,7 +18,7 @@ export function ImportSummaryCard({
   return (
     <div
       data-testid="import-summary"
-      className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm"
+      className="mx-auto max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-xs"
     >
       <CheckCircle className="mx-auto mb-4 h-12 w-12 text-green-500" />
       <h2 className="mb-4 text-xl font-semibold text-gray-900">Import Complete</h2>

@@ -57,7 +57,7 @@ export function TemplatePicker({ selected, onChange }: TemplatePickerProps) {
                 ${
                   isSelected
                     ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500'
-                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-xs'
                 }
               `}
             >

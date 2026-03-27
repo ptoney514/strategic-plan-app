@@ -55,7 +55,7 @@ function AuthForms({ email, onSuccess }: { email: string; onSuccess: () => void 
     }
   };
 
-  const inputClass = "block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-sm ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50";
+  const inputClass = "block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-xs ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50";
 
   return (
     <div className="mt-6">
@@ -63,13 +63,13 @@ function AuthForms({ email, onSuccess }: { email: string; onSuccess: () => void 
       <div className="flex rounded-lg p-1 mb-6" style={{ background: 'var(--editorial-surface, #f8fafc)' }}>
         <button
           onClick={() => { setTab('create'); setError(''); }}
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${tab === 'create' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${tab === 'create' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
         >
           Create Account
         </button>
         <button
           onClick={() => { setTab('signin'); setError(''); }}
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${tab === 'signin' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
+          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${tab === 'signin' ? 'bg-white shadow-xs text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}
         >
           Sign In
         </button>
@@ -77,7 +77,7 @@ function AuthForms({ email, onSuccess }: { email: string; onSuccess: () => void 
 
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
           <p className="text-sm text-red-600">{error}</p>
         </div>
       )}
@@ -166,7 +166,7 @@ export function AcceptInvitation() {
   if (isError || !invitation) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%)' }}>
-        <div className="w-full max-w-md rounded-xl border bg-white p-8 shadow-sm text-center" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
+        <div className="w-full max-w-md rounded-xl border bg-white p-8 shadow-xs text-center" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
           <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-50 mb-4">
             <AlertCircle className="w-6 h-6 text-red-500" />
           </div>
@@ -192,20 +192,20 @@ export function AcceptInvitation() {
       <div className="w-full max-w-md fade-in">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="h-10 w-10 overflow-hidden rounded-lg shadow-sm">
+          <div className="h-10 w-10 overflow-hidden rounded-lg shadow-xs">
             <img src="/assets/stratadash-logo.png" alt="StrataDash" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-semibold tracking-tight text-slate-900">StrataDash</span>
         </div>
 
-        <div className="rounded-xl border bg-white p-8 shadow-sm" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
+        <div className="rounded-xl border bg-white p-8 shadow-xs" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
           <h1 className="text-xl font-semibold tracking-tight text-center" style={{ color: 'var(--editorial-text-primary)', fontFamily: 'Playfair Display, serif' }}>
             You've been invited
           </h1>
 
           {/* Invitation Details */}
           <div className="mt-6 rounded-lg border p-4 flex items-center gap-4" style={{ borderColor: 'var(--editorial-border, #e2e8f0)', background: 'var(--editorial-surface, #f8fafc)' }}>
-            <div className="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-white flex items-center justify-center border" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
+            <div className="shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-white flex items-center justify-center border" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
               {invitation.organization.logo_url ? (
                 <img src={invitation.organization.logo_url} alt={invitation.organization.name} className="h-full w-full object-cover" />
               ) : (
@@ -227,7 +227,7 @@ export function AcceptInvitation() {
               {/* Accept / Decline errors */}
               {(accept.isError || decline.isError) && (
                 <div className="mt-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                   <p className="text-sm text-red-600">Something went wrong. Please try again.</p>
                 </div>
               )}

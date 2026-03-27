@@ -21,7 +21,7 @@ export function GoalRow({
       }}
     >
       <div
-        className="flex items-center justify-center rounded-lg font-bold text-sm text-white flex-shrink-0"
+        className="flex items-center justify-center rounded-lg font-bold text-sm text-white shrink-0"
         style={{ width: 40, height: 40, backgroundColor: primaryColor }}
       >
         {goalNumber}

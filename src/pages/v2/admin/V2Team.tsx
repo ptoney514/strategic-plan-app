@@ -86,7 +86,7 @@ export function V2Team() {
                   )}
                 </div>
               </div>
-              <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex items-center gap-3 shrink-0">
                 <RoleBadge role={member.role} />
                 {member.role !== 'owner' && (
                   <button
@@ -128,7 +128,7 @@ export function V2Team() {
                     Sent {inv.created_at ? new Date(inv.created_at).toLocaleDateString() : 'N/A'}
                   </div>
                 </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <RoleBadge role={inv.role} />
                   <button
                     onClick={() => resendInvitation.mutate(inv.id)}

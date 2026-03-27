@@ -117,6 +117,7 @@ export function DistrictsPage() {
 
   const handleRowClick = (district: DistrictWithStats) => {
     const adminUrl = buildSubdomainUrlWithPath('district', '/admin', district.slug);
+    // eslint-disable-next-line react-hooks/immutability
     window.location.href = adminUrl;
   };
 
@@ -156,7 +157,7 @@ export function DistrictsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <h1 className="font-['Playfair_Display',_Georgia,_serif] text-[28px] font-medium text-[#1a1a1a] tracking-tight">
+          <h1 className="font-['Playfair_Display',Georgia,serif] text-[28px] font-medium text-[#1a1a1a] tracking-tight">
             Districts
           </h1>
           <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#f5f3ef] text-[#4a4a4a] border border-[#e8e6e1]">
@@ -184,7 +185,7 @@ export function DistrictsPage() {
               setSearchTerm(e.target.value);
               setCurrentPage(1);
             }}
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#e8e6e1] bg-white text-sm focus:outline-none focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] placeholder:text-[#8a8a8a]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-[#e8e6e1] bg-white text-sm focus:outline-hidden focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227] placeholder:text-[#8a8a8a]"
           />
         </div>
         <select
@@ -193,7 +194,7 @@ export function DistrictsPage() {
             setStatusFilter(e.target.value as StatusFilter);
             setCurrentPage(1);
           }}
-          className="px-3 py-2.5 rounded-lg border border-[#e8e6e1] bg-white text-sm text-[#4a4a4a] focus:outline-none focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227]"
+          className="px-3 py-2.5 rounded-lg border border-[#e8e6e1] bg-white text-sm text-[#4a4a4a] focus:outline-hidden focus:border-[#c9a227] focus:ring-1 focus:ring-[#c9a227]"
         >
           <option value="all">All Status</option>
           <option value="active">Active</option>
@@ -261,18 +262,18 @@ export function DistrictsPage() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-[3px] h-10 rounded-full flex-shrink-0"
+                        className="w-[3px] h-10 rounded-full shrink-0"
                         style={{ backgroundColor: district.primary_color || '#c9a227' }}
                       />
                       {district.logo_url ? (
                         <img
                           src={district.logo_url}
                           alt=""
-                          className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+                          className="w-8 h-8 rounded-lg object-cover shrink-0"
                         />
                       ) : (
                         <div
-                          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                          className="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold shrink-0"
                           style={{ backgroundColor: district.primary_color || '#c9a227' }}
                         >
                           {district.name.charAt(0)}
@@ -420,7 +421,7 @@ export function DistrictsPage() {
                 type="text"
                 value={deleteConfirmSlug}
                 onChange={(e) => setDeleteConfirmSlug(e.target.value)}
-                className="w-full px-3 py-2 rounded-lg border border-[#e8e6e1] text-sm focus:outline-none focus:border-red-400 focus:ring-1 focus:ring-red-400"
+                className="w-full px-3 py-2 rounded-lg border border-[#e8e6e1] text-sm focus:outline-hidden focus:border-red-400 focus:ring-1 focus:ring-red-400"
                 placeholder={deletingDistrict.slug}
               />
             </div>

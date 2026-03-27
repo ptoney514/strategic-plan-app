@@ -22,8 +22,11 @@ export function V2Appearance() {
   useEffect(() => {
     if (district.data) {
       initFromDistrict(district.data);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTagline(district.data.tagline || '');
+       
       setIsPublic(district.data.is_public ?? false);
+       
       setLocalDirty(false);
     }
   }, [district.data, initFromDistrict]);

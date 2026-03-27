@@ -109,7 +109,7 @@ export const AutoFixModal: React.FC<AutoFixModalProps> = ({
               // Bulk mode: Show list of all placeholders that will be created
               <div className="space-y-4">
                 <div className="flex items-start space-x-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                  <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-800">
                     <p className="font-medium">The following placeholder goals will be created:</p>
                   </div>
@@ -124,7 +124,7 @@ export const AutoFixModal: React.FC<AutoFixModalProps> = ({
                         key={index}
                         className="flex items-start space-x-3 p-3 border border-border rounded-lg"
                       >
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium flex-shrink-0 ${
+                        <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${
                           sug.suggestedLevel === 0
                             ? 'bg-purple-100 text-purple-700'
                             : sug.suggestedLevel === 1
@@ -155,7 +155,7 @@ export const AutoFixModal: React.FC<AutoFixModalProps> = ({
               suggestion && (
                 <div className="space-y-4">
                   <div className="flex items-start space-x-2 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                    <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <AlertCircle className="h-5 w-5 text-blue-600 shrink-0 mt-0.5" />
                     <div className="text-sm text-blue-800">
                       <p className="font-medium">Missing Parent Detected</p>
                       <p className="mt-1">

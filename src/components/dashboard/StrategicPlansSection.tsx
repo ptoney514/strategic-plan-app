@@ -17,7 +17,7 @@ export function StrategicPlansSection({
   isLoading,
 }: StrategicPlansSectionProps) {
   return (
-    <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
+    <section className="bg-white rounded-xl border border-slate-200 shadow-xs p-8">
       <div className="flex flex-col gap-6 max-w-4xl">
         {/* Header */}
         <div className="space-y-1.5">
@@ -49,7 +49,7 @@ export function StrategicPlansSection({
               value={selectedPlanId || ''}
               onChange={(e) => onPlanSelect(e.target.value)}
               disabled={isLoading || plans.length === 0}
-              className="w-full appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-sm focus:ring-2 focus:ring-brand-teal/20 focus:border-brand-teal focus:bg-white outline-none cursor-pointer hover:border-slate-300 hover:bg-white transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full appearance-none pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 text-sm focus:ring-2 focus:ring-brand-teal/20 focus:border-brand-teal focus:bg-white outline-hidden cursor-pointer hover:border-slate-300 hover:bg-white transition-all shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="" disabled>
                 {isLoading ? 'Loading plans...' : 'Select a strategic plan'}

@@ -116,7 +116,7 @@ export function DashboardPlansPage() {
             placeholder="Search plans..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-none"
+            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm focus:outline-hidden"
             style={{
               border: '1px solid var(--editorial-border)',
               backgroundColor: 'var(--editorial-surface)',
@@ -128,7 +128,7 @@ export function DashboardPlansPage() {
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2 rounded-lg text-sm focus:outline-none"
+            className="px-4 py-2 rounded-lg text-sm focus:outline-hidden"
             style={{
               border: '1px solid var(--editorial-border)',
               backgroundColor: 'var(--editorial-surface)',

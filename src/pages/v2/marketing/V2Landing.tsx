@@ -63,7 +63,7 @@ export function V2Landing() {
             {features.map((feature) => (
               <div
                 key={feature.title}
-                className="bg-white rounded-xl p-8 shadow-sm border border-gray-100"
+                className="bg-white rounded-xl p-8 shadow-xs border border-gray-100"
               >
                 <div className="w-12 h-12 rounded-lg bg-blue-50 flex items-center justify-center mb-5">
                   <feature.icon className="w-6 h-6 text-blue-500" />

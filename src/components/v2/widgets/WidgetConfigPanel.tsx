@@ -40,7 +40,7 @@ function TextInput({ value, onChange, placeholder }: {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder={placeholder}
-      className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+      className="w-full rounded-lg px-3 py-2 text-sm outline-hidden"
       style={{
         backgroundColor: 'var(--editorial-bg, #f9fafb)',
         border: '1px solid var(--editorial-border)',
@@ -61,7 +61,7 @@ function NumberInput({ value, onChange, placeholder }: {
       value={value ?? ''}
       onChange={(e) => onChange(e.target.value ? Number(e.target.value) : undefined)}
       placeholder={placeholder}
-      className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+      className="w-full rounded-lg px-3 py-2 text-sm outline-hidden"
       style={{
         backgroundColor: 'var(--editorial-bg, #f9fafb)',
         border: '1px solid var(--editorial-border)',
@@ -80,7 +80,7 @@ function SelectInput({ value, onChange, options }: {
     <select
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+      className="w-full rounded-lg px-3 py-2 text-sm outline-hidden"
       style={{
         backgroundColor: 'var(--editorial-bg, #f9fafb)',
         border: '1px solid var(--editorial-border)',
@@ -319,7 +319,7 @@ function DataPointsEditor({ config, onUpdate, multiValue }: {
             value={point.label}
             onChange={(e) => updatePoint(i, 'label', e.target.value)}
             placeholder="Label"
-            className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-none"
+            className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-hidden"
             style={{
               backgroundColor: 'var(--editorial-bg)',
               border: '1px solid var(--editorial-border)',
@@ -332,7 +332,7 @@ function DataPointsEditor({ config, onUpdate, multiValue }: {
               value={point.values?.join(', ') ?? ''}
               onChange={(e) => updatePointValues(i, e.target.value)}
               placeholder="1, 2, 3"
-              className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-none"
+              className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-hidden"
               style={{
                 backgroundColor: 'var(--editorial-bg)',
                 border: '1px solid var(--editorial-border)',
@@ -345,7 +345,7 @@ function DataPointsEditor({ config, onUpdate, multiValue }: {
               value={point.value ?? ''}
               onChange={(e) => updatePoint(i, 'value', e.target.value)}
               placeholder="0"
-              className="w-20 rounded-lg px-3 py-1.5 text-xs outline-none"
+              className="w-20 rounded-lg px-3 py-1.5 text-xs outline-hidden"
               style={{
                 backgroundColor: 'var(--editorial-bg)',
                 border: '1px solid var(--editorial-border)',
@@ -413,7 +413,7 @@ function BreakdownEditor({ config, onUpdate }: {
             value={item.label}
             onChange={(e) => updateItem(i, 'label', e.target.value)}
             placeholder="Label"
-            className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-none"
+            className="flex-1 rounded-lg px-3 py-1.5 text-xs outline-hidden"
             style={{
               backgroundColor: 'var(--editorial-bg)',
               border: '1px solid var(--editorial-border)',
@@ -425,7 +425,7 @@ function BreakdownEditor({ config, onUpdate }: {
             value={item.value}
             onChange={(e) => updateItem(i, 'value', e.target.value)}
             placeholder="0"
-            className="w-20 rounded-lg px-3 py-1.5 text-xs outline-none"
+            className="w-20 rounded-lg px-3 py-1.5 text-xs outline-hidden"
             style={{
               backgroundColor: 'var(--editorial-bg)',
               border: '1px solid var(--editorial-border)',

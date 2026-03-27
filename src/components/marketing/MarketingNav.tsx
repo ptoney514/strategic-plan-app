@@ -80,7 +80,7 @@ export function MarketingNav({ onDemoClick }: MarketingNavProps) {
               </Link>
               <button
                 onClick={onDemoClick}
-                className="bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-sm transition-all hover:shadow-md hover:shadow-indigo-200"
+                className="bg-indigo-900 hover:bg-indigo-800 text-white text-sm font-medium px-4 py-2 rounded-lg shadow-xs transition-all hover:shadow-md hover:shadow-indigo-200"
               >
                 View District Plan Demo
               </button>

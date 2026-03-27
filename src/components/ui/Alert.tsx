@@ -42,7 +42,7 @@ export const Alert: React.FC<AlertProps> = ({
   return (
     <div className={`rounded-lg border p-4 ${styles.container} ${className}`}>
       <div className="flex items-start">
-        <div className="flex-shrink-0">{styles.icon}</div>
+        <div className="shrink-0">{styles.icon}</div>
         <div className="ml-3 flex-1">
           {title && (
             <h3 className={`text-sm font-medium ${styles.titleColor} mb-1`}>

@@ -39,7 +39,7 @@ export function DistrictSwitcher({ currentDistrict, className, variant = 'light'
         <button
           className={cn(
             'w-full flex items-center gap-3 p-4 transition-colors',
-            'focus:outline-none focus-visible:ring-2 focus-visible:ring-inset',
+            'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset',
             isDark
               ? 'focus-visible:ring-white/30'
               : 'focus-visible:ring-brand-teal',
@@ -74,7 +74,7 @@ export function DistrictSwitcher({ currentDistrict, className, variant = 'light'
             </div>
           </div>
           <ChevronDown
-            className="w-4 h-4 flex-shrink-0"
+            className="w-4 h-4 shrink-0"
             style={{ color: isDark ? 'var(--editorial-sidebar-text-muted)' : 'var(--editorial-text-muted)' }}
           />
         </button>
@@ -114,7 +114,7 @@ export function DistrictSwitcher({ currentDistrict, className, variant = 'light'
                 <a
                   href={buildSubdomainUrlWithPath('district', '/admin', district.slug)}
                   className={cn(
-                    'flex items-center gap-3 px-3 py-2 text-sm outline-none cursor-pointer transition-colors',
+                    'flex items-center gap-3 px-3 py-2 text-sm outline-hidden cursor-pointer transition-colors',
                     isDark
                       ? isCurrent
                         ? 'bg-white/10 text-white'
@@ -130,7 +130,7 @@ export function DistrictSwitcher({ currentDistrict, className, variant = 'light'
                   <span className="flex-1 truncate">{district.name}</span>
                   {isCurrent && (
                     <Check
-                      className="w-4 h-4 flex-shrink-0"
+                      className="w-4 h-4 shrink-0"
                       style={{ color: isDark ? 'var(--editorial-accent-secondary)' : 'var(--editorial-accent-primary)' }}
                     />
                   )}
@@ -149,7 +149,7 @@ export function DistrictSwitcher({ currentDistrict, className, variant = 'light'
             <a
               href={buildSubdomainUrlWithPath('root', '/dashboard')}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 text-sm outline-none cursor-pointer transition-colors',
+                'flex items-center gap-3 px-3 py-2 text-sm outline-hidden cursor-pointer transition-colors',
                 isDark
                   ? 'text-[#e8e6e1] hover:bg-white/10 hover:text-white'
                   : 'text-slate-700 hover:bg-slate-50'
@@ -211,7 +211,7 @@ function DistrictAvatar({ district, size = 'md' }: { district: District; size?: 
       <img
         src={district.logo_url}
         alt=""
-        className={cn(sizeClasses, 'rounded-lg object-cover flex-shrink-0')}
+        className={cn(sizeClasses, 'rounded-lg object-cover shrink-0')}
       />
     );
   }
@@ -220,7 +220,7 @@ function DistrictAvatar({ district, size = 'md' }: { district: District; size?: 
     <div
       className={cn(
         sizeClasses,
-        'rounded-lg flex items-center justify-center text-white font-bold flex-shrink-0'
+        'rounded-lg flex items-center justify-center text-white font-bold shrink-0'
       )}
       style={{ backgroundColor: district.primary_color || 'var(--editorial-accent-primary)' }}
     >

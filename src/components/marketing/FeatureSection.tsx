@@ -86,7 +86,7 @@ function FeatureItem({ title, description, icon, highlighted = false }: Feature)
     return (
       <div className="flex gap-4">
         <div
-          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-sm ${
+          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-xs ${
             highlighted
               ? 'bg-blue-50 border border-blue-100 text-blue-600'
               : 'bg-white border border-indigo-200 text-indigo-600'
@@ -120,9 +120,9 @@ function FeatureItem({ title, description, icon, highlighted = false }: Feature)
 // Pre-built visuals for the three feature sections
 export function FeatureVisualHierarchy() {
   return (
-    <div className="bg-indigo-50 rounded-2xl border border-indigo-200 p-8 aspect-square lg:aspect-video flex items-center justify-center relative shadow-sm">
+    <div className="bg-indigo-50 rounded-2xl border border-indigo-200 p-8 aspect-square lg:aspect-video flex items-center justify-center relative shadow-xs">
       <div className="flex flex-col items-center gap-6 w-full max-w-sm">
-        <div className="bg-white border border-indigo-200 shadow-sm px-4 py-3 rounded-lg flex items-center gap-3 w-full justify-center">
+        <div className="bg-white border border-indigo-200 shadow-xs px-4 py-3 rounded-lg flex items-center gap-3 w-full justify-center">
           <div className="w-8 h-8 rounded bg-blue-100 flex items-center justify-center text-blue-600">
             <Icon icon="solar:city-linear" width="18" />
           </div>
@@ -130,20 +130,20 @@ export function FeatureVisualHierarchy() {
         </div>
         <div className="h-8 w-px bg-indigo-300" />
         <div className="grid grid-cols-2 gap-4 w-full">
-          <div className="bg-white border border-indigo-200 shadow-sm px-3 py-3 rounded-lg flex items-center gap-2">
+          <div className="bg-white border border-indigo-200 shadow-xs px-3 py-3 rounded-lg flex items-center gap-2">
             <div className="w-6 h-6 rounded bg-green-50 text-green-500 flex items-center justify-center">
               <Icon icon="solar:book-linear" width="14" />
             </div>
             <span className="text-xs font-medium text-indigo-600">Academic</span>
           </div>
-          <div className="bg-white border border-indigo-200 shadow-sm px-3 py-3 rounded-lg flex items-center gap-2">
+          <div className="bg-white border border-indigo-200 shadow-xs px-3 py-3 rounded-lg flex items-center gap-2">
             <div className="w-6 h-6 rounded bg-cyan-50 text-cyan-500 flex items-center justify-center">
               <Icon icon="solar:bus-linear" width="14" />
             </div>
             <span className="text-xs font-medium text-indigo-600">Operations</span>
           </div>
         </div>
-        <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm text-xs text-indigo-500">
+        <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-indigo-200 shadow-xs text-xs text-indigo-500">
           Strategic Plan Builder
         </div>
       </div>
@@ -153,7 +153,7 @@ export function FeatureVisualHierarchy() {
 
 export function FeatureVisualProgress() {
   return (
-    <div className="bg-white rounded-2xl border border-indigo-200 p-8 aspect-square lg:aspect-video flex items-center justify-center relative shadow-sm">
+    <div className="bg-white rounded-2xl border border-indigo-200 p-8 aspect-square lg:aspect-video flex items-center justify-center relative shadow-xs">
       <div className="w-full max-w-md space-y-4">
         {/* Progress Item */}
         <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
@@ -180,7 +180,7 @@ export function FeatureVisualProgress() {
           </div>
         </div>
       </div>
-      <div className="absolute top-6 left-6 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm text-xs text-indigo-500">
+      <div className="absolute top-6 left-6 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-indigo-200 shadow-xs text-xs text-indigo-500">
         District Progress Tracking
       </div>
     </div>
@@ -189,7 +189,7 @@ export function FeatureVisualProgress() {
 
 export function FeatureVisualChart() {
   return (
-    <div className="bg-indigo-50 rounded-2xl border border-indigo-200 p-8 aspect-square lg:aspect-video flex items-center justify-center relative shadow-sm">
+    <div className="bg-indigo-50 rounded-2xl border border-indigo-200 p-8 aspect-square lg:aspect-video flex items-center justify-center relative shadow-xs">
       <div className="w-full max-w-xs bg-white rounded-xl shadow-lg border border-indigo-100 overflow-hidden">
         <div className="h-32 bg-indigo-50 p-4 relative overflow-hidden">
           {/* Fake chart bars */}
@@ -209,7 +209,7 @@ export function FeatureVisualChart() {
           <div className="text-blue-600 font-bold text-lg">84%</div>
         </div>
       </div>
-      <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg border border-indigo-200 shadow-sm text-xs text-indigo-500">
+      <div className="absolute bottom-6 right-6 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-indigo-200 shadow-xs text-xs text-indigo-500">
         Board Progress Analytics
       </div>
     </div>

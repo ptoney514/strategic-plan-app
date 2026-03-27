@@ -31,7 +31,7 @@ function InvitationCard({ invitation }: { invitation: InvitationWithOrg }) {
 
   return (
     <div className="rounded-xl border p-5 flex items-center gap-4" style={{ borderColor: 'var(--editorial-border)', background: 'var(--editorial-surface)' }}>
-      <div className="flex-shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
+      <div className="shrink-0 h-12 w-12 rounded-lg overflow-hidden bg-slate-100 flex items-center justify-center">
         {invitation.organization.logo_url ? (
           <img src={invitation.organization.logo_url} alt={invitation.organization.name} className="h-full w-full object-cover" />
         ) : (
@@ -48,7 +48,7 @@ function InvitationCard({ invitation }: { invitation: InvitationWithOrg }) {
         </p>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         <button
           onClick={handleDecline}
           disabled={isActing}
@@ -88,14 +88,14 @@ export function Welcome() {
       <div className="w-full max-w-lg fade-in">
         {/* Logo */}
         <div className="flex items-center justify-center gap-3 mb-8">
-          <div className="h-10 w-10 overflow-hidden rounded-lg shadow-sm">
+          <div className="h-10 w-10 overflow-hidden rounded-lg shadow-xs">
             <img src="/assets/stratadash-logo.png" alt="StrataDash" className="w-full h-full object-cover" />
           </div>
           <span className="text-xl font-semibold tracking-tight text-slate-900">StrataDash</span>
         </div>
 
         {/* Welcome Card */}
-        <div className="rounded-xl border bg-white p-8 shadow-sm" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
+        <div className="rounded-xl border bg-white p-8 shadow-xs" style={{ borderColor: 'var(--editorial-border, #e2e8f0)' }}>
           <h1 className="text-2xl font-semibold tracking-tight text-center" style={{ color: 'var(--editorial-text-primary)', fontFamily: 'Playfair Display, serif' }}>
             Welcome to StrataDash{user?.name ? `, ${user.name}` : ''}!
           </h1>

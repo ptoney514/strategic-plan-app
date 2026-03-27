@@ -107,10 +107,10 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center">
+    <div className="fixed inset-0 z-100 flex items-center justify-center">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
         onClick={onClose}
       />
 
@@ -174,7 +174,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   />
                 </div>
 
@@ -191,7 +191,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                       required
                       value={formData.firstName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                     />
                   </div>
                   <div>
@@ -205,7 +205,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                       required
                       value={formData.lastName}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                     />
                   </div>
                 </div>
@@ -222,7 +222,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     required
                     value={formData.organization}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   />
                 </div>
 
@@ -237,7 +237,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     required
                     value={formData.topic}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors appearance-none bg-white"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors appearance-none bg-white"
                   >
                     <option value="">Select a topic</option>
                     {TOPIC_OPTIONS.map((topic) => (
@@ -259,7 +259,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
                   />
                 </div>
 
@@ -274,7 +274,7 @@ export function ContactModal({ isOpen, onClose }: ContactModalProps) {
                     rows={4}
                     value={formData.message}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors resize-none"
                   />
                 </div>
 

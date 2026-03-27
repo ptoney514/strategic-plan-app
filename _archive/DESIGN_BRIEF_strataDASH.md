@@ -384,7 +384,7 @@ We need your input on which direction resonates:
 
 - White/light backgrounds
 - Generous white space
-- Subtle shadows (`shadow-sm`, not `shadow-xl`)
+- Subtle shadows (`shadow-xs`, not `shadow-xl`)
 - Border-focused over shadow-focused
 - Typography hierarchy with clear scale
 - Fast, snappy animations

@@ -9,20 +9,20 @@ export function HeroSection({ onDemoClick }: HeroSectionProps) {
     <main className="pt-32 pb-20 relative">
       {/* Background Decoration - moved to absolute within main, not fixed */}
       <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-[size:24px_24px]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[24px_24px]" />
         <div className="absolute left-1/2 -translate-x-1/2 top-0 h-[50vh] w-[60vw] rounded-full bg-blue-500/10 blur-[120px]" />
       </div>
 
       <div className="fade-in-up text-center max-w-4xl mx-auto px-6 mb-20 space-y-8">
         {/* Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-100 bg-blue-50/80 text-blue-700 text-xs font-semibold tracking-wide uppercase shadow-sm">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-blue-100 bg-blue-50/80 text-blue-700 text-xs font-semibold tracking-wide uppercase shadow-xs">
           Built for K-12 Districts
         </div>
 
         {/* Headline */}
         <h1 className="text-indigo-900 text-5xl md:text-6xl font-bold leading-tight tracking-tight">
           Plan Better.{' '}
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-red-500">
+          <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-red-500">
             Show Progress.
           </span>{' '}
           Build Trust.
@@ -63,7 +63,7 @@ export function HeroSection({ onDemoClick }: HeroSectionProps) {
       {/* Product Video Showcase */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 fade-in-up fade-in-delay-1">
         <div className="shadow-indigo-200/50 md:p-4 bg-indigo-50/50 border-indigo-200 border rounded-xl p-2 relative shadow-2xl">
-          <div className="rounded-lg overflow-hidden border border-indigo-200 bg-white relative shadow-sm group">
+          <div className="rounded-lg overflow-hidden border border-indigo-200 bg-white relative shadow-xs group">
             <video
               autoPlay
               loop

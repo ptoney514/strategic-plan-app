@@ -65,7 +65,7 @@ export function TeamStep({ data, onChange }: TeamStepProps) {
                   value={inv.email}
                   onChange={(e) => updateMember(index, { email: e.target.value })}
                   placeholder="team@example.com"
-                  className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+                  className="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
                   style={{
                     backgroundColor: 'var(--editorial-surface)',
                     borderColor: emailInvalid ? '#ef4444' : 'var(--editorial-border)',
@@ -81,7 +81,7 @@ export function TeamStep({ data, onChange }: TeamStepProps) {
               <select
                 value={inv.role}
                 onChange={(e) => updateMember(index, { role: e.target.value })}
-                className="px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:ring-1"
+                className="px-3 py-2.5 rounded-lg border text-sm focus:outline-hidden focus:ring-1"
                 style={{
                   backgroundColor: 'var(--editorial-surface)',
                   borderColor: 'var(--editorial-border)',

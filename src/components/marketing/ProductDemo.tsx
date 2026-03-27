@@ -94,7 +94,7 @@ export function ProductDemo() {
 
         {/* Title Section */}
         <div className="flex items-start gap-3 mb-4">
-          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-red-500 text-white flex items-center justify-center text-sm md:text-lg font-bold flex-shrink-0 shadow-md">
+          <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-red-500 text-white flex items-center justify-center text-sm md:text-lg font-bold shrink-0 shadow-md">
             1
           </div>
           <div className="min-w-0 flex-1">
@@ -127,7 +127,7 @@ export function ProductDemo() {
             style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)' }}
           >
             <div className="flex items-start gap-2 mb-2">
-              <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-red-500 text-white flex items-center justify-center text-[10px] md:text-xs font-bold flex-shrink-0">
+              <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-red-500 text-white flex items-center justify-center text-[10px] md:text-xs font-bold shrink-0">
                 1.1
               </div>
               <div className="min-w-0 flex-1">
@@ -138,7 +138,7 @@ export function ProductDemo() {
                   Foster an inclusive environment where all students, staff, families, and community members feel valued and connected.
                 </p>
               </div>
-              <Icon icon="solar:maximize-square-linear" className="w-4 h-4 text-slate-400 flex-shrink-0 hidden md:block" />
+              <Icon icon="solar:maximize-square-linear" className="w-4 h-4 text-slate-400 shrink-0 hidden md:block" />
             </div>
 
             <div className="flex flex-1 min-h-0 gap-3 mt-2">
@@ -212,7 +212,7 @@ export function ProductDemo() {
             style={{ boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.05)' }}
           >
             <div className="flex items-start gap-2 mb-2">
-              <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-red-500 text-white flex items-center justify-center text-[10px] md:text-xs font-bold flex-shrink-0">
+              <div className="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-red-500 text-white flex items-center justify-center text-[10px] md:text-xs font-bold shrink-0">
                 1.2
               </div>
               <div className="text-[9px] md:text-xs font-semibold text-slate-800 leading-tight">
@@ -249,7 +249,7 @@ export function ProductDemo() {
               }}
             >
               <div className="flex items-start gap-2 mb-2">
-                <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-red-500 text-white flex items-center justify-center text-[9px] md:text-[10px] font-bold flex-shrink-0">
+                <div className="w-6 h-6 md:w-7 md:h-7 rounded-lg bg-red-500 text-white flex items-center justify-center text-[9px] md:text-[10px] font-bold shrink-0">
                   {card.id}
                 </div>
                 <div className="text-[8px] md:text-[10px] font-medium text-slate-700 leading-tight line-clamp-2">

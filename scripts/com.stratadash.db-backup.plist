@@ -9,7 +9,7 @@
     <array>
         <string>/bin/bash</string>
         <string>-c</string>
-        <string>source ~/.zprofile 2>/dev/null; source ~/.zshrc 2>/dev/null; cd ~/Projects/strategic-plan-app &amp;&amp; DATABASE_URL_PROD="$(grep DATABASE_URL_PROD .env.local 2>/dev/null | cut -d= -f2-)" bash scripts/backup-db.sh</string>
+        <string>mkdir -p ~/backups/stratadash &amp;&amp; source ~/.zprofile 2>/dev/null; source ~/.zshrc 2>/dev/null; cd ~/Projects/strategic-plan-app &amp;&amp; DATABASE_URL_PROD="$(grep DATABASE_URL_PROD .env.local 2>/dev/null | cut -d= -f2-)" bash scripts/backup-db.sh</string>
     </array>
 
     <key>StartCalendarInterval</key>
@@ -23,8 +23,8 @@
     </dict>
 
     <key>StandardOutPath</key>
-    <string>/tmp/stratadash-backup.log</string>
+    <string>/Users/pernelltoney/backups/stratadash/backup.log</string>
     <key>StandardErrorPath</key>
-    <string>/tmp/stratadash-backup.log</string>
+    <string>/Users/pernelltoney/backups/stratadash/backup.log</string>
 </dict>
 </plist>

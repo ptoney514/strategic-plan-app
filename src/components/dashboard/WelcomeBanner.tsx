@@ -61,13 +61,13 @@ export function WelcomeBanner() {
               Welcome back, {firstName}!
             </h2>
             <div className="flex flex-wrap items-center gap-4 text-brand-mint/80 text-sm font-medium">
-              <span className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm">
+              <span className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-xs">
                 <FileText size={16} />
                 <span className="text-white">
                   {isLoading ? '...' : stats?.plan_count || 0} active plans
                 </span>
               </span>
-              <span className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-sm">
+              <span className="flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10 backdrop-blur-xs">
                 <Bell size={16} />
                 <span className="text-white">
                   {isLoading ? '...' : stats?.objective_count || 0} objectives

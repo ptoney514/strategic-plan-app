@@ -60,7 +60,7 @@ export function AddGoalInline({ planId, districtId, parentId, level, onCancel }:
         onBlur={onCancel}
         placeholder={`New ${levelLabels[level] || 'goal'} title...`}
         disabled={createGoal.isPending}
-        className="flex-1 px-3 py-1.5 rounded-md text-sm outline-none"
+        className="flex-1 px-3 py-1.5 rounded-md text-sm outline-hidden"
         style={{
           backgroundColor: 'var(--editorial-bg)',
           border: '1px solid var(--editorial-border)',

@@ -238,7 +238,7 @@ export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, prim
                       e.currentTarget.style.opacity = '1';
                     }}
                   >
-                    <div className="w-8 h-8 rounded-lg text-white flex items-center justify-center text-xs font-bold flex-shrink-0"
+                    <div className="w-8 h-8 rounded-lg text-white flex items-center justify-center text-xs font-bold shrink-0"
                          style={{ backgroundColor: primaryColor }}>
                       {child.goal_number}
                     </div>
@@ -254,14 +254,14 @@ export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, prim
                     </div>
                     {previewWidget && (
                       <span
-                        className="text-xs font-semibold whitespace-nowrap flex-shrink-0"
+                        className="text-xs font-semibold whitespace-nowrap shrink-0"
                         style={{ color: 'var(--editorial-text-secondary)' }}
                       >
                         {formatValue(previewWidget.config)} · {getTypeLabel(previewWidget.type)}
                       </span>
                     )}
                     <ChevronRight
-                      className="w-4 h-4 flex-shrink-0"
+                      className="w-4 h-4 shrink-0"
                       style={{ color: 'var(--editorial-text-secondary)' }}
                     />
                   </Link>

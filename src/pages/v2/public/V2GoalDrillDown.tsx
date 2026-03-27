@@ -93,7 +93,7 @@ export function V2GoalDrillDown() {
       <div className="space-y-3">
         <div className="flex items-start gap-4">
           <div
-            className="flex items-center justify-center rounded-xl font-bold text-lg text-white flex-shrink-0"
+            className="flex items-center justify-center rounded-xl font-bold text-lg text-white shrink-0"
             style={{
               width: 48,
               height: 48,

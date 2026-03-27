@@ -130,7 +130,7 @@ export function InviteUserModal({ isOpen, onClose }: InviteUserModalProps) {
             <select
               value={selectedDistrict}
               onChange={(e) => setSelectedDistrict(e.target.value)}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2"
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-hidden focus:ring-2"
               style={{
                 backgroundColor: 'var(--editorial-bg)',
                 borderColor: 'var(--editorial-border)',

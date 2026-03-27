@@ -59,7 +59,7 @@ export function UserDashboard() {
   } = usePlanGoals(selectedPlanId || '');
 
   // Get user display name
-  const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'User';
+  const displayName = user?.user_metadata?.display_name || user?.name || user?.email?.split('@')[0] || 'User';
   const firstName = displayName.split(' ')[0];
 
   // Get greeting based on time of day

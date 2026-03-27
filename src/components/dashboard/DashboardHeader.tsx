@@ -6,15 +6,15 @@ import { UserAvatarMenu } from '../common/UserAvatarMenu';
 
 // Map routes to page titles
 const routeTitles: Record<string, string> = {
-  '/': 'Home',
-  '/districts': 'Districts',
-  '/plans': 'Strategic Plans',
-  '/objectives': 'Objectives & Goals',
-  '/metrics': 'Metrics',
-  '/dashboards': 'Dashboards',
-  '/reports': 'Reports',
-  '/invite': 'Invite Teammates',
-  '/help': 'Help & Support',
+  '/dashboard': 'Home',
+  '/dashboard/districts': 'Districts',
+  '/dashboard/plans': 'Strategic Plans',
+  '/dashboard/objectives': 'Objectives & Goals',
+  '/dashboard/metrics': 'Metrics',
+  '/dashboard/dashboards': 'Dashboards',
+  '/dashboard/reports': 'Reports',
+  '/dashboard/invite': 'Invite Teammates',
+  '/dashboard/help': 'Help & Support',
 };
 
 export function DashboardHeader() {

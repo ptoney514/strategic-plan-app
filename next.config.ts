@@ -2,7 +2,7 @@ import type { NextConfig } from 'next'
 import path from 'path'
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['*.lvh.me'],
+  allowedDevOrigins: ['*.lvh.me', 'lvh.me'],
   turbopack: {
     root: path.resolve(__dirname),
     resolveAlias: {

@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 
 const V2OnboardingWizard = dynamic(
-  () => import('@/pages/v2/onboarding/V2OnboardingWizard').then((m) => ({ default: m.V2OnboardingWizard })),
+  () => import('@/views/v2/onboarding/V2OnboardingWizard').then((m) => ({ default: m.V2OnboardingWizard })),
   { ssr: false }
 )
 

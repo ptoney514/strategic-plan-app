@@ -36,11 +36,6 @@ const nextConfig: NextConfig = {
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
     },
   },
-  // Custom pageExtensions: App Router files use `.next.tsx`/`.next.ts` convention,
-  // which prevents src/pages/*.tsx component files and *.test.tsx test files from
-  // being accidentally treated as Pages Router routes.
-  // In Phase 3, when src/pages/ is removed, this can be reverted to standard extensions.
-  pageExtensions: ['next.tsx', 'next.ts', 'next.jsx', 'next.js'],
   // Security headers (from current vercel.json)
   async headers() {
     return [

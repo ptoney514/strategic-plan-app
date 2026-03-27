@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 
 const V2AdminDashboard = dynamic(
-  () => import('@/pages/v2/admin/V2AdminDashboard').then((m) => ({ default: m.V2AdminDashboard })),
+  () => import('@/views/v2/admin/V2AdminDashboard').then((m) => ({ default: m.V2AdminDashboard })),
   { ssr: false }
 )
 

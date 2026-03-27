@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 
 const V2WidgetBuilder = dynamic(
-  () => import('@/pages/v2/admin/V2WidgetBuilder').then((m) => ({ default: m.V2WidgetBuilder })),
+  () => import('@/views/v2/admin/V2WidgetBuilder').then((m) => ({ default: m.V2WidgetBuilder })),
   { ssr: false }
 )
 

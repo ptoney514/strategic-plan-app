@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 
 const V2PlanEditor = dynamic(
-  () => import('@/pages/v2/admin/V2PlanEditor').then((m) => ({ default: m.V2PlanEditor })),
+  () => import('@/views/v2/admin/V2PlanEditor').then((m) => ({ default: m.V2PlanEditor })),
   { ssr: false }
 )
 

@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 
 const V2Import = dynamic(
-  () => import('@/pages/v2/admin/V2Import').then((m) => ({ default: m.V2Import })),
+  () => import('@/views/v2/admin/V2Import').then((m) => ({ default: m.V2Import })),
   { ssr: false }
 )
 

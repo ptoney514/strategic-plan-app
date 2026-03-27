@@ -1,5 +1,5 @@
 // Empty module stub for test-only packages that get accidentally compiled
-// by Next.js when test files in src/pages/**/__tests__/ are treated as pages.
+// by Next.js when test files in src/views/**/__tests__/ are treated as pages.
 // This is a scaffold limitation that will be resolved in Phase 3.
 
 /* eslint-disable @typescript-eslint/no-explicit-any */

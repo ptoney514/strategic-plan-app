@@ -2,7 +2,7 @@
 import dynamic from 'next/dynamic'
 
 const V2GoalDrillDown = dynamic(
-  () => import('@/pages/v2/public/V2GoalDrillDown').then((m) => ({ default: m.V2GoalDrillDown })),
+  () => import('@/views/v2/public/V2GoalDrillDown').then((m) => ({ default: m.V2GoalDrillDown })),
   { ssr: false }
 )
 

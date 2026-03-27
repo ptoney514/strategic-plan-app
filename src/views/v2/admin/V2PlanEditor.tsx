@@ -1,6 +1,6 @@
 'use client'
 import { useState, useMemo } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useParams, useRouter } from 'next/navigation';
 import { Plus, FileText } from 'lucide-react';
 import { useSubdomain } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
@@ -17,7 +17,8 @@ export function V2PlanEditor() {
   const router = useRouter();
   const [showAddRoot, setShowAddRoot] = useState(false);
 
-  const planIdParam = searchParams.get('planId');
+  const params = useParams<{ planId?: string }>();
+  const planIdParam = params.planId || searchParams.get('planId');
 
   const selectedPlanId = useMemo(() => {
     if (planIdParam && plans?.some((p) => p.id === planIdParam)) return planIdParam;

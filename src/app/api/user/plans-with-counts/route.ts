@@ -90,7 +90,7 @@ export async function GET(request: Request) {
     // Combine plan data with objective counts
     const result = rows.map((p) => ({
       ...planToSnake(p),
-      objective_count: countMap.get(p.id) ?? 0,
+      objectiveCount: countMap.get(p.id) ?? 0,
     }));
 
     return jsonOk(result);

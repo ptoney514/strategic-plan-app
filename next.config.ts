@@ -2,6 +2,7 @@ import type { NextConfig } from 'next'
 import path from 'path'
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ['*.lvh.me'],
   turbopack: {
     root: path.resolve(__dirname),
     resolveAlias: {
@@ -53,8 +54,9 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.userjot.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' data:; connect-src 'self' https://*.neon.tech https://*.sentry.io https://o*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
+            value: process.env.NODE_ENV === 'development'
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.userjot.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' data:; connect-src 'self' https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com wss: ws:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+              : "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.userjot.com; style-src 'self' 'unsafe-inline'; img-src 'self' https: data: blob:; font-src 'self' data:; connect-src 'self' https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },

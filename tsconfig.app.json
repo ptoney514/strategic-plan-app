@@ -33,5 +33,5 @@
     /* Next.js plugin */
     "plugins": [{ "name": "next" }]
   },
-  "include": ["src", "middleware.ts", "next.config.ts"]
+  "include": ["src", "next.config.ts"]
 }

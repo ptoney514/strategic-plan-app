@@ -17,7 +17,7 @@ import { drizzle } from "drizzle-orm/neon-http";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sql, count } from "drizzle-orm";
-import * as schema from "../api/lib/schema/index.js";
+import * as schema from "../_api/lib/schema/index.js";
 
 // Abort early if DATABASE_URL points to production
 guardAgainstProduction();

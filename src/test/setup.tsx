@@ -7,6 +7,31 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SubdomainProvider } from '../contexts/SubdomainContext';
 
+// Mock next/navigation for tests (App Router context is not available in Vitest)
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => ({
+    get: vi.fn().mockReturnValue(null),
+    toString: vi.fn().mockReturnValue(''),
+  }),
+  usePathname: () => '/',
+}));
+
+// Mock next/link for tests
+vi.mock('next/link', () => ({
+  default: ({ href, children, ...props }: { href: string; children: ReactNode; [key: string]: unknown }) => (
+    <a href={href} {...(props as object)}>{children}</a>
+  ),
+}));
+
 // Extend Vitest's expect with jest-dom matchers
 expect.extend(matchers);
 
@@ -15,25 +40,29 @@ afterEach(() => {
   cleanup();
 });
 
-// Mock ResizeObserver for Recharts ResponsiveContainer
-global.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
-};
+// Mock ResizeObserver for Recharts ResponsiveContainer (browser-only)
+if (typeof global !== 'undefined' && !global.ResizeObserver) {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
 
-// Mock window.location for subdomain detection
-Object.defineProperty(window, 'location', {
-  value: {
-    hostname: 'localhost',
-    port: '5173',
-    protocol: 'http:',
-    search: '',
-    pathname: '/',
-    href: 'http://localhost:5173/',
-  },
-  writable: true,
-});
+// Mock window.location for subdomain detection (browser-only)
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'location', {
+    value: {
+      hostname: 'localhost',
+      port: '5173',
+      protocol: 'http:',
+      search: '',
+      pathname: '/',
+      href: 'http://localhost:5173/',
+    },
+    writable: true,
+  });
+}
 
 // Create a query client for tests
 function createTestQueryClient() {

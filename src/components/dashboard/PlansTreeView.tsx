@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { MessageSquareText, MoreHorizontal, Plus, ChevronRight, X, Target } from 'lucide-react';
 import type { PlanWithSummary, HierarchicalGoal } from '../../lib/types';
 import { cn } from '../../lib/utils';
@@ -96,7 +96,7 @@ function ObjectiveItem({
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4">
               <Link
-                to={`/objectives/${goal.id}`}
+                href={`/objectives/${goal.id}`}
                 className="text-sm font-medium text-slate-900 leading-snug hover:text-brand-teal transition-colors"
               >
                 {goal.title}

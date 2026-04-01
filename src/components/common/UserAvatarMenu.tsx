@@ -1,5 +1,6 @@
+'use client'
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { LogOut, Building2, Shield, Moon, Sun, Monitor, Check } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -32,7 +33,7 @@ interface UserAvatarMenuProps {
 export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
   const { user, logout, isSystemAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
-  const navigate = useNavigate();
+  const router = useRouter();
   const [adminDistricts, setAdminDistricts] = useState<AdminDistrict[]>([]);
   const [loadingDistricts, setLoadingDistricts] = useState(true);
 
@@ -79,7 +80,7 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
   const handleLogout = async () => {
     try {
       await logout();
-      navigate('/');
+      router.push('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }

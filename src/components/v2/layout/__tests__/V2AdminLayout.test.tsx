@@ -54,15 +54,6 @@ vi.mock('@/lib/auth-client', () => ({
   },
 }));
 
-// Mock Outlet
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    Outlet: () => <div data-testid="outlet">Outlet Content</div>,
-  };
-});
-
 describe('V2AdminLayout', () => {
   it('renders the sidebar with district name', () => {
     render(<V2AdminLayout />);
@@ -82,7 +73,7 @@ describe('V2AdminLayout', () => {
   });
 
   it('renders the main content area with Outlet', () => {
-    render(<V2AdminLayout />);
+    render(<V2AdminLayout><div data-testid="outlet">Outlet Content</div></V2AdminLayout>);
 
     expect(screen.getByTestId('outlet')).toBeInTheDocument();
   });

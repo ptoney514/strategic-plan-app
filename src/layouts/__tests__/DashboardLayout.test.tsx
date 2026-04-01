@@ -2,17 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '../../test/setup';
 import { DashboardLayout } from '../DashboardLayout';
 
-// Mock react-router-dom
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useLocation: () => ({ pathname: '/' }),
-    useNavigate: () => vi.fn(),
-    Outlet: () => <div data-testid="outlet">Page Content</div>,
-  };
-});
-
 // Mock useAuth
 vi.mock('../../contexts/AuthContext', () => ({
   useAuth: () => ({
@@ -53,7 +42,7 @@ vi.mock('../../lib/subdomain', () => ({
 
 describe('DashboardLayout', () => {
   it('renders the layout structure', () => {
-    render(<DashboardLayout basePath="/" />);
+    render(<DashboardLayout basePath="/"><div data-testid="outlet">Page Content</div></DashboardLayout>);
 
     // Should render sidebar
     expect(screen.getByRole('complementary')).toBeInTheDocument();
@@ -66,7 +55,7 @@ describe('DashboardLayout', () => {
   });
 
   it('renders main element with relative positioning', () => {
-    render(<DashboardLayout basePath="/" />);
+    render(<DashboardLayout basePath="/"><div data-testid="outlet">Page Content</div></DashboardLayout>);
 
     // Find main element by looking for the outlet container's parent
     const outlet = screen.getByTestId('outlet');
@@ -93,7 +82,7 @@ describe('DashboardLayout', () => {
 
 describe('DashboardLayout gradient positioning', () => {
   it('has relative positioning on main for absolute gradient child', () => {
-    render(<DashboardLayout basePath="/" />);
+    render(<DashboardLayout basePath="/"><div data-testid="outlet">Page Content</div></DashboardLayout>);
 
     // The main element needs relative positioning so the absolute gradient
     // is properly contained within it

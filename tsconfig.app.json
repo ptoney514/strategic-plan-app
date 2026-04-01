@@ -13,7 +13,7 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
 
     /* Linting */
     "strict": true,
@@ -26,8 +26,12 @@
     /* Path aliases (must match vitest.config.ts resolve.alias) */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
-    }
+      "@/*": ["./src/*"],
+      "@api/*": ["./_api/*"]
+    },
+
+    /* Next.js plugin */
+    "plugins": [{ "name": "next" }]
   },
-  "include": ["src"]
+  "include": ["src", "next.config.ts"]
 }

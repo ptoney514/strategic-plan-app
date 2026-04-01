@@ -2,16 +2,6 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '../../../test/setup';
 import { DashboardHeader } from '../DashboardHeader';
 
-// Mock react-router-dom
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useLocation: () => ({ pathname: '/' }),
-    useNavigate: () => vi.fn(),
-  };
-});
-
 // Mock useAuth
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({

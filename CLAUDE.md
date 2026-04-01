@@ -4,21 +4,22 @@ A comprehensive strategic planning system for educational districts to manage go
 
 ## Project Overview
 
-Modern web application built with Vite + React for educational district strategic planning. Enables districts to create hierarchical goals, track metrics, and monitor progress toward strategic objectives.
+Modern web application built with Next.js + React for educational district strategic planning. Enables districts to create hierarchical goals, track metrics, and monitor progress toward strategic objectives.
 
 ## Tech Stack
 
+- **Framework**: Next.js 16 (App Router, Turbopack/Webpack)
 - **Frontend**: React 19 + TypeScript
-- **Build Tool**: Vite 6.x
 - **Styling**: Tailwind CSS 4.x
 - **State Management**: Zustand (client state), React Query (server state)
-- **Routing**: React Router v6
+- **Routing**: Next.js App Router (file-system based) + middleware for subdomain detection
 - **Database**: Neon (PostgreSQL)
 - **ORM**: Drizzle ORM
 - **Authentication**: Better Auth
-- **API**: Vercel Serverless Functions (Node.js runtime)
+- **API**: Next.js Route Handlers (in src/app/api/)
 - **Charts**: Recharts
 - **Testing**: Vitest + Testing Library
+- **Legacy Fallback**: Vite 6.x (dev:vite, build:vite scripts preserved)
 
 ## Architecture Overview
 

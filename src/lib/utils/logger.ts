@@ -15,7 +15,7 @@
  * ```
  */
 
-const isDev = import.meta.env.DEV;
+const isDev = process.env.NODE_ENV === 'development';
 
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 

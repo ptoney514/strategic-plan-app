@@ -1,5 +1,8 @@
+'use client'
 import { useState } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Shield,
   LayoutDashboard,
@@ -30,16 +33,16 @@ const externalTools = [
   { name: 'Google Analytics', url: 'https://analytics.google.com' },
 ];
 
-export function SystemAdminEditorialLayout() {
-  const location = useLocation();
+export function SystemAdminEditorialLayout({ children }: { children?: ReactNode }) {
+  const pathname = usePathname();
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isActiveRoute = (path: string) => {
     if (path === '/') {
-      return location.pathname === '/';
+      return pathname === '/';
     }
-    return location.pathname.startsWith(path);
+    return (pathname ?? '').startsWith(path);
   };
 
   return (
@@ -66,7 +69,7 @@ export function SystemAdminEditorialLayout() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
           <Link
-            to="/"
+            href="/"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               isActiveRoute('/')
                 ? 'bg-[#333333] text-white'
@@ -78,7 +81,7 @@ export function SystemAdminEditorialLayout() {
           </Link>
 
           <Link
-            to="/districts"
+            href="/districts"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               isActiveRoute('/districts')
                 ? 'bg-[#333333] text-white'
@@ -90,7 +93,7 @@ export function SystemAdminEditorialLayout() {
           </Link>
 
           <Link
-            to="/users"
+            href="/users"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               isActiveRoute('/users')
                 ? 'bg-[#333333] text-white'
@@ -102,7 +105,7 @@ export function SystemAdminEditorialLayout() {
           </Link>
 
           <Link
-            to="/contacts"
+            href="/contacts"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               isActiveRoute('/contacts')
                 ? 'bg-[#333333] text-white'
@@ -114,7 +117,7 @@ export function SystemAdminEditorialLayout() {
           </Link>
 
           <Link
-            to="/settings"
+            href="/settings"
             className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
               isActiveRoute('/settings')
                 ? 'bg-[#333333] text-white'
@@ -209,7 +212,7 @@ export function SystemAdminEditorialLayout() {
 
         {/* Page Content */}
         <main className="flex-1 overflow-auto">
-          <Outlet />
+          {children}
         </main>
 
         {/* Footer */}
@@ -255,7 +258,7 @@ export function SystemAdminEditorialLayout() {
             {/* Mobile Navigation */}
             <nav className="flex-1 overflow-y-auto p-3 space-y-1">
               <Link
-                to="/"
+                href="/"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActiveRoute('/')
@@ -268,7 +271,7 @@ export function SystemAdminEditorialLayout() {
               </Link>
 
               <Link
-                to="/districts"
+                href="/districts"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActiveRoute('/districts')
@@ -281,7 +284,7 @@ export function SystemAdminEditorialLayout() {
               </Link>
 
               <Link
-                to="/users"
+                href="/users"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActiveRoute('/users')
@@ -294,7 +297,7 @@ export function SystemAdminEditorialLayout() {
               </Link>
 
               <Link
-                to="/contacts"
+                href="/contacts"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActiveRoute('/contacts')
@@ -307,7 +310,7 @@ export function SystemAdminEditorialLayout() {
               </Link>
 
               <Link
-                to="/settings"
+                href="/settings"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActiveRoute('/settings')

@@ -1,5 +1,6 @@
+'use client'
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Plus, Trash2, ExternalLink } from 'lucide-react';
 import type { HierarchicalGoal } from '../../../lib/types';
 import { useUpdateGoal, useDeleteGoal } from '../../../hooks/v2/useGoals';
@@ -31,7 +32,7 @@ const INDENT: Record<number, string> = {
 };
 
 export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
-  const navigate = useNavigate();
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(goal.title);
   const [showAddChild, setShowAddChild] = useState(false);
@@ -145,7 +146,7 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
 
         {/* Detail page link */}
         <button
-          onClick={() => navigate(`/admin/goals/${goal.id}`)}
+          onClick={() => router.push(`/admin/goals/${goal.id}`)}
           className="opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity"
           style={{ color: 'var(--editorial-text-secondary)' }}
           title="View goal details"

@@ -27,6 +27,11 @@ const ADMIN_SUBDOMAINS = ['admin'];
  * Get subdomain information from the current hostname
  */
 export function getSubdomainInfo(): SubdomainInfo {
+  // SSR guard: return root type during server-side rendering
+  if (typeof window === 'undefined') {
+    return { type: 'root', slug: null, hostname: '' };
+  }
+
   const hostname = window.location.hostname;
 
   // Handle localhost development with query param fallback
@@ -110,6 +115,7 @@ export function getSubdomainInfo(): SubdomainInfo {
  * Check if running in local development
  */
 export function isLocalDev(): boolean {
+  if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname;
   return hostname === 'localhost' ||
          hostname === '127.0.0.1' ||
@@ -120,6 +126,7 @@ export function isLocalDev(): boolean {
  * Check if running on a Vercel preview deployment
  */
 export function isVercelPreview(): boolean {
+  if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname;
   return hostname.includes('vercel.app') && !hostname.includes('strategic-plan-app.vercel.app');
 }
@@ -128,6 +135,11 @@ export function isVercelPreview(): boolean {
  * Get the base URL for a given subdomain type
  */
 export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
+  if (typeof window === 'undefined') {
+    if (type === 'admin') return 'https://admin.stratadash.org';
+    if (type === 'district' && slug) return `https://${slug}.stratadash.org`;
+    return 'https://stratadash.org';
+  }
   if (isLocalDev()) {
     const port = window.location.port ? `:${window.location.port}` : '';
     const protocol = window.location.protocol;
@@ -163,6 +175,7 @@ export function getSubdomainUrl(type: SubdomainType, slug?: string): string {
  * Check if subdomain is simulated via query param (localhost or Vercel preview)
  */
 export function isQueryParamSubdomain(): boolean {
+  if (typeof window === 'undefined') return false;
   const hostname = window.location.hostname;
   // localhost/127.0.0.1 (not lvh.me which uses real subdomains)
   if ((hostname === 'localhost' || hostname === '127.0.0.1') && !hostname.includes('lvh.me')) {
@@ -232,6 +245,12 @@ export function buildDistrictPathWithQueryParam(
 export function buildSubdomainUrlWithPath(type: SubdomainType, path: string = '', slug?: string): string {
   // Ensure path starts with /
   const normalizedPath = path && !path.startsWith('/') ? `/${path}` : path;
+
+  if (typeof window === 'undefined') {
+    if (type === 'admin') return `https://admin.stratadash.org${normalizedPath}`;
+    if (type === 'district' && slug) return `https://${slug}.stratadash.org${normalizedPath}`;
+    return `https://stratadash.org${normalizedPath}`;
+  }
 
   if (isLocalDev()) {
     const port = window.location.port ? `:${window.location.port}` : '';

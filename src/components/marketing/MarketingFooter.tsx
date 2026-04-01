@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Icon } from '@iconify/react';
 
 export function MarketingFooter() {
@@ -91,7 +91,7 @@ export function MarketingFooter() {
             <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Company</h4>
             <ul className="space-y-2 text-sm text-indigo-500">
               <li>
-                <Link to="/about" className="hover:text-blue-600 transition-colors">
+                <Link href="/about" className="hover:text-blue-600 transition-colors">
                   About Us
                 </Link>
               </li>
@@ -99,7 +99,7 @@ export function MarketingFooter() {
                 <span className="cursor-default">Careers</span>
               </li>
               <li>
-                <Link to="/privacy" className="hover:text-blue-600 transition-colors">
+                <Link href="/privacy" className="hover:text-blue-600 transition-colors">
                   Legal
                 </Link>
               </li>

@@ -1,0 +1,232 @@
+@import 'tailwindcss';
+
+@source "../../src";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: Inter, system-ui, sans-serif;
+  --font-display: Sora, system-ui, sans-serif;
+
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+
+  --color-card: var(--color-card);
+  --color-card-foreground: var(--color-card-foreground);
+
+  --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+
+  --color-muted: var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+
+  --color-border: var(--color-border);
+  --color-input: var(--color-input);
+  --color-ring: var(--color-ring);
+
+  --color-district-red: #b91c1c;
+  --color-district-red-light: #fee2e2;
+  --color-district-blue: #2563eb;
+  --color-district-blue-light: #dbeafe;
+  --color-district-green: #059669;
+  --color-district-green-light: #d1fae5;
+  --color-district-amber: #d97706;
+  --color-district-amber-light: #fef3c7;
+
+  --color-brand-bg: #0b0b12;
+  --color-brand-ink: #061427;
+  --color-brand-navy: #0b1f3a;
+  --color-brand-slate: #0f172a;
+  --color-brand-deepTeal: #1a6f73;
+  --color-brand-teal: #22b8ae;
+  --color-brand-mint: #36d7c3;
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
+}
+
+/* Custom theme variables */
+:root {
+  /* Light mode colors */
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(222.2 84% 4.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(222.2 84% 4.9%);
+  --color-primary: hsl(222.2 47.4% 11.2%);
+  --color-primary-foreground: hsl(210 40% 98%);
+  --color-secondary: hsl(210 40% 96.1%);
+  --color-secondary-foreground: hsl(222.2 47.4% 11.2%);
+  --color-muted: hsl(210 40% 96.1%);
+  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
+  --color-border: hsl(214.3 31.8% 91.4%);
+  --color-input: hsl(214.3 31.8% 91.4%);
+  --color-ring: hsl(222.2 84% 4.9%);
+
+  /* Radius variables */
+  --radius: 0.5rem;
+
+  /* Editorial palette */
+  --editorial-bg: #faf9f7;
+  --editorial-surface: #ffffff;
+  --editorial-surface-alt: #f5f3ef;
+  --editorial-border: #e8e6e1;
+  --editorial-border-light: #f0eee9;
+  --editorial-text-primary: #1a1a1a;
+  --editorial-text-secondary: #4a4a4a;
+  --editorial-text-muted: #8a8a8a;
+  --editorial-text-light: #6a6a6a;
+  --editorial-accent-primary: #b85c38;
+  --editorial-accent-primary-hover: #a04d2d;
+  --editorial-accent-secondary: #c9a227;
+  --editorial-accent-success: #6b8f71;
+  --editorial-accent-link: #4a6fa5;
+  --editorial-sidebar-bg: #1a1a1a;
+  --editorial-sidebar-hover: #2a2a2a;
+  --editorial-sidebar-text: #e8e6e1;
+  --editorial-sidebar-text-muted: #8a8a8a;
+  --editorial-sidebar-active: #b85c38;
+}
+
+.dark {
+  /* Dark mode colors */
+  --color-background: hsl(222.2 84% 4.9%);
+  --color-foreground: hsl(210 40% 98%);
+  --color-card: hsl(222.2 84% 4.9%);
+  --color-card-foreground: hsl(210 40% 98%);
+  --color-primary: hsl(210 40% 98%);
+  --color-primary-foreground: hsl(222.2 47.4% 11.2%);
+  --color-secondary: hsl(217.2 32.6% 17.5%);
+  --color-secondary-foreground: hsl(210 40% 98%);
+  --color-muted: hsl(217.2 32.6% 17.5%);
+  --color-muted-foreground: hsl(215 20.2% 65.1%);
+  --color-border: hsl(217.2 32.6% 17.5%);
+  --color-input: hsl(217.2 32.6% 17.5%);
+  --color-ring: hsl(212.7 26.8% 83.9%);
+}
+
+/* Base styles — Tailwind's preflight handles resets, only add overrides */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Smooth scroll target highlight transition */
+[id^="goal-"] {
+  transition: box-shadow 0.3s ease-out, outline 0.3s ease-out;
+}
+
+/* Shimmer animation for progress bars */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Modal animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@utility animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+@utility animate-fadeIn {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@utility animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Pulse glow animations for highlighted goals - color variants */
+
+/* Red glow */
+@keyframes pulse-glow-red {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.4), 0 0 20px rgba(185, 28, 28, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(185, 28, 28, 0.2), 0 0 30px rgba(185, 28, 28, 0.2); }
+}
+
+/* Blue glow */
+@keyframes pulse-glow-blue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4), 0 0 20px rgba(37, 99, 235, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.2), 0 0 30px rgba(37, 99, 235, 0.2); }
+}
+
+/* Amber glow */
+@keyframes pulse-glow-amber {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.4), 0 0 20px rgba(217, 119, 6, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.2), 0 0 30px rgba(217, 119, 6, 0.2); }
+}
+
+/* Green glow */
+@keyframes pulse-glow-green {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.4), 0 0 20px rgba(22, 163, 74, 0.3); }
+  30%, 60% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0.2), 0 0 30px rgba(22, 163, 74, 0.2); }
+}
+
+.goal-highlight-pulse-red {
+  animation: pulse-glow-red 2.5s ease-out forwards;
+  border-radius: 12px;
+}
+
+.goal-highlight-pulse-blue {
+  animation: pulse-glow-blue 2.5s ease-out forwards;
+  border-radius: 12px;
+}
+
+.goal-highlight-pulse-amber {
+  animation: pulse-glow-amber 2.5s ease-out forwards;
+  border-radius: 12px;
+}
+
+.goal-highlight-pulse-green {
+  animation: pulse-glow-green 2.5s ease-out forwards;
+  border-radius: 12px;
+}

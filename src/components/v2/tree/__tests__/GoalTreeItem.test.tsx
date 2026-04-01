@@ -4,15 +4,21 @@ import userEvent from '@testing-library/user-event';
 import { GoalTreeItem } from '../GoalTreeItem';
 import type { HierarchicalGoal } from '@/lib/types';
 
-// Mock navigate
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+// Mock next/navigation router
+const mockPush = vi.fn();
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: mockPush,
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({}),
+  useSearchParams: () => ({ get: vi.fn().mockReturnValue(null), toString: vi.fn().mockReturnValue('') }),
+  usePathname: () => '/',
+}));
 
 // Mock the goal hooks
 const mockUpdateMutate = vi.fn();
@@ -196,6 +202,6 @@ describe('GoalTreeItem', () => {
     render(<GoalTreeItem goal={makeGoal()} {...defaultProps} />);
 
     await user.click(screen.getByTitle('View goal details'));
-    expect(mockNavigate).toHaveBeenCalledWith('/admin/goals/goal-1');
+    expect(mockPush).toHaveBeenCalledWith('/admin/goals/goal-1');
   });
 });

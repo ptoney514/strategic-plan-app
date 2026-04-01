@@ -1,4 +1,6 @@
-import { Link, useLocation } from 'react-router-dom';
+'use client'
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Home,
   Building2,
@@ -53,7 +55,7 @@ interface DashboardSidebarProps {
 }
 
 export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
-  const location = useLocation();
+  const location = { pathname: usePathname() ?? '/' };
   const { type: subdomainType, slug: currentSlug } = useSubdomain();
   const { data: currentDistrict, isLoading: isDistrictLoading } = useDistrict(currentSlug || '');
   const { data: districts, isLoading: isDistrictsLoading } = useUserDistricts();
@@ -101,7 +103,7 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
         )
       ) : (
         <div className="h-[72px] flex items-center px-6 border-b border-slate-700/50">
-          <Link to={basePath} className="flex items-center gap-3 group">
+          <Link href={basePath} className="flex items-center gap-3 group">
             <img
               src={LOGO_URL}
               alt="StrataDASH"
@@ -121,7 +123,7 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
           {mainNavItems.map((item) => (
             <li key={item.path}>
               <Link
-                to={getHref(item.path)}
+                href={getHref(item.path)}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
                   isActive(item.path)
@@ -148,7 +150,7 @@ export function DashboardSidebar({ basePath = '/' }: DashboardSidebarProps) {
           {footerNavItems.map((item) => (
             <li key={item.path}>
               <Link
-                to={getHref(item.path)}
+                href={getHref(item.path)}
                 className="flex items-center gap-3 px-3 py-2.5 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all duration-200"
               >
                 <span className="shrink-0">{item.icon}</span>
@@ -218,7 +220,7 @@ function FallbackDistrictHeader({ slug, basePath }: { slug: string; basePath: st
 
   return (
     <div className="h-[72px] flex items-center px-4 border-b border-slate-700/50">
-      <Link to={basePath} className="flex items-center gap-3 group min-w-0">
+      <Link href={basePath} className="flex items-center gap-3 group min-w-0">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold shrink-0 bg-slate-600"
         >
@@ -239,7 +241,7 @@ function FallbackDistrictHeader({ slug, basePath }: { slug: string; basePath: st
 function StaticDistrictHeader({ district, basePath }: { district: District; basePath: string }) {
   return (
     <div className="h-[72px] flex items-center px-4 border-b border-slate-700/50">
-      <Link to={basePath} className="flex items-center gap-3 group min-w-0">
+      <Link href={basePath} className="flex items-center gap-3 group min-w-0">
         <DistrictAvatar district={district} />
         <div className="min-w-0 flex-1">
           <div className="font-semibold text-white text-sm truncate">{district.name}</div>

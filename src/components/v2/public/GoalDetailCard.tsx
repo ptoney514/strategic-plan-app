@@ -118,7 +118,7 @@ export function GoalDetailCard({
             </p>
           )}
         </div>
-        <GoalStatusBadge status={goal.status} className="shrink-0 ml-2" />
+        <GoalStatusBadge status={goal.status} className="shrink-0 ml-2 !text-[10px] !px-2.5 !py-0.5" />
       </div>
 
       {/* Zone 2: KPI + Chart */}
@@ -126,8 +126,8 @@ export function GoalDetailCard({
         <div className="flex max-sm:flex-col" style={{ minHeight: 180 }}>
           {/* KPI Panel */}
           <div
-            className="flex flex-col justify-center p-6 max-sm:p-4 max-sm:border-b sm:border-r sm:w-[280px] sm:shrink-0"
-            style={{ borderColor: 'var(--editorial-border-light, #f0eee9)' }}
+            className="flex flex-col justify-center p-6 max-sm:p-4 sm:w-[280px] sm:shrink-0"
+            style={{ borderRight: '1px solid var(--editorial-border-light, #f0eee9)' }}
           >
             {config!.indicatorText && (
               <span
@@ -150,12 +150,17 @@ export function GoalDetailCard({
             >
               {getTypeLabel(primaryWidget!.type)}
             </div>
-            <div
-              className="text-[44px] font-bold leading-none"
-              style={{ color: 'var(--editorial-text-primary)' }}
-            >
-              {formatValue(config!)}
-            </div>
+            {(() => {
+              const kpiText = formatValue(config!);
+              return (
+                <div
+                  className={`${kpiText.length > 5 ? 'text-[28px]' : 'text-[44px]'} font-bold leading-none`}
+                  style={{ color: 'var(--editorial-text-primary)' }}
+                >
+                  {kpiText}
+                </div>
+              );
+            })()}
             <div className="mt-3 flex flex-col gap-1">
               {config!.target !== undefined && (
                 <div className="text-[13px]" style={{ color: 'var(--editorial-text-secondary)' }}>
@@ -167,6 +172,15 @@ export function GoalDetailCard({
                   Baseline: {config!.baseline}{config!.unit === '%' ? '%' : config!.unit ? ` ${config!.unit}` : ''}
                 </div>
               )}
+              {config!.value !== undefined && config!.baseline !== undefined && (() => {
+                const delta = config!.value! - config!.baseline!;
+                const isPositive = delta >= 0;
+                return (
+                  <div className="text-[13px] font-medium" style={{ color: isPositive ? '#16a34a' : '#dc2626' }}>
+                    {isPositive ? '▲' : '▼'} {Math.abs(delta).toFixed(1)}{config!.unit === '%' ? '%' : ''} from baseline
+                  </div>
+                );
+              })()}
               {goal.owner_name && (
                 <div
                   className="text-[11px] mt-1"
@@ -179,8 +193,8 @@ export function GoalDetailCard({
           </div>
 
           {/* Chart Panel */}
-          <div className="flex-1 p-6 max-sm:p-4 flex items-center">
-            <div className="w-full min-h-[140px] sm:min-h-[180px]">
+          <div className="flex-1 p-6 max-sm:p-4 flex items-center justify-center">
+            <div className={`w-full ${['donut', 'big-number', 'progress-bar'].includes(primaryWidget!.type) ? 'max-w-[300px]' : ''} min-h-[140px] sm:min-h-[180px]`}>
               <WidgetChart widget={primaryWidget!} />
             </div>
           </div>

@@ -6,9 +6,11 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
 import type { WidgetConfig } from '../../../../lib/types/v2';
+import { ChartTooltip } from '../ChartTooltip';
 
 interface BarChartWidgetProps {
   config: WidgetConfig;
@@ -23,11 +25,9 @@ export function BarChartWidget({ config }: BarChartWidgetProps) {
   const legendLabels = config.legend ?? [];
   const colors = config.colors ?? DEFAULT_COLORS;
 
-  // Determine the number of series from the first dataPoint with values
   const firstWithValues = dataPoints.find((dp) => dp.values && dp.values.length > 0);
   const seriesCount = firstWithValues?.values?.length ?? 1;
 
-  // Transform data for Recharts
   const chartData = dataPoints.map((dp) => {
     const entry: Record<string, string | number> = { label: dp.label };
     if (dp.values) {
@@ -44,16 +44,34 @@ export function BarChartWidget({ config }: BarChartWidgetProps) {
     <div className="w-full h-48">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--editorial-border, #e5e7eb)" />
+          <CartesianGrid
+            stroke="#f0eee9"
+            strokeWidth={0.5}
+            vertical={false}
+          />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 12, fill: 'var(--editorial-text-secondary, #6b7280)' }}
+            tick={{ fontSize: 9, fill: '#b0b0b0' }}
+            axisLine={false}
+            tickLine={false}
+            interval="preserveStartEnd"
           />
           <YAxis
-            tick={{ fontSize: 12, fill: 'var(--editorial-text-secondary, #6b7280)' }}
+            tick={{ fontSize: 9, fill: '#b0b0b0' }}
+            axisLine={false}
+            tickLine={false}
+            tickCount={4}
           />
-          <Tooltip />
-          {legendLabels.length > 0 && <Legend />}
+          <Tooltip content={<ChartTooltip />} />
+          {config.target !== undefined && (
+            <ReferenceLine
+              y={config.target}
+              stroke={colors[0] || DEFAULT_COLORS[0]}
+              strokeDasharray="4 4"
+              strokeOpacity={0.4}
+            />
+          )}
+          {legendLabels.length >= 2 && <Legend />}
           {Array.from({ length: seriesCount }, (_, i) => (
             <Bar
               key={i}

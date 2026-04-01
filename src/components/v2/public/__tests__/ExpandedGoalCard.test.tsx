@@ -27,6 +27,7 @@ vi.mock('recharts', () => ({
   CartesianGrid: () => <div />,
   Tooltip: () => <div />,
   Legend: () => <div />,
+  ReferenceLine: () => <div />,
   PieChart: ({ children }: React.PropsWithChildren) => <div data-testid="pie-chart">{children}</div>,
   Pie: () => <div data-testid="pie" />,
   Cell: () => <div />,

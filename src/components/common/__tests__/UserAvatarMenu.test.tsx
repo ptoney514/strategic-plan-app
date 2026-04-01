@@ -62,15 +62,15 @@ describe('UserAvatarMenu', () => {
   });
 
   describe('when user is not authenticated', () => {
-    it('renders nothing when no user', () => {
+    it('still renders avatar button for navigation access', () => {
       mockUseAuth.mockReturnValue({
         user: null,
         logout: mockLogout,
         isSystemAdmin: false,
       });
 
-      const { container } = render(<UserAvatarMenu />);
-      expect(container).toBeEmptyDOMElement();
+      render(<UserAvatarMenu />);
+      expect(screen.getByRole('button', { name: /user menu/i })).toBeInTheDocument();
     });
   });
 

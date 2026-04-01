@@ -5,9 +5,11 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  ReferenceLine,
   ResponsiveContainer,
 } from 'recharts';
 import type { WidgetConfig } from '../../../../lib/types/v2';
+import { ChartTooltip } from '../ChartTooltip';
 
 interface AreaLineWidgetProps {
   config: WidgetConfig;
@@ -30,19 +32,37 @@ export function AreaLineWidget({ config }: AreaLineWidgetProps) {
         <AreaChart data={chartData}>
           <defs>
             <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={accentColor} stopOpacity={0.3} />
-              <stop offset="95%" stopColor={accentColor} stopOpacity={0} />
+              <stop offset="5%" stopColor={accentColor} stopOpacity={0.12} />
+              <stop offset="95%" stopColor={accentColor} stopOpacity={0.01} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--editorial-border, #e5e7eb)" />
+          <CartesianGrid
+            stroke="#f0eee9"
+            strokeWidth={0.5}
+            vertical={false}
+          />
           <XAxis
             dataKey="label"
-            tick={{ fontSize: 12, fill: 'var(--editorial-text-secondary, #6b7280)' }}
+            tick={{ fontSize: 9, fill: '#b0b0b0' }}
+            axisLine={false}
+            tickLine={false}
+            interval="preserveStartEnd"
           />
           <YAxis
-            tick={{ fontSize: 12, fill: 'var(--editorial-text-secondary, #6b7280)' }}
+            tick={{ fontSize: 9, fill: '#b0b0b0' }}
+            axisLine={false}
+            tickLine={false}
+            tickCount={4}
           />
-          <Tooltip />
+          <Tooltip content={<ChartTooltip />} />
+          {config.target !== undefined && (
+            <ReferenceLine
+              y={config.target}
+              stroke={accentColor}
+              strokeDasharray="4 4"
+              strokeOpacity={0.4}
+            />
+          )}
           <Area
             type="monotone"
             dataKey="value"

@@ -2,7 +2,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
-import { useSubdomain } from '../../../contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { usePlansBySlug } from '../../../hooks/v2/usePlans';
 import { useGoalsByPlan } from '../../../hooks/v2/useGoals';
@@ -25,6 +25,7 @@ export function V2GoalDrillDown() {
   const params = useParams<{ goalId: string }>();
   const goalId = Array.isArray(params.goalId) ? params.goalId[0] : params.goalId;
   const { slug } = useSubdomain();
+  const districtLink = useDistrictLink();
   const { data: district } = useDistrict(slug || '');
   const { data: plans } = usePlansBySlug(slug || '');
 
@@ -86,7 +87,7 @@ export function V2GoalDrillDown() {
     <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
       <Breadcrumb
         items={[
-          { label: activePlan?.name || 'Plan', href: '/' },
+          { label: activePlan?.name || 'Plan', href: districtLink('/') },
           { label: goal.goal_number + ' ' + goal.title },
         ]}
       />
@@ -181,6 +182,7 @@ export function V2GoalDrillDown() {
                           subGoalWidgets={subGoalWidgetMap}
                           onClose={() => setExpandedGoalId(null)}
                           primaryColor={district?.primary_color}
+                          buildLink={districtLink}
                         />
                       ) : (
                         <GoalCard

@@ -74,9 +74,10 @@ export interface ExpandedGoalCardProps {
   subGoalWidgets?: Record<string, Widget[]>;
   primaryColor?: string;
   onClose: () => void;
+  buildLink?: (path: string) => string;
 }
 
-export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, primaryColor = '#1e293b', onClose }: ExpandedGoalCardProps) {
+export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, primaryColor = '#1e293b', onClose, buildLink = (p) => p }: ExpandedGoalCardProps) {
   const children = goal.children ?? [];
   const primaryWidget = widgets[0];
   const config = primaryWidget?.config;
@@ -228,7 +229,7 @@ export function ExpandedGoalCard({ goal, widgets = [], subGoalWidgets = {}, prim
                 return (
                   <Link
                     key={child.id}
-                    href={`/goals/${child.id}`}
+                    href={buildLink(`/goals/${child.id}`)}
                     className="flex items-center gap-3 p-3 rounded-lg transition-colors"
                     style={{ backgroundColor: 'var(--editorial-surface-alt, var(--editorial-border))' }}
                     onMouseEnter={(e) => {

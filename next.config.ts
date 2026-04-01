@@ -55,8 +55,8 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: process.env.NODE_ENV === 'development'
-              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.userjot.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com wss: ws:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
-              : "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.userjot.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
+              ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.userjot.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com https://vercel.live wss: ws:; frame-src https://vercel.live; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+              : "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.userjot.com https://vercel.live; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' https: data: blob:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://*.neon.tech https://*.sentry.io https://*.ingest.sentry.io https://*.workers.dev https://cdn.userjot.com https://vercel.live wss:; frame-src https://vercel.live; frame-ancestors 'none'; base-uri 'self'; form-action 'self';",
           },
         ],
       },

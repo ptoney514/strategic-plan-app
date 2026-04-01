@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation';
-import { useSubdomain } from '../../../contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { usePlansBySlug } from '../../../hooks/v2/usePlans';
 import { useGoalsByPlan } from '../../../hooks/v2/useGoals';
@@ -9,6 +9,7 @@ import { ObjectiveCard, Breadcrumb } from '../../../components/v2/public';
 export function V2GoalsOverview() {
   const router = useRouter();
   const { slug } = useSubdomain();
+  const districtLink = useDistrictLink();
   const { data: district } = useDistrict(slug || '');
   const { data: plans, isLoading: plansLoading } = usePlansBySlug(slug || '');
 
@@ -72,7 +73,7 @@ export function V2GoalsOverview() {
               description={goal.description}
               overallProgress={goal.overall_progress}
               progressDisplayMode={goal.overall_progress_display_mode}
-              onClick={() => router.push('/goals/' + goal.id)}
+              onClick={() => router.push(districtLink('/goals/' + goal.id))}
             />
           ))}
         </div>

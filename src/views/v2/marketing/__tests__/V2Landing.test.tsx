@@ -6,42 +6,49 @@ describe('V2Landing', () => {
   it('renders the hero heading', () => {
     render(<V2Landing />);
 
-    expect(screen.getByText(/share your strategic plan with the world/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', {
+        name: /your strategic plan deserves better than a pdf\./i,
+      }),
+    ).toBeInTheDocument();
   });
 
   it('renders hero description', () => {
     render(<V2Landing />);
 
-    expect(screen.getByText(/beautiful, interactive dashboards/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/transform static documents into interactive, branded dashboards/i),
+    ).toBeInTheDocument();
   });
 
-  it('renders Get Started Free CTA button', () => {
+  it('renders Book a demo CTA button', () => {
     render(<V2Landing />);
 
-    const ctaLink = screen.getByText('Get Started Free');
+    const ctaLink = screen
+      .getAllByText('Book a demo')
+      .map((node) => node.closest('a'))
+      .find((link) => link?.getAttribute('href')?.startsWith('mailto:'));
+
     expect(ctaLink).toBeInTheDocument();
-    expect(ctaLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/onboard');
+    expect(ctaLink).toHaveAttribute(
+      'href',
+      'mailto:sales@stratadash.org?subject=StrataDash%20demo',
+    );
   });
 
-  it('renders View Pricing link', () => {
+  it('renders live example link', () => {
     render(<V2Landing />);
 
-    const pricingLink = screen.getByText('View Pricing');
-    expect(pricingLink).toBeInTheDocument();
-    expect(pricingLink.closest('a')).toHaveAttribute('href', '/pricing');
+    const exampleLink = screen.getByText('View a live district example');
+    expect(exampleLink).toBeInTheDocument();
+    expect(exampleLink.closest('a')).toHaveAttribute('href', '/district/westside');
   });
 
-  it('renders feature sections', () => {
+  it('renders core section headings', () => {
     render(<V2Landing />);
 
-    expect(screen.getByText('Hierarchical Goals')).toBeInTheDocument();
-    expect(screen.getByText('Your Brand')).toBeInTheDocument();
-    expect(screen.getByText('Import from Excel')).toBeInTheDocument();
-  });
-
-  it('renders features section heading', () => {
-    render(<V2Landing />);
-
-    expect(screen.getByText('Everything you need to share your strategy')).toBeInTheDocument();
+    expect(screen.getByText('Why upgrade from a PDF?')).toBeInTheDocument();
+    expect(screen.getByText('Go live in three steps')).toBeInTheDocument();
+    expect(screen.getByText('Frequently asked questions')).toBeInTheDocument();
   });
 });

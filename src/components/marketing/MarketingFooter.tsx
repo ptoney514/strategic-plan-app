@@ -1,128 +1,141 @@
 import Link from 'next/link';
-import { Icon } from '@iconify/react';
+import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
 
-export function MarketingFooter() {
+type Variant = 'marketing' | 'document';
+
+interface MarketingFooterProps {
+  variant?: Variant;
+}
+
+const productLinks = [
+  { label: 'Home', href: '/' },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'About', href: '/about' },
+  { label: 'Sign in', href: '/login' },
+] as const;
+
+const companyLinks = [
+  { label: 'District example', href: '/district/westside' },
+  { label: 'Contact sales', href: 'mailto:sales@stratadash.org?subject=StrataDash%20demo' },
+  { label: 'Support', href: 'mailto:support@stratadash.org?subject=StrataDash%20support' },
+] as const;
+
+const legalLinks = [
+  { label: 'Privacy Policy', href: '/privacy' },
+  { label: 'Terms of Service', href: '/terms' },
+  { label: 'Accessibility', href: 'mailto:support@stratadash.org?subject=Accessibility%20support' },
+] as const;
+
+export function MarketingFooter({ variant = 'marketing' }: MarketingFooterProps) {
+  const isDocument = variant === 'document';
+
   return (
-    <footer className="bg-white border-t border-indigo-200 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
-          {/* Logo & Tagline */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <img
-                src="/assets/stratadash-logo.png"
-                alt="StrataDash"
-                className="w-7 h-7 rounded-lg shadow-xs"
-              />
-              <span className="font-bold text-indigo-900">StrataDash</span>
-            </div>
-            <p className="text-xs text-indigo-500 leading-relaxed mb-4">
-              Our commitment to student success and community prosperity.
-            </p>
+    <footer className="mt-auto border-t border-black/5 bg-surface">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-12 px-6 py-14 md:grid-cols-4 md:px-12 md:py-16">
+        <div className="space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="font-headline text-xl font-black tracking-tighter text-on-surface">
+              StrataDash
+            </span>
+            <span className="rounded-full bg-primary/10 p-1 text-primary">
+              <MaterialIcon icon="bolt" size={16} weight={700} />
+            </span>
           </div>
-
-          {/* Our Plan */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Our Plan</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <a href="/#goals" className="hover:text-blue-600 transition-colors">
-                  Plan Overview
-                </a>
-              </li>
-              <li>
-                <a href="/#initiatives" className="hover:text-blue-600 transition-colors">
-                  Our Initiatives
-                </a>
-              </li>
-              <li>
-                <a href="/#goals" className="hover:text-blue-600 transition-colors">
-                  Strategic Goals
-                </a>
-              </li>
-              <li>
-                <a href="/#progress" className="hover:text-blue-600 transition-colors">
-                  Metrics
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Stakeholders */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Stakeholders</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <span className="cursor-default">Enterprise</span>
-              </li>
-              <li>
-                <span className="cursor-default">Educators</span>
-              </li>
-              <li>
-                <span className="cursor-default">Community</span>
-              </li>
-              <li>
-                <span className="cursor-default">Parents</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Resources</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <span className="cursor-default">Strategy Factory</span>
-              </li>
-              <li>
-                <span className="cursor-default">Templates</span>
-              </li>
-              <li>
-                <span className="cursor-default">Blog</span>
-              </li>
-              <li>
-                <span className="cursor-default">Events</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Company</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <Link href="/about" className="hover:text-blue-600 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <span className="cursor-default">Careers</span>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:text-blue-600 transition-colors">
-                  Legal
-                </Link>
-              </li>
-              <li>
-                <span className="cursor-default">Contact</span>
-              </li>
-            </ul>
-          </div>
+          <p className="max-w-xs text-sm leading-relaxed text-on-surface-variant">
+            {isDocument
+              ? 'Strategic planning software that turns district plans into something people can actually read.'
+              : 'Transforming strategic planning for K-12 leadership teams.'}
+          </p>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-indigo-400">
-            &copy; {new Date().getFullYear()} StrataDash. All rights reserved.
+        <div className="space-y-4">
+          <p className="font-label text-[10px] font-bold uppercase tracking-[0.24em] text-on-surface-variant">
+            Product
           </p>
-          <div className="flex gap-4 text-indigo-400">
-            <span className="cursor-default hover:text-indigo-900 transition-colors">
-              <Icon icon="solar:camera-linear" width="18" />
-            </span>
-            <span className="cursor-default hover:text-indigo-900 transition-colors">
-              <Icon icon="solar:plain-linear" width="18" />
-            </span>
-          </div>
+          <ul className="space-y-3 text-sm">
+            {productLinks.map((item) => (
+              <li key={item.label}>
+                <Link
+                  href={item.href}
+                  className="text-on-surface-variant transition-colors hover:text-primary"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="space-y-4">
+          <p className="font-label text-[10px] font-bold uppercase tracking-[0.24em] text-on-surface-variant">
+            Company
+          </p>
+          <ul className="space-y-3 text-sm">
+            {companyLinks.map((item) =>
+              item.href.startsWith('mailto:') ? (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="text-on-surface-variant transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ) : (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="text-on-surface-variant transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ),
+            )}
+          </ul>
+        </div>
+
+        <div className="space-y-4">
+          <p className="font-label text-[10px] font-bold uppercase tracking-[0.24em] text-on-surface-variant">
+            Legal
+          </p>
+          <ul className="space-y-3 text-sm">
+            {legalLinks.map((item) =>
+              item.href.startsWith('mailto:') ? (
+                <li key={item.label}>
+                  <a
+                    href={item.href}
+                    className="text-on-surface-variant transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ) : (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    className="text-on-surface-variant transition-colors hover:text-primary"
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              ),
+            )}
+          </ul>
+        </div>
+      </div>
+
+      <div className="border-t border-black/5 px-6 py-4 text-center text-xs text-on-surface-variant md:px-12 md:text-left">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <p>
+            © {new Date().getFullYear()} StrataDash.{' '}
+            {isDocument
+              ? 'Strategic planning deserves better than a PDF.'
+              : 'Your strategic plan deserves better than a PDF.'}
+          </p>
+          <p className="font-label uppercase tracking-[0.22em] text-on-surface-variant/80">
+            Powered by StrataDash
+          </p>
         </div>
       </div>
     </footer>

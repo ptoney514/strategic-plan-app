@@ -6,65 +6,69 @@ describe('V2Pricing', () => {
   it('renders the pricing heading', () => {
     render(<V2Pricing />);
 
-    expect(screen.getByText('Simple, transparent pricing')).toBeInTheDocument();
+    expect(
+      screen.getByText('Strategy is the work. The software should just work.'),
+    ).toBeInTheDocument();
   });
 
   it('renders pricing description', () => {
     render(<V2Pricing />);
 
-    expect(screen.getByText(/start for free and upgrade as you grow/i)).toBeInTheDocument();
+    expect(screen.getByText(/transparent, annual pricing designed for school districts/i)).toBeInTheDocument();
   });
 
   it('renders all three pricing tiers', () => {
     render(<V2Pricing />);
 
-    expect(screen.getByText('Free')).toBeInTheDocument();
-    expect(screen.getByText('Pro')).toBeInTheDocument();
+    expect(screen.getByText('Pilot')).toBeInTheDocument();
+    expect(screen.getByText('District')).toBeInTheDocument();
     expect(screen.getByText('Enterprise')).toBeInTheDocument();
   });
 
   it('renders tier prices', () => {
     render(<V2Pricing />);
 
-    expect(screen.getByText('$0')).toBeInTheDocument();
-    expect(screen.getByText('$29')).toBeInTheDocument();
+    expect(screen.getByText('$4,500')).toBeInTheDocument();
+    expect(screen.getByText('$12,000')).toBeInTheDocument();
     expect(screen.getByText('Custom')).toBeInTheDocument();
   });
 
-  it('renders POPULAR badge for Pro tier', () => {
+  it('renders the featured badge for the District tier', () => {
     render(<V2Pricing />);
 
-    expect(screen.getByText('POPULAR')).toBeInTheDocument();
+    expect(screen.getByText('Most requested')).toBeInTheDocument();
   });
 
   it('renders CTA buttons for each tier', () => {
     render(<V2Pricing />);
 
-    expect(screen.getByText('Get Started')).toBeInTheDocument();
-    expect(screen.getByText('Start Free Trial')).toBeInTheDocument();
-    expect(screen.getByText('Contact Sales')).toBeInTheDocument();
+    expect(screen.getByText('Start pilot')).toBeInTheDocument();
+    expect(screen.getByText('Select district plan')).toBeInTheDocument();
+    expect(screen.getByText('Inquire today')).toBeInTheDocument();
   });
 
   it('renders feature lists for each tier', () => {
     render(<V2Pricing />);
 
-    // Free tier features
-    expect(screen.getByText('Up to 1 plan')).toBeInTheDocument();
-    expect(screen.getByText('Community support')).toBeInTheDocument();
-
-    // Pro tier features
-    expect(screen.getByText('Unlimited plans')).toBeInTheDocument();
-    expect(screen.getByText('Excel import')).toBeInTheDocument();
-
-    // Enterprise features
-    expect(screen.getByText('SSO & SAML')).toBeInTheDocument();
-    expect(screen.getByText('SLA')).toBeInTheDocument();
+    expect(screen.getByText('1 active strategic plan')).toBeInTheDocument();
+    expect(screen.getByText('Board presentation mode')).toBeInTheDocument();
+    expect(screen.getByText('Dedicated strategic advisor')).toBeInTheDocument();
   });
 
-  it('links Get Started to signup page', () => {
+  it('links the pilot CTA to email', () => {
     render(<V2Pricing />);
 
-    const getStartedLink = screen.getByText('Get Started');
-    expect(getStartedLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/onboard');
+    const getStartedLink = screen.getByText('Start pilot');
+    expect(getStartedLink.closest('a')).toHaveAttribute(
+      'href',
+      'mailto:sales@stratadash.org?subject=StrataDash%20pilot',
+    );
+  });
+
+  it('renders the foundational section heading', () => {
+    render(<V2Pricing />);
+
+    expect(screen.getByText('Foundationally integrated')).toBeInTheDocument();
+    expect(screen.getByText('Common procurement inquiries')).toBeInTheDocument();
   });
 });

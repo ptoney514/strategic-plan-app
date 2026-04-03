@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 
 export interface BreadcrumbItem {
   label: string;
@@ -12,36 +11,31 @@ export interface BreadcrumbProps {
 
 export function Breadcrumb({ items }: BreadcrumbProps) {
   return (
-    <nav aria-label="Breadcrumb">
-      <ol className="flex items-center gap-1 text-sm">
-        {items.map((item, index) => (
-          <li key={index} className="flex items-center gap-1">
-            {item.href ? (
-              <Link
-                href={item.href}
-                className="text-sm font-medium hover:underline"
-                style={{ color: 'var(--editorial-text-secondary)' }}
-              >
-                {item.label}
-              </Link>
-            ) : (
-              <span
-                className="text-sm font-semibold"
-                style={{ color: 'var(--editorial-text-primary)' }}
-                aria-current="page"
-              >
-                {item.label}
-              </span>
-            )}
-            {index < items.length - 1 && (
-              <ChevronRight
-                className="h-4 w-4"
-                style={{ color: 'var(--editorial-text-secondary)' }}
-              />
-            )}
-          </li>
-        ))}
-      </ol>
+    <nav aria-label="Breadcrumb" className="flex items-center gap-2">
+      {items.map((item, index) => (
+        <span key={index} className="flex items-center gap-2">
+          {item.href ? (
+            <Link
+              href={item.href}
+              className="text-[12px] font-medium uppercase tracking-wider text-md3-outline hover:text-md3-primary transition-colors"
+            >
+              {item.label}
+            </Link>
+          ) : (
+            <span
+              className="text-[12px] font-medium uppercase tracking-wider text-md3-primary"
+              aria-current="page"
+            >
+              {item.label}
+            </span>
+          )}
+          {index < items.length - 1 && (
+            <span className="material-symbols-outlined text-sm text-md3-outline">
+              chevron_right
+            </span>
+          )}
+        </span>
+      ))}
     </nav>
   );
 }

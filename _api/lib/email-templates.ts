@@ -48,6 +48,24 @@ function footer(text: string): string {
   return `<p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">${text}</p>`;
 }
 
+export function loginOtpEmailHtml(otp: string): string {
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:20px;color:#111827;font-weight:600;">Your StrataDash sign-in code</h2>
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;line-height:1.6;">
+      Use this code to finish signing in to StrataDash. It expires in 5 minutes.
+    </p>
+    <div style="margin:24px 0;padding:18px 24px;border-radius:12px;background:#f8fafc;border:1px solid #e5e7eb;text-align:center;">
+      <span style="display:block;font-size:30px;line-height:1;font-weight:700;letter-spacing:0.32em;color:#111827;">${otp}</span>
+    </div>
+    <p style="margin:0;font-size:14px;color:#6b7280;line-height:1.5;">
+      If you did not request this code, you can safely ignore this email.
+    </p>
+    ${footer("Need help? Contact your district administrator or the StrataDash team.")}
+  `;
+
+  return layout(content);
+}
+
 export function invitationEmailHtml(
   orgName: string,
   inviterName: string,

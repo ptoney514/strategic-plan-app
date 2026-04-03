@@ -38,9 +38,9 @@ describe('Breadcrumb', () => {
   it('renders separators between items', () => {
     const { container } = render(<Breadcrumb items={items} />);
 
-    // ChevronRight renders as SVG icons between items (2 separators for 3 items)
-    const svgs = container.querySelectorAll('svg');
-    expect(svgs).toHaveLength(2);
+    // Material Symbols renders as <span> with chevron_right text (2 separators for 3 items)
+    const separators = container.querySelectorAll('.material-symbols-outlined');
+    expect(separators).toHaveLength(2);
   });
 
   it('applies aria-current="page" to last item', () => {

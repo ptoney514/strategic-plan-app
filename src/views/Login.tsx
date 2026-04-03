@@ -1,65 +1,25 @@
 'use client'
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useSubdomain } from '../contexts/SubdomainContext';
+import { authClient } from '../lib/auth-client';
 import { getSubdomainUrl } from '../lib/subdomain';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { mapBetterAuthUser, type AuthUser } from '../lib/types/auth';
+import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
 
-export function Login() {
+function usePublicRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, isAuthenticated } = useAuth();
   const { type: subdomainType } = useSubdomain();
+  const redirectParam = searchParams.get('redirect');
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  return useCallback(
+    (rawUser: Parameters<typeof mapBetterAuthUser>[0]) => {
+      const user: AuthUser = mapBetterAuthUser(rawUser);
 
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      const redirectParam = searchParams.get('redirect');
-
-      // On non-root subdomains, redirect to root domain dashboard
-      if (subdomainType !== 'root' && !redirectParam) {
-        window.location.href = getSubdomainUrl('root') + '/dashboard';
-        return;
-      }
-
-      const redirectUrl = redirectParam || '/dashboard';
-      router.replace(redirectUrl);
-    }
-  }, [isAuthenticated, searchParams, router, subdomainType]);
-
-  // Show nothing while redirecting
-  if (isAuthenticated) {
-    return null;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await login(email, password);
-      const user = response.data.user;
-
-      if (!user) {
-        setError('Login failed. Please try again.');
-        return;
-      }
-
-      // On admin subdomain, system admins stay, others go to root
       if (subdomainType === 'admin') {
         if (user.isSystemAdmin) {
           router.replace('/');
@@ -69,268 +29,388 @@ export function Login() {
         return;
       }
 
-      // Redirect to the intended destination or /dashboard
-      // Users can access admin pages from the avatar menu
-      const redirectParam = searchParams.get('redirect');
-
-      // On non-root subdomains (district), redirect to root domain dashboard
       if (subdomainType !== 'root' && !redirectParam) {
-        window.location.href = getSubdomainUrl('root') + '/dashboard';
+        window.location.href = `${getSubdomainUrl('root')}/dashboard`;
         return;
       }
 
-      const redirectUrl = redirectParam || '/dashboard';
-      router.replace(redirectUrl);
+      router.replace(redirectParam || '/dashboard');
+    },
+    [redirectParam, router, subdomainType],
+  );
+}
+
+export function Login() {
+  const { isAuthenticated, user } = useAuth();
+  const redirectAfterAuth = usePublicRedirect();
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState<'email' | 'code'>('email');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    redirectAfterAuth(user);
+  }, [isAuthenticated, redirectAfterAuth, user]);
+
+  if (isAuthenticated) {
+    return null;
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const canSubmitEmail = normalizedEmail.length > 0;
+  const canSubmitCode = otp.trim().length > 0;
+
+  const handleSendCode = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+
+    if (!canSubmitEmail) {
+      setError('Please enter your work email.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await authClient.emailOtp.sendVerificationOtp({
+        email: normalizedEmail,
+        type: 'sign-in',
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to send sign-in code.');
+      }
+
+      setOtp('');
+      setStep('code');
     } catch (err) {
-      console.error('[Login] Error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.');
+      console.error('[Login] send code error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to send sign-in code.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Google OAuth temporarily disabled during Better Auth migration.
-    // Will be re-enabled with socialProviders.google server config.
-    setError('Google sign-in is temporarily unavailable. Please use email/password.');
+  const handleVerifyCode = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+
+    if (!canSubmitCode) {
+      setError('Please enter the code we emailed you.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await authClient.signIn.emailOtp({
+        email: normalizedEmail,
+        otp: otp.trim(),
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to verify code.');
+      }
+
+      const rawUser = response.data?.user;
+      if (!rawUser) {
+        throw new Error('Login failed. Please try again.');
+      }
+
+      redirectAfterAuth(rawUser as Parameters<typeof mapBetterAuthUser>[0]);
+    } catch (err) {
+      console.error('[Login] verify code error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to verify code.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleStartOver = () => {
+    setStep('email');
+    setOtp('');
+    setError('');
+  };
+
+  const handleResendCode = async () => {
+    if (!canSubmitEmail || isLoading) return;
+
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await authClient.emailOtp.sendVerificationOtp({
+        email: normalizedEmail,
+        type: 'sign-in',
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || 'Failed to resend code.');
+      }
+
+      setOtp('');
+    } catch (err) {
+      console.error('[Login] resend code error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to resend code.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const buttonLabel = step === 'email' ? 'Send Code' : 'Sign in';
+  const formHandler = step === 'email' ? handleSendCode : handleVerifyCode;
+
   return (
-    <div className="flex min-h-screen w-full bg-white text-slate-900 antialiased">
-      <style>{`
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
-        @keyframes fadeIn { to { opacity: 1; } }
-      `}</style>
+    <div className="flex min-h-screen bg-background text-on-surface antialiased">
+      <section className="relative flex w-full items-center justify-center overflow-hidden bg-background px-6 py-10 lg:w-[45%] lg:px-16">
+        <div className="absolute left-6 top-6 lg:left-12 lg:top-12">
+          <span className="font-headline text-2xl font-black tracking-tighter text-on-surface">
+            StrataDash
+          </span>
+        </div>
 
-      {/* Left Side: Login Form */}
-      <div className="flex flex-1 flex-col px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-white z-10 pt-12 pb-12 relative justify-center">
-        <div className="mx-auto w-full max-w-sm lg:w-96 fade-in">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-10">
-            <div className="h-10 w-10 overflow-hidden rounded-lg shadow-xs">
-              <img
-                src="/assets/stratadash-logo.png"
-                alt="StrataDash"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-xl font-semibold tracking-tight text-slate-900">StrataDash</span>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-              Log in to StrataDash
-            </h2>
-            <p className="mt-2 text-sm text-slate-500">Welcome back! Please enter your details.</p>
-          </div>
-
-          <div className="mt-10">
-            {/* Error Alert */}
-            {error && (
-              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-red-600 font-medium">Authentication Error</p>
-                  <p className="text-sm text-red-500 mt-1">{error}</p>
-                </div>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium leading-6 text-slate-700">
-                  Email address
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    className="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-xs ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50"
-                  />
-                </div>
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-slate-700">
-                  Password
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                    className="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-xs ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50"
-                  />
-                </div>
-              </div>
-
-              {/* Remember Me + Forgot Password */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    disabled={isLoading}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
-                    Remember me
-                  </label>
-                </div>
-                <div className="text-sm">
-                  <Link
-                    href="/forgot-password"
-                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex w-full justify-center items-center gap-2 rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-xs hover:bg-slate-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    'Sign in'
-                  )}
-                </button>
-              </div>
-            </form>
-
-            {/* Divider */}
-            <div className="relative mt-8">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-sm font-medium leading-6">
-                <span className="bg-white px-6 text-slate-400">Or continue with</span>
-              </div>
-            </div>
-
-            {/* Google OAuth Button */}
-            <div className="mt-8">
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 shadow-xs ring-1 ring-inset ring-slate-200 hover:bg-slate-50 focus-visible:ring-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                Google
-              </button>
-            </div>
-
-            {/* Sign Up Link */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-slate-500">
-                Don't have an account?{' '}
-                <Link
-                  href="/signup"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-                >
-                  Sign up
-                </Link>
+        <div className="w-full max-w-md pt-12 lg:pt-0">
+          <div className="rounded-[28px] bg-surface p-8 editorial-shadow md:p-10">
+            <header className="mb-8">
+              <h1 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
+                Sign in to StrataDash
+              </h1>
+              <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">
+                {step === 'email'
+                  ? 'Enter your work email to receive a secure sign-in code.'
+                  : `We sent a code to ${normalizedEmail}. Enter it below to finish signing in.`}
               </p>
-            </div>
-          </div>
-        </div>
+            </header>
 
-        {/* Mobile Footer */}
-        <div className="mt-16 lg:hidden text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} StrataDash.
-        </div>
-      </div>
+            {error ? (
+              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-error/20 bg-error-container/60 p-4">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-error" />
+                <div>
+                  <p className="font-semibold text-error">Authentication error</p>
+                  <p className="mt-1 text-sm text-error">{error}</p>
+                </div>
+              </div>
+            ) : null}
 
-      {/* Right Side: Branding */}
-      <div className="relative hidden w-0 flex-1 lg:block bg-slate-950 overflow-hidden">
-        {/* Grid Background with Vignette Mask */}
-        <div className="absolute inset-0 h-full w-full bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
-
-        {/* Subtle Purple/Indigo Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none" />
-
-        <div
-          className="flex flex-col fade-in text-center h-full p-12 relative items-center justify-center z-10"
-          style={{ animationDelay: '0.1s' }}
-        >
-          <div className="flex flex-col items-center gap-8 max-w-lg">
-            {/* Logo Container with Glow */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-2xl blur-sm opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-              <div className="relative h-28 w-28 overflow-hidden rounded-2xl bg-indigo-950 ring-1 ring-white/10 shadow-2xl">
-                <img
-                  src="/assets/stratadash-logo.png"
-                  alt="StrataDash Logo"
-                  className="w-full h-full object-cover"
+            <form onSubmit={formHandler} className="space-y-5">
+              <div className="space-y-2">
+                <label
+                  htmlFor="email"
+                  className="font-label text-xs font-bold uppercase tracking-[0.24em] text-on-surface-variant"
+                >
+                  Work email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  placeholder="name@school-district.edu"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  disabled={isLoading || step === 'code'}
+                  className="w-full rounded-full border border-transparent bg-surface-container-high px-5 py-4 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant/60 focus:border-primary/20 focus:bg-surface focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                 />
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <h1 className="text-5xl font-semibold tracking-tight text-white">StrataDash</h1>
-              <p className="text-lg text-slate-400 font-medium leading-relaxed">
-                The intelligent strategic planning platform designed for K-12 Districts.
+              {step === 'code' ? (
+                <div className="space-y-2">
+                  <label
+                    htmlFor="otp"
+                    className="font-label text-xs font-bold uppercase tracking-[0.24em] text-on-surface-variant"
+                  >
+                    Verification code
+                  </label>
+                  <input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    required
+                    placeholder="123456"
+                    value={otp}
+                    onChange={(event) => setOtp(event.target.value)}
+                    disabled={isLoading}
+                    maxLength={6}
+                    className="w-full rounded-full border border-transparent bg-surface-container-high px-5 py-4 text-sm text-on-surface outline-none transition-all placeholder:text-on-surface-variant/60 focus:border-primary/20 focus:bg-surface focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                  />
+                </div>
+              ) : null}
+
+              <button
+                type="submit"
+                disabled={isLoading || (step === 'email' ? !canSubmitEmail : !canSubmitCode)}
+                className="tactile-button inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 font-headline text-lg font-bold text-white transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    {step === 'email' ? 'Sending code...' : 'Signing in...'}
+                  </>
+                ) : (
+                  <>
+                    {buttonLabel}
+                    <MaterialIcon icon="arrow_forward" size={18} />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {step === 'code' ? (
+              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm">
+                <button
+                  type="button"
+                  onClick={handleStartOver}
+                  className="font-semibold text-on-surface-variant transition-colors hover:text-primary"
+                >
+                  Use a different email
+                </button>
+                <button
+                  type="button"
+                  onClick={handleResendCode}
+                  disabled={isLoading || !canSubmitEmail}
+                  className="font-semibold text-primary transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  Resend code
+                </button>
+              </div>
+            ) : null}
+
+            <div className="mt-10 border-t border-black/5 pt-8">
+              <p className="text-sm leading-relaxed text-on-surface-variant">
+                New to StrataDash?{' '}
+                <a
+                  href="mailto:support@stratadash.org?subject=StrataDash%20access%20request"
+                  className="font-semibold text-primary transition-colors hover:underline"
+                >
+                  Contact your administrator
+                </a>{' '}
+                to request access.
               </p>
             </div>
+          </div>
 
-            {/* Decorative Dots */}
-            <div className="flex gap-2 mt-4">
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/50" />
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/20" />
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-[10px] font-label uppercase tracking-[0.24em] text-on-surface-variant/60">
+            <span>© {new Date().getFullYear()} StrataDash</span>
+            <Link href="/privacy" className="transition-colors hover:text-primary">
+              Privacy
+            </Link>
+            <Link href="/terms" className="transition-colors hover:text-primary">
+              Terms
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="relative hidden w-full overflow-hidden bg-primary-container lg:flex lg:w-[55%]">
+        <div className="absolute inset-0 bg-[url('/stitch/graphy.png')] opacity-10" />
+        <div className="absolute -right-24 top-1/2 h-96 w-96 -translate-y-1/2 rounded-full bg-primary blur-[120px] opacity-40" />
+        <div className="absolute -bottom-[10%] left-[-10%] h-[80%] w-[80%] rounded-full bg-[#0f4671] blur-[150px] opacity-30" />
+
+        <div className="relative z-10 flex w-full flex-col justify-center px-20">
+          <div className="max-w-2xl">
+            <h2 className="font-headline text-6xl font-black leading-[1.08] tracking-tighter text-white">
+              Your strategic plan deserves better than a PDF.
+            </h2>
+            <p className="mt-6 max-w-xl text-xl leading-relaxed text-on-primary-container">
+              Empowering school districts with interactive transparency and real-time progress
+              tracking.
+            </p>
+          </div>
+
+          <div className="mt-12">
+            <div className="glass-panel relative rounded-2xl border border-white/10 p-8 shadow-[0_30px_60px_rgba(10,28,52,0.18)]">
+              <div className="mb-8 flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/20">
+                    <MaterialIcon icon="school" size={22} className="text-primary-fixed" />
+                  </div>
+                  <div>
+                    <h3 className="font-headline text-lg font-bold text-on-surface">
+                      Westside Community Schools
+                    </h3>
+                    <p className="font-mono text-xs text-on-surface-variant">
+                      STRATEGIC PLAN 2024-2027
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 rounded-full border border-white/15 bg-tertiary-fixed px-3 py-1">
+                  <div className="h-2 w-2 rounded-full bg-on-tertiary-fixed-variant" />
+                  <span className="font-label text-[10px] font-bold uppercase tracking-[0.24em] text-on-tertiary-fixed-variant">
+                    Live monitoring
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-6">
+                <div className="rounded-2xl bg-surface-container-low p-6">
+                  <p className="mb-2 font-label text-xs uppercase tracking-[0.24em] text-on-surface-variant">
+                    Student achievement
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-3xl font-bold text-primary">87.4%</span>
+                    <span className="font-mono text-xs text-secondary">+2.1%</span>
+                  </div>
+                  <div className="mt-4 h-1.5 rounded-full bg-surface-container-highest">
+                    <div className="h-full w-[87.4%] rounded-full bg-primary" />
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-surface-container-low p-6">
+                  <p className="mb-2 font-label text-xs uppercase tracking-[0.24em] text-on-surface-variant">
+                    Operational excellence
+                  </p>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-mono text-3xl font-bold text-primary">92/100</span>
+                  </div>
+                  <div className="mt-4 h-1.5 rounded-full bg-surface-container-highest">
+                    <div className="h-full w-[92%] rounded-full bg-primary" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 space-y-4">
+                <div className="flex items-center justify-between rounded-2xl bg-white/50 p-4">
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon icon="verified" size={18} className="text-on-surface-variant" />
+                    <span className="text-sm">Modernizing STEAM Labs (Phase 2)</span>
+                  </div>
+                  <span className="rounded-full bg-tertiary-fixed px-2 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-on-tertiary-fixed-variant">
+                    On target
+                  </span>
+                </div>
+                <div className="flex items-center justify-between rounded-2xl bg-white/50 p-4">
+                  <div className="flex items-center gap-3">
+                    <MaterialIcon icon="schedule" size={18} className="text-on-surface-variant" />
+                    <span className="text-sm">Dual-language immersion expansion</span>
+                  </div>
+                  <span className="rounded-full bg-secondary-fixed px-2 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-on-secondary-container">
+                    Off track
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="absolute -bottom-6 -right-6 hidden rounded-2xl border border-white/20 bg-white/85 p-4 shadow-[0_20px_40px_rgba(15,24,40,0.16)] lg:block">
+              <div className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white">
+                  <MaterialIcon icon="trending_up" size={16} />
+                </div>
+                <div>
+                  <p className="font-label text-[10px] uppercase tracking-[0.24em] text-on-surface-variant">
+                    Transparency score
+                  </p>
+                  <p className="font-mono text-sm font-bold text-on-surface">Tier 1 exemplar</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Bottom Legal Text */}
-        <div className="absolute bottom-10 left-0 right-0 text-center">
-          <p className="text-xs text-slate-500 font-medium tracking-wide uppercase opacity-60">
-            Empowering Education Leadership
-          </p>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

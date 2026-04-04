@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ELA/Reading Proficiency | StrataDash</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        /* Custom Scrollbar for sleek UI */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .chart-bar-gradient {
+            background: linear-gradient(to top, #702ae1, #b28cff);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "error": "#b41340",
+                      "tertiary": "#994100",
+                      "secondary-container": "#6df5e1",
+                      "secondary-dim": "#005a50",
+                      "tertiary-fixed": "#ff955a",
+                      "on-primary-fixed": "#000000",
+                      "on-error": "#ffefef",
+                      "outline-variant": "#9eaec7",
+                      "on-surface-variant": "#4d5d73",
+                      "on-primary": "#f8f0ff",
+                      "on-secondary-fixed-variant": "#00655b",
+                      "on-tertiary-fixed-variant": "#632800",
+                      "primary-fixed-dim": "#a67aff",
+                      "inverse-on-surface": "#8e9eb7",
+                      "on-secondary-container": "#005b51",
+                      "on-primary-fixed-variant": "#390083",
+                      "background": "#f4f6ff",
+                      "surface-variant": "#c9deff",
+                      "surface-container-high": "#d2e4ff",
+                      "on-primary-container": "#2e006c",
+                      "inverse-primary": "#a476ff",
+                      "surface-tint": "#702ae1",
+                      "on-secondary": "#c0fff3",
+                      "error-dim": "#a70138",
+                      "primary-container": "#b28cff",
+                      "tertiary-fixed-dim": "#ff7f2f",
+                      "primary": "#702ae1",
+                      "primary-fixed": "#b28cff",
+                      "surface-dim": "#bdd6fc",
+                      "tertiary-container": "#ff955a",
+                      "surface": "#f4f6ff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#510017",
+                      "error-container": "#f74b6d",
+                      "secondary-fixed-dim": "#5de7d3",
+                      "tertiary-dim": "#863800",
+                      "inverse-surface": "#000f21",
+                      "primary-dim": "#6411d5",
+                      "secondary": "#00675d",
+                      "surface-container-low": "#eaf1ff",
+                      "on-secondary-fixed": "#00463e",
+                      "surface-bright": "#f4f6ff",
+                      "secondary-fixed": "#6df5e1",
+                      "on-tertiary-container": "#552100",
+                      "surface-container-highest": "#c9deff",
+                      "on-surface": "#203044",
+                      "outline": "#68788f",
+                      "surface-container": "#dce9ff",
+                      "on-tertiary": "#fff0e9",
+                      "on-background": "#203044",
+                      "on-tertiary-fixed": "#2e0e00"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface text-on-surface min-h-screen flex flex-col font-['Inter']">
+<!-- TopNavBar -->
+<nav class="bg-white dark:bg-slate-950 flex justify-between items-center w-full px-6 py-3 h-16 docked full-width top-0 border-b border-slate-200/60 dark:border-slate-800/60 sticky z-50">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold tracking-tighter text-slate-900 dark:text-slate-50">StrataDash</span>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors duration-200 text-sm font-medium" href="#">Plan</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors duration-200 text-sm font-medium" href="#">Objectives</a>
+<a class="text-violet-700 dark:text-violet-400 font-semibold border-b-2 border-violet-700 dark:border-violet-400 pb-1 text-sm" href="#">Goals</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 rounded-full transition-colors">
+<span class="material-symbols-outlined">dark_mode</span>
+</button>
+<div class="h-8 w-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs" title="District Square Initials Avatar">
+                DS
+            </div>
+</div>
+</nav>
+<main class="flex-grow w-full max-w-7xl mx-auto px-6 py-8">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-outline mb-6">
+<a class="hover:text-primary" href="#">Plan</a>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<a class="hover:text-primary" href="#">Student Achievement</a>
+<span class="material-symbols-outlined text-[10px]">chevron_right</span>
+<span class="text-on-surface">ELA/Reading Proficiency</span>
+</nav>
+<!-- Goal Header -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+<div class="flex items-start gap-4">
+<div class="h-12 w-12 rounded-xl bg-primary flex items-center justify-center text-white font-bold text-xl shrink-0">
+                    01
+                </div>
+<div>
+<h1 class="text-3xl font-extrabold tracking-tight text-on-surface mb-1">ELA/Reading Proficiency</h1>
+<p class="text-on-surface-variant max-w-2xl text-sm leading-relaxed">Increase the percentage of students meeting or exceeding grade-level expectations in English Language Arts through targeted literacy interventions.</p>
+</div>
+</div>
+<div class="flex flex-col items-end gap-3">
+<span class="px-3 py-1 rounded-full bg-amber-100 text-tertiary text-[10px] font-bold tracking-widest uppercase border border-amber-200/50">
+                    In Progress
+                </span>
+<a class="flex items-center gap-1 text-primary text-xs font-semibold hover:underline group" href="#">
+<span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                    Back to goals
+                </a>
+</div>
+</header>
+<!-- Main Content Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+<!-- Left Panel: KPI Metrics -->
+<section class="lg:col-span-4 bg-surface-container-lowest rounded-xl border border-outline-variant/20 p-8 flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-2 mb-8">
+<span class="material-symbols-outlined text-tertiary" data-weight="fill">pending_actions</span>
+<span class="text-[10px] font-bold tracking-widest uppercase text-tertiary">Current Status</span>
+</div>
+<div class="mb-10">
+<label class="text-[10px] font-bold tracking-widest uppercase text-outline block mb-2">Current Score</label>
+<div class="flex items-baseline gap-2">
+<span class="text-7xl font-black tracking-tighter text-on-surface tabular-nums">72%</span>
+<div class="px-2 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-1 border border-emerald-100">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                                ↑ 7.0%
+                            </div>
+</div>
+<p class="text-xs text-outline mt-2 font-medium">from baseline (65%)</p>
+</div>
+<div class="space-y-6">
+<div class="flex justify-between items-center py-3 border-b border-outline-variant/10">
+<span class="text-sm font-medium text-on-surface-variant">2026 Target</span>
+<span class="text-lg font-bold text-on-surface tabular-nums">85%</span>
+</div>
+<div class="flex justify-between items-center py-3 border-b border-outline-variant/10">
+<span class="text-sm font-medium text-on-surface-variant">Baseline (2021)</span>
+<span class="text-lg font-bold text-on-surface tabular-nums">65%</span>
+</div>
+</div>
+</div>
+<div class="mt-8 p-4 rounded-lg bg-surface-container-low border border-outline-variant/10">
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-1">Forecast</p>
+<p class="text-xs text-on-surface-variant leading-relaxed">Currently trending to hit <span class="text-primary font-bold">79%</span> by end of 2025 academic year.</p>
+</div>
+</section>
+<!-- Right Panel: Time-series Bar Chart -->
+<section class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant/20 p-8">
+<div class="flex justify-between items-center mb-8">
+<h3 class="text-sm font-bold tracking-tight text-on-surface">Annual Proficiency Growth</h3>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-3 h-3 rounded-sm chart-bar-gradient"></div>
+<span class="text-[10px] font-bold text-outline uppercase">Proficiency %</span>
+</div>
+</div>
+</div>
+<!-- Simulated Bar Chart Layout -->
+<div class="relative h-[320px] w-full flex items-end justify-between gap-4 px-4 border-b border-outline-variant/20">
+<!-- Y-Axis Markers (Simulated) -->
+<div class="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-[10px] font-bold text-outline -ml-8 pointer-events-none">
+<span>100%</span>
+<span>75%</span>
+<span>50%</span>
+<span>25%</span>
+<span>0%</span>
+</div>
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-20">
+<div class="w-full border-t border-dashed border-outline"></div>
+<div class="w-full border-t border-dashed border-outline"></div>
+<div class="w-full border-t border-dashed border-outline"></div>
+<div class="w-full border-t border-dashed border-outline"></div>
+<div class="w-full"></div>
+</div>
+<!-- Chart Bars -->
+<div class="relative group flex flex-col items-center flex-1 h-full justify-end">
+<div class="w-full chart-bar-gradient rounded-t-[4px] relative transition-all duration-500 hover:brightness-110" style="height: 65%;">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">65.0%</div>
+</div>
+<span class="absolute -bottom-6 text-[10px] font-bold text-outline uppercase">2021</span>
+</div>
+<div class="relative group flex flex-col items-center flex-1 h-full justify-end">
+<div class="w-full chart-bar-gradient rounded-t-[4px] relative transition-all duration-500 hover:brightness-110" style="height: 67%;">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">67.2%</div>
+</div>
+<span class="absolute -bottom-6 text-[10px] font-bold text-outline uppercase">2022</span>
+</div>
+<div class="relative group flex flex-col items-center flex-1 h-full justify-end">
+<div class="w-full chart-bar-gradient rounded-t-[4px] relative transition-all duration-500 hover:brightness-110" style="height: 68%;">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">68.5%</div>
+</div>
+<span class="absolute -bottom-6 text-[10px] font-bold text-outline uppercase">2023</span>
+</div>
+<div class="relative group flex flex-col items-center flex-1 h-full justify-end">
+<div class="w-full chart-bar-gradient rounded-t-[4px] relative transition-all duration-500 hover:brightness-110" style="height: 70%;">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">70.1%</div>
+</div>
+<span class="absolute -bottom-6 text-[10px] font-bold text-outline uppercase">2024</span>
+</div>
+<div class="relative group flex flex-col items-center flex-1 h-full justify-end">
+<div class="w-full chart-bar-gradient rounded-t-[4px] relative transition-all duration-500 hover:brightness-110 border-2 border-primary-container" style="height: 72%;">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">72.0%</div>
+</div>
+<span class="absolute -bottom-6 text-[10px] font-bold text-primary uppercase">Current</span>
+</div>
+<div class="relative group flex flex-col items-center flex-1 h-full justify-end opacity-40">
+<div class="w-full bg-surface-container rounded-t-[4px] border border-dashed border-outline-variant relative" style="height: 85%;">
+<div class="absolute -top-10 left-1/2 -translate-x-1/2 bg-on-surface text-white text-[10px] font-bold py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">85.0%</div>
+</div>
+<span class="absolute -bottom-6 text-[10px] font-bold text-outline uppercase">Target</span>
+</div>
+</div>
+<p class="mt-12 text-[10px] font-medium text-outline-variant flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px]">info</span>
+                    Updated Mar 4, 2026 • Reporting Cycle: Annual State Assessment
+                </p>
+</section>
+</div>
+<!-- Bottom Section: Sub-Goals Accordion -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden">
+<div class="px-8 py-5 border-b border-outline-variant/10 flex justify-between items-center bg-surface-container-low/30">
+<h3 class="text-sm font-bold tracking-tight text-on-surface flex items-center gap-2">
+                    Sub-Goals (3)
+                    <span class="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px]">Active</span>
+</h3>
+<span class="text-xs text-outline italic">Detailed performance by grade band</span>
+</div>
+<div class="divide-y divide-outline-variant/10">
+<!-- Accordion Row 1 -->
+<div class="group">
+<button class="w-full px-8 py-6 flex items-center justify-between hover:bg-surface-container-low/20 transition-colors">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+<div class="text-left">
+<h4 class="text-sm font-bold text-on-surface">K-2 Early Literacy Skills</h4>
+<p class="text-xs text-on-surface-variant">Phonemic awareness and decoding benchmarks</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right">
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-0.5">Progress</p>
+<p class="text-sm font-black tabular-nums text-secondary">78.4%</p>
+</div>
+<div class="h-10 w-24 bg-surface-container rounded overflow-hidden flex items-end gap-0.5 p-1">
+<div class="w-full bg-secondary-container h-[40%] rounded-sm"></div>
+<div class="w-full bg-secondary-container h-[55%] rounded-sm"></div>
+<div class="w-full bg-secondary-container h-[70%] rounded-sm"></div>
+<div class="w-full bg-secondary-container h-[78%] rounded-sm"></div>
+</div>
+</div>
+</button>
+<!-- Expanded content simulation (hidden by default) -->
+<div class="px-24 pb-6 grid grid-cols-3 gap-6 hidden">
+<div class="bg-surface p-4 rounded-lg border border-outline-variant/10">
+<p class="text-[10px] font-bold text-outline uppercase mb-2">Cohort A</p>
+<p class="text-xl font-black text-on-surface">82%</p>
+</div>
+</div>
+</div>
+<!-- Accordion Row 2 -->
+<div class="group">
+<button class="w-full px-8 py-6 flex items-center justify-between hover:bg-surface-container-low/20 transition-colors">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+<div class="text-left">
+<h4 class="text-sm font-bold text-on-surface">3-5 Reading Comprehension</h4>
+<p class="text-xs text-on-surface-variant">Main idea identification and text evidence</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right">
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-0.5">Progress</p>
+<p class="text-sm font-black tabular-nums text-tertiary">64.1%</p>
+</div>
+<div class="h-10 w-24 bg-surface-container rounded overflow-hidden flex items-end gap-0.5 p-1">
+<div class="w-full bg-tertiary-container h-[60%] rounded-sm"></div>
+<div class="w-full bg-tertiary-container h-[62%] rounded-sm"></div>
+<div class="w-full bg-tertiary-container h-[63%] rounded-sm"></div>
+<div class="w-full bg-tertiary-container h-[64%] rounded-sm"></div>
+</div>
+</div>
+</button>
+</div>
+<!-- Accordion Row 3 -->
+<div class="group">
+<button class="w-full px-8 py-6 flex items-center justify-between hover:bg-surface-container-low/20 transition-colors">
+<div class="flex items-center gap-6">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">expand_more</span>
+<div class="text-left">
+<h4 class="text-sm font-bold text-on-surface">6-8 Critical Literacy</h4>
+<p class="text-xs text-on-surface-variant">Analysis of complex informational texts</p>
+</div>
+</div>
+<div class="flex items-center gap-8">
+<div class="text-right">
+<p class="text-[10px] font-bold text-outline uppercase tracking-widest mb-0.5">Progress</p>
+<p class="text-sm font-black tabular-nums text-on-surface">71.0%</p>
+</div>
+<div class="h-10 w-24 bg-surface-container rounded overflow-hidden flex items-end gap-0.5 p-1">
+<div class="w-full bg-outline-variant h-[50%] rounded-sm"></div>
+<div class="w-full bg-outline-variant h-[65%] rounded-sm"></div>
+<div class="w-full bg-outline-variant h-[68%] rounded-sm"></div>
+<div class="w-full bg-outline-variant h-[71%] rounded-sm"></div>
+</div>
+</div>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full max-w-7xl mx-auto gap-6">
+<div class="flex flex-col gap-2">
+<span class="font-bold text-slate-900 dark:text-slate-50 text-lg">StrataDash</span>
+<p class="text-xs font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400">© 2024 School District Strategic Planning</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity opacity-80 hover:opacity-100" href="#">Powered by StrataDash</a>
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity opacity-80 hover:opacity-100" href="#">Accessibility</a>
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

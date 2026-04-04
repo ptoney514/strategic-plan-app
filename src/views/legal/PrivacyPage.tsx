@@ -1,219 +1,242 @@
-import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
-import { MarketingFooter } from '../../components/marketing/MarketingFooter';
-import { MarketingNav } from '../../components/marketing/MarketingNav';
+import {
+  CheckCircle,
+  LockKey,
+  ShieldCheck,
+} from "@phosphor-icons/react/dist/ssr";
+import {
+  PublicDocumentShell,
+  type PublicDocumentTocItem,
+} from "@/components/public-site/PublicDocumentShell";
+import { MarketingFooter } from "../../components/marketing/MarketingFooter";
+import { MarketingNav } from "../../components/marketing/MarketingNav";
 
-const tocItems = [
-  { label: 'Introduction', href: '#introduction' },
-  { label: 'Information collected', href: '#information-collected' },
-  { label: 'How we use info', href: '#usage' },
-  { label: 'Cookies', href: '#cookies' },
-  { label: 'Data sharing and vendors', href: '#sharing' },
-  { label: 'Data retention', href: '#retention' },
-  { label: 'Security', href: '#security' },
-  { label: 'Your choices and rights', href: '#choices' },
-  { label: 'Student and district data', href: '#student-data' },
-  { label: 'Contact', href: '#contact' },
-] as const;
+const tocItems: PublicDocumentTocItem[] = [
+  { label: "Introduction", href: "#introduction" },
+  { label: "Information collected", href: "#information-collected" },
+  { label: "How we use info", href: "#usage" },
+  { label: "Cookies", href: "#cookies" },
+  { label: "Data sharing and vendors", href: "#sharing" },
+  { label: "Data retention", href: "#retention" },
+  { label: "Security", href: "#security" },
+  { label: "Your choices and rights", href: "#choices" },
+  { label: "Student and district data", href: "#student-data" },
+  { label: "Contact", href: "#contact" },
+];
+
+function PrivacySection({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      className="scroll-mt-28 rounded-[30px] border border-outline-variant/70 bg-white/84 px-6 py-7 backdrop-blur-sm md:px-8"
+    >
+      <h2 className="text-2xl font-semibold tracking-[-0.04em] text-on-surface md:text-3xl">
+        {title}
+      </h2>
+      <div className="mt-5 space-y-4 text-sm leading-7 text-on-surface-variant md:text-base">
+        {children}
+      </div>
+    </section>
+  );
+}
 
 export function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <MarketingNav variant="document" />
 
-      <header className="mx-auto max-w-[1440px] px-6 pt-24 pb-16 text-center md:px-12">
-        <div className="mx-auto inline-flex items-center gap-2 rounded-full bg-surface-container-high px-4 py-1.5">
-          <span className="font-label text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
-            Last updated April 3, 2026
-          </span>
-        </div>
-        <h1 className="mt-6 font-headline text-5xl font-black tracking-tighter text-on-surface md:text-6xl">
-          Privacy Policy
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-on-surface-variant">
-          StrataDash is committed to protecting your privacy and explaining how information is
-          handled within our strategic planning ecosystem.
-        </p>
-      </header>
-
-      <main className="mx-auto flex max-w-[1440px] flex-col gap-16 px-6 pb-32 md:flex-row md:px-12">
-        <aside className="hidden w-64 shrink-0 lg:block">
-          <nav className="sticky top-32 space-y-3">
-            <p className="mb-6 font-label text-xs font-bold uppercase tracking-[0.24em] text-primary/50">
-              Contents
+      <PublicDocumentShell
+        eyebrow="Privacy policy"
+        title="Privacy Policy"
+        description="This policy explains how StrataDash collects, uses, and protects information across the website, the hosted product, and the district planning workflow."
+        updatedAt="April 3, 2026"
+        toc={tocItems}
+        heroAside={
+          <div>
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <ShieldCheck size={22} weight="bold" />
+            </span>
+            <h2 className="mt-5 text-xl font-semibold tracking-[-0.03em] text-on-surface">
+              Privacy posture
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-on-surface-variant">
+              StrataDash is designed around aggregate strategic reporting, not
+              student-level data collection.
             </p>
-            {tocItems.map((item, index) => (
-              <a
-                key={item.label}
-                href={item.href}
-                className={`block border-l-2 pl-4 text-sm font-medium transition-colors ${
-                  index === 0
-                    ? 'border-primary text-primary'
-                    : 'border-transparent text-on-surface-variant hover:border-primary/30 hover:text-primary'
-                }`}
+          </div>
+        }
+      >
+        <PrivacySection id="introduction" title="Introduction">
+          <p>
+            This Privacy Policy describes how StrataDash collects, uses, and
+            shares information when you use our website, platform, and services.
+          </p>
+          <p>
+            By using the service, you agree to this policy. It is starter copy
+            intended for legal review, not a final legal opinion.
+          </p>
+        </PrivacySection>
+
+        <PrivacySection
+          id="information-collected"
+          title="Information collected"
+        >
+          <p>
+            We collect information to operate the platform and support strategic
+            planning workflows.
+          </p>
+          <div className="grid gap-4">
+            <article className="rounded-[24px] bg-surface-container-low px-5 py-5">
+              <h3 className="text-lg font-semibold tracking-[-0.03em] text-on-surface">
+                Institutional data
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-on-surface-variant">
+                District names, school identifiers, goals, progress notes, and
+                other planning records entered by authorized users.
+              </p>
+            </article>
+            <article className="rounded-[24px] bg-surface-container-low px-5 py-5">
+              <h3 className="text-lg font-semibold tracking-[-0.03em] text-on-surface">
+                Account information
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-on-surface-variant">
+                Professional contact details such as names, email addresses,
+                titles, and access settings used to manage collaboration.
+              </p>
+            </article>
+          </div>
+        </PrivacySection>
+
+        <PrivacySection id="usage" title="How we use info">
+          <div className="space-y-3">
+            {[
+              "To provide, maintain, and improve the platform.",
+              "To support strategic visualization and reporting.",
+              "To communicate with users about service updates and support.",
+            ].map((item) => (
+              <div
+                key={item}
+                className="flex items-start gap-3 rounded-[22px] bg-surface-container-low px-4 py-4"
               >
-                {item.label}
-              </a>
+                <CheckCircle
+                  size={16}
+                  className="mt-1 text-primary"
+                  weight="fill"
+                />
+                <span>{item}</span>
+              </div>
             ))}
-          </nav>
-        </aside>
+          </div>
+        </PrivacySection>
 
-        <article className="max-w-4xl space-y-16">
-          <section id="introduction" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Introduction
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              This Privacy Policy describes how StrataDash collects, uses, and shares information
-              when you use our website, platform, and services.
-            </p>
-            <p className="mt-4 text-lg leading-relaxed text-on-surface-variant">
-              By using the service, you agree to this policy. It is starter copy intended for legal
-              review, not a final legal opinion.
-            </p>
-          </section>
+        <PrivacySection id="cookies" title="Cookies">
+          <p>
+            We use essential cookies to maintain secure sessions. Marketing
+            pages may use standard analytics cookies to help us understand site
+            performance. We do not use advertising cookies inside the
+            authenticated product experience.
+          </p>
+        </PrivacySection>
 
-          <section id="information-collected" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Information collected
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              We collect information to operate the platform and support strategic planning
-              workflows.
-            </p>
-            <div className="mt-6 grid gap-6">
-              <article className="rounded-2xl border border-outline-variant/20 bg-surface p-8 editorial-shadow">
-                <h3 className="font-headline text-xl font-bold text-on-surface">Institutional data</h3>
-                <p className="mt-3 leading-relaxed text-on-surface-variant">
-                  District names, school identifiers, goals, progress notes, and other planning
-                  records entered by authorized users.
-                </p>
-              </article>
-              <article className="rounded-2xl border border-outline-variant/20 bg-surface p-8 editorial-shadow">
-                <h3 className="font-headline text-xl font-bold text-on-surface">Account information</h3>
-                <p className="mt-3 leading-relaxed text-on-surface-variant">
-                  Professional contact details such as names, email addresses, titles, and access
-                  settings used to manage collaboration.
-                </p>
-              </article>
-            </div>
-          </section>
+        <PrivacySection id="sharing" title="Data sharing and vendors">
+          <p>
+            We may share information with service providers that help us host
+            the platform, process communications, or support customer
+            operations. We do not sell personal data.
+          </p>
+        </PrivacySection>
 
-          <section id="usage" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              How we use info
-            </h2>
-            <ul className="mt-6 space-y-5">
-              {[
-                'To provide, maintain, and improve the platform.',
-                'To support strategic visualization and reporting.',
-                'To communicate with users about service updates and support.',
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-4">
-                  <MaterialIcon icon="check_circle" fill weight={700} className="mt-1 text-primary" />
-                  <span className="text-lg leading-relaxed text-on-surface-variant">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
+        <PrivacySection id="retention" title="Data retention">
+          <p>
+            We retain information only as long as needed to provide the service,
+            comply with legal obligations, or resolve disputes. Retention
+            periods can vary by customer agreement.
+          </p>
+        </PrivacySection>
 
-          <section id="cookies" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Cookies
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              We use essential cookies to maintain secure sessions. Marketing pages may use standard
-              analytics cookies to help us understand site performance. We do not use advertising
-              cookies inside the authenticated product experience.
-            </p>
-          </section>
+        <PrivacySection id="security" title="Security">
+          <p>
+            We use administrative, technical, and organizational safeguards
+            designed to protect district data. No method of transmission or
+            storage is fully secure, so we continue to review and improve our
+            controls.
+          </p>
+        </PrivacySection>
 
-          <section id="sharing" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Data sharing and vendors
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              We may share information with service providers that help us host the platform,
-              process communications, or support customer operations. We do not sell personal data.
-            </p>
-          </section>
+        <PrivacySection id="choices" title="Your choices and rights">
+          <p>
+            Depending on your location and role, you may have rights to access,
+            correct, export, or delete certain personal information. Contact us
+            if you need assistance with any of those requests.
+          </p>
+        </PrivacySection>
 
-          <section id="retention" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Data retention
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              We retain information only as long as needed to provide the service, comply with legal
-              obligations, or resolve disputes. Retention periods can vary by customer agreement.
-            </p>
-          </section>
-
-          <section id="security" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Security
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              We use administrative, technical, and organizational safeguards designed to protect
-              district data. No method of transmission or storage is fully secure, so we continue to
-              review and improve our controls.
-            </p>
-          </section>
-
-          <section id="choices" className="scroll-mt-32">
-            <h2 className="font-headline text-3xl font-bold tracking-tight text-on-surface">
-              Your choices and rights
-            </h2>
-            <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-              Depending on your location and role, you may have rights to access, correct, export,
-              or delete certain personal information. Contact us if you need assistance with any of
-              those requests.
-            </p>
-          </section>
-
-          <section id="student-data" className="scroll-mt-32">
-            <div className="rounded-2xl border border-primary/10 bg-primary/5 p-8 md:p-12">
-              <h2 className="font-headline text-3xl font-bold tracking-tight text-primary">
-                Student and district data
-              </h2>
-              <p className="mt-6 text-lg leading-relaxed text-on-surface-variant">
-                StrataDash is designed for aggregate strategic data, not student-level records. When
-                possible, districts should avoid uploading personally identifiable information.
-              </p>
-              <ul className="mt-6 space-y-4">
-                {[
-                  'Aggregate metrics are preferred over student-level records.',
-                  'Access should be limited to authorized district personnel.',
-                  'Sensitive data should be reviewed before upload.',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3">
-                    <MaterialIcon icon="verified_user" size={20} className="mt-0.5 text-primary" />
-                    <span className="text-sm font-bold uppercase tracking-[0.22em] text-primary">
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          <section id="contact" className="scroll-mt-32">
-            <div className="rounded-2xl bg-surface-container-highest/30 p-8 text-center md:p-12">
-              <h2 className="font-headline text-2xl font-bold text-on-surface">
-                Questions about your data?
-              </h2>
-              <p className="mt-4 text-on-surface-variant">
-                Our team can help with privacy questions or district review workflows.
-              </p>
-              <a
-                href="mailto:privacy@stratadash.org"
-                className="mt-8 inline-flex items-center gap-2 font-label text-sm font-bold uppercase tracking-[0.24em] text-primary transition-colors hover:underline"
+        <section
+          id="student-data"
+          className="scroll-mt-28 rounded-[32px] border border-primary/10 bg-primary/6 px-6 py-7 md:px-8"
+        >
+          <div className="flex items-center gap-3 text-primary">
+            <LockKey size={22} weight="bold" />
+            <p className="public-kicker">Student and district data</p>
+          </div>
+          <h2 className="mt-4 text-2xl font-semibold tracking-[-0.04em] text-primary md:text-3xl">
+            Aggregate reporting is preferred.
+          </h2>
+          <p className="mt-5 max-w-[64ch] text-sm leading-7 text-on-surface-variant md:text-base">
+            StrataDash is designed for aggregate strategic data, not
+            student-level records. When possible, districts should avoid
+            uploading personally identifiable information.
+          </p>
+          <div className="mt-6 space-y-3">
+            {[
+              "Aggregate metrics are preferred over student-level records.",
+              "Access should be limited to authorized district personnel.",
+              "Sensitive data should be reviewed before upload.",
+            ].map((item) => (
+              <div
+                key={item}
+                className="flex items-start gap-3 rounded-[22px] bg-white/82 px-4 py-4"
               >
-                <MaterialIcon icon="mail" size={18} />
-                privacy@stratadash.org
-              </a>
-            </div>
-          </section>
-        </article>
-      </main>
+                <CheckCircle
+                  size={16}
+                  className="mt-1 text-primary"
+                  weight="fill"
+                />
+                <span className="text-sm leading-7 text-on-surface">
+                  {item}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section
+          id="contact"
+          className="scroll-mt-28 rounded-[32px] border border-outline-variant/70 bg-white/86 px-6 py-7 backdrop-blur-sm md:px-8"
+        >
+          <p className="public-kicker text-primary">Contact</p>
+          <h2 className="mt-3 text-2xl font-semibold tracking-[-0.04em] text-on-surface">
+            Questions about your data?
+          </h2>
+          <p className="mt-4 max-w-[62ch] text-sm leading-7 text-on-surface-variant md:text-base">
+            Our team can help with privacy questions or district review
+            workflows.
+          </p>
+          <a
+            href="mailto:privacy@stratadash.org"
+            className="mt-6 inline-flex rounded-full bg-surface-container-low px-5 py-3 text-sm font-semibold text-primary transition-colors hover:text-on-surface"
+          >
+            privacy@stratadash.org
+          </a>
+        </section>
+      </PublicDocumentShell>
 
       <MarketingFooter variant="document" />
     </div>

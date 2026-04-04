@@ -1,29 +1,46 @@
-import Link from 'next/link';
-import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
-import { MarketingFooter } from '../../components/marketing/MarketingFooter';
-import { MarketingNav } from '../../components/marketing/MarketingNav';
+import Link from "next/link";
+import {
+  ArrowRight,
+  Buildings,
+  CheckCircle,
+  GlobeHemisphereWest,
+  TrendUp,
+} from "@phosphor-icons/react/dist/ssr";
+import { MarketingFooter } from "../../components/marketing/MarketingFooter";
+import { MarketingNav } from "../../components/marketing/MarketingNav";
+import {
+  ProductCanvas,
+  ProductVideoFrame,
+} from "@/components/public-site/ProductCanvas";
+import { PublicSectionHeading } from "@/components/public-site/PublicSectionHeading";
 
-const beliefCards = [
+const operatingBeliefs = [
   {
-    title: 'Clarity over complexity',
+    title: "Clarity over consulting language",
     description:
-      'We design for busy district leaders, not data engineers. Information should be easy to scan and easy to explain.',
+      "District leaders need to explain progress quickly. The product should reduce interpretation work, not increase it.",
   },
   {
-    title: 'Usefulness over flash',
+    title: "Readable hierarchy over visual clutter",
     description:
-      'Every element should help a parent, board member, or cabinet leader understand what is happening.',
+      "Plans, objectives, owners, and KPIs should align cleanly so the public surface tells one coherent story.",
   },
   {
-    title: 'Trust over hype',
+    title: "Update rhythm over presentation churn",
     description:
-      'We speak plainly and build with the restraint that public-sector work deserves.',
+      "The weekly cadence of leadership work matters more than a quarterly deck rebuild. We optimize for the operational rhythm.",
   },
   {
-    title: 'Accessibility over cleverness',
+    title: "Institutional trust over marketing noise",
     description:
-      'If a parent cannot read it on their phone, the page is not doing its job.',
+      "A district planning surface should feel current and credible, not overloaded with startup theatrics.",
   },
+] as const;
+
+const audienceItems = [
+  "K-12 school districts that need a public-facing strategic hub",
+  "Leadership teams managing cabinet, campus, and board communication",
+  "Organizations that want strategic reporting without custom software overhead",
 ] as const;
 
 export function AboutPage() {
@@ -31,221 +48,164 @@ export function AboutPage() {
     <div className="min-h-screen bg-background text-foreground">
       <MarketingNav />
 
-      <main>
-        <section className="mx-auto grid max-w-[1440px] grid-cols-1 items-center gap-12 px-6 pb-20 pt-24 md:grid-cols-12 md:px-12 md:pb-28">
-          <div className="md:col-span-7">
-            <div className="inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-low px-4 py-2 font-label text-[10px] font-bold uppercase tracking-[0.24em] text-on-surface-variant">
-              Our story
-            </div>
-            <h1 className="mt-8 max-w-3xl font-headline text-5xl font-black leading-[1.06] tracking-tighter text-primary md:text-[3.5rem]">
-              Modernizing how districts communicate strategic progress.
-            </h1>
-            <p className="mt-8 max-w-2xl text-xl leading-relaxed text-on-surface-variant">
-              Public education thrives on trust, transparency, and a shared community understanding
-              of where the district is headed.
-            </p>
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <a
-                href="mailto:sales@stratadash.org?subject=StrataDash%20demo"
-                className="tactile-button inline-flex items-center justify-center rounded-full px-10 py-4 font-headline text-lg font-bold text-white transition-transform hover:-translate-y-0.5"
-              >
-                Book a demo
-              </a>
-              <Link
-                href="/district/westside"
-                className="inline-flex items-center justify-center rounded-full border-2 border-primary/20 px-10 py-4 font-headline text-lg font-bold text-primary transition-colors hover:bg-primary/5"
-              >
-                View a live district example
-              </Link>
-            </div>
-          </div>
-
-          <div className="md:col-span-5">
-            <div className="aspect-[4/5] overflow-hidden rounded-2xl bg-surface-container-high editorial-shadow">
-              <img
-                src="/stitch/about-hero.png"
-                alt="Strategy meeting"
-                className="h-full w-full object-cover"
-              />
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-surface-container-low py-24 md:py-32">
-          <div className="mx-auto grid max-w-[1440px] grid-cols-1 gap-16 px-6 md:grid-cols-2 md:px-12">
-            <div className="lg:sticky lg:top-32">
-              <p className="mb-6 font-label text-sm font-bold uppercase tracking-[0.24em] text-secondary">
-                The catalyst
+      <main className="overflow-hidden">
+        <section className="mx-auto max-w-[1400px] px-6 pb-18 pt-14 md:px-10 md:pb-24 md:pt-18">
+          <div className="grid gap-16 lg:grid-cols-[minmax(0,0.88fr)_minmax(520px,1.12fr)] lg:items-center">
+            <div className="max-w-2xl">
+              <p className="public-kicker text-primary">About StrataDash</p>
+              <h1 className="mt-5 font-headline text-5xl font-semibold tracking-[-0.06em] text-on-surface md:text-7xl">
+                Modernizing how districts communicate strategic progress.
+              </h1>
+              <p className="mt-6 max-w-[64ch] text-lg leading-8 text-on-surface-variant md:text-xl">
+                We built StrataDash for leadership teams that are tired of
+                treating their most important public strategy like a file
+                attachment.
               </p>
-              <h2 className="max-w-xl font-headline text-5xl font-extrabold leading-tight tracking-tighter text-primary">
-                Strategic plans deserve better than a binder.
-              </h2>
-              <p className="mt-8 max-w-2xl text-lg leading-relaxed text-on-surface-variant">
-                For decades, the most ambitious goals for students have been buried in PDFs or
-                binders on a shelf. We saw a gap between the district vision and the community
-                understanding of that work.
-                <br />
-                <br />
-                StrataDash was built to bridge that gap with a public-facing dashboard that makes
-                progress visible, actionable, and modern.
-              </p>
-            </div>
-
-            <div className="space-y-6">
-              <article className="rounded-2xl border border-outline-variant/10 bg-surface p-8 editorial-shadow">
-                <MaterialIcon icon="description" size={36} className="mb-6 text-primary" />
-                <h3 className="font-headline text-2xl font-bold text-on-surface">The PDF problem</h3>
-                <p className="mt-4 text-on-surface-variant">
-                  Static documents are hard to update, hard to search, and rarely read by the
-                  public.
-                </p>
-              </article>
-              <article className="rounded-2xl border border-outline-variant/10 bg-surface p-8 editorial-shadow">
-                <MaterialIcon icon="history_edu" size={36} className="mb-6 text-primary" />
-                <h3 className="font-headline text-2xl font-bold text-on-surface">The trust gap</h3>
-                <p className="mt-4 text-on-surface-variant">
-                  When progress is hidden, skepticism grows. Visibility makes it easier to build
-                  confidence.
-                </p>
-              </article>
-              <article className="rounded-2xl border border-outline-variant/10 bg-surface p-8 editorial-shadow">
-                <MaterialIcon icon="payments" size={36} className="mb-6 text-primary" />
-                <h3 className="font-headline text-2xl font-bold text-on-surface">The budget reality</h3>
-                <p className="mt-4 text-on-surface-variant">
-                  Public funds should go to classrooms, not custom consulting software.
-                </p>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-background py-24 md:py-32">
-          <div className="mx-auto max-w-[1440px] px-6 md:px-12">
-            <div className="mb-16 text-center">
-              <h2 className="font-headline text-5xl font-black tracking-tighter text-on-surface">
-                Built for the institutional architect.
-              </h2>
-              <p className="mx-auto mt-6 max-w-2xl text-xl leading-relaxed text-on-surface-variant">
-                We serve the people managing the public systems that matter most.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-12">
-              <article className="relative overflow-hidden rounded-2xl bg-primary p-10 text-on-primary md:col-span-8">
-                <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(to_right,rgba(255,255,255,0.18)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.18)_1px,transparent_1px)] [background-size:24px_24px]" />
-                <div className="relative z-10 flex h-full flex-col justify-end">
-                  <h3 className="max-w-md font-headline text-4xl font-bold">K-12 school districts</h3>
-                  <p className="mt-4 max-w-lg text-lg leading-relaxed text-white/80">
-                    From small rural districts to large urban systems, the platform aligns cabinet
-                    teams and school boards under one source of truth.
-                  </p>
-                </div>
-              </article>
-
-              <article className="rounded-2xl bg-surface-container-highest p-10 md:col-span-4">
-                <MaterialIcon icon="hub" size={40} className="text-primary" />
-                <h3 className="mt-10 font-headline text-2xl font-bold text-on-surface">Charter networks</h3>
-                <p className="mt-4 text-on-surface-variant">
-                  Scale excellence by keeping strategic focus across multiple campuses and regions.
-                </p>
-              </article>
-
-              <article className="rounded-2xl bg-tertiary-fixed p-10 md:col-span-4">
-                <MaterialIcon icon="account_balance" size={40} className="text-tertiary" />
-                <h3 className="mt-10 font-headline text-2xl font-bold text-on-tertiary-fixed-variant">
-                  Education agencies
-                </h3>
-                <p className="mt-4 text-on-tertiary-fixed-variant/80">
-                  Visualize policy impact and resource allocation across regions without extra
-                  overhead.
-                </p>
-              </article>
-
-              <article className="flex items-center justify-between gap-12 rounded-2xl bg-surface-container-low p-10 md:col-span-8">
-                <div className="max-w-md">
-                  <h3 className="font-headline text-2xl font-bold text-on-surface">
-                    Public transparency
-                  </h3>
-                  <p className="mt-4 text-on-surface-variant">
-                    Built-in public dashboards make it easy for parents and taxpayers to understand
-                    district performance without a data degree.
-                  </p>
-                </div>
-                <div className="hidden h-32 w-48 items-center justify-center rounded-2xl bg-surface editorial-shadow lg:flex">
-                  <span className="font-label text-sm font-bold uppercase tracking-[0.24em] text-primary">
-                    98% on track
-                  </span>
-                </div>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-surface-container-high py-24 md:py-32">
-          <div className="mx-auto max-w-[1440px] px-6 md:px-12">
-            <div className="grid grid-cols-1 gap-16 lg:grid-cols-3">
-              <div>
-                <h2 className="font-headline text-4xl font-extrabold tracking-tighter text-primary">
-                  Our core beliefs
-                </h2>
-                <ul className="mt-10 space-y-8">
-                  <li className="flex gap-4">
-                    <MaterialIcon icon="check_circle" fill weight={700} className="text-secondary" />
-                    <span className="font-body font-bold text-on-surface">Usable transparency is a human right.</span>
-                  </li>
-                  <li className="flex gap-4">
-                    <MaterialIcon icon="check_circle" fill weight={700} className="text-secondary" />
-                    <span className="font-body font-bold text-on-surface">Visible progress accelerates growth.</span>
-                  </li>
-                  <li className="flex gap-4">
-                    <MaterialIcon icon="check_circle" fill weight={700} className="text-secondary" />
-                    <span className="font-body font-bold text-on-surface">Respect for public budgets is paramount.</span>
-                  </li>
-                  <li className="flex gap-4">
-                    <MaterialIcon icon="check_circle" fill weight={700} className="text-secondary" />
-                    <span className="font-body font-bold text-on-surface">No custom consulting should be needed.</span>
-                  </li>
-                </ul>
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <a
+                  href="mailto:sales@stratadash.org?subject=StrataDash%20demo"
+                  className="public-button-primary inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
+                >
+                  Book a demo
+                  <ArrowRight size={18} weight="bold" />
+                </a>
+                <Link
+                  href="/district/westside"
+                  className="public-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-semibold text-on-surface transition-colors hover:text-primary"
+                >
+                  View a live district example
+                  <ArrowRight size={18} weight="bold" />
+                </Link>
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 gap-6 lg:col-span-2 md:grid-cols-2">
-                {beliefCards.map((card, index) => (
-                  <article key={card.title} className="border-l-4 border-primary bg-surface/60 p-8">
-                    <p className="mb-4 font-label text-xs font-bold uppercase tracking-[0.24em] text-primary/60">
-                      Principle 0{index + 1}
-                    </p>
-                    <h3 className="font-headline text-2xl font-bold text-on-surface">{card.title}</h3>
-                    <p className="mt-4 text-sm leading-relaxed text-on-surface-variant">
-                      {card.description}
-                    </p>
-                  </article>
+            <ProductCanvas mode="analytics" />
+          </div>
+        </section>
+
+        <section className="border-y border-outline-variant/70 bg-white/74">
+          <div className="mx-auto grid max-w-[1400px] gap-6 px-6 py-8 md:px-10 lg:grid-cols-[1fr_1fr_1fr]">
+            {[
+              { label: "Built for district leadership teams", icon: Buildings },
+              {
+                label: "Public surfaces that stay current",
+                icon: GlobeHemisphereWest,
+              },
+              { label: "Board updates without deck churn", icon: TrendUp },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-4 rounded-[24px] px-2 py-2"
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <item.icon size={20} weight="bold" />
+                </span>
+                <p className="text-sm font-semibold tracking-[-0.02em] text-on-surface">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 md:py-30">
+          <div className="grid gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+            <PublicSectionHeading
+              eyebrow="Why it exists"
+              title="District plans deserve better than a binder."
+              description="The catalyst was simple: districts invest too much effort in strategy for the result to disappear into a PDF, a board packet, or a hard-to-find attachment on the website."
+            />
+            <ProductVideoFrame
+              label="Product-led story"
+              title="The interface is the explanation"
+              description="Current product reel"
+            />
+          </div>
+        </section>
+
+        <section className="bg-surface-container-low py-24">
+          <div className="mx-auto grid max-w-[1400px] gap-16 px-6 md:px-10 lg:grid-cols-[0.74fr_1.26fr]">
+            <PublicSectionHeading
+              eyebrow="Operating beliefs"
+              title="The design principle is institutional clarity."
+              description="We build around the communication burden that district leaders already carry. Every surface should make that burden lighter."
+            />
+            <div className="space-y-5">
+              {operatingBeliefs.map((belief) => (
+                <article
+                  key={belief.title}
+                  className="rounded-[28px] border border-outline-variant/70 bg-white/86 px-6 py-6 backdrop-blur-sm"
+                >
+                  <h2 className="text-xl font-semibold tracking-[-0.03em] text-on-surface">
+                    {belief.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-on-surface-variant">
+                    {belief.description}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 md:py-30">
+          <div className="grid gap-14 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+            <div className="public-gradient public-shadow-strong rounded-[34px] px-8 py-10 text-white md:px-10 md:py-12">
+              <p className="public-kicker text-white/70">Who it serves</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+                Built for the people managing public systems.
+              </h2>
+              <div className="mt-8 space-y-4">
+                {audienceItems.map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-start gap-3 rounded-[24px] border border-white/14 bg-white/8 px-4 py-4"
+                  >
+                    <CheckCircle
+                      size={16}
+                      weight="fill"
+                      className="mt-1 text-white"
+                    />
+                    <span className="text-sm leading-7 text-white">{item}</span>
+                  </div>
                 ))}
               </div>
             </div>
+            <ProductCanvas mode="editor" />
           </div>
         </section>
 
-        <section className="bg-primary py-24 text-center text-on-primary md:py-32">
-          <div className="mx-auto max-w-4xl px-6 md:px-12">
-            <h2 className="font-headline text-5xl font-black tracking-tighter text-white">
-              Ready to bring your strategic plan to life?
-            </h2>
-            <p className="mx-auto mt-8 max-w-2xl text-xl leading-relaxed text-on-primary-container">
-              Transparency, trust, and clarity should be the default.
-            </p>
-            <div className="mt-10 flex flex-col justify-center gap-4 sm:flex-row">
-              <a
-                href="mailto:sales@stratadash.org?subject=StrataDash%20demo"
-                className="inline-flex items-center justify-center rounded-full bg-surface px-12 py-5 font-headline text-xl font-black text-primary transition-transform hover:-translate-y-0.5"
-              >
-                Book a demo
-              </a>
-              <Link
-                href="/district/westside"
-                className="inline-flex items-center justify-center rounded-full border-2 border-white/30 px-12 py-5 font-headline text-xl font-black text-white transition-colors hover:bg-white/10"
-              >
-                View live example
-              </Link>
+        <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10">
+          <div className="public-gradient public-shadow-strong overflow-hidden rounded-[36px] px-8 py-10 text-white md:px-12 md:py-14">
+            <div className="grid gap-8 lg:grid-cols-[0.88fr_0.72fr] lg:items-end">
+              <div>
+                <p className="public-kicker text-white/70">Next step</p>
+                <h2 className="mt-4 max-w-3xl font-headline text-4xl font-semibold tracking-[-0.05em] md:text-6xl">
+                  Ready to bring your strategic plan to life?
+                </h2>
+              </div>
+              <div className="lg:justify-self-end">
+                <p className="max-w-xl text-base leading-8 text-white/78">
+                  Transparency, trust, and readable progress should be the
+                  default surface for a district strategy.
+                </p>
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                  <a
+                    href="mailto:sales@stratadash.org?subject=StrataDash%20demo"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 text-base font-semibold text-primary transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
+                  >
+                    Book a demo
+                    <ArrowRight size={18} weight="bold" />
+                  </a>
+                  <Link
+                    href="/district/westside"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-7 py-4 text-base font-semibold text-white transition-colors hover:bg-white/10"
+                  >
+                    View live example
+                    <ArrowRight size={18} weight="bold" />
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>

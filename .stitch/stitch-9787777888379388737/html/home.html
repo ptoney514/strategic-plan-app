@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StrataDash | Strategic Planning for Modern Districts</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;800;900&amp;family=Manrope:wght@400;500;600&amp;family=Space+Grotesk:wght@500;700&amp;family=Outfit:wght@400;700&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3036",
+                        "on-surface-variant": "#42474f",
+                        "on-primary-container": "#b4d6ff",
+                        "on-primary-fixed": "#001d35",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e1e2e9",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#2f5e8a",
+                        "tertiary-container": "#006760",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#33618e",
+                        "tertiary-fixed-dim": "#83d5cb",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-primary": "#9ecafc",
+                        "tertiary": "#004d47",
+                        "outline": "#72777f",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e1e2e9",
+                        "on-secondary-container": "#65000b",
+                        "secondary-container": "#fd625f",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "surface-container": "#ecedf5",
+                        "on-secondary-fixed-variant": "#8f0d19",
+                        "primary": "#0f4671",
+                        "surface-container-low": "#f2f3fa",
+                        "on-tertiary-container": "#90e3d9",
+                        "surface": "#f8f9ff",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "surface-container-high": "#e6e8ef",
+                        "primary-fixed": "#d0e4ff",
+                        "secondary-fixed": "#ffdad7",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#191c21",
+                        "on-surface": "#191c21",
+                        "background": "#f8f9ff",
+                        "secondary": "#b12a2e",
+                        "tertiary-fixed": "#9ff1e7",
+                        "on-secondary-fixed": "#410005",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c2c7d0",
+                        "inverse-on-surface": "#eff0f8",
+                        "on-tertiary-fixed": "#00201d",
+                        "surface-dim": "#d8dae1",
+                        "on-primary-fixed-variant": "#154974",
+                        "primary-fixed-dim": "#9ecafc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit", "Epilogue", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .editorial-gradient {
+            background: linear-gradient(135deg, #0F4671 0%, #2F5E8A 100%);
+        }
+        .canvas-bg { background-color: #F5F2EA; }
+    </style>
+</head>
+<body class="canvas-bg font-body text-on-surface antialiased">
+<!-- Top Navigation -->
+<nav class="sticky top-0 w-full z-50 bg-[#F5F2EA] dark:bg-slate-950 backdrop-blur-md opacity-90">
+<div class="flex justify-between items-center px-6 md:px-12 py-6 max-w-[1440px] mx-auto">
+<div class="text-2xl font-black text-[#171A1F] dark:text-slate-100 font-headline tracking-tighter">
+                StrataDash
+            </div>
+<div class="hidden md:flex items-center gap-8 font-headline font-bold tracking-tight text-sm">
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">Product</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">Pricing</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">About</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">Sign in</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="editorial-gradient text-white px-6 py-2.5 rounded-full font-headline font-bold text-sm transition-transform scale-95 active:scale-90 duration-200">
+                    Book a demo
+                </button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-24 px-6 md:px-12 max-w-[1440px] mx-auto">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+<div class="lg:col-span-6 space-y-8">
+<h1 class="text-5xl lg:text-7xl font-black font-headline text-on-surface leading-[1.1] tracking-tighter">
+                        Your strategic plan deserves better than a <span class="text-primary italic">PDF.</span>
+</h1>
+<p class="text-xl text-on-surface-variant leading-relaxed max-w-xl">
+                        StrataDash helps forward-thinking school districts transform static documents into interactive, branded dashboards that build public trust and board alignment.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 pt-4">
+<button class="editorial-gradient text-white px-8 py-4 rounded-full font-headline font-bold text-lg shadow-xl shadow-primary/10 hover:shadow-primary/20 transition-all">
+                            Book a demo
+                        </button>
+<button class="border border-outline-variant bg-surface text-on-surface px-8 py-4 rounded-full font-headline font-bold text-lg hover:bg-surface-container-low transition-all">
+                            View a live district example
+                        </button>
+</div>
+</div>
+<div class="lg:col-span-6 relative h-[500px] lg:h-[600px]">
+<!-- Layered Mockups -->
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="relative w-full h-full max-w-lg">
+<!-- Main Window -->
+<div class="absolute top-0 right-0 w-[85%] aspect-[4/3] bg-surface rounded-xl shadow-2xl border border-outline-variant/10 overflow-hidden z-10">
+<div class="p-4 bg-surface-container-high flex items-center gap-2">
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-error/30"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-tertiary/30"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-primary/30"></div>
+</div>
+<div class="bg-surface px-3 py-1 rounded text-[10px] font-mono text-outline-variant w-40">westside.stratadash.com</div>
+</div>
+<div class="p-6 space-y-4">
+<div class="h-6 w-32 bg-surface-container-highest rounded"></div>
+<div class="grid grid-cols-2 gap-4">
+<div class="h-24 bg-surface-container-low rounded-lg p-3">
+<div class="h-2 w-12 bg-primary/20 rounded mb-2"></div>
+<div class="h-8 w-16 bg-primary/10 rounded"></div>
+</div>
+<div class="h-24 bg-surface-container-low rounded-lg p-3">
+<div class="h-2 w-12 bg-tertiary/20 rounded mb-2"></div>
+<div class="h-8 w-16 bg-tertiary/10 rounded"></div>
+</div>
+</div>
+<div class="h-32 bg-surface-container rounded-lg"></div>
+</div>
+</div>
+<!-- Detail Panel -->
+<div class="absolute -bottom-4 -left-4 w-64 bg-surface rounded-xl shadow-xl border border-outline-variant/20 p-6 z-20">
+<div class="flex items-center gap-3 mb-4">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label text-xs uppercase tracking-wider text-on-tertiary-fixed-variant">On Target</span>
+</div>
+<h4 class="font-headline font-bold text-sm mb-2">Early Literacy Initiative</h4>
+<div class="h-1.5 w-full bg-surface-container-high rounded-full overflow-hidden">
+<div class="h-full w-4/5 bg-tertiary rounded-full"></div>
+</div>
+<div class="mt-3 font-mono text-[10px] text-on-surface-variant flex justify-between">
+<span>Progress</span>
+<span>82%</span>
+</div>
+</div>
+<!-- Background Abstract -->
+<div class="absolute -top-10 -right-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
+<div class="absolute bottom-10 left-10 w-48 h-48 bg-tertiary/5 rounded-full blur-2xl -z-10"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Strip -->
+<section class="py-12 bg-surface border-y border-outline-variant/10">
+<div class="max-w-[1440px] mx-auto px-12 flex flex-wrap justify-between items-center gap-8">
+<div class="flex items-center gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">account_balance</span>
+</div>
+<span class="font-headline font-bold text-xs uppercase tracking-widest">Built for district leadership teams</span>
+</div>
+<div class="flex items-center gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">present_to_all</span>
+</div>
+<span class="font-headline font-bold text-xs uppercase tracking-widest">Made for board presentations</span>
+</div>
+<div class="flex items-center gap-4 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl">devices</span>
+</div>
+<span class="font-headline font-bold text-xs uppercase tracking-widest">Readable on any device</span>
+</div>
+</div>
+</section>
+<!-- Problem/Contrast Section -->
+<section class="py-24 px-6 md:px-12 max-w-[1440px] mx-auto">
+<div class="text-center mb-16">
+<h2 class="text-3xl md:text-5xl font-black font-headline tracking-tighter mb-4">Why upgrade from a PDF?</h2>
+<div class="h-1 w-24 bg-primary mx-auto rounded-full"></div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-px bg-outline-variant/20 rounded-xl overflow-hidden shadow-sm">
+<!-- The Old Way -->
+<div class="bg-surface-container-low p-12 space-y-8">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-error-container text-on-error-container font-label text-xs uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm">block</span>
+                        The Old Way
+                    </div>
+<div class="space-y-6">
+<div class="p-6 bg-surface rounded-lg opacity-60 flex items-start gap-4 border border-error/10">
+<span class="material-symbols-outlined text-error">picture_as_pdf</span>
+<div>
+<h4 class="font-bold mb-1">Static Attachments</h4>
+<p class="text-sm">Hard to find on the website, difficult to read on mobile.</p>
+</div>
+</div>
+<div class="p-6 bg-surface rounded-lg opacity-60 flex items-start gap-4 border border-error/10">
+<span class="material-symbols-outlined text-error">update_disabled</span>
+<div>
+<h4 class="font-bold mb-1">Instantly Outdated</h4>
+<p class="text-sm">The moment it's printed, the data is months old.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- The StrataDash Way -->
+<div class="bg-surface p-12 space-y-8 border-l border-outline-variant/10">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed-variant font-label text-xs uppercase tracking-tighter">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                        The StrataDash Way
+                    </div>
+<div class="space-y-6">
+<div class="p-6 bg-surface-container-low rounded-lg flex items-start gap-4 border border-tertiary/10">
+<span class="material-symbols-outlined text-tertiary">dashboard</span>
+<div>
+<h4 class="font-bold mb-1">Live Public Dashboard</h4>
+<p class="text-sm">A centralized, beautiful URL that stays updated.</p>
+</div>
+</div>
+<div class="p-6 bg-surface-container-low rounded-lg flex items-start gap-4 border border-tertiary/10">
+<span class="material-symbols-outlined text-tertiary">monitoring</span>
+<div>
+<h4 class="font-bold mb-1">Dynamic KPI Tracking</h4>
+<p class="text-sm">Connect data directly to your strategic goals.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Product Preview (3 Frames) -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-[1440px] mx-auto px-6 md:px-12">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+<!-- Frame 1: Plan Landing -->
+<div class="space-y-6">
+<div class="aspect-video bg-surface rounded-xl overflow-hidden shadow-lg border border-outline-variant/10 p-6 flex flex-col justify-between">
+<div class="flex justify-between items-center mb-4">
+<div class="h-4 w-24 bg-surface-container-high rounded"></div>
+<div class="h-4 w-4 bg-surface-container-high rounded-full"></div>
+</div>
+<div class="space-y-3">
+<div class="h-8 w-48 bg-primary/10 rounded"></div>
+<div class="h-2 w-full bg-tertiary/20 rounded-full">
+<div class="h-full w-2/3 bg-tertiary rounded-full"></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 mt-6">
+<div class="h-16 bg-surface-container-low rounded"></div>
+<div class="h-16 bg-surface-container-low rounded"></div>
+</div>
+</div>
+<h3 class="text-xl font-bold font-headline">1. Central Plan Hub</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">A high-level view of district health with visual status bars and strategic pillars clearly defined for the public.</p>
+</div>
+<!-- Frame 2: Objective Overview -->
+<div class="space-y-6 lg:mt-12">
+<div class="aspect-video bg-surface rounded-xl overflow-hidden shadow-lg border border-outline-variant/10 p-6">
+<div class="space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<div class="h-3 w-32 bg-surface-container-highest rounded"></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
+<div class="h-3 w-40 bg-surface-container-highest rounded"></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<div class="h-3 w-24 bg-surface-container-highest rounded"></div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-2 h-2 rounded-full bg-tertiary"></div>
+<div class="h-3 w-48 bg-surface-container-highest rounded"></div>
+</div>
+</div>
+</div>
+<h3 class="text-xl font-bold font-headline">2. Strategic Alignment</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Map every objective to a status. Whether 'On Target' or 'Needs Support', maintain transparency with a simple dot-grid UI.</p>
+</div>
+<!-- Frame 3: Goal Detail -->
+<div class="space-y-6 lg:mt-24">
+<div class="aspect-video bg-surface rounded-xl overflow-hidden shadow-lg border border-outline-variant/10 p-6 flex gap-4">
+<div class="w-1/3 bg-surface-container-low rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-outline-variant">bar_chart</span>
+</div>
+<div class="w-2/3 space-y-2">
+<div class="h-4 w-full bg-surface-container-highest rounded"></div>
+<div class="h-2 w-1/2 bg-surface-container-high rounded"></div>
+<div class="h-10 w-full bg-surface-container-low rounded mt-4"></div>
+</div>
+</div>
+<h3 class="text-xl font-bold font-headline">3. Deep-Dive Metrics</h3>
+<p class="text-sm text-on-surface-variant leading-relaxed">Drill down into specific KPIs. Connect your goals to real metrics, charts, and detailed status updates for the board.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works -->
+<section class="py-24 px-6 md:px-12 max-w-[1200px] mx-auto">
+<div class="text-center mb-20">
+<h2 class="text-4xl font-black font-headline tracking-tighter mb-4">Go live in three steps</h2>
+<p class="text-on-surface-variant">Simple enough for a small team, powerful enough for the whole district.</p>
+</div>
+<div class="relative">
+<div class="absolute top-12 left-0 w-full h-0.5 bg-outline-variant/30 hidden md:block"></div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-16 relative z-10">
+<div class="flex flex-col items-center text-center group">
+<div class="w-24 h-24 rounded-full bg-surface border-4 border-primary flex items-center justify-center text-primary font-mono text-3xl font-black mb-8 shadow-xl group-hover:scale-110 transition-transform">1</div>
+<h4 class="text-xl font-bold font-headline mb-3">Import your plan</h4>
+<p class="text-sm text-on-surface-variant">Upload your existing spreadsheet or PDF content. Our engine extracts your hierarchy automatically.</p>
+</div>
+<div class="flex flex-col items-center text-center group">
+<div class="w-24 h-24 rounded-full bg-surface border-4 border-primary flex items-center justify-center text-primary font-mono text-3xl font-black mb-8 shadow-xl group-hover:scale-110 transition-transform">2</div>
+<h4 class="text-xl font-bold font-headline mb-3">Brand your hub</h4>
+<p class="text-sm text-on-surface-variant">Add your district logo, colors, and mission statement to create a seamless extension of your website.</p>
+</div>
+<div class="flex flex-col items-center text-center group">
+<div class="w-24 h-24 rounded-full bg-surface border-4 border-primary flex items-center justify-center text-primary font-mono text-3xl font-black mb-8 shadow-xl group-hover:scale-110 transition-transform">3</div>
+<h4 class="text-xl font-bold font-headline mb-3">Share &amp; Sync</h4>
+<p class="text-sm text-on-surface-variant">Launch your subdomain and give your team access to update metrics quarterly or monthly.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="py-24 bg-surface border-y border-outline-variant/10">
+<div class="max-w-[1440px] mx-auto px-6 md:px-12">
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+<!-- Public Facing -->
+<div class="space-y-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">public</span>
+<h3 class="text-2xl font-black font-headline">For the Public</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="p-8 bg-surface-container-low rounded-xl space-y-4 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary">palette</span>
+<h4 class="font-bold">District Branding</h4>
+<p class="text-xs text-on-surface-variant">A custom interface that matches your district's visual identity.</p>
+</div>
+<div class="p-8 bg-surface-container-low rounded-xl space-y-4 hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-primary">layers</span>
+<h4 class="font-bold">Clear Hierarchy</h4>
+<p class="text-xs text-on-surface-variant">Logic flows from pillars to goals to measurable KPIs.</p>
+</div>
+</div>
+</div>
+<!-- Admin Facing -->
+<div class="space-y-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-3xl">admin_panel_settings</span>
+<h3 class="text-2xl font-black font-headline">For Admins</h3>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+<div class="p-8 bg-surface-container-low rounded-xl space-y-4 hover:bg-surface-container transition-colors border-l-4 border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">edit_note</span>
+<h4 class="font-bold">Intuitive Editor</h4>
+<p class="text-xs text-on-surface-variant">Update goal progress and narratives in seconds, not hours.</p>
+</div>
+<div class="p-8 bg-surface-container-low rounded-xl space-y-4 hover:bg-surface-container transition-colors border-l-4 border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary">group</span>
+<h4 class="font-bold">Team Access</h4>
+<p class="text-xs text-on-surface-variant">Assign department heads to specific goals for accountability.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ -->
+<section class="py-24 px-6 md:px-12 max-w-[900px] mx-auto">
+<h2 class="text-3xl font-black font-headline mb-12 text-center">Frequently asked questions</h2>
+<div class="space-y-6">
+<div class="bg-surface p-6 rounded-xl border border-outline-variant/10 shadow-sm">
+<button class="flex justify-between items-center w-full text-left font-bold font-headline">
+                        Can we import from our existing Excel sheet?
+                        <span class="material-symbols-outlined text-primary">add</span>
+</button>
+<div class="mt-4 text-sm text-on-surface-variant leading-relaxed">
+                        Yes. Most districts start with an Excel or Google Sheet. You can upload it directly, and our platform will map your rows to the dashboard hierarchy.
+                    </div>
+</div>
+<div class="bg-surface p-6 rounded-xl border border-outline-variant/10 shadow-sm">
+<button class="flex justify-between items-center w-full text-left font-bold font-headline">
+                        How much does branding cost?
+                        <span class="material-symbols-outlined text-primary">add</span>
+</button>
+<div class="mt-4 text-sm text-on-surface-variant leading-relaxed">
+                        Custom district branding is included in all our tiers. We believe your strategic plan should look and feel like your district, not our software.
+                    </div>
+</div>
+<div class="bg-surface p-6 rounded-xl border border-outline-variant/10 shadow-sm">
+<button class="flex justify-between items-center w-full text-left font-bold font-headline">
+                        Can we keep some goals internal only?
+                        <span class="material-symbols-outlined text-primary">add</span>
+</button>
+<div class="mt-4 text-sm text-on-surface-variant leading-relaxed">
+                        Absolutely. You can toggle visibility for every individual goal or KPI, keeping sensitive operational data private while showcasing public success.
+                    </div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-24 px-6 md:px-12">
+<div class="max-w-[1200px] mx-auto editorial-gradient rounded-xl p-12 md:p-24 text-center text-white relative overflow-hidden">
+<!-- Decorative elements -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+<div class="absolute -bottom-24 -left-24 w-64 h-64 bg-white/5 rounded-full blur-3xl"></div>
+<div class="relative z-10 space-y-8">
+<h2 class="text-4xl md:text-6xl font-black font-headline tracking-tighter leading-tight">
+                        Ready to make your strategy<br/>visible to the community?
+                    </h2>
+<p class="text-xl text-on-primary-container max-w-2xl mx-auto">
+                        Join forward-thinking school districts that are moving away from dusty PDF binders toward live, transparent leadership.
+                    </p>
+<div class="flex flex-col sm:flex-row justify-center gap-6 pt-8">
+<button class="bg-white text-primary px-10 py-5 rounded-full font-headline font-black text-xl hover:scale-105 transition-transform shadow-2xl">
+                            Book a demo
+                        </button>
+<a class="inline-flex items-center justify-center px-10 py-5 font-headline font-bold text-xl border border-white/30 rounded-full hover:bg-white/10 transition-colors" href="#">
+                            Explore Pricing
+                        </a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#FFFFFF] dark:bg-slate-900 w-full border-t border-[#171A1F]/5">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-24 max-w-[1440px] mx-auto font-body leading-relaxed text-sm">
+<div class="space-y-6">
+<div class="text-xl font-bold text-[#171A1F] dark:text-slate-100 font-headline">StrataDash</div>
+<p class="text-[#171A1F]/60 dark:text-slate-400">Transforming strategic planning for K-12 leadership teams.</p>
+</div>
+<div>
+<h5 class="font-bold mb-6">Product</h5>
+<ul class="space-y-4">
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Pricing</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Features</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Security</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6">Company</h5>
+<ul class="space-y-4">
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">About</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Careers</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Press</a></li>
+</ul>
+</div>
+<div>
+<h5 class="font-bold mb-6">Legal</h5>
+<ul class="space-y-4">
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Privacy</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-colors" href="#">Terms</a></li>
+</ul>
+</div>
+</div>
+<div class="px-12 py-8 max-w-[1440px] mx-auto border-t border-outline-variant/10 text-center md:text-left text-[#171A1F]/60 dark:text-slate-400 font-body text-xs">
+            © 2024 StrataDash. Your strategic plan deserves better than a PDF.
+        </div>
+</footer>
+</body></html>

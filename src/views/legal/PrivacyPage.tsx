@@ -50,7 +50,7 @@ function PrivacySection({
 export function PrivacyPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <MarketingNav variant="document" />
+      <MarketingNav />
 
       <PublicDocumentShell
         eyebrow="Privacy policy"
@@ -238,7 +238,7 @@ export function PrivacyPage() {
         </section>
       </PublicDocumentShell>
 
-      <MarketingFooter variant="document" />
+      <MarketingFooter />
     </div>
   );
 }

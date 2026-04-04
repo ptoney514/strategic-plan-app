@@ -80,7 +80,7 @@ export function MarketingLanding() {
       `}</style>
 
       {/* Navigation */}
-      <MarketingNav onDemoClick={handleDemoClick} />
+      <MarketingNav />
 
       {/* Hero Section */}
       <HeroSection onDemoClick={handleDemoClick} />

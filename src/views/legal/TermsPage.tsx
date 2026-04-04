@@ -52,7 +52,7 @@ function TermsSection({
 export function TermsPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <MarketingNav variant="document" />
+      <MarketingNav />
 
       <PublicDocumentShell
         eyebrow="Legal document"
@@ -208,7 +208,7 @@ export function TermsPage() {
         </section>
       </PublicDocumentShell>
 
-      <MarketingFooter variant="document" />
+      <MarketingFooter />
     </div>
   );
 }

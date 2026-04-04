@@ -8,7 +8,7 @@ describe("V2Landing", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /publish strategy like a current product, not an archived file/i,
+        name: /make your strategic plan visible to your community/i,
       }),
     ).toBeInTheDocument();
   });
@@ -23,25 +23,22 @@ describe("V2Landing", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Book a demo CTA button", () => {
+  it("renders Request a demo CTA button", () => {
     render(<V2Landing />);
 
-    const ctaLink = screen
-      .getAllByText("Book a demo")
+    const ctaLinks = screen
+      .getAllByText("Request a demo")
       .map((node) => node.closest("a"))
-      .find((link) => link?.getAttribute("href")?.startsWith("mailto:"));
+      .filter((link) => link?.getAttribute("href") === "/demo");
 
-    expect(ctaLink).toBeInTheDocument();
-    expect(ctaLink).toHaveAttribute(
-      "href",
-      "mailto:sales@stratadash.org?subject=StrataDash%20demo",
-    );
+    expect(ctaLinks.length).toBeGreaterThan(0);
+    expect(ctaLinks[0]).toBeInTheDocument();
   });
 
-  it("renders live example link", () => {
+  it("renders example dashboard link", () => {
     render(<V2Landing />);
 
-    const exampleLink = screen.getByText("View a live district example");
+    const exampleLink = screen.getByText("View example dashboard");
     expect(exampleLink).toBeInTheDocument();
     expect(exampleLink.closest("a")).toHaveAttribute(
       "href",
@@ -53,13 +50,27 @@ describe("V2Landing", () => {
     render(<V2Landing />);
 
     expect(
-      screen.getByText("A strategic plan people will actually read."),
+      screen.getByText("Built for clarity. Designed for results."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("A rollout sequence that fits district reality."),
+      screen.getByText("High-fidelity metrics for every KPI"),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Questions districts ask before switching."),
+      screen.getByText(/Ready to visualize your district/i),
     ).toBeInTheDocument();
+  });
+
+  it("renders social proof strip with district names", () => {
+    render(<V2Landing />);
+
+    expect(screen.getByText("WESTSIDE USD")).toBeInTheDocument();
+    expect(screen.getByText("EASTSIDE ISD")).toBeInTheDocument();
+  });
+
+  it("renders leadership and community cards", () => {
+    render(<V2Landing />);
+
+    expect(screen.getByText("For Leadership")).toBeInTheDocument();
+    expect(screen.getByText("For Community")).toBeInTheDocument();
   });
 });

@@ -5,7 +5,6 @@ import {
   CheckCircle,
   Eye,
   FileText,
-  GearSix,
   PresentationChart,
   TrendUp,
 } from "@phosphor-icons/react/dist/ssr";

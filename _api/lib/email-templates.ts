@@ -100,3 +100,39 @@ export function passwordResetEmailHtml(resetUrl: string): string {
   `;
   return layout(content);
 }
+
+export function demoRequestNotificationHtml(fields: {
+  name: string;
+  email: string;
+  organization: string;
+  role: string;
+  message: string;
+}): string {
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:20px;color:#111827;font-weight:600;">New Demo Request</h2>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;width:120px;">Name</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;">${fields.name}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;">Email</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;"><a href="mailto:${fields.email}">${fields.email}</a></td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;">Organization</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;">${fields.organization || "Not provided"}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;">Role</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;">${fields.role}</td>
+      </tr>
+    </table>
+    <div style="padding:16px;background:#f9fafb;border-radius:8px;margin-bottom:16px;">
+      <p style="margin:0 0 8px;font-size:13px;color:#6b7280;font-weight:600;">Message</p>
+      <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;white-space:pre-wrap;">${fields.message}</p>
+    </div>
+    ${footer("Reply directly to this email to respond to the prospect.")}
+  `;
+  return layout(content);
+}

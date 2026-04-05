@@ -1,5 +1,6 @@
 'use client'
-import type { ReactNode } from 'react';
+import { useMemo, type ReactNode } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useSubdomain } from '@/contexts/SubdomainContext';
 import { useDistrict } from '@/hooks/useDistricts';
@@ -26,7 +27,10 @@ function SidebarContent() {
   const { data: goals } = useGoalsByPlan(activePlan?.id || '');
   const { mobileOpen, closeMobile } = usePublicSidebar();
 
-  const objectives: HierarchicalGoal[] = (goals?.filter((g) => g.level === 0) || []) as HierarchicalGoal[];
+  const objectives = useMemo(
+    () => (goals?.filter((g) => g.level === 0) || []) as HierarchicalGoal[],
+    [goals],
+  );
 
   const planCycle = activePlan
     ? `${activePlan.start_date?.slice(0, 4) || ''}-${activePlan.end_date?.slice(0, 4) || ''} Strategic Cycle`
@@ -77,22 +81,33 @@ function SidebarContent() {
             {navItems.map((item) => {
               const isObjectivesTree = item.icon === 'account_tree';
               const isActive = isObjectivesTree
-                ? pathname.includes('/objectives')
+                ? pathname.includes('/objectives') || pathname.includes('/goals/')
                 : pathname === item.href;
+              const isDisabled = item.href === '#';
+              const itemClasses = `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
+                isActive
+                  ? 'text-violet-700 font-semibold border-l-4 border-violet-700 bg-violet-50/50'
+                  : isDisabled
+                  ? 'text-slate-300 cursor-not-allowed'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
+              }`;
 
               return (
                 <div key={item.icon}>
-                  <a
-                    href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${
-                      isActive
-                        ? 'text-violet-700 font-semibold border-l-4 border-violet-700 bg-violet-50/50'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100'
-                    }`}
-                  >
-                    <MaterialIcon icon={item.icon} size={20} />
-                    <span className="text-sm font-medium">{item.label}</span>
-                  </a>
+                  {isDisabled ? (
+                    <div
+                      aria-disabled="true"
+                      className={itemClasses}
+                    >
+                      <MaterialIcon icon={item.icon} size={20} />
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </div>
+                  ) : (
+                    <Link href={item.href} className={itemClasses}>
+                      <MaterialIcon icon={item.icon} size={20} />
+                      <span className="text-sm font-medium">{item.label}</span>
+                    </Link>
+                  )}
 
                   {/* Objectives Tree nested items */}
                   {isObjectivesTree && isActive && objectives.length > 0 && (

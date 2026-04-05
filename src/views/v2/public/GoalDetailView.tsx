@@ -1,4 +1,6 @@
 'use client'
+import Link from 'next/link';
+import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
 import { useSubdomain } from '@/contexts/SubdomainContext';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
@@ -10,30 +12,32 @@ import { GoalKpiPanel } from '@/components/v2/public/GoalKpiPanel';
 import { SvgDonutChart } from '@/components/v2/public/SvgDonutChart';
 import { GoalBarChart } from '@/components/v2/public/GoalBarChart';
 import { SubGoalAccordion } from '@/components/v2/public/SubGoalAccordion';
-import { statusBadgeClasses, statusBadgeLabel, computeGoalTrend } from '@/lib/utils/goalHealth';
+import { WidgetGrid } from '@/components/v2/widgets/WidgetGrid';
+import {
+  statusBadgeClasses,
+  statusBadgeLabel,
+  computeGoalTrend,
+} from '@/lib/utils/goalHealth';
 import type { HierarchicalGoal } from '@/lib/types';
 import type { Widget } from '@/lib/types/v2';
+import { findGoalLineage } from '@/lib/utils/goalTree';
 
-function findGoalInHierarchy(goals: HierarchicalGoal[], id: string): HierarchicalGoal | undefined {
-  for (const g of goals) {
-    if (g.id === id) return g;
-    const found = findGoalInHierarchy(g.children || [], id);
-    if (found) return found;
-  }
-  return undefined;
+function sortWidgets(widgets: Widget[]): Widget[] {
+  return [...widgets].sort((a, b) => a.position - b.position);
 }
 
-function findParentObjective(goals: HierarchicalGoal[], goalId: string): HierarchicalGoal | undefined {
-  for (const obj of goals) {
-    if (obj.level === 0) {
-      const found = (obj.children || []).find((c) => c.id === goalId);
-      if (found) return obj;
-      for (const child of obj.children || []) {
-        const grandchild = (child.children || []).find((gc) => gc.id === goalId);
-        if (grandchild) return obj;
-      }
-    }
+function formatWidgetValue(widget?: Widget, fallbackProgress?: number): string | undefined {
+  if (widget?.config?.value != null) {
+    const unit = widget.config.unit || '';
+    if (unit === '%') return `${widget.config.value}%`;
+    if (unit) return `${widget.config.value} ${unit}`;
+    return String(widget.config.value);
   }
+
+  if (fallbackProgress != null) {
+    return `${fallbackProgress}%`;
+  }
+
   return undefined;
 }
 
@@ -46,20 +50,127 @@ export function GoalDetailView() {
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
   const { data: allGoals, isLoading } = useGoalsByPlan(activePlan?.id || '');
 
-  const goal = allGoals && goalId ? findGoalInHierarchy(allGoals as HierarchicalGoal[], goalId) : undefined;
-  const parentObj = allGoals ? findParentObjective(allGoals as HierarchicalGoal[], goalId) : undefined;
-  const children: HierarchicalGoal[] = (goal?.children || []) as HierarchicalGoal[];
+  const goals = useMemo(
+    () => (allGoals || []) as HierarchicalGoal[],
+    [allGoals],
+  );
+  const lineage = useMemo(
+    () => (goalId ? findGoalLineage(goals, goalId) : []),
+    [goalId, goals],
+  );
 
-  const allGoalIds = [goalId, ...children.map((c) => c.id)].filter(Boolean) as string[];
-  const { data: widgets } = useWidgetsByGoals(slug || '', allGoalIds);
+  const goal = lineage[lineage.length - 1];
+  const objective = lineage.find((node) => node.level === 0);
+  const parentNode = lineage.length > 1 ? lineage[lineage.length - 2] : undefined;
+  const children = useMemo(
+    () => (goal?.children || []) as HierarchicalGoal[],
+    [goal],
+  );
+  const siblingGoals = useMemo(
+    () => (parentNode ? (parentNode.children || []).filter((node) => node.id !== goalId) : []),
+    [goalId, parentNode],
+  );
+  const comparisonGoals = useMemo(
+    () => (children.length > 0 ? children : siblingGoals),
+    [children, siblingGoals],
+  );
 
-  const primaryWidget: Widget | undefined = widgets?.find((w) => w.goalId === goalId);
-  const trend = computeGoalTrend(primaryWidget);
-  const config = primaryWidget?.config || {};
+  const relevantGoalIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (goalId) ids.add(goalId);
+    children.forEach((child) => ids.add(child.id));
+    comparisonGoals.forEach((comparisonGoal) => ids.add(comparisonGoal.id));
+    return Array.from(ids);
+  }, [children, comparisonGoals, goalId]);
 
-  // Determine chart type: donut for progress-bar/donut, bar for bar-chart/area-line
-  const isDonut = !primaryWidget || primaryWidget.type === 'donut' || primaryWidget.type === 'progress-bar' || primaryWidget.type === 'big-number';
+  const { data: widgets } = useWidgetsByGoals(slug || '', relevantGoalIds);
+
+  const widgetsByGoal = useMemo(() => {
+    const widgetMap = new Map<string, Widget[]>();
+
+    (widgets || []).forEach((widget) => {
+      if (!widget.goalId) return;
+      const currentList = widgetMap.get(widget.goalId) || [];
+      currentList.push(widget);
+      widgetMap.set(widget.goalId, currentList);
+    });
+
+    widgetMap.forEach((widgetList, key) => {
+      widgetMap.set(key, sortWidgets(widgetList));
+    });
+
+    return widgetMap;
+  }, [widgets]);
+
+  const currentGoalWidgets = goalId ? widgetsByGoal.get(goalId) || [] : [];
+  const primaryWidget = currentGoalWidgets[0];
+  const supplementalWidgets = currentGoalWidgets.slice(1);
+  const comparisonWidgets = comparisonGoals
+    .map((comparisonGoal) => (widgetsByGoal.get(comparisonGoal.id) || [])[0])
+    .filter((widget): widget is Widget => Boolean(widget));
+
+  const derivedTrend = primaryWidget
+    ? computeGoalTrend(primaryWidget)
+    : {
+        delta: 0,
+        direction: 'flat' as const,
+        value: goal?.overall_progress ?? 0,
+        target: 100,
+        baseline: 0,
+        progress: goal?.overall_progress ?? 0,
+      };
+
+  const chartConfig = primaryWidget?.config || {};
+  const unit = chartConfig.unit || '%';
+  const isDonutWidget = primaryWidget
+    ? primaryWidget.type === 'donut'
+      || primaryWidget.type === 'progress-bar'
+      || primaryWidget.type === 'big-number'
+    : false;
   const isBarChart = primaryWidget?.type === 'bar-chart' || primaryWidget?.type === 'area-line';
+  const subGoalItems = children.map((child) => {
+    const childWidget = (widgetsByGoal.get(child.id) || [])[0];
+
+    return {
+      id: child.id,
+      goalNumber: child.goal_number,
+      title: child.title,
+      description: child.description,
+      href: `${basePath}/goals/${child.id}`,
+      target: childWidget?.config?.target,
+      current: childWidget?.config?.value,
+      unit: childWidget?.config?.unit || unit,
+      status: child.status,
+      valuePreview: formatWidgetValue(childWidget, child.overall_progress),
+      childCount: child.children?.length || 0,
+    };
+  });
+
+  const breadcrumbItems = [
+    { label: 'Plan', href: basePath },
+    ...lineage.map((node, index) => {
+      const isLast = index === lineage.length - 1;
+      const href = isLast
+        ? undefined
+        : node.level === 0
+        ? `${basePath}/objectives/${node.id}`
+        : `${basePath}/goals/${node.id}`;
+
+      return { label: node.title, href };
+    }),
+  ];
+
+  const backHref = parentNode
+    ? parentNode.level === 0
+      ? `${basePath}/objectives/${parentNode.id}`
+      : `${basePath}/goals/${parentNode.id}`
+    : objective
+    ? `${basePath}/objectives/${objective.id}`
+    : `${basePath}/objectives`;
+  const backLabel = parentNode && parentNode.level > 0
+    ? 'Back to parent goal'
+    : 'Back to goals';
+  const showContextualVisuals = supplementalWidgets.length > 0 || comparisonWidgets.length > 0;
 
   if (isLoading) {
     return (
@@ -77,43 +188,19 @@ export function GoalDetailView() {
     );
   }
 
-  const unit = config.unit || '%';
-
-  // Build sub-goal items
-  const subGoalItems = children.map((c) => {
-    const cWidget = widgets?.find((w) => w.goalId === c.id);
-    return {
-      id: c.id,
-      title: c.title,
-      description: c.description,
-      target: cWidget?.config?.target,
-      current: cWidget?.config?.value,
-      unit: cWidget?.config?.unit || unit,
-      status: c.status,
-    };
-  });
-
   return (
-    <div className="min-h-[calc(100vh-128px)]">
-      {/* Breadcrumbs & Back Link */}
+    <div className="min-h-[calc(100vh-128px)] px-6 py-8 md:px-8 md:py-10">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <Breadcrumb
-          items={[
-            { label: 'Plan', href: basePath },
-            ...(parentObj ? [{ label: parentObj.title, href: `${basePath}/objectives/${parentObj.id}` }] : []),
-            { label: goal.title },
-          ]}
-        />
-        <a
-          href={parentObj ? `${basePath}/objectives/${parentObj.id}` : `${basePath}/objectives`}
+        <Breadcrumb items={breadcrumbItems} />
+        <Link
+          href={backHref}
           className="flex items-center text-sm font-medium text-md3-primary hover:translate-x-[-4px] transition-transform duration-200"
         >
           <MaterialIcon icon="arrow_back" size={18} className="mr-1" />
-          Back to goals
-        </a>
+          {backLabel}
+        </Link>
       </div>
 
-      {/* Goal Header */}
       <div className="bg-md3-surface-low p-8 rounded-xl border border-md3-outline-variant/15 mb-6 relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
           <div className="flex gap-4">
@@ -139,15 +226,13 @@ export function GoalDetailView() {
         </div>
       </div>
 
-      {/* Main Split Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
-        {/* Left Panel: KPI Stats */}
-        <div className={isDonut ? 'lg:col-span-5' : 'lg:col-span-4'}>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+        <div className={isDonutWidget ? 'lg:col-span-5' : 'lg:col-span-4'}>
           <GoalKpiPanel
-            value={trend.value}
+            value={derivedTrend.value}
             unit={unit}
-            total={isDonut && config.target ? config.target : undefined}
-            totalLabel={isDonut ? unit : undefined}
+            total={isDonutWidget && chartConfig.target ? chartConfig.target : undefined}
+            totalLabel={isDonutWidget ? unit : undefined}
             statusLabel={statusBadgeLabel(goal.status).toUpperCase()}
             statusColor={
               goal.status?.toLowerCase().includes('target') || goal.status?.toLowerCase().includes('exceeding')
@@ -156,39 +241,94 @@ export function GoalDetailView() {
                 ? 'text-md3-tertiary bg-md3-tertiary/5'
                 : 'text-md3-error bg-md3-error/5'
             }
-            trend={{
-              delta: trend.delta,
-              direction: trend.direction,
-              label: `from baseline (${trend.baseline}${unit === '%' ? '%' : ''})`,
-            }}
-            target={config.target}
-            baseline={config.baseline}
-            forecast={config.indicatorText}
+            trend={primaryWidget && chartConfig.baseline != null ? {
+              delta: derivedTrend.delta,
+              direction: derivedTrend.direction,
+              label: `from baseline (${derivedTrend.baseline}${unit === '%' ? '%' : ''})`,
+            } : undefined}
+            target={chartConfig.target}
+            baseline={chartConfig.baseline}
+            forecast={chartConfig.indicatorText}
           />
         </div>
 
-        {/* Right Panel: Chart */}
-        <div className={isDonut ? 'lg:col-span-7' : 'lg:col-span-8'}>
-          {isBarChart && config.dataPoints ? (
+        <div className={isDonutWidget ? 'lg:col-span-7' : 'lg:col-span-8'}>
+          {isBarChart && chartConfig.dataPoints ? (
             <GoalBarChart
-              dataPoints={config.dataPoints}
-              targetValue={config.target}
+              dataPoints={chartConfig.dataPoints}
+              targetValue={chartConfig.target}
               title={primaryWidget?.title || 'Annual Growth'}
-              legendLabel={config.label || `${unit} Value`}
+              legendLabel={chartConfig.label || `${unit} Value`}
             />
           ) : (
             <SvgDonutChart
-              value={trend.value}
-              total={config.target || 100}
+              value={derivedTrend.value}
+              total={chartConfig.target || 100}
               color="#994100"
-              label={`${trend.value} of ${config.target || 100} ${unit === '%' ? 'completed' : unit + ' completed'}`}
+              label={`${derivedTrend.value} of ${chartConfig.target || 100} ${unit === '%' ? 'completed' : `${unit} completed`}`}
             />
           )}
         </div>
       </div>
 
-      {/* Sub-Goals Accordion */}
-      {subGoalItems.length > 0 && <SubGoalAccordion subGoals={subGoalItems} />}
+      {subGoalItems.length > 0 && (
+        <div className="mb-10">
+          <SubGoalAccordion subGoals={subGoalItems} />
+        </div>
+      )}
+
+      <section className="space-y-6">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-lg font-bold tracking-tight text-md3-on-surface">
+            Contextual visuals
+          </h2>
+          <p className="text-sm text-md3-on-surface-variant max-w-2xl">
+            Supporting charts and comparisons for this goal stay in the main content area so the explorer context remains visible.
+          </p>
+        </div>
+
+        {supplementalWidgets.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-md3-on-surface-variant">
+                Goal visuals
+              </h3>
+              <span className="text-xs text-md3-on-surface-variant">
+                {supplementalWidgets.length} additional view{supplementalWidgets.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            <WidgetGrid widgets={supplementalWidgets} />
+          </div>
+        )}
+
+        {comparisonWidgets.length > 0 && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-md3-on-surface-variant">
+                {children.length > 0 ? 'Child comparisons' : 'Related comparisons'}
+              </h3>
+              <span className="text-xs text-md3-on-surface-variant">
+                {comparisonWidgets.length} comparison visual{comparisonWidgets.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            <WidgetGrid widgets={comparisonWidgets} />
+          </div>
+        )}
+
+        {!showContextualVisuals && (
+          <div className="rounded-xl border border-dashed border-md3-outline-variant/30 bg-md3-surface-lowest p-8 text-center">
+            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-md3-surface-container text-md3-on-surface-variant">
+              <MaterialIcon icon="insights" />
+            </div>
+            <p className="font-semibold text-md3-on-surface mb-1">
+              No additional visuals published yet
+            </p>
+            <p className="text-sm text-md3-on-surface-variant max-w-lg mx-auto">
+              This goal still has its primary score and narrative context above. Extra charts and comparison widgets can appear here as the district publishes them.
+            </p>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

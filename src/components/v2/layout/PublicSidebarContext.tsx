@@ -26,15 +26,30 @@ function sidebarReducer(state: SidebarState, action: SidebarAction): SidebarStat
       return { ...state, expandedNodes: next };
     }
     case 'SET_ACTIVE':
+      if (state.activeNodeId === action.id) {
+        return state;
+      }
       return { ...state, activeNodeId: action.id };
     case 'EXPAND_TO_NODE': {
       const next = new Set(state.expandedNodes);
-      action.ids.forEach((id) => next.add(id));
+      let didChange = false;
+      action.ids.forEach((id) => {
+        if (!next.has(id)) {
+          next.add(id);
+          didChange = true;
+        }
+      });
+      if (!didChange) {
+        return state;
+      }
       return { ...state, expandedNodes: next };
     }
     case 'TOGGLE_MOBILE':
       return { ...state, mobileOpen: !state.mobileOpen };
     case 'CLOSE_MOBILE':
+      if (!state.mobileOpen) {
+        return state;
+      }
       return { ...state, mobileOpen: false };
     default:
       return state;

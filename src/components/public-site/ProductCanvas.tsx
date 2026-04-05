@@ -539,7 +539,7 @@ const AuthCanvas = memo(function AuthCanvas() {
             <p className="text-sm font-semibold text-on-surface">Auth notes</p>
             <div className="mt-4 space-y-3">
               {[
-                "No passwords required for standard sign-in",
+                "Password sign-in with optional email code",
                 "Reset flows preserve support-safe messaging",
                 "Workspaces remain separated by subdomain rules",
               ].map((item) => (

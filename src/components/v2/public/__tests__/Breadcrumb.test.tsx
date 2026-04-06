@@ -55,5 +55,18 @@ describe('Breadcrumb', () => {
 
     const nav = screen.getByRole('navigation');
     expect(nav).toHaveAttribute('aria-label', 'Breadcrumb');
+    expect(nav).toHaveClass('overflow-x-auto');
+  });
+
+  it('marks older breadcrumb items to hide on mobile when more than two items exist', () => {
+    render(<Breadcrumb items={items} />);
+
+    const firstItem = screen.getByText('Strategic Plan 2025').closest('[data-breadcrumb-item]');
+    const middleItem = screen.getByText('Academic Excellence').closest('[data-breadcrumb-item]');
+    const lastItem = screen.getByText('Reading Proficiency').closest('[data-breadcrumb-item]');
+
+    expect(firstItem).toHaveAttribute('data-hide-on-mobile', 'true');
+    expect(middleItem).toHaveAttribute('data-hide-on-mobile', 'false');
+    expect(lastItem).toHaveAttribute('data-hide-on-mobile', 'false');
   });
 });

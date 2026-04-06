@@ -70,45 +70,60 @@ export function PlanLandingView() {
   const dateRange = activePlan.start_date && activePlan.end_date
     ? `${new Date(activePlan.start_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()} — ${new Date(activePlan.end_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()}`
     : '';
+  const lastUpdated = new Date(activePlan.updated_at).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
 
   return (
-    <div>
+    <div className="overflow-x-clip">
       {/* Hero Section */}
-      <section className="px-8 pt-12 pb-16 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
+      <section id="district-identity" className="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 sm:pb-14 sm:pt-10 lg:pb-16 lg:pt-12">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
           <div className="max-w-2xl">
-            {dateRange && (
-              <div className="inline-flex items-center px-3 py-1 rounded-full bg-md3-primary-fixed/20 text-md3-primary text-[10px] font-bold tracking-widest uppercase mb-6">
-                {dateRange}
+            <div className="mb-5 flex flex-wrap items-center gap-3 sm:mb-6">
+              {dateRange && (
+                <div className="inline-flex items-center rounded-full bg-md3-primary-fixed/20 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-md3-primary">
+                  {dateRange}
+                </div>
+              )}
+              <div className="inline-flex items-center rounded-full bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500 ring-1 ring-slate-200/80 lg:hidden">
+                Updated {lastUpdated}
               </div>
-            )}
-            <h1 className="text-5xl md:text-6xl font-extrabold text-md3-on-surface tracking-tight leading-tight mb-6">
+            </div>
+            <h1 className="mb-5 text-4xl font-extrabold leading-tight tracking-tight text-md3-on-surface sm:mb-6 sm:text-5xl lg:text-6xl">
               {district?.name} Strategic Plan
             </h1>
             {activePlan.description && (
-              <p className="text-xl text-md3-on-surface-variant font-light leading-relaxed mb-8">
+              <p className="mb-6 max-w-[34rem] text-base font-light leading-relaxed text-md3-on-surface-variant sm:mb-8 sm:text-lg lg:text-xl">
                 {activePlan.description}
               </p>
             )}
-            <button className="bg-md3-primary hover:opacity-90 text-white px-8 py-3.5 rounded-lg font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
+            <button
+              type="button"
+              disabled
+              aria-disabled="true"
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-500 shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-80 sm:px-6"
+            >
               <MaterialIcon icon="download" size={18} />
-              Download Vision PDF
+              Vision PDF coming soon
             </button>
           </div>
-          <div className="text-right hidden lg:block">
+          <div className="hidden text-right lg:block">
             <p className="text-[12px] text-md3-on-surface-variant uppercase tracking-widest font-medium mb-1">
               Last Updated
             </p>
             <p className="text-lg font-medium text-md3-on-surface">
-              {new Date(activePlan.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {lastUpdated}
             </p>
           </div>
         </div>
       </section>
 
       {/* KPI Row */}
-      <section className="px-8 pb-12 max-w-7xl mx-auto">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+      <section className="mx-auto max-w-7xl px-4 pb-10 sm:px-6 sm:pb-12">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
           <KpiStatCard label="Total Objectives" value={objectives.length} />
           <KpiStatCard label="Total Goals" value={allLevel1Goals.length} />
           <KpiStatCard label="On Target" value={counts.onTarget} statusDot="bg-emerald-500" valueColor="text-emerald-600" />
@@ -118,23 +133,24 @@ export function PlanLandingView() {
 
       {/* Plan Health */}
       {segments.length > 0 && (
-        <section className="px-8 pb-16 max-w-7xl mx-auto">
+        <section id="plan-health" className="mx-auto max-w-7xl px-4 pb-12 sm:px-6 sm:pb-16">
           <PlanHealthBar segments={segments} />
         </section>
       )}
 
       {/* Objective Cards */}
-      <section className="px-8 pb-20 max-w-7xl mx-auto">
-        <h3 className="text-[12px] uppercase font-extrabold tracking-[0.2em] text-md3-primary mb-8 px-1">
+      <section id="objectives-overview" className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 sm:pb-20">
+        <h3 className="mb-6 px-1 text-[11px] font-extrabold uppercase tracking-[0.2em] text-md3-primary sm:mb-8 sm:text-[12px]">
           Core Strategic Objectives
         </h3>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-8">
           {objectives.map((obj, idx) => {
             const children = (obj.children || []) as HierarchicalGoal[];
             const childCounts = computeStatusCounts(children);
             return (
               <LandingObjectiveCard
                 key={obj.id}
+                testId={`objective-card-${idx + 1}`}
                 title={obj.title}
                 description={obj.description}
                 icon={OBJECTIVE_ICONS[idx % OBJECTIVE_ICONS.length]}

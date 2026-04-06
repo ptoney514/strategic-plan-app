@@ -42,7 +42,7 @@ export function SubGoalAccordion({ subGoals }: SubGoalAccordionProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-bold tracking-tight text-md3-on-surface flex items-center gap-2">
+      <h3 className="flex items-center gap-2 text-lg font-bold tracking-tight text-md3-on-surface">
         Sub-Goals
         <span className="px-2 py-0.5 rounded-full bg-md3-surface-container text-xs">
           {subGoals.length}
@@ -60,15 +60,15 @@ export function SubGoalAccordion({ subGoals }: SubGoalAccordionProps) {
             <Link
               key={sg.id}
               href={sg.href}
-              className="group block px-6 py-5 hover:bg-slate-50 transition-colors"
+              className="group block px-4 py-4 transition-colors hover:bg-slate-50 sm:px-6 sm:py-5"
             >
-              <div className="flex items-start justify-between gap-6">
-                <div className="flex min-w-0 items-start gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+                <div className="flex min-w-0 items-start gap-3 sm:gap-4">
                   <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-md3-surface-container font-bold text-sm text-md3-on-surface">
                     {sg.goalNumber || <MaterialIcon icon="account_tree" size={18} />}
                   </div>
                   <div className="min-w-0">
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
                       <span className="block font-bold text-md3-on-surface">{sg.title}</span>
                       {sg.childCount != null && sg.childCount > 0 && (
                         <span className="rounded-full bg-md3-surface-container px-2 py-0.5 text-[11px] font-medium text-md3-on-surface-variant">
@@ -96,7 +96,7 @@ export function SubGoalAccordion({ subGoals }: SubGoalAccordionProps) {
                   </div>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-4">
+                <div className="flex items-center justify-between gap-4 sm:shrink-0 sm:justify-start">
                   <span className={`text-xs font-bold uppercase tracking-widest ${color}`}>
                     {label}
                   </span>

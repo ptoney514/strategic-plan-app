@@ -6,10 +6,10 @@ export interface PlanHealthBarProps {
 
 export function PlanHealthBar({ segments }: PlanHealthBarProps) {
   return (
-    <div className="bg-md3-surface-lowest ghost-border rounded-xl p-8">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-2xl font-bold tracking-tight">Plan Health at a Glance</h2>
-        <div className="flex items-center gap-4 flex-wrap">
+    <div className="rounded-2xl bg-md3-surface-lowest p-5 ghost-border sm:p-8">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-xl font-bold tracking-tight sm:text-2xl">Plan Health at a Glance</h2>
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4">
           {segments.map((seg) => (
             <div key={seg.label} className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: seg.color }} />
@@ -21,7 +21,7 @@ export function PlanHealthBar({ segments }: PlanHealthBarProps) {
         </div>
       </div>
 
-      <div className="relative w-full h-10 bg-slate-100 rounded-full overflow-hidden flex">
+      <div className="relative flex h-8 w-full overflow-hidden rounded-full bg-slate-100 sm:h-10">
         {segments.map((seg) => (
           <div
             key={seg.label}
@@ -35,9 +35,9 @@ export function PlanHealthBar({ segments }: PlanHealthBarProps) {
         ))}
       </div>
 
-      <div className="mt-6 flex justify-between px-2">
+      <div className="mt-5 flex justify-between px-1 sm:mt-6 sm:px-2">
         {['0%', '25%', '50%', '75%', '100%'].map((label) => (
-          <span key={label} className="text-[10px] uppercase font-bold text-slate-400 tracking-tighter">
+          <span key={label} className="text-[9px] uppercase font-bold text-slate-400 tracking-tighter sm:text-[10px]">
             {label}
           </span>
         ))}

@@ -10,6 +10,7 @@ export interface NumberedObjectiveCardProps {
   offTrackCount: number;
   goalCount: number;
   onClick?: () => void;
+  testId?: string;
 }
 
 export function NumberedObjectiveCard({
@@ -22,11 +23,14 @@ export function NumberedObjectiveCard({
   offTrackCount,
   goalCount,
   onClick,
+  testId,
 }: NumberedObjectiveCardProps) {
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className="group relative flex flex-col bg-md3-surface-lowest ghost-border rounded-xl transition-all overflow-hidden cursor-pointer"
+      data-testid={testId}
+      className="group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-2xl bg-md3-surface-lowest text-left transition-all ghost-border"
     >
       {/* Left accent bar */}
       <div
@@ -34,10 +38,10 @@ export function NumberedObjectiveCard({
         style={{ backgroundColor: accentColor }}
       />
 
-      <div className="p-8 lg:p-10 flex flex-col h-full">
-        <div className="flex justify-between items-start mb-6">
+      <div className="flex h-full flex-col p-5 sm:p-8 lg:p-10">
+        <div className="mb-6 flex items-start justify-between gap-4">
           <span
-            className="text-6xl font-black select-none tabular-nums"
+            className="select-none text-4xl font-black tabular-nums sm:text-6xl"
             style={{ color: `${accentColor}08` }}
           >
             {number}
@@ -48,26 +52,26 @@ export function NumberedObjectiveCard({
           />
         </div>
 
-        <h3 className="text-2xl font-bold text-md3-on-surface mb-3 leading-tight">{title}</h3>
+        <h3 className="mb-3 text-xl font-bold leading-tight text-md3-on-surface sm:text-2xl">{title}</h3>
         {description && (
-          <p className="text-md3-on-surface-variant leading-relaxed mb-8 flex-1">{description}</p>
+          <p className="mb-6 flex-1 text-sm leading-relaxed text-md3-on-surface-variant sm:mb-8 sm:text-base">{description}</p>
         )}
 
-        <div className="space-y-6">
+        <div className="space-y-5 sm:space-y-6">
           <div className="flex items-center gap-4">
-            <span className="text-[12px] font-bold uppercase tracking-widest text-md3-outline">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-md3-outline sm:text-[12px]">
               Goal Health
             </span>
             <div className="flex-1 h-[1px] bg-md3-outline-variant/30" />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-1.5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-1.5">
               {statusDots.map((dot, i) => (
                 <div key={i} className={`w-2.5 h-2.5 rounded-full ${dot.color}`} />
               ))}
             </div>
-            <div className="text-sm font-medium">
+            <div className="text-sm font-medium leading-5">
               <span className="text-md3-on-surface">{onTargetCount} on target</span>
               <span className="text-md3-outline mx-1.5">&middot;</span>
               <span className="text-md3-on-surface">{offTrackCount} off track</span>
@@ -84,6 +88,6 @@ export function NumberedObjectiveCard({
           </div>
         </div>
       </div>
-    </div>
+    </button>
   );
 }

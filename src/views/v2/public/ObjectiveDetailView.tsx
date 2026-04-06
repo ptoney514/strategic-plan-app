@@ -4,7 +4,6 @@ import { useSubdomain } from '@/contexts/SubdomainContext';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
 import { useWidgetsByGoals } from '@/hooks/v2/useWidgets';
-import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
 import { Breadcrumb } from '@/components/v2/public/Breadcrumb';
 import { GoalMetricCard } from '@/components/v2/public/GoalMetricCard';
 import { computeStatusCounts, computeGoalTrend } from '@/lib/utils/goalHealth';
@@ -59,7 +58,7 @@ export function ObjectiveDetailView() {
   const objNumber = String(objIdx + 1).padStart(2, '0');
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-10">
+    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
@@ -69,35 +68,35 @@ export function ObjectiveDetailView() {
       />
 
       {/* Objective Header */}
-      <section className="bg-white rounded-xl p-10 mb-12 ghost-border mt-6">
-        <div className="flex flex-col md:flex-row items-start gap-8">
-          <div className="h-16 w-16 rounded-lg bg-violet-50 text-violet-700 flex items-center justify-center shrink-0 ghost-border">
-            <span className="text-3xl font-black tabular-nums">{objNumber}</span>
+      <section className="mt-5 rounded-2xl bg-white p-5 ghost-border sm:mt-6 sm:p-8 lg:p-10">
+        <div className="flex flex-col items-start gap-6 sm:gap-8 md:flex-row">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 ghost-border sm:h-16 sm:w-16">
+            <span className="text-2xl font-black tabular-nums sm:text-3xl">{objNumber}</span>
           </div>
           <div className="flex-1">
-            <h2 className="text-4xl font-black tracking-tight text-slate-900 mb-4">
+            <h2 className="mb-4 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
               {objective.title}
             </h2>
             {objective.description && (
-              <p className="text-lg text-slate-600 leading-relaxed max-w-4xl mb-8">
+              <p className="mb-6 max-w-4xl text-base leading-relaxed text-slate-600 sm:mb-8 sm:text-lg">
                 {objective.description}
               </p>
             )}
-            <div className="pt-8 border-t border-slate-100">
-              <div className="flex items-center justify-between">
+            <div className="border-t border-slate-100 pt-6 sm:pt-8">
+              <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-3">
+                  <span className="mb-3 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
                     Goal Health Summary
                   </span>
-                  <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-2 text-xl tracking-widest">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-6">
+                    <div className="flex flex-wrap items-center gap-2 text-xl tracking-widest">
                       {children.map((c) => (
                         <span key={c.id} className={statusDotChar(c.status)}>
                           {c.status?.toLowerCase().includes('target') || c.status?.toLowerCase().includes('exceeding') ? '\u25CF' : '\u25CB'}
                         </span>
                       ))}
                     </div>
-                    <p className="text-sm font-medium text-slate-600">
+                    <p className="text-sm font-medium leading-6 text-slate-600">
                       <span className="text-emerald-600">{counts.onTarget} on target</span>
                       {' \u00B7 '}
                       <span className="text-red-500">{counts.critical + counts.atRisk} off</span>
@@ -110,8 +109,13 @@ export function ObjectiveDetailView() {
                     </p>
                   </div>
                 </div>
-                <button className="px-6 py-2.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-opacity">
-                  Export PDF
+                <button
+                  type="button"
+                  disabled
+                  aria-disabled="true"
+                  className="inline-flex w-full items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
+                >
+                  PDF export coming soon
                 </button>
               </div>
             </div>
@@ -120,7 +124,7 @@ export function ObjectiveDetailView() {
       </section>
 
       {/* Goal Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 xl:gap-6">
         {children.map((child) => {
           const widget = getWidgetForGoal(child.id);
           const trend = computeGoalTrend(widget);
@@ -137,6 +141,7 @@ export function ObjectiveDetailView() {
               trendDirection={widget ? trend.direction : undefined}
               target={widget?.config?.target}
               progressPercent={widget ? trend.progress : child.overall_progress}
+              testId={`objective-goal-card-${child.goal_number}`}
               onClick={() => router.push(`${basePath}/goals/${child.id}`)}
             />
           );

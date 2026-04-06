@@ -189,11 +189,12 @@ export function GoalDetailView() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-128px)] px-6 py-8 md:px-8 md:py-10">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+    <div className="min-h-[calc(100vh-128px)] px-4 py-6 sm:px-6 sm:py-8 md:px-8 md:py-10">
+      <div className="mb-6 flex flex-col gap-4 sm:mb-8 md:flex-row md:items-center md:justify-between">
         <Breadcrumb items={breadcrumbItems} />
         <Link
           href={backHref}
+          data-testid="goal-detail-back-link"
           className="flex items-center text-sm font-medium text-md3-primary hover:translate-x-[-4px] transition-transform duration-200"
         >
           <MaterialIcon icon="arrow_back" size={18} className="mr-1" />
@@ -201,18 +202,18 @@ export function GoalDetailView() {
         </Link>
       </div>
 
-      <div className="bg-md3-surface-low p-8 rounded-xl border border-md3-outline-variant/15 mb-6 relative overflow-hidden">
-        <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div className="relative mb-6 overflow-hidden rounded-2xl border border-md3-outline-variant/15 bg-md3-surface-low p-5 sm:p-8">
+        <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-6">
           <div className="flex gap-4">
-            <div className="w-12 h-12 bg-md3-primary text-md3-on-primary rounded-lg flex items-center justify-center font-black text-xl flex-shrink-0">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-md3-primary text-xl font-black text-md3-on-primary">
               {goal.goal_number}
             </div>
             <div>
-              <h1 className="text-3xl font-black tracking-tight text-md3-on-surface mb-2">
+              <h1 className="mb-2 text-2xl font-black tracking-tight text-md3-on-surface sm:text-3xl">
                 {goal.title}
               </h1>
               {goal.description && (
-                <p className="text-md3-on-surface-variant max-w-2xl leading-relaxed">
+                <p className="max-w-2xl leading-relaxed text-md3-on-surface-variant">
                   {goal.description}
                 </p>
               )}
@@ -226,7 +227,7 @@ export function GoalDetailView() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-10">
+      <div className="mb-10 grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
         <div className={isDonutWidget ? 'lg:col-span-5' : 'lg:col-span-4'}>
           <GoalKpiPanel
             value={derivedTrend.value}
@@ -289,7 +290,7 @@ export function GoalDetailView() {
 
         {supplementalWidgets.length > 0 && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-md3-on-surface-variant">
                 Goal visuals
               </h3>
@@ -303,7 +304,7 @@ export function GoalDetailView() {
 
         {comparisonWidgets.length > 0 && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em] text-md3-on-surface-variant">
                 {children.length > 0 ? 'Child comparisons' : 'Related comparisons'}
               </h3>

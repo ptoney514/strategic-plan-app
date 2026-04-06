@@ -12,6 +12,7 @@ export interface GoalMetricCardProps {
   target?: number;
   progressPercent?: number;
   onClick?: () => void;
+  testId?: string;
 }
 
 function trendColor(direction?: string): string {
@@ -58,34 +59,37 @@ export function GoalMetricCard({
   target,
   progressPercent,
   onClick,
+  testId,
 }: GoalMetricCardProps) {
   const hasScore = currentScore != null;
 
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className="bg-white ghost-border p-8 rounded-xl transition-all hover:border-slate-300 cursor-pointer"
+      data-testid={testId}
+      className="w-full cursor-pointer rounded-2xl bg-white p-5 text-left transition-all ghost-border hover:border-slate-300 sm:p-8"
     >
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex items-center gap-3">
+      <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 items-start gap-3">
           <span className="text-[10px] font-bold tabular-nums bg-slate-100 text-slate-500 px-2 py-1 rounded">
             {goalNumber}
           </span>
-          <h4 className="text-sm font-bold text-slate-900">{title}</h4>
+          <h4 className="min-w-0 text-sm font-bold leading-5 text-slate-900">{title}</h4>
         </div>
-        <span className={`px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter ${statusBadgeClasses(status)}`}>
+        <span className={`inline-flex w-fit px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-[0.16em] ${statusBadgeClasses(status)}`}>
           {statusBadgeLabel(status)}
         </span>
       </div>
 
       {/* Current Score */}
-      <div className="mb-8">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">
+      <div className="mb-6 sm:mb-8">
+        <span className="mb-2 block text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
           Current Score
         </span>
-        <div className="flex items-baseline gap-3">
-          <span className="text-5xl font-black tabular-nums text-slate-900 animate-countUp">
+        <div className="flex flex-wrap items-baseline gap-3">
+          <span className="animate-countUp text-4xl font-black tabular-nums text-slate-900 sm:text-5xl">
             {hasScore ? `${currentScore}${unit}` : '--'}
           </span>
           {trendDelta != null && trendDelta !== 0 && (
@@ -140,6 +144,6 @@ export function GoalMetricCard({
           })}
         </div>
       </div>
-    </div>
+    </button>
   );
 }

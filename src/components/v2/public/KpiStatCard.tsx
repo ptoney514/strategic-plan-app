@@ -7,14 +7,14 @@ export interface KpiStatCardProps {
 
 export function KpiStatCard({ label, value, statusDot, valueColor }: KpiStatCardProps) {
   return (
-    <div className="bg-md3-surface-lowest ghost-border rounded-xl p-6 transition-all">
-      <div className="flex items-center gap-2 mb-2">
-        <p className="text-[10px] text-md3-on-surface-variant uppercase tracking-widest font-bold">
+    <div className="rounded-2xl bg-md3-surface-lowest p-4 transition-all ghost-border sm:p-6">
+      <div className="mb-2 flex items-start gap-2 sm:items-center">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-md3-on-surface-variant">
           {label}
         </p>
         {statusDot && <div className={`w-2 h-2 rounded-full ${statusDot}`} />}
       </div>
-      <div className={`text-4xl font-bold tabular-nums ${valueColor || 'text-md3-on-surface'}`}>
+      <div className={`text-3xl font-bold tabular-nums sm:text-4xl ${valueColor || 'text-md3-on-surface'}`}>
         {value}
       </div>
     </div>

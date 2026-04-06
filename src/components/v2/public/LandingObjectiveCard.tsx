@@ -11,6 +11,7 @@ export interface LandingObjectiveCardProps {
   onTargetCount: number;
   offTrackCount: number;
   onClick?: () => void;
+  testId?: string;
 }
 
 export function LandingObjectiveCard({
@@ -24,41 +25,44 @@ export function LandingObjectiveCard({
   onTargetCount,
   offTrackCount,
   onClick,
+  testId,
 }: LandingObjectiveCardProps) {
   return (
-    <div
+    <button
+      type="button"
       onClick={onClick}
-      className="bg-md3-surface-lowest ghost-border rounded-xl p-8 flex flex-col group hover:border-md3-primary/30 transition-all cursor-pointer"
+      data-testid={testId}
+      className="group flex w-full cursor-pointer flex-col rounded-2xl bg-md3-surface-lowest p-5 text-left transition-all ghost-border hover:border-md3-primary/30 sm:p-8"
     >
-      <div className="flex items-start justify-between mb-6">
-        <div className={`p-3 rounded-xl ${iconBgClass}`}>
-          <MaterialIcon icon={icon} size={28} />
+      <div className="mb-5 flex items-start justify-between gap-3 sm:mb-6">
+        <div className={`rounded-xl p-3 ${iconBgClass}`}>
+          <MaterialIcon icon={icon} size={24} />
         </div>
-        <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBadge.classes}`}>
+        <div className={`shrink-0 rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] ${statusBadge.classes}`}>
           {statusBadge.label}
         </div>
       </div>
 
-      <h4 className="text-xl font-bold mb-3">{title}</h4>
+      <h4 className="mb-3 text-lg font-bold leading-tight sm:text-xl">{title}</h4>
       {description && (
-        <p className="text-md3-on-surface-variant leading-relaxed text-sm mb-8 flex-grow">
+        <p className="mb-6 flex-grow text-sm leading-relaxed text-md3-on-surface-variant sm:mb-8">
           {description}
         </p>
       )}
 
-      <div className="pt-6 border-t border-slate-50">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-1.5">
+      <div className="border-t border-slate-100 pt-5 sm:pt-6">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-1.5">
             {statusDots.map((dot, i) => (
               <span key={i} className={`w-2.5 h-2.5 rounded-full ${dot.color}`} />
             ))}
           </div>
-          <span className="text-[11px] font-medium text-md3-on-surface-variant">
+          <span className="text-xs leading-5 text-md3-on-surface-variant sm:text-[11px]">
             {onTargetCount} on target &middot; {offTrackCount} off track
           </span>
         </div>
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+          <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
             {goalCount} Total Goals
           </span>
           <MaterialIcon
@@ -68,6 +72,6 @@ export function LandingObjectiveCard({
           />
         </div>
       </div>
-    </div>
+    </button>
   );
 }

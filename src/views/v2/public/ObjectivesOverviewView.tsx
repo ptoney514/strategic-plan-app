@@ -41,22 +41,22 @@ export function ObjectivesOverviewView() {
   }
 
   return (
-    <div className="p-8 lg:p-12">
+    <div className="px-4 py-6 sm:px-6 sm:py-8 lg:px-10 lg:py-12">
       {/* Header */}
-      <header className="mb-12 max-w-7xl mx-auto">
+      <header className="mx-auto mb-10 max-w-7xl sm:mb-12">
         <Breadcrumb
           items={[
             { label: 'Plan', href: basePath },
             { label: 'All Objectives' },
           ]}
         />
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mt-6">
+        <div className="mt-5 flex flex-col gap-5 sm:mt-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-md3-on-surface mb-2">
+            <h2 className="mb-2 text-3xl font-bold tracking-tight text-md3-on-surface sm:text-4xl lg:text-5xl">
               Strategic Objectives
             </h2>
-            <div className="flex items-center gap-3">
-              <span className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-wider">
+            <div className="flex flex-wrap items-center gap-3">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-600 sm:text-[12px]">
                 {objectives.length} Objectives
               </span>
               <span className="text-md3-outline text-sm">
@@ -64,16 +64,21 @@ export function ObjectivesOverviewView() {
               </span>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white ghost-border rounded-lg text-sm font-semibold text-md3-on-surface hover:bg-slate-50 transition-all">
+          <button
+            type="button"
+            disabled
+            aria-disabled="true"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-500 transition-all disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
+          >
             <MaterialIcon icon="filter_list" size={20} />
-            Filter by Status
+            Filters coming soon
             <MaterialIcon icon="expand_more" size={14} />
           </button>
         </div>
       </header>
 
       {/* Objectives Grid */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 md:grid-cols-2 md:gap-8">
         {objectives.map((obj, idx) => {
           const children = (obj.children || []) as HierarchicalGoal[];
           const childCounts = computeStatusCounts(children);
@@ -82,6 +87,7 @@ export function ObjectivesOverviewView() {
           return (
             <NumberedObjectiveCard
               key={obj.id}
+              testId={`objectives-overview-card-${idx + 1}`}
               number={num}
               title={obj.title}
               description={obj.description}
@@ -97,8 +103,8 @@ export function ObjectivesOverviewView() {
       </div>
 
       {/* Footer stats */}
-      <footer className="mt-16 pt-12 border-t border-slate-100 max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-        <div className="flex items-center gap-12">
+      <footer className="mx-auto mt-12 flex max-w-7xl flex-col gap-8 border-t border-slate-100 pt-8 sm:mt-16 sm:pt-12 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:gap-12">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">
               Health Score
@@ -116,9 +122,14 @@ export function ObjectivesOverviewView() {
             </p>
           </div>
         </div>
-        <button className="bg-md3-primary text-white font-bold text-sm px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+        <button
+          type="button"
+          disabled
+          aria-disabled="true"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-500 shadow-sm transition-colors disabled:cursor-not-allowed disabled:opacity-80 sm:w-auto"
+        >
           <MaterialIcon icon="download" size={18} />
-          Export Strategic Report
+          Strategic report coming soon
         </button>
       </footer>
     </div>

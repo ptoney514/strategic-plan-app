@@ -18,8 +18,8 @@ export function SvgDonutChart({
   const offset = circumference - (percent / 100) * circumference;
 
   return (
-    <div className="bg-md3-surface-lowest p-8 rounded-xl border border-md3-outline-variant/15 flex flex-col items-center justify-center h-full">
-      <div className="relative w-72 h-72">
+    <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-md3-outline-variant/15 bg-md3-surface-lowest p-5 sm:p-8">
+      <div className="relative h-56 w-56 sm:h-72 sm:w-72">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
           {/* Track */}
           <circle
@@ -46,11 +46,11 @@ export function SvgDonutChart({
         </svg>
         {/* Center Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span className="text-5xl font-black tracking-tighter text-md3-on-surface tabular-nums">
+          <span className="text-4xl font-black tracking-tighter text-md3-on-surface tabular-nums sm:text-5xl">
             {Math.round(percent)}%
           </span>
           {label && (
-            <span className="text-[10px] font-bold tracking-widest uppercase text-md3-on-surface-variant mt-1">
+            <span className="mt-1 max-w-[13rem] text-[10px] font-bold uppercase tracking-[0.18em] text-md3-on-surface-variant sm:max-w-[16rem]">
               {label}
             </span>
           )}
@@ -58,7 +58,7 @@ export function SvgDonutChart({
       </div>
 
       {/* Legend */}
-      <div className="mt-8 flex gap-6">
+      <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:gap-6">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
           <span className="text-xs font-medium text-md3-on-surface">Actual Completion</span>

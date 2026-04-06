@@ -124,7 +124,10 @@ export function ObjectiveDetailView() {
       </section>
 
       {/* Goal Cards Grid */}
-      <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 xl:gap-6">
+      <div
+        className="mt-8 grid grid-cols-1 gap-5 xl:grid-cols-2 xl:gap-6"
+        data-testid="objective-detail-goal-grid"
+      >
         {children.map((child) => {
           const widget = getWidgetForGoal(child.id);
           const trend = computeGoalTrend(widget);

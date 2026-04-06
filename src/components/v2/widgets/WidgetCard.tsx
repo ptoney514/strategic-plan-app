@@ -51,6 +51,7 @@ export function WidgetCard({ widget, onEdit, onDelete }: WidgetCardProps) {
 
   return (
     <div
+      data-testid={`widget-card-${widget.id}`}
       className="rounded-xl p-5 relative group"
       style={{
         backgroundColor: 'var(--editorial-surface)',

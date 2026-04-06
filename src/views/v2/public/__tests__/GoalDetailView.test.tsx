@@ -195,7 +195,7 @@ describe('GoalDetailView', () => {
   });
 
   it('renders navigable child goals and contextual visuals', () => {
-    render(<GoalDetailView />);
+    const { container } = render(<GoalDetailView />);
 
     expect(screen.getByText('Contextual visuals')).toBeInTheDocument();
     expect(screen.getByText('Goal visuals')).toBeInTheDocument();
@@ -206,6 +206,14 @@ describe('GoalDetailView', () => {
     );
     expect(screen.getByText('Reading cohort breakdown')).toBeInTheDocument();
     expect(screen.getByText('Phonics mastery')).toBeInTheDocument();
+
+    const publicDetailGrids = container.querySelectorAll('[data-widget-grid-variant="public-detail"]');
+    expect(publicDetailGrids).toHaveLength(2);
+    publicDetailGrids.forEach((grid) => {
+      expect(grid.className).toContain('grid-cols-1');
+      expect(grid.className).toContain('xl:grid-cols-2');
+      expect(grid.className).not.toContain('md:grid-cols-2');
+    });
   });
 
   it('shows a public empty state when no extra visuals exist', () => {

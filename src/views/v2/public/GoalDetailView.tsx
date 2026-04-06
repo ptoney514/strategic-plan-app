@@ -298,7 +298,7 @@ export function GoalDetailView() {
                 {supplementalWidgets.length} additional view{supplementalWidgets.length === 1 ? '' : 's'}
               </span>
             </div>
-            <WidgetGrid widgets={supplementalWidgets} />
+            <WidgetGrid widgets={supplementalWidgets} variant="public-detail" />
           </div>
         )}
 
@@ -312,7 +312,7 @@ export function GoalDetailView() {
                 {comparisonWidgets.length} comparison visual{comparisonWidgets.length === 1 ? '' : 's'}
               </span>
             </div>
-            <WidgetGrid widgets={comparisonWidgets} />
+            <WidgetGrid widgets={comparisonWidgets} variant="public-detail" />
           </div>
         )}
 

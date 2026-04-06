@@ -166,6 +166,19 @@ describe('PublicSidebarLayout', () => {
     expect(document.body.style.overflow).toBe('');
   });
 
+  it('uses lg breakpoints for the public explorer shell', () => {
+    render(
+      <PublicSidebarLayout>
+        <div>Explorer content</div>
+      </PublicSidebarLayout>,
+    );
+
+    expect(screen.getByTestId('public-desktop-sidebar').className).toContain('hidden');
+    expect(screen.getByTestId('public-desktop-sidebar').className).toContain('lg:block');
+    expect(screen.getByTestId('public-mobile-topbar').className).toContain('lg:hidden');
+    expect(screen.getByTestId('public-main-content').className).toContain('lg:ml-80');
+  });
+
   it('closes the mobile sheet when the overlay is pressed', async () => {
     const user = userEvent.setup();
 

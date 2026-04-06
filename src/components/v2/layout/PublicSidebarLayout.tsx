@@ -228,7 +228,10 @@ function MobileTopBar() {
   const { mobileOpen, toggleMobile } = usePublicSidebar();
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl md:hidden">
+    <header
+      className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl lg:hidden"
+      data-testid="public-mobile-topbar"
+    >
       <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <button
@@ -295,7 +298,10 @@ function PublicSidebarShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-[100dvh] overflow-x-clip bg-md3-surface font-sans text-md3-on-surface antialiased">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-80 border-r border-slate-200 bg-slate-50 md:block">
+      <aside
+        className="fixed inset-y-0 left-0 z-30 hidden w-80 border-r border-slate-200 bg-slate-50 lg:block"
+        data-testid="public-desktop-sidebar"
+      >
         <SidebarContent />
       </aside>
 
@@ -304,14 +310,14 @@ function PublicSidebarShell({ children }: { children: ReactNode }) {
       {mobileOpen && (
         <>
           <div
-            className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px] md:hidden"
+            className="fixed inset-0 z-40 bg-slate-950/35 backdrop-blur-[1px] lg:hidden"
             onClick={closeMobile}
             aria-hidden="true"
             data-testid="public-mobile-overlay"
           />
           <aside
             id="public-mobile-sidebar"
-            className="fixed inset-y-0 left-0 z-50 w-[min(20rem,86vw)] overflow-y-auto border-r border-slate-200 bg-slate-50 shadow-2xl md:hidden"
+            className="fixed inset-y-0 left-0 z-50 w-[min(20rem,86vw)] overflow-y-auto border-r border-slate-200 bg-slate-50 shadow-2xl lg:hidden"
             role="dialog"
             aria-modal="true"
             aria-label="Public navigation menu"
@@ -322,7 +328,7 @@ function PublicSidebarShell({ children }: { children: ReactNode }) {
         </>
       )}
 
-      <main className="min-h-[100dvh] md:ml-80">
+      <main className="min-h-[100dvh] lg:ml-80" data-testid="public-main-content">
         <div className="flex min-h-[100dvh] flex-col">
           <div className="flex-1">{children}</div>
           <PublicFooter />

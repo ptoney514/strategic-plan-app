@@ -37,6 +37,15 @@ describe('WidgetGrid', () => {
     expect(skeletons.length).toBe(3);
   });
 
+  it('uses the default multi-column grid variant when unspecified', () => {
+    const { container } = render(<WidgetGrid widgets={mockWidgets} />);
+    const grid = container.querySelector('[data-widget-grid-variant="default"]');
+
+    expect(grid).toBeInTheDocument();
+    expect(grid?.className).toContain('md:grid-cols-2');
+    expect(grid?.className).toContain('lg:grid-cols-3');
+  });
+
   it('renders empty state when no widgets', () => {
     render(<WidgetGrid widgets={[]} />);
     expect(screen.getByText('No widgets yet')).toBeInTheDocument();
@@ -54,5 +63,16 @@ describe('WidgetGrid', () => {
     const onDelete = vi.fn();
     render(<WidgetGrid widgets={mockWidgets} onEdit={onEdit} onDelete={onDelete} />);
     expect(screen.getByText('Enrollment')).toBeInTheDocument();
+  });
+
+  it('uses the public-detail stacked-first grid variant when requested', () => {
+    const { container } = render(<WidgetGrid widgets={mockWidgets} variant="public-detail" />);
+    const grid = container.querySelector('[data-widget-grid-variant="public-detail"]');
+
+    expect(grid).toBeInTheDocument();
+    expect(grid?.className).toContain('grid-cols-1');
+    expect(grid?.className).toContain('xl:grid-cols-2');
+    expect(grid?.className).not.toContain('md:grid-cols-2');
+    expect(grid?.className).not.toContain('lg:grid-cols-3');
   });
 });

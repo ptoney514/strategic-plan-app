@@ -510,8 +510,12 @@ describe('buildDistrictPath', () => {
     expect(buildDistrictPath('/objective/123', 'westside', false)).toBe('/district/westside/objective/123');
   });
 
-  it('handles path without leading slash for subdomain', () => {
-    expect(buildDistrictPath('objective/123', 'westside', true)).toBe('objective/123');
+  it('normalizes path without leading slash for subdomain', () => {
+    expect(buildDistrictPath('objective/123', 'westside', true)).toBe('/objective/123');
+  });
+
+  it('normalizes path without leading slash for root domain', () => {
+    expect(buildDistrictPath('objective/123', 'westside', false)).toBe('/district/westside/objective/123');
   });
 
   it('handles root path for subdomain', () => {
@@ -539,6 +543,16 @@ describe('buildDistrictPathWithQueryParam — root-domain branch', () => {
     // a query-param subdomain host — so the query-param gets appended even
     // when isSubdomain=true.
     expect(buildDistrictPathWithQueryParam('/goals', 'westside', true))
+      .toBe('/goals?subdomain=westside');
+  });
+
+  it('normalizes path without leading slash on root domain', () => {
+    expect(buildDistrictPathWithQueryParam('goals/abc-123', 'westside', false))
+      .toBe('/district/westside/goals/abc-123');
+  });
+
+  it('normalizes path without leading slash on subdomain (jsdom query-param form)', () => {
+    expect(buildDistrictPathWithQueryParam('goals', 'westside', true))
       .toBe('/goals?subdomain=westside');
   });
 });

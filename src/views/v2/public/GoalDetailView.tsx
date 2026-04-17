@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useParams } from 'next/navigation';
-import { useSubdomain } from '@/contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '@/contexts/SubdomainContext';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
 import { useWidgetsByGoals } from '@/hooks/v2/useWidgets';
@@ -44,7 +44,8 @@ export function GoalDetailView() {
   const params = useParams<{ goalId: string }>();
   const goalId = Array.isArray(params.goalId) ? params.goalId[0] : params.goalId;
   const { slug } = useSubdomain();
-  const basePath = `/district/${slug}`;
+  const link = useDistrictLink();
+  const homeHref = link('/');
   const { data: plans } = usePlansBySlug(slug || '');
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
   const { data: allGoals, isLoading } = useGoalsByPlan(activePlan?.id || '');
@@ -134,7 +135,7 @@ export function GoalDetailView() {
       goalNumber: child.goal_number,
       title: child.title,
       description: child.description,
-      href: `${basePath}/goals/${child.id}`,
+      href: link(`/goals/${child.id}`),
       target: childWidget?.config?.target,
       current: childWidget?.config?.value,
       unit: childWidget?.config?.unit || unit,
@@ -145,14 +146,14 @@ export function GoalDetailView() {
   });
 
   const breadcrumbItems = [
-    { label: 'Plan', href: basePath },
+    { label: 'Plan', href: homeHref },
     ...lineage.map((node, index) => {
       const isLast = index === lineage.length - 1;
       const href = isLast
         ? undefined
         : node.level === 0
-        ? `${basePath}/objectives/${node.id}`
-        : `${basePath}/goals/${node.id}`;
+        ? link(`/objectives/${node.id}`)
+        : link(`/goals/${node.id}`);
 
       return { label: node.title, href };
     }),
@@ -160,11 +161,11 @@ export function GoalDetailView() {
 
   const backHref = parentNode
     ? parentNode.level === 0
-      ? `${basePath}/objectives/${parentNode.id}`
-      : `${basePath}/goals/${parentNode.id}`
+      ? link(`/objectives/${parentNode.id}`)
+      : link(`/goals/${parentNode.id}`)
     : objective
-    ? `${basePath}/objectives/${objective.id}`
-    : `${basePath}/objectives`;
+    ? link(`/objectives/${objective.id}`)
+    : link('/objectives');
   const backLabel = parentNode && parentNode.level > 0
     ? 'Back to parent goal'
     : 'Back to goals';

@@ -38,6 +38,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/contexts/SubdomainContext', () => ({
   useSubdomain: () => ({ slug: 'westside', type: 'district' }),
+  useDistrictLink: () => (path: string) => path,
 }));
 
 vi.mock('@/hooks/v2/usePlans', () => ({
@@ -202,7 +203,7 @@ describe('GoalDetailView', () => {
     expect(screen.getByText('Child comparisons')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /phonics foundation/i })).toHaveAttribute(
       'href',
-      '/district/westside/goals/goal-child',
+      '/goals/goal-child',
     );
     expect(screen.getByText('Reading cohort breakdown')).toBeInTheDocument();
     expect(screen.getByText('Phonics mastery')).toBeInTheDocument();
@@ -227,5 +228,29 @@ describe('GoalDetailView', () => {
 
     expect(screen.getByText('No additional visuals published yet')).toBeInTheDocument();
     expect(screen.getByText('Back to parent goal')).toBeInTheDocument();
+  });
+});
+
+describe('GoalDetailView – useDistrictLink routing', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGoalId = 'goal-parent';
+    mockUseGoalsByPlan.mockReturnValue({
+      data: goals,
+      isLoading: false,
+    });
+    mockUseWidgetsByGoals.mockReturnValue({
+      data: widgets,
+      isLoading: false,
+    });
+  });
+
+  it('produces no hard-coded /district/<slug> hrefs', () => {
+    render(<GoalDetailView />);
+    const hardCodedLinks = screen
+      .queryAllByRole('link')
+      .map((a) => a.getAttribute('href'))
+      .filter((h) => h && h.startsWith('/district/'));
+    expect(hardCodedLinks).toHaveLength(0);
   });
 });

@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation';
-import { useSubdomain } from '@/contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '@/contexts/SubdomainContext';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
 import { Breadcrumb } from '@/components/v2/public/Breadcrumb';
@@ -24,7 +24,8 @@ function statusDotsForGoals(children: HierarchicalGoal[]): { color: string }[] {
 export function ObjectivesOverviewView() {
   const router = useRouter();
   const { slug } = useSubdomain();
-  const basePath = `/district/${slug}`;
+  const link = useDistrictLink();
+  const homeHref = link('/');
   const { data: plans, isLoading: plansLoading } = usePlansBySlug(slug || '');
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
   const { data: goals, isLoading: goalsLoading } = useGoalsByPlan(activePlan?.id || '');
@@ -46,7 +47,7 @@ export function ObjectivesOverviewView() {
       <header className="mx-auto mb-10 max-w-7xl sm:mb-12">
         <Breadcrumb
           items={[
-            { label: 'Plan', href: basePath },
+            { label: 'Plan', href: homeHref },
             { label: 'All Objectives' },
           ]}
         />
@@ -96,7 +97,7 @@ export function ObjectivesOverviewView() {
               onTargetCount={childCounts.onTarget}
               offTrackCount={childCounts.critical + childCounts.atRisk}
               goalCount={children.length}
-              onClick={() => router.push(`${basePath}/objectives/${obj.id}`)}
+              onClick={() => router.push(link(`/objectives/${obj.id}`))}
             />
           );
         })}

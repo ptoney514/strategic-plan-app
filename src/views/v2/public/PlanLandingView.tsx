@@ -1,6 +1,6 @@
 'use client'
 import { useRouter } from 'next/navigation';
-import { useSubdomain } from '@/contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '@/contexts/SubdomainContext';
 import { useDistrict } from '@/hooks/useDistricts';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
@@ -40,7 +40,7 @@ export function PlanLandingView() {
   const router = useRouter();
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
-  const basePath = `/district/${slug}`;
+  const link = useDistrictLink();
   const { data: plans, isLoading: plansLoading } = usePlansBySlug(slug || '');
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
   const { data: goals, isLoading: goalsLoading } = useGoalsByPlan(activePlan?.id || '');
@@ -160,7 +160,7 @@ export function PlanLandingView() {
                 goalCount={children.length}
                 onTargetCount={childCounts.onTarget}
                 offTrackCount={childCounts.critical + childCounts.atRisk}
-                onClick={() => router.push(`${basePath}/objectives/${obj.id}`)}
+                onClick={() => router.push(link(`/objectives/${obj.id}`))}
               />
             );
           })}

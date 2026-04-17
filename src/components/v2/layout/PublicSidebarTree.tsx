@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { useEffect, useMemo } from 'react';
 import { usePathname } from 'next/navigation';
-import { useSubdomain } from '@/contexts/SubdomainContext';
+import { useDistrictLink } from '@/contexts/SubdomainContext';
 import { usePublicSidebar } from './PublicSidebarContext';
 import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
 import type { HierarchicalGoal } from '@/lib/types';
@@ -34,8 +34,7 @@ function statusColor(status?: string): string {
 
 export function PublicSidebarTree({ objectives }: PublicSidebarTreeProps) {
   const pathname = usePathname();
-  const { slug } = useSubdomain();
-  const basePath = `/district/${slug}`;
+  const link = useDistrictLink();
   const {
     activeNodeId,
     closeMobile,
@@ -74,8 +73,8 @@ export function PublicSidebarTree({ objectives }: PublicSidebarTreeProps) {
     const isActive = activeNodeId === node.id;
     const isInActiveLineage = activeLineageIds.has(node.id);
     const href = isObjective
-      ? `${basePath}/objectives/${node.id}`
-      : `${basePath}/goals/${node.id}`;
+      ? link(`/objectives/${node.id}`)
+      : link(`/goals/${node.id}`);
     const valueLabel = node.overall_progress != null ? `${node.overall_progress}%` : '--';
     const label = isObjective ? node.title : `${node.goal_number} ${node.title}`;
 

@@ -39,6 +39,7 @@ vi.mock('next/link', () => ({
 
 vi.mock('@/contexts/SubdomainContext', () => ({
   useSubdomain: () => ({ slug: 'westside', type: 'district' }),
+  useDistrictLink: () => (path: string) => `${path}?subdomain=westside`,
 }));
 
 vi.mock('@/contexts/ThemeContext', () => ({

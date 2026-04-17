@@ -8,11 +8,10 @@ import { useGoalsByPlan } from '@/hooks/v2/useGoals';
 import { useWidgetsByGoals } from '@/hooks/v2/useWidgets';
 import { Breadcrumb } from '@/components/v2/public/Breadcrumb';
 import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
-import { GoalKpiPanel } from '@/components/v2/public/GoalKpiPanel';
-import { SvgDonutChart } from '@/components/v2/public/SvgDonutChart';
-import { GoalBarChart } from '@/components/v2/public/GoalBarChart';
+import { GoalKpiPanelV2 } from '@/components/v2/public/GoalKpiPanelV2';
 import { SubGoalAccordion } from '@/components/v2/public/SubGoalAccordion';
 import { WidgetGrid } from '@/components/v2/widgets/WidgetGrid';
+import { WidgetRenderer } from '@/components/v2/widgets/WidgetRenderer';
 import {
   statusBadgeClasses,
   statusBadgeLabel,
@@ -127,7 +126,6 @@ export function GoalDetailView() {
       || primaryWidget.type === 'progress-bar'
       || primaryWidget.type === 'big-number'
     : false;
-  const isBarChart = primaryWidget?.type === 'bar-chart' || primaryWidget?.type === 'area-line';
   const subGoalItems = children.map((child) => {
     const childWidget = (widgetsByGoal.get(child.id) || [])[0];
 
@@ -229,7 +227,7 @@ export function GoalDetailView() {
 
       <div className="mb-10 grid grid-cols-1 gap-5 lg:grid-cols-12 lg:gap-6">
         <div className={isDonutWidget ? 'lg:col-span-5' : 'lg:col-span-4'}>
-          <GoalKpiPanel
+          <GoalKpiPanelV2
             value={derivedTrend.value}
             unit={unit}
             total={isDonutWidget && chartConfig.target ? chartConfig.target : undefined}
@@ -237,10 +235,10 @@ export function GoalDetailView() {
             statusLabel={statusBadgeLabel(goal.status).toUpperCase()}
             statusColor={
               goal.status?.toLowerCase().includes('target') || goal.status?.toLowerCase().includes('exceeding')
-                ? 'text-md3-secondary bg-md3-secondary/5'
+                ? 'text-md3-secondary bg-md3-secondary/10 dark:bg-md3-secondary/15'
                 : goal.status?.toLowerCase().includes('risk') || goal.status?.toLowerCase().includes('progress')
-                ? 'text-md3-tertiary bg-md3-tertiary/5'
-                : 'text-md3-error bg-md3-error/5'
+                ? 'text-md3-tertiary bg-md3-tertiary/10 dark:bg-md3-tertiary/15'
+                : 'text-md3-error bg-md3-error/10 dark:bg-md3-error/15'
             }
             trend={primaryWidget && chartConfig.baseline != null ? {
               delta: derivedTrend.delta,
@@ -254,21 +252,35 @@ export function GoalDetailView() {
         </div>
 
         <div className={isDonutWidget ? 'lg:col-span-7' : 'lg:col-span-8'}>
-          {isBarChart && chartConfig.dataPoints ? (
-            <GoalBarChart
-              dataPoints={chartConfig.dataPoints}
-              targetValue={chartConfig.target}
-              title={primaryWidget?.title || 'Annual Growth'}
-              legendLabel={chartConfig.label || `${unit} Value`}
-            />
-          ) : (
-            <SvgDonutChart
-              value={derivedTrend.value}
-              total={chartConfig.target || 100}
-              color="#994100"
-              label={`${derivedTrend.value} of ${chartConfig.target || 100} ${unit === '%' ? 'completed' : `${unit} completed`}`}
-            />
-          )}
+          <div className="flex h-full flex-col rounded-2xl border border-md3-outline-variant/25 bg-md3-surface-lowest p-6 shadow-sm">
+            {primaryWidget ? (
+              <>
+                <div className="mb-4 flex items-baseline justify-between">
+                  <div>
+                    <h3 className="text-base font-bold text-md3-on-surface">
+                      {primaryWidget.title}
+                    </h3>
+                    {primaryWidget.subtitle && (
+                      <p className="text-xs text-md3-on-surface-variant">{primaryWidget.subtitle}</p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex-1 min-h-[260px]">
+                  <WidgetRenderer widget={primaryWidget} />
+                </div>
+              </>
+            ) : (
+              <div className="flex flex-1 flex-col items-center justify-center py-10 text-center">
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-md3-surface-container text-md3-on-surface-variant">
+                  <MaterialIcon icon="insights" />
+                </div>
+                <p className="font-semibold text-md3-on-surface mb-1">No chart published yet</p>
+                <p className="text-sm text-md3-on-surface-variant max-w-md">
+                  The district hasn't attached a primary visual to this goal. KPI values above remain accurate.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

@@ -196,6 +196,44 @@
   --color-border: hsl(217.2 32.6% 17.5%);
   --color-input: hsl(217.2 32.6% 17.5%);
   --color-ring: hsl(212.7 26.8% 83.9%);
+
+  /* MD3 Public Dashboard Tokens — dark mode overrides
+     Surfaces step from darkest (surface-lowest) up to lightest (surface-highest),
+     matching Material Design 3's elevated-on-dark surface tinting model.
+     Accent colors shift toward lighter container hues for contrast against dark. */
+  --color-md3-primary: #b28cff;
+  --color-md3-on-primary: #2e006c;
+  --color-md3-primary-container: #5417b0;
+  --color-md3-on-primary-container: #eadcff;
+  --color-md3-primary-fixed: #b28cff;
+  --color-md3-primary-fixed-dim: #a67aff;
+  --color-md3-secondary: #6df5e1;
+  --color-md3-on-secondary: #003731;
+  --color-md3-secondary-container: #005046;
+  --color-md3-on-secondary-container: #c0fff3;
+  --color-md3-tertiary: #ff955a;
+  --color-md3-on-tertiary: #552100;
+  --color-md3-tertiary-container: #7a3100;
+  --color-md3-on-tertiary-container: #ffdbc9;
+  --color-md3-error: #ffb3be;
+  --color-md3-on-error: #67002a;
+  --color-md3-error-container: #8c1434;
+  --color-md3-surface: #0f172a;
+  --color-md3-surface-bright: #2b3447;
+  --color-md3-surface-dim: #0b1220;
+  --color-md3-surface-lowest: #0b1220;
+  --color-md3-surface-low: #131d30;
+  --color-md3-surface-container: #1a2540;
+  --color-md3-surface-high: #21304f;
+  --color-md3-surface-highest: #293a5d;
+  --color-md3-on-surface: #e6edf8;
+  --color-md3-on-surface-variant: #a6b3c7;
+  --color-md3-outline: #768499;
+  --color-md3-outline-variant: #394560;
+  --color-md3-inverse-surface: #e6edf8;
+  --color-md3-inverse-on-surface: #1a2540;
+  --color-md3-inverse-primary: #702ae1;
+  --color-md3-surface-tint: #b28cff;
 }
 
 /* Base styles — Tailwind's preflight handles resets, only add overrides */

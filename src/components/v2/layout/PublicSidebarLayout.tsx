@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useSubdomain } from '@/contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '@/contexts/SubdomainContext';
 import { useDistrict } from '@/hooks/useDistricts';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
@@ -63,7 +63,8 @@ function SidebarContent({ mobile = false }: { mobile?: boolean }) {
   const pathname = usePathname();
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
-  const basePath = `/district/${slug}`;
+  const link = useDistrictLink();
+  const homeHref = link('/');
   const { data: plans } = usePlansBySlug(slug || '');
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
   const { data: goals } = useGoalsByPlan(activePlan?.id || '');
@@ -103,19 +104,19 @@ function SidebarContent({ mobile = false }: { mobile?: boolean }) {
     {
       icon: 'domain',
       label: 'District overview',
-      href: `${basePath}#district-identity`,
-      isActive: pathname === basePath && currentHash !== '#plan-health',
+      href: `${homeHref}#district-identity`,
+      isActive: pathname === homeHref && currentHash !== '#plan-health',
     },
     {
       icon: 'analytics',
       label: 'Plan health',
-      href: `${basePath}#plan-health`,
-      isActive: pathname === basePath && currentHash === '#plan-health',
+      href: `${homeHref}#plan-health`,
+      isActive: pathname === homeHref && currentHash === '#plan-health',
     },
     {
       icon: 'account_tree',
       label: 'Objectives',
-      href: `${basePath}/objectives`,
+      href: link('/objectives'),
       isActive: pathname.includes('/objectives') || pathname.includes('/goals/'),
     },
   ];

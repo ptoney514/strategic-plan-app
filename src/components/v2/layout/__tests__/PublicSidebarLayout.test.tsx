@@ -231,4 +231,29 @@ describe('PublicSidebarLayout', () => {
     expect(within(dialog).getByRole('link', { name: /1.1.1 phonics program/i })).toBeInTheDocument();
     expect(within(dialog).queryByRole('link', { name: /settings/i })).not.toBeInTheDocument();
   });
+
+  it('does not render any anchor href prefixed with /district/', () => {
+    render(
+      <PublicSidebarLayout>
+        <div>Explorer content</div>
+      </PublicSidebarLayout>,
+    );
+
+    const links = screen.getAllByRole('link');
+    const badLinks = links
+      .map((a) => a.getAttribute('href'))
+      .filter((href): href is string => !!href && href.startsWith('/district/'));
+    expect(badLinks).toEqual([]);
+  });
+
+  it('renders the Objectives nav link with the hook-generated href', () => {
+    render(
+      <PublicSidebarLayout>
+        <div>Explorer content</div>
+      </PublicSidebarLayout>,
+    );
+
+    const objectivesLink = screen.getByRole('link', { name: /objectives/i });
+    expect(objectivesLink).toHaveAttribute('href', '/objectives?subdomain=westside');
+  });
 });

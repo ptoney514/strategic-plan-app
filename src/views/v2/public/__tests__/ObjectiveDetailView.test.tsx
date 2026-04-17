@@ -3,10 +3,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@/test/setup';
 import { ObjectiveDetailView } from '../ObjectiveDetailView';
 
+const mockPush = vi.fn();
+
 vi.mock('next/navigation', () => ({
   useParams: () => ({ objectiveId: 'obj-1' }),
   useRouter: () => ({
-    push: vi.fn(),
+    push: mockPush,
     replace: vi.fn(),
     back: vi.fn(),
     forward: vi.fn(),
@@ -17,6 +19,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/contexts/SubdomainContext', () => ({
   useSubdomain: () => ({ slug: 'westside', type: 'district' }),
+  useDistrictLink: () => (p: string) => p,
 }));
 
 vi.mock('@/hooks/v2/usePlans', () => ({
@@ -164,5 +167,41 @@ describe('ObjectiveDetailView', () => {
     expect(grid.className).not.toContain('xl:grid-cols-3');
     expect(screen.getByTestId('objective-goal-card-1.1')).toBeInTheDocument();
     expect(screen.getByTestId('objective-goal-card-1.2')).toBeInTheDocument();
+  });
+});
+
+describe('ObjectiveDetailView — link construction', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockUseGoalsByPlan.mockReturnValue({
+      data: goals,
+      isLoading: false,
+    });
+    mockUseWidgetsByGoals.mockReturnValue({
+      data: widgets,
+      isLoading: false,
+    });
+  });
+
+  it('breadcrumb and any rendered hrefs never start with /district/', () => {
+    render(<ObjectiveDetailView />);
+
+    const badLinks = screen
+      .queryAllByRole('link')
+      .map((a) => a.getAttribute('href'))
+      .filter((href): href is string => !!href && href.startsWith('/district/'));
+
+    expect(badLinks).toEqual([]);
+  });
+
+  it('goal card click routes without /district/ prefix', () => {
+    render(<ObjectiveDetailView />);
+
+    screen.getByTestId('objective-goal-card-1.1').click();
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    const calledWith = mockPush.mock.calls[0][0] as string;
+    expect(calledWith.startsWith('/district/')).toBe(false);
+    expect(calledWith).toBe('/goals/goal-1');
   });
 });

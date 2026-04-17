@@ -1,6 +1,6 @@
 'use client'
 import { useParams, useRouter } from 'next/navigation';
-import { useSubdomain } from '@/contexts/SubdomainContext';
+import { useSubdomain, useDistrictLink } from '@/contexts/SubdomainContext';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
 import { useWidgetsByGoals } from '@/hooks/v2/useWidgets';
@@ -23,7 +23,8 @@ export function ObjectiveDetailView() {
   const objectiveId = Array.isArray(params.objectiveId) ? params.objectiveId[0] : params.objectiveId;
   const router = useRouter();
   const { slug } = useSubdomain();
-  const basePath = `/district/${slug}`;
+  const link = useDistrictLink();
+  const homeHref = link('/');
   const { data: plans } = usePlansBySlug(slug || '');
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
   const { data: goals, isLoading } = useGoalsByPlan(activePlan?.id || '');
@@ -62,7 +63,7 @@ export function ObjectiveDetailView() {
       {/* Breadcrumb */}
       <Breadcrumb
         items={[
-          { label: 'Plan', href: basePath },
+          { label: 'Plan', href: homeHref },
           { label: objective.title },
         ]}
       />
@@ -145,7 +146,7 @@ export function ObjectiveDetailView() {
               target={widget?.config?.target}
               progressPercent={widget ? trend.progress : child.overall_progress}
               testId={`objective-goal-card-${child.goal_number}`}
-              onClick={() => router.push(`${basePath}/goals/${child.id}`)}
+              onClick={() => router.push(link(`/goals/${child.id}`))}
             />
           );
         })}

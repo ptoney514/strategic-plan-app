@@ -202,8 +202,8 @@ export function buildDistrictPath(basePath: string, slug: string, isSubdomain: b
   if (isSubdomain) {
     return basePath;
   }
-  // On root domain, include slug in path
-  return `/${slug}${basePath}`;
+  // On root domain, include slug in path under /district/
+  return `/district/${slug}${basePath}`;
 }
 
 /**
@@ -229,8 +229,8 @@ export function buildDistrictPathWithQueryParam(
     // Real subdomain (westside.stratadash.org) - no query param needed
     return basePath;
   }
-  // On root domain, include slug in path
-  return `/${slug}${basePath}`;
+  // On root domain, include slug in path under /district/
+  return `/district/${slug}${basePath}`;
 }
 
 /**

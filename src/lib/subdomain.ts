@@ -23,6 +23,10 @@ const ROOT_DOMAINS = [
 
 const ADMIN_SUBDOMAINS = ['admin'];
 
+function ensureLeadingSlash(path: string): string {
+  return path && !path.startsWith('/') ? `/${path}` : path;
+}
+
 /**
  * Get subdomain information from the current hostname
  */
@@ -198,12 +202,11 @@ export function isQueryParamSubdomain(): boolean {
  * For components using React Router <Link>, use the useDistrictLink hook instead.
  */
 export function buildDistrictPath(basePath: string, slug: string, isSubdomain: boolean): string {
-  // On subdomain, paths don't need slug prefix
+  const normalizedPath = ensureLeadingSlash(basePath);
   if (isSubdomain) {
-    return basePath;
+    return normalizedPath;
   }
-  // On root domain, include slug in path under /district/
-  return `/district/${slug}${basePath}`;
+  return `/district/${slug}${normalizedPath}`;
 }
 
 /**
@@ -220,17 +223,16 @@ export function buildDistrictPathWithQueryParam(
   slug: string,
   isSubdomain: boolean
 ): string {
-  // On subdomain routing
+  const normalizedPath = ensureLeadingSlash(basePath);
   if (isSubdomain) {
-    // If using query param simulation (localhost/Vercel preview), preserve it
+    // Localhost/Vercel preview simulate subdomains via ?subdomain= since
+    // real subdomain DNS isn't available — preserve the query param.
     if (isQueryParamSubdomain()) {
-      return `${basePath}?subdomain=${slug}`;
+      return `${normalizedPath}?subdomain=${slug}`;
     }
-    // Real subdomain (westside.stratadash.org) - no query param needed
-    return basePath;
+    return normalizedPath;
   }
-  // On root domain, include slug in path under /district/
-  return `/district/${slug}${basePath}`;
+  return `/district/${slug}${normalizedPath}`;
 }
 
 /**
@@ -243,8 +245,7 @@ export function buildDistrictPathWithQueryParam(
  *   - production: https://admin.stratadash.org/districts
  */
 export function buildSubdomainUrlWithPath(type: SubdomainType, path: string = '', slug?: string): string {
-  // Ensure path starts with /
-  const normalizedPath = path && !path.startsWith('/') ? `/${path}` : path;
+  const normalizedPath = ensureLeadingSlash(path);
 
   if (typeof window === 'undefined') {
     if (type === 'admin') return `https://admin.stratadash.org${normalizedPath}`;

@@ -19,7 +19,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/contexts/SubdomainContext', () => ({
   useSubdomain: () => ({ slug: 'westside', type: 'district' }),
-  useDistrictLink: () => (p: string) => p,
+  useDistrictLink: () => (p: string) => `${p}?subdomain=westside`,
 }));
 
 vi.mock('@/hooks/v2/usePlans', () => ({
@@ -202,6 +202,6 @@ describe('ObjectiveDetailView — link construction', () => {
     expect(mockPush).toHaveBeenCalledTimes(1);
     const calledWith = mockPush.mock.calls[0][0] as string;
     expect(calledWith.startsWith('/district/')).toBe(false);
-    expect(calledWith).toBe('/goals/goal-1');
+    expect(calledWith).toBe('/goals/goal-1?subdomain=westside');
   });
 });

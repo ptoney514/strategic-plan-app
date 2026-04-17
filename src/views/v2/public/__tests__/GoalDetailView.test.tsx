@@ -38,7 +38,7 @@ vi.mock('next/navigation', () => ({
 
 vi.mock('@/contexts/SubdomainContext', () => ({
   useSubdomain: () => ({ slug: 'westside', type: 'district' }),
-  useDistrictLink: () => (path: string) => path,
+  useDistrictLink: () => (path: string) => `${path}?subdomain=westside`,
 }));
 
 vi.mock('@/hooks/v2/usePlans', () => ({
@@ -203,7 +203,7 @@ describe('GoalDetailView', () => {
     expect(screen.getByText('Child comparisons')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /phonics foundation/i })).toHaveAttribute(
       'href',
-      '/goals/goal-child',
+      '/goals/goal-child?subdomain=westside',
     );
     expect(screen.getByText('Reading cohort breakdown')).toBeInTheDocument();
     expect(screen.getByText('Phonics mastery')).toBeInTheDocument();

@@ -6,13 +6,17 @@ const ROOT = join(__dirname, '..', '..');
 const SCANNED_DIRS = [
   join(ROOT, 'views', 'v2', 'public'),
   join(ROOT, 'components', 'v2', 'layout'),
+  join(ROOT, 'components', 'v2', 'public'),
 ];
 
 const FORBIDDEN_PATTERNS = [
-  { pattern: /`\/district\/\$\{/, label: 'template literal `/district/${...}`' },
   {
-    pattern: /const\s+basePath\s*=\s*`\/district\//,
-    label: 'const basePath = `/district/...`',
+    pattern: /[`'"]\/district\/\$?\{?/,
+    label: 'hardcoded /district/ path literal (template, single, or double-quoted)',
+  },
+  {
+    pattern: /=\s*[`'"]\/district\//,
+    label: 'variable assigned a /district/ string literal',
   },
 ];
 

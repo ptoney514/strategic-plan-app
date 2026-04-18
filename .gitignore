@@ -83,3 +83,6 @@ e2e/.auth/
 
 # Playwright MCP artifacts
 .playwright-mcp/
+
+# Superpowers brainstorm sessions
+.superpowers/

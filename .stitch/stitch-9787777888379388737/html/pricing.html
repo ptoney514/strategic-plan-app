@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Pricing | StrataDash Strategic Planning</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: Epilogue, Manrope, Space Grotesk -->
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&amp;family=Manrope:wght@400;500;600&amp;family=Space+Grotesk:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-surface": "#2e3036",
+                    "on-surface-variant": "#42474f",
+                    "on-primary-container": "#b4d6ff",
+                    "on-primary-fixed": "#001d35",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#e1e2e9",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#2f5e8a",
+                    "tertiary-container": "#006760",
+                    "error-container": "#ffdad6",
+                    "surface-tint": "#33618e",
+                    "tertiary-fixed-dim": "#83d5cb",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#f8f9ff",
+                    "inverse-primary": "#9ecafc",
+                    "tertiary": "#004d47",
+                    "outline": "#72777f",
+                    "error": "#ba1a1a",
+                    "surface-container-highest": "#e1e2e9",
+                    "on-secondary-container": "#65000b",
+                    "secondary-container": "#fd625f",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#ffb3ae",
+                    "surface-container": "#ecedf5",
+                    "on-secondary-fixed-variant": "#8f0d19",
+                    "primary": "#0f4671",
+                    "surface-container-low": "#f2f3fa",
+                    "on-tertiary-container": "#90e3d9",
+                    "surface": "#f8f9ff",
+                    "on-tertiary-fixed-variant": "#00504a",
+                    "surface-container-high": "#e6e8ef",
+                    "primary-fixed": "#d0e4ff",
+                    "secondary-fixed": "#ffdad7",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#191c21",
+                    "on-surface": "#191c21",
+                    "background": "#f8f9ff",
+                    "secondary": "#b12a2e",
+                    "tertiary-fixed": "#9ff1e7",
+                    "on-secondary-fixed": "#410005",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#c2c7d0",
+                    "inverse-on-surface": "#eff0f8",
+                    "on-tertiary-fixed": "#00201d",
+                    "surface-dim": "#d8dae1",
+                    "on-primary-fixed-variant": "#154974",
+                    "primary-fixed-dim": "#9ecafc"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Epilogue"],
+                    "body": ["Manrope"],
+                    "label": ["Space Grotesk"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .editorial-canvas {
+            background-color: #F5F2EA;
+        }
+        .tactile-cta {
+            background: linear-gradient(135deg, #0F4671 0%, #2F5E8A 100%);
+        }
+        .glass-overlay {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+</head>
+<body class="font-body editorial-canvas text-on-surface selection:bg-primary-fixed">
+<!-- TopNavBar -->
+<nav class="sticky top-0 w-full z-50 bg-[#F5F2EA] dark:bg-slate-950 backdrop-blur-md opacity-90">
+<div class="flex justify-between items-center px-12 py-6 max-w-[1440px] mx-auto">
+<div class="text-2xl font-black text-[#171A1F] dark:text-slate-100 font-headline tracking-tight">StrataDash</div>
+<div class="hidden md:flex items-center space-x-8 font-['Epilogue'] font-bold tracking-tight text-sm">
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">Product</a>
+<a class="text-[#2F5E8A] font-bold border-b-2 border-[#2F5E8A] pb-1" href="#">Pricing</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">About</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity" href="#">Sign in</a>
+</div>
+<div class="flex items-center gap-6">
+<button class="tactile-cta text-white px-6 py-3 rounded-full font-headline text-sm font-bold shadow-sm active:scale-95 transition-all">Book a demo</button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="max-w-[1440px] mx-auto px-12 pt-24 pb-32">
+<div class="max-w-4xl">
+<h1 class="font-headline font-black text-[3.5rem] leading-[1.1] text-on-surface mb-8">
+                    Strategy is the work.<br/>
+                    The software should just work.
+                </h1>
+<p class="font-body text-xl text-on-surface-variant leading-relaxed max-w-2xl mb-12">
+                    Transparent, annual pricing designed for school districts. Skip the six-figure consultant fees and the PDF graveyard. StrataDash provides the architecture your district needs to execute with precision.
+                </p>
+<div class="inline-flex items-center gap-4 bg-surface-container-high px-6 py-4 rounded-xl">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label text-sm uppercase tracking-wider text-on-surface-variant font-bold">Public Sector Ready: Annual Billing &amp; Procurement Compliant</span>
+</div>
+</div>
+</section>
+<!-- Pricing Tiers -->
+<section class="max-w-[1440px] mx-auto px-12 mb-32">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Pilot Tier -->
+<div class="bg-surface rounded-xl p-12 flex flex-col justify-between hover:shadow-[0_20px_40px_rgba(25,28,33,0.06)] transition-all duration-300 transform hover:-translate-y-1">
+<div>
+<h3 class="font-headline text-2xl font-bold mb-2">Pilot</h3>
+<p class="text-on-surface-variant mb-8 h-12">Ideal for individual school sites or small leadership teams testing a single plan.</p>
+<div class="mb-10">
+<span class="font-label text-4xl font-bold text-primary">$4,500</span>
+<span class="text-on-surface-variant font-medium">/ year</span>
+</div>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">1 Active Strategic Plan</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">5 Admin Seats</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">Standard District Branding</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">Email Support</span>
+</li>
+</ul>
+</div>
+<button class="w-full py-4 rounded-full border-2 border-outline text-on-surface font-headline font-bold hover:bg-surface-container-low transition-colors">Start Pilot</button>
+</div>
+<!-- District Tier (Featured) -->
+<div class="bg-primary text-white rounded-xl p-12 flex flex-col justify-between relative overflow-hidden shadow-[0_20px_40px_rgba(15,70,113,0.15)] transform scale-105 z-10">
+<div class="absolute top-0 right-0 p-6">
+<span class="bg-white/10 text-white text-[10px] font-label font-bold px-3 py-1 rounded-full uppercase tracking-widest border border-white/20">Most Requested</span>
+</div>
+<div>
+<h3 class="font-headline text-2xl font-bold mb-2">District</h3>
+<p class="text-white/80 mb-8 h-12">The standard for central office leadership and board-level strategic management.</p>
+<div class="mb-10">
+<span class="font-label text-4xl font-bold">$12,000</span>
+<span class="text-white/60 font-medium">/ year</span>
+</div>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed text-sm">check_circle</span>
+<span class="text-sm font-medium">Unlimited Strategic Plans</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed text-sm">check_circle</span>
+<span class="text-sm font-medium">25 Admin Seats</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed text-sm">check_circle</span>
+<span class="text-sm font-medium">Advanced Custom Branding</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed text-sm">check_circle</span>
+<span class="text-sm font-medium">Priority Onboarding Success</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary-fixed text-sm">check_circle</span>
+<span class="text-sm font-medium">Board Presentation Mode</span>
+</li>
+</ul>
+</div>
+<button class="w-full py-4 rounded-full bg-white text-primary font-headline font-bold hover:bg-primary-fixed transition-colors">Select District Plan</button>
+</div>
+<!-- Multi-District Tier -->
+<div class="bg-surface rounded-xl p-12 flex flex-col justify-between hover:shadow-[0_20px_40px_rgba(25,28,33,0.06)] transition-all duration-300 transform hover:-translate-y-1">
+<div>
+<h3 class="font-headline text-2xl font-bold mb-2">Enterprise</h3>
+<p class="text-on-surface-variant mb-8 h-12">Custom solutions for County Offices, ESAs, and Multi-District Collectives.</p>
+<div class="mb-10">
+<span class="font-label text-4xl font-bold text-primary">Custom</span>
+</div>
+<ul class="space-y-4 mb-12">
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">Regional Aggregation Dashboards</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">SSO &amp; API Integrations</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">Unlimited Admin Seats</span>
+</li>
+<li class="flex items-center gap-3">
+<span class="material-symbols-outlined text-tertiary text-sm">check_circle</span>
+<span class="text-sm font-medium">Dedicated Strategic Advisor</span>
+</li>
+</ul>
+</div>
+<button class="w-full py-4 rounded-full border-2 border-outline text-on-surface font-headline font-bold hover:bg-surface-container-low transition-colors">Inquire Today</button>
+</div>
+</div>
+</section>
+<!-- Included in Every Plan (Bento Grid) -->
+<section class="bg-surface-container-low py-24">
+<div class="max-w-[1440px] mx-auto px-12">
+<div class="mb-16">
+<h2 class="font-headline text-4xl font-bold mb-4">Foundationally Integrated</h2>
+<p class="text-on-surface-variant font-body">Every StrataDash license includes the core engine for strategic transparency.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Feature 1 -->
+<div class="md:col-span-2 bg-white p-10 rounded-xl flex flex-col justify-between min-h-[300px]">
+<span class="material-symbols-outlined text-4xl text-primary mb-6" style="font-variation-settings: 'FILL' 1;">public</span>
+<div>
+<h4 class="font-headline text-xl font-bold mb-3">Public Dashboard Publishing</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Instantly share progress with families, staff, and the board via a beautiful, hosted URL designed for transparency.</p>
+</div>
+</div>
+<!-- Feature 2 -->
+<div class="bg-white p-10 rounded-xl flex flex-col justify-between min-h-[300px]">
+<span class="material-symbols-outlined text-4xl text-primary mb-6">account_tree</span>
+<div>
+<h4 class="font-headline text-lg font-bold mb-3">Strategic Hierarchy</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Map Goals to Pillars to Actions with a 1:1 digital twin of your document.</p>
+</div>
+</div>
+<!-- Feature 3 -->
+<div class="bg-white p-10 rounded-xl flex flex-col justify-between min-h-[300px]">
+<span class="material-symbols-outlined text-4xl text-primary mb-6">query_stats</span>
+<div>
+<h4 class="font-headline text-lg font-bold mb-3">KPI Visuals</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Interactive progress charts that update instantly as you input data.</p>
+</div>
+</div>
+<!-- Feature 4 -->
+<div class="bg-white p-10 rounded-xl flex flex-col justify-between min-h-[300px]">
+<span class="material-symbols-outlined text-4xl text-primary mb-6">palette</span>
+<div>
+<h4 class="font-headline text-lg font-bold mb-3">District Branding</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Upload your logos and select your primary palette for a native feel.</p>
+</div>
+</div>
+<!-- Feature 5 -->
+<div class="md:col-span-2 bg-white p-10 rounded-xl flex flex-col justify-between min-h-[300px]">
+<span class="material-symbols-outlined text-4xl text-primary mb-6">admin_panel_settings</span>
+<div>
+<h4 class="font-headline text-xl font-bold mb-3">Governance &amp; Admin Access</h4>
+<p class="text-on-surface-variant text-sm leading-relaxed">Granular permissions to ensure the right leaders have editing access while the rest of the organization views the plan.</p>
+</div>
+</div>
+<!-- Comparison Card -->
+<div class="md:col-span-1 bg-tertiary text-white p-10 rounded-xl flex flex-col justify-center items-center text-center">
+<div class="font-label text-5xl font-bold mb-4">1/10th</div>
+<p class="text-sm font-medium">The cost of traditional strategic planning consultants. We give you the tools, not the billable hours.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ Section (Editorial Layout) -->
+<section class="max-w-[1440px] mx-auto px-12 py-32 grid grid-cols-1 md:grid-cols-3 gap-16">
+<div>
+<h2 class="font-headline text-4xl font-bold mb-6">Common Procurement Inquiries</h2>
+<p class="text-on-surface-variant leading-relaxed">Everything you need to know about bringing StrataDash to your district's leadership team.</p>
+</div>
+<div class="md:col-span-2 space-y-12">
+<div class="group">
+<h4 class="font-headline text-xl font-bold mb-3 text-on-surface">How does the annual billing cycle work?</h4>
+<p class="text-on-surface-variant leading-relaxed">We operate on a standard July 1 – June 30 fiscal year billing cycle for most districts, but we can pro-rate your first year to match your specific budget calendar. Invoices are payable via check, ACH, or Purchase Order.</p>
+</div>
+<div class="group">
+<h4 class="font-headline text-xl font-bold mb-3 text-on-surface">Can we import our existing 5-year plan?</h4>
+<p class="text-on-surface-variant leading-relaxed">Yes. Our onboarding success team provides a templated CSV for bulk uploads, or we can provide a white-glove setup service for District and Enterprise tiers to manually map your existing PDF into our hierarchy.</p>
+</div>
+<div class="group">
+<h4 class="font-headline text-xl font-bold mb-3 text-on-surface">Is there a limit on public page views?</h4>
+<p class="text-on-surface-variant leading-relaxed">No. We believe transparency should never be penalized. Whether you have 100 parents or 100,000 visiting your strategic dashboard, there are never extra data or bandwidth charges.</p>
+</div>
+<div class="group">
+<h4 class="font-headline text-xl font-bold mb-3 text-on-surface">What about student data privacy?</h4>
+<p class="text-on-surface-variant leading-relaxed">StrataDash is designed for high-level strategic tracking. We do not require, nor do we recommend, the upload of PII (Personally Identifiable Information). We track aggregate percentages and district-wide metrics.</p>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-[1440px] mx-auto px-12 pb-32">
+<div class="bg-primary-container rounded-xl p-16 text-center text-white relative overflow-hidden">
+<div class="relative z-10 max-w-2xl mx-auto">
+<h2 class="font-headline text-[3rem] font-black mb-6 leading-tight">Ready to lead with clarity?</h2>
+<p class="text-on-primary-container text-lg mb-12">Join 150+ forward-thinking school districts transforming their strategic plans from static documents into living roadmaps.</p>
+<div class="flex flex-col sm:flex-row gap-6 justify-center">
+<button class="bg-white text-primary px-10 py-5 rounded-full font-headline font-black text-lg hover:bg-primary-fixed transition-colors shadow-lg active:scale-95">Book a Live Demo</button>
+<button class="border-2 border-white/30 text-white px-10 py-5 rounded-full font-headline font-black text-lg hover:bg-white/10 transition-colors active:scale-95">Contact Sales</button>
+</div>
+</div>
+<!-- Abstract visual element -->
+<div class="absolute -bottom-24 -right-24 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+<div class="absolute -top-24 -left-24 w-96 h-96 bg-tertiary/10 rounded-full blur-3xl"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#FFFFFF] dark:bg-slate-900 w-full border-t border-[#171A1F]/5">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-24 max-w-[1440px] mx-auto font-['Manrope'] leading-relaxed text-sm">
+<div class="space-y-6">
+<div class="text-xl font-bold text-[#171A1F] dark:text-slate-100">StrataDash</div>
+<p class="text-[#171A1F]/60 dark:text-slate-400 max-w-xs">Empowering school district leaders to execute their vision with data-driven transparency.</p>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-bold text-[#171A1F] dark:text-white uppercase tracking-widest text-[10px]">Product</span>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Public Dashboards</a>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Strategic Alignment</a>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">KPI Engine</a>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-bold text-[#171A1F] dark:text-white uppercase tracking-widest text-[10px]">Resources</span>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">White Papers</a>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Case Studies</a>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Planning Guides</a>
+</div>
+<div class="flex flex-col space-y-4">
+<span class="font-bold text-[#171A1F] dark:text-white uppercase tracking-widest text-[10px]">Legal</span>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Privacy Policy</a>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Terms of Service</a>
+<a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] dark:hover:text-blue-300 transition-all duration-300" href="#">Security Center</a>
+</div>
+</div>
+<div class="px-12 py-8 max-w-[1440px] mx-auto border-t border-[#171A1F]/5 text-[#171A1F]/60 dark:text-slate-400 text-xs">
+            © 2024 StrataDash. Your strategic plan deserves better than a PDF.
+        </div>
+</footer>
+</body></html>

@@ -1,4 +1,5 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
 
 @source "../../src";
 
@@ -7,18 +8,54 @@
 @theme {
   --font-sans: Inter, system-ui, sans-serif;
   --font-display: Sora, system-ui, sans-serif;
+  --font-headline: var(--font-public-headline);
+  --font-body: var(--font-public-body);
+  --font-label: var(--font-public-label);
+  --font-mono: var(--font-public-mono);
 
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
+  --color-surface: var(--color-surface);
+  --color-on-surface: var(--color-on-surface);
+  --color-on-surface-variant: var(--color-on-surface-variant);
+  --color-surface-container-lowest: var(--color-surface-container-lowest);
+  --color-surface-container-low: var(--color-surface-container-low);
+  --color-surface-container: var(--color-surface-container);
+  --color-surface-container-high: var(--color-surface-container-high);
+  --color-surface-container-highest: var(--color-surface-container-highest);
+  --color-outline: var(--color-outline);
+  --color-outline-variant: var(--color-outline-variant);
 
   --color-card: var(--color-card);
   --color-card-foreground: var(--color-card-foreground);
 
   --color-primary: var(--color-primary);
   --color-primary-foreground: var(--color-primary-foreground);
+  --color-primary-container: var(--color-primary-container);
+  --color-on-primary-container: var(--color-on-primary-container);
+  --color-primary-fixed: var(--color-primary-fixed);
+  --color-primary-fixed-dim: var(--color-primary-fixed-dim);
 
   --color-secondary: var(--color-secondary);
   --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-secondary-container: var(--color-secondary-container);
+  --color-on-secondary-container: var(--color-on-secondary-container);
+  --color-secondary-fixed: var(--color-secondary-fixed);
+  --color-secondary-fixed-dim: var(--color-secondary-fixed-dim);
+
+  --color-tertiary: var(--color-tertiary);
+  --color-tertiary-foreground: var(--color-tertiary-foreground);
+  --color-tertiary-container: var(--color-tertiary-container);
+  --color-on-tertiary-container: var(--color-on-tertiary-container);
+  --color-tertiary-fixed: var(--color-tertiary-fixed);
+  --color-tertiary-fixed-dim: var(--color-tertiary-fixed-dim);
+  --color-on-tertiary-fixed: var(--color-on-tertiary-fixed);
+  --color-on-tertiary-fixed-variant: var(--color-on-tertiary-fixed-variant);
+
+  --color-error: var(--color-error);
+  --color-on-error: var(--color-on-error);
+  --color-error-container: var(--color-error-container);
+  --color-on-error-container: var(--color-on-error-container);
 
   --color-muted: var(--color-muted);
   --color-muted-foreground: var(--color-muted-foreground);
@@ -26,6 +63,9 @@
   --color-border: var(--color-border);
   --color-input: var(--color-input);
   --color-ring: var(--color-ring);
+  --color-inverse-surface: var(--color-inverse-surface);
+  --color-inverse-on-surface: var(--color-inverse-on-surface);
+  --color-inverse-primary: var(--color-inverse-primary);
 
   --color-district-red: #b91c1c;
   --color-district-red-light: #fee2e2;
@@ -43,6 +83,41 @@
   --color-brand-deepTeal: #1a6f73;
   --color-brand-teal: #22b8ae;
   --color-brand-mint: #36d7c3;
+
+  /* MD3 Public Dashboard Tokens */
+  --color-md3-primary: #702ae1;
+  --color-md3-on-primary: #f8f0ff;
+  --color-md3-primary-container: #b28cff;
+  --color-md3-on-primary-container: #2e006c;
+  --color-md3-primary-fixed: #b28cff;
+  --color-md3-primary-fixed-dim: #a67aff;
+  --color-md3-secondary: #00675d;
+  --color-md3-on-secondary: #c0fff3;
+  --color-md3-secondary-container: #6df5e1;
+  --color-md3-on-secondary-container: #005b51;
+  --color-md3-tertiary: #994100;
+  --color-md3-on-tertiary: #fff0e9;
+  --color-md3-tertiary-container: #ff955a;
+  --color-md3-on-tertiary-container: #552100;
+  --color-md3-error: #b41340;
+  --color-md3-on-error: #ffefef;
+  --color-md3-error-container: #f74b6d;
+  --color-md3-surface: #f4f6ff;
+  --color-md3-surface-bright: #f4f6ff;
+  --color-md3-surface-dim: #bdd6fc;
+  --color-md3-surface-lowest: #ffffff;
+  --color-md3-surface-low: #eaf1ff;
+  --color-md3-surface-container: #dce9ff;
+  --color-md3-surface-high: #d2e4ff;
+  --color-md3-surface-highest: #c9deff;
+  --color-md3-on-surface: #203044;
+  --color-md3-on-surface-variant: #4d5d73;
+  --color-md3-outline: #68788f;
+  --color-md3-outline-variant: #9eaec7;
+  --color-md3-inverse-surface: #000f21;
+  --color-md3-inverse-on-surface: #8e9eb7;
+  --color-md3-inverse-primary: #a476ff;
+  --color-md3-surface-tint: #702ae1;
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -121,6 +196,44 @@
   --color-border: hsl(217.2 32.6% 17.5%);
   --color-input: hsl(217.2 32.6% 17.5%);
   --color-ring: hsl(212.7 26.8% 83.9%);
+
+  /* MD3 Public Dashboard Tokens — dark mode overrides
+     Surfaces step from darkest (surface-lowest) up to lightest (surface-highest),
+     matching Material Design 3's elevated-on-dark surface tinting model.
+     Accent colors shift toward lighter container hues for contrast against dark. */
+  --color-md3-primary: #b28cff;
+  --color-md3-on-primary: #2e006c;
+  --color-md3-primary-container: #5417b0;
+  --color-md3-on-primary-container: #eadcff;
+  --color-md3-primary-fixed: #b28cff;
+  --color-md3-primary-fixed-dim: #a67aff;
+  --color-md3-secondary: #6df5e1;
+  --color-md3-on-secondary: #003731;
+  --color-md3-secondary-container: #005046;
+  --color-md3-on-secondary-container: #c0fff3;
+  --color-md3-tertiary: #ff955a;
+  --color-md3-on-tertiary: #552100;
+  --color-md3-tertiary-container: #7a3100;
+  --color-md3-on-tertiary-container: #ffdbc9;
+  --color-md3-error: #ffb3be;
+  --color-md3-on-error: #67002a;
+  --color-md3-error-container: #8c1434;
+  --color-md3-surface: #0f172a;
+  --color-md3-surface-bright: #2b3447;
+  --color-md3-surface-dim: #0b1220;
+  --color-md3-surface-lowest: #0b1220;
+  --color-md3-surface-low: #131d30;
+  --color-md3-surface-container: #1a2540;
+  --color-md3-surface-high: #21304f;
+  --color-md3-surface-highest: #293a5d;
+  --color-md3-on-surface: #e6edf8;
+  --color-md3-on-surface-variant: #a6b3c7;
+  --color-md3-outline: #768499;
+  --color-md3-outline-variant: #394560;
+  --color-md3-inverse-surface: #e6edf8;
+  --color-md3-inverse-on-surface: #1a2540;
+  --color-md3-inverse-primary: #702ae1;
+  --color-md3-surface-tint: #b28cff;
 }
 
 /* Base styles — Tailwind's preflight handles resets, only add overrides */
@@ -133,9 +246,24 @@ body {
   color: var(--color-foreground);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
 /* Smooth scroll target highlight transition */
 [id^="goal-"] {
-  transition: box-shadow 0.3s ease-out, outline 0.3s ease-out;
+  transition:
+    box-shadow 0.3s ease-out,
+    outline 0.3s ease-out;
 }
 
 /* Shimmer animation for progress bars */
@@ -185,30 +313,86 @@ body {
 
 /* Red glow */
 @keyframes pulse-glow-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
-  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(185, 28, 28, 0.4), 0 0 20px rgba(185, 28, 28, 0.3); }
-  30%, 60% { box-shadow: 0 0 0 8px rgba(185, 28, 28, 0.2), 0 0 30px rgba(185, 28, 28, 0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0);
+  }
+  15%,
+  45%,
+  75% {
+    box-shadow:
+      0 0 0 4px rgba(185, 28, 28, 0.4),
+      0 0 20px rgba(185, 28, 28, 0.3);
+  }
+  30%,
+  60% {
+    box-shadow:
+      0 0 0 8px rgba(185, 28, 28, 0.2),
+      0 0 30px rgba(185, 28, 28, 0.2);
+  }
 }
 
 /* Blue glow */
 @keyframes pulse-glow-blue {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0); }
-  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.4), 0 0 20px rgba(37, 99, 235, 0.3); }
-  30%, 60% { box-shadow: 0 0 0 8px rgba(37, 99, 235, 0.2), 0 0 30px rgba(37, 99, 235, 0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+  }
+  15%,
+  45%,
+  75% {
+    box-shadow:
+      0 0 0 4px rgba(37, 99, 235, 0.4),
+      0 0 20px rgba(37, 99, 235, 0.3);
+  }
+  30%,
+  60% {
+    box-shadow:
+      0 0 0 8px rgba(37, 99, 235, 0.2),
+      0 0 30px rgba(37, 99, 235, 0.2);
+  }
 }
 
 /* Amber glow */
 @keyframes pulse-glow-amber {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(217, 119, 6, 0); }
-  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(217, 119, 6, 0.4), 0 0 20px rgba(217, 119, 6, 0.3); }
-  30%, 60% { box-shadow: 0 0 0 8px rgba(217, 119, 6, 0.2), 0 0 30px rgba(217, 119, 6, 0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(217, 119, 6, 0);
+  }
+  15%,
+  45%,
+  75% {
+    box-shadow:
+      0 0 0 4px rgba(217, 119, 6, 0.4),
+      0 0 20px rgba(217, 119, 6, 0.3);
+  }
+  30%,
+  60% {
+    box-shadow:
+      0 0 0 8px rgba(217, 119, 6, 0.2),
+      0 0 30px rgba(217, 119, 6, 0.2);
+  }
 }
 
 /* Green glow */
 @keyframes pulse-glow-green {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
-  15%, 45%, 75% { box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.4), 0 0 20px rgba(22, 163, 74, 0.3); }
-  30%, 60% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0.2), 0 0 30px rgba(22, 163, 74, 0.2); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+  15%,
+  45%,
+  75% {
+    box-shadow:
+      0 0 0 4px rgba(22, 163, 74, 0.4),
+      0 0 20px rgba(22, 163, 74, 0.3);
+  }
+  30%,
+  60% {
+    box-shadow:
+      0 0 0 8px rgba(22, 163, 74, 0.2),
+      0 0 30px rgba(22, 163, 74, 0.2);
+  }
 }
 
 .goal-highlight-pulse-red {
@@ -229,4 +413,116 @@ body {
 .goal-highlight-pulse-green {
   animation: pulse-glow-green 2.5s ease-out forwards;
   border-radius: 12px;
+}
+
+/* MD3 Public Dashboard Utilities */
+@utility ghost-border {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  &:hover {
+    border-color: rgba(0, 0, 0, 0.15);
+  }
+}
+
+@utility tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility editorial-shadow {
+  box-shadow:
+    0 1px 1px rgba(23, 26, 31, 0.04),
+    0 12px 32px rgba(15, 70, 113, 0.08);
+}
+
+@utility editorial-gradient {
+  background-image: linear-gradient(135deg, #0f4671 0%, #2f5e8a 100%);
+}
+
+@utility tactile-button {
+  background-image: linear-gradient(135deg, #0f4671 0%, #2f5e8a 100%);
+  box-shadow: 0 16px 32px rgba(15, 70, 113, 0.15);
+}
+
+@utility glass-panel {
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(23, 26, 31, 0.08);
+}
+
+/* Material Symbols Outlined base styles */
+.material-symbols-outlined {
+  font-variation-settings:
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* MD3 countUp animation for goal metric cards */
+@keyframes countUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-countUp {
+  animation: countUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@utility public-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(17, 0, 172, 0.04),
+    0 20px 40px -10px rgba(26, 27, 31, 0.08);
+}
+
+@utility public-shadow-strong {
+  box-shadow:
+    0 4px 6px -1px rgba(17, 0, 172, 0.06),
+    0 24px 64px -12px rgba(26, 27, 31, 0.12);
+}
+
+@utility public-panel {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 4px 6px -1px rgba(17, 0, 172, 0.04),
+    0 20px 40px -10px rgba(26, 27, 31, 0.08);
+  backdrop-filter: blur(16px);
+}
+
+@utility public-gradient {
+  background-image: linear-gradient(135deg, #1100ac 0%, #2419df 100%);
+}
+
+@utility public-kicker {
+  font-family: var(--font-public-label);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@utility public-button-primary {
+  background-image: linear-gradient(135deg, #1100ac 0%, #2419df 100%);
+  box-shadow: 0 8px 24px rgba(17, 0, 172, 0.25);
+}
+
+@utility public-button-secondary {
+  background: var(--color-surface-container-highest);
+}
+
+@utility hero-gradient {
+  background: linear-gradient(135deg, #1100ac 0%, #2419df 100%);
+}
+
+@utility ambient-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(17, 0, 172, 0.04),
+    0 20px 40px -10px rgba(26, 27, 31, 0.08);
 }

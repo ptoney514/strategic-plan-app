@@ -1,0 +1,159 @@
+<h2>Mobile Collapse: How should the KPI split stack on small screens?</h2>
+<p class="subtitle">Option B's side-by-side KPI/chart layout needs to stack vertically on mobile. Two approaches:</p>
+
+<div class="split">
+
+  <!-- Option A: KPI then Chart -->
+  <div class="mockup" data-choice="kpi-first" onclick="toggleSelect(this)" style="cursor: pointer;">
+    <div class="mockup-header">A. KPI Above Chart</div>
+    <div class="mockup-body" style="padding: 0; background: #faf9f7;">
+      <div style="max-width: 375px; margin: 0 auto; padding: 16px;">
+        <div style="background: #fff; border-radius: 16px; border: 1px solid #e8e6e1; overflow: hidden;">
+
+          <!-- Header -->
+          <div style="padding: 16px 16px 12px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+              <div style="width: 28px; height: 28px; border-radius: 6px; background: #b85c38; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">1.1</div>
+              <span style="font-size: 14px; font-weight: 600; color: #1a1a1a; flex: 1;">Increase Student Achievement</span>
+            </div>
+            <div style="margin-left: 38px;">
+              <span style="font-size: 10px; font-weight: 600; background: #dcfce7; color: #16a34a; padding: 2px 8px; border-radius: 999px;">On Track</span>
+            </div>
+          </div>
+
+          <!-- KPI block (full width, stacked) -->
+          <div style="padding: 16px; border-top: 1px solid #f0eee9; border-bottom: 1px solid #f0eee9;">
+            <div style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #8a8a8a; margin-bottom: 4px;">Current Score</div>
+            <div style="font-size: 36px; font-weight: 700; color: #1a1a1a; line-height: 1;">78%</div>
+            <div style="display: flex; gap: 16px; margin-top: 8px;">
+              <span style="font-size: 12px; color: #4a4a4a;">Target: 85%</span>
+              <span style="font-size: 12px; color: #16a34a; font-weight: 500;">+4.2%</span>
+            </div>
+          </div>
+
+          <!-- Chart (full width) -->
+          <div style="padding: 16px;">
+            <svg viewBox="0 0 340 100" style="width: 100%; height: 100px;">
+              <defs>
+                <linearGradient id="gm1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#b85c38" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#b85c38" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="25" x2="340" y2="25" stroke="#f0eee9" stroke-width="0.5"/>
+              <line x1="0" y1="50" x2="340" y2="50" stroke="#f0eee9" stroke-width="0.5"/>
+              <line x1="0" y1="75" x2="340" y2="75" stroke="#f0eee9" stroke-width="0.5"/>
+              <path d="M0,85 C40,80 90,65 140,58 C190,50 230,38 280,30 C310,25 330,22 340,20 L340,100 L0,100 Z" fill="url(#gm1)"/>
+              <path d="M0,85 C40,80 90,65 140,58 C190,50 230,38 280,30 C310,25 330,22 340,20" fill="none" stroke="#b85c38" stroke-width="2"/>
+              <text x="0" y="98" fill="#8a8a8a" font-size="9">Q1</text>
+              <text x="110" y="98" fill="#8a8a8a" font-size="9">Q2</text>
+              <text x="220" y="98" fill="#8a8a8a" font-size="9">Q3</text>
+              <text x="325" y="98" fill="#8a8a8a" font-size="9">Q4</text>
+            </svg>
+          </div>
+
+          <!-- Sub-goals -->
+          <div style="padding: 12px 16px 16px; border-top: 1px solid #f0eee9;">
+            <div style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #8a8a8a; margin-bottom: 8px;">3 Sub-goals</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4a4a4a;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #16a34a;"></span>
+                <span>1.1.1 Reading proficiency</span>
+                <span style="margin-left: auto; color: #8a8a8a;">82%</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4a4a4a;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #d97706;"></span>
+                <span>1.1.2 Math achievement</span>
+                <span style="margin-left: auto; color: #8a8a8a;">71%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B: Compact KPI row then Chart -->
+  <div class="mockup" data-choice="compact-kpi" onclick="toggleSelect(this)" style="cursor: pointer;">
+    <div class="mockup-header">B. Compact KPI Row + Chart</div>
+    <div class="mockup-body" style="padding: 0; background: #faf9f7;">
+      <div style="max-width: 375px; margin: 0 auto; padding: 16px;">
+        <div style="background: #fff; border-radius: 16px; border: 1px solid #e8e6e1; overflow: hidden;">
+
+          <!-- Header -->
+          <div style="padding: 16px 16px 12px;">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+              <div style="width: 28px; height: 28px; border-radius: 6px; background: #b85c38; color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;">1.1</div>
+              <span style="font-size: 14px; font-weight: 600; color: #1a1a1a; flex: 1;">Increase Student Achievement</span>
+            </div>
+            <div style="margin-left: 38px;">
+              <span style="font-size: 10px; font-weight: 600; background: #dcfce7; color: #16a34a; padding: 2px 8px; border-radius: 999px;">On Track</span>
+            </div>
+          </div>
+
+          <!-- Compact KPI row (3 items side by side) -->
+          <div style="display: flex; padding: 12px 16px; gap: 2px; border-top: 1px solid #f0eee9; border-bottom: 1px solid #f0eee9;">
+            <div style="flex: 1; text-align: center;">
+              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #8a8a8a; margin-bottom: 2px;">Current</div>
+              <div style="font-size: 22px; font-weight: 700; color: #1a1a1a; line-height: 1;">78%</div>
+            </div>
+            <div style="width: 1px; background: #f0eee9;"></div>
+            <div style="flex: 1; text-align: center;">
+              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #8a8a8a; margin-bottom: 2px;">Target</div>
+              <div style="font-size: 16px; font-weight: 500; color: #4a4a4a; line-height: 1; padding-top: 3px;">85%</div>
+            </div>
+            <div style="width: 1px; background: #f0eee9;"></div>
+            <div style="flex: 1; text-align: center;">
+              <div style="font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #8a8a8a; margin-bottom: 2px;">Delta</div>
+              <div style="font-size: 16px; font-weight: 500; color: #16a34a; line-height: 1; padding-top: 3px;">+4.2%</div>
+            </div>
+          </div>
+
+          <!-- Chart (full width, given more height) -->
+          <div style="padding: 16px;">
+            <svg viewBox="0 0 340 110" style="width: 100%; height: 110px;">
+              <defs>
+                <linearGradient id="gm2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#b85c38" stop-opacity="0.15"/>
+                  <stop offset="100%" stop-color="#b85c38" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              <line x1="0" y1="27" x2="340" y2="27" stroke="#f0eee9" stroke-width="0.5"/>
+              <line x1="0" y1="55" x2="340" y2="55" stroke="#f0eee9" stroke-width="0.5"/>
+              <line x1="0" y1="82" x2="340" y2="82" stroke="#f0eee9" stroke-width="0.5"/>
+              <path d="M0,95 C40,88 90,72 140,64 C190,55 230,42 280,33 C310,28 330,25 340,22 L340,110 L0,110 Z" fill="url(#gm2)"/>
+              <path d="M0,95 C40,88 90,72 140,64 C190,55 230,42 280,33 C310,28 330,25 340,22" fill="none" stroke="#b85c38" stroke-width="2"/>
+              <text x="0" y="108" fill="#8a8a8a" font-size="9">Q1</text>
+              <text x="110" y="108" fill="#8a8a8a" font-size="9">Q2</text>
+              <text x="220" y="108" fill="#8a8a8a" font-size="9">Q3</text>
+              <text x="325" y="108" fill="#8a8a8a" font-size="9">Q4</text>
+            </svg>
+          </div>
+
+          <!-- Sub-goals -->
+          <div style="padding: 12px 16px 16px; border-top: 1px solid #f0eee9;">
+            <div style="font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #8a8a8a; margin-bottom: 8px;">3 Sub-goals</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4a4a4a;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #16a34a;"></span>
+                <span>1.1.1 Reading proficiency</span>
+                <span style="margin-left: auto; color: #8a8a8a;">82%</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: #4a4a4a;">
+                <span style="width: 6px; height: 6px; border-radius: 50%; background: #d97706;"></span>
+                <span>1.1.2 Math achievement</span>
+                <span style="margin-left: auto; color: #8a8a8a;">71%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<p class="subtitle" style="margin-top: 24px; text-align: center;">
+  <strong>A</strong> gives the KPI its own block with the big number staying dominant.<br>
+  <strong>B</strong> keeps KPIs compact in a row so the chart gets more vertical space.
+</p>

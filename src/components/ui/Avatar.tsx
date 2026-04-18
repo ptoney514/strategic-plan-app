@@ -3,7 +3,7 @@ import { cn } from '../../lib/utils';
 
 interface AvatarProps {
   name?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   src?: string;
   className?: string;
 }
@@ -12,12 +12,14 @@ const sizeClasses = {
   sm: 'w-7 h-7',
   md: 'w-9 h-9',
   lg: 'w-12 h-12',
+  xl: 'w-20 h-20',
 };
 
 const iconSizeClasses = {
   sm: 'w-4 h-4',
   md: 'w-5 h-5',
   lg: 'w-6 h-6',
+  xl: 'w-9 h-9',
 };
 
 /**

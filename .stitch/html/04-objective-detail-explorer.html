@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StrataDash - District Plan Explorer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error": "#b41340",
+                    "tertiary": "#994100",
+                    "secondary-container": "#6df5e1",
+                    "secondary-dim": "#005a50",
+                    "tertiary-fixed": "#ff955a",
+                    "on-primary-fixed": "#000000",
+                    "on-error": "#ffefef",
+                    "outline-variant": "#9eaec7",
+                    "on-surface-variant": "#4d5d73",
+                    "on-primary": "#f8f0ff",
+                    "on-secondary-fixed-variant": "#00655b",
+                    "on-tertiary-fixed-variant": "#632800",
+                    "primary-fixed-dim": "#a67aff",
+                    "inverse-on-surface": "#8e9eb7",
+                    "on-secondary-container": "#005b51",
+                    "on-primary-fixed-variant": "#390083",
+                    "background": "#f4f6ff",
+                    "surface-variant": "#c9deff",
+                    "surface-container-high": "#d2e4ff",
+                    "on-primary-container": "#2e006c",
+                    "inverse-primary": "#a476ff",
+                    "surface-tint": "#702ae1",
+                    "on-secondary": "#c0fff3",
+                    "error-dim": "#a70138",
+                    "primary-container": "#b28cff",
+                    "tertiary-fixed-dim": "#ff7f2f",
+                    "primary": "#702ae1",
+                    "primary-fixed": "#b28cff",
+                    "surface-dim": "#bdd6fc",
+                    "tertiary-container": "#ff955a",
+                    "surface": "#f4f6ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#510017",
+                    "error-container": "#f74b6d",
+                    "secondary-fixed-dim": "#5de7d3",
+                    "tertiary-dim": "#863800",
+                    "inverse-surface": "#000f21",
+                    "primary-dim": "#6411d5",
+                    "secondary": "#00675d",
+                    "surface-container-low": "#eaf1ff",
+                    "on-secondary-fixed": "#00463e",
+                    "surface-bright": "#f4f6ff",
+                    "secondary-fixed": "#6df5e1",
+                    "on-tertiary-container": "#552100",
+                    "surface-container-highest": "#c9deff",
+                    "on-surface": "#203044",
+                    "outline": "#68788f",
+                    "surface-container": "#dce9ff",
+                    "on-tertiary": "#fff0e9",
+                    "on-background": "#203044",
+                    "on-tertiary-fixed": "#2e0e00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        .mixpanel-border { border: 1px solid rgba(0, 0, 0, 0.08); }
+        .dark .mixpanel-border { border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-count { animation: countUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<div class="flex min-h-screen">
+<!-- SideNavBar (Public Plan Explorer Sidebar) -->
+<aside class="h-screen w-80 fixed left-0 top-0 flex flex-col bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 overflow-y-auto">
+<div class="flex flex-col h-full py-6 px-4">
+<!-- Header Section -->
+<div class="mb-8 px-2">
+<div class="flex items-center gap-3 mb-4">
+<div class="h-10 w-10 rounded bg-white dark:bg-slate-800 mixpanel-border flex items-center justify-center">
+<span class="material-symbols-outlined text-violet-700 dark:text-violet-400" data-icon="domain">domain</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-slate-900 dark:text-slate-100">District Plan Explorer</h1>
+<p class="text-[10px] font-bold uppercase tracking-widest text-slate-500">2023-2025 Strategic Cycle</p>
+</div>
+</div>
+</div>
+<!-- Main Navigation -->
+<div class="flex flex-col gap-1 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="analytics">analytics</span>
+<span class="text-sm font-medium">Plan Health</span>
+</a>
+<!-- Active Tree Section -->
+<div class="mt-2">
+<div class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-violet-700 dark:text-violet-400 font-semibold border-l-4 border-violet-700 bg-violet-50/50 dark:bg-violet-900/20">
+<span class="material-symbols-outlined text-xl" data-icon="account_tree">account_tree</span>
+<span class="text-sm">Objectives Tree</span>
+</div>
+<!-- Nested Goal Tree -->
+<div class="ml-4 mt-2 pl-4 border-l border-slate-200 dark:border-slate-800 flex flex-col gap-1">
+<a class="flex items-center justify-between px-3 py-2 rounded-lg bg-white dark:bg-slate-800 mixpanel-border group scale-98 transition-transform" href="#">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-xs font-medium text-slate-900 dark:text-slate-100">Student Achievement</span>
+</div>
+<span class="text-[10px] font-bold tabular-nums text-slate-400">72%</span>
+</a>
+<div class="ml-4 flex flex-col gap-1 py-1">
+<a class="text-[11px] text-slate-500 dark:text-slate-400 py-1 hover:text-violet-600 dark:hover:text-violet-400 flex items-center gap-2" href="#">
+<span class="w-1 h-1 rounded-full bg-emerald-400"></span> 1.1 Literacy
+                            </a>
+<a class="text-[11px] text-slate-500 dark:text-slate-400 py-1 hover:text-violet-600 dark:hover:text-violet-400 flex items-center gap-2" href="#">
+<span class="w-1 h-1 rounded-full bg-amber-400"></span> 1.2 Mathematics
+                            </a>
+<a class="text-[11px] text-slate-500 dark:text-slate-400 py-1 hover:text-violet-600 dark:hover:text-violet-400 flex items-center gap-2" href="#">
+<span class="w-1 h-1 rounded-full bg-error"></span> 1.3 SEL Core
+                            </a>
+</div>
+<a class="flex items-center justify-between px-3 py-2 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" href="#">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-slate-300"></span>
+<span class="text-xs font-medium">Equity &amp; Access</span>
+</div>
+<span class="text-[10px] font-bold tabular-nums">--</span>
+</a>
+</div>
+</div>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mt-2" href="#">
+<span class="material-symbols-outlined text-xl" data-icon="settings">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</div>
+<!-- Footer Navigation -->
+<div class="mt-auto pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-1">
+<button class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-900 transition-colors text-sm">
+<span class="material-symbols-outlined text-lg" data-icon="dark_mode">dark_mode</span>
+                    Dark Mode
+                </button>
+<div class="px-3 py-2 text-slate-400 dark:text-slate-500 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+<span class="material-symbols-outlined text-sm" data-icon="bolt">bolt</span>
+                    Powered by StrataDash
+                </div>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 ml-80 bg-surface min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-white/80 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center w-full px-8 py-4 h-16">
+<div class="flex items-center gap-4">
+<nav class="flex items-center gap-3">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Plan</span>
+<span class="material-symbols-outlined text-[10px] text-slate-300" data-icon="chevron_right">chevron_right</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-violet-700 dark:text-violet-400">Student Achievement</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 rounded-lg text-slate-400 hover:text-violet-600 transition-all opacity-80 hover:opacity-100">
+<span class="material-symbols-outlined" data-icon="info">info</span>
+</button>
+<div class="h-8 w-8 rounded bg-slate-200 overflow-hidden mixpanel-border">
+<img alt="District Avatar" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0YTborgxFnzz5IKdqcWqNxFZ1kSP2q3gD-y5iXXhMMOZo3EUhcVyyiNel97dmoZDc9RUzqPdWQ9Y9bzHGqWfUkTKG-elx8IeV8HpYxSFq4oNZra3w-LKOid7AOX4_ofl26BRVerhnVqvAmSv88J7Rd91Q1yhIFGUuKnb16jbyeBKpPprwlHEiWTjERFF99saPuifxQ96uAfNGgzGUb1ea2wFZuCRAtL3rl5kDN8JKM5cgIuqpZThxc_ZkM-OrWnDmDfGzD_TBkpCa"/>
+</div>
+</div>
+</nav>
+<div class="max-w-7xl mx-auto px-8 py-10">
+<!-- Objective Header -->
+<section class="bg-white dark:bg-slate-900 rounded-xl p-10 mb-12 mixpanel-border">
+<div class="flex flex-col md:flex-row items-start gap-8">
+<div class="h-16 w-16 rounded-lg bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400 flex items-center justify-center shrink-0 mixpanel-border">
+<span class="text-3xl font-black tabular-nums">01</span>
+</div>
+<div class="flex-1">
+<h2 class="text-4xl font-black tracking-tight text-slate-900 dark:text-slate-100 mb-4">Student Achievement &amp; Well-being</h2>
+<p class="text-lg text-slate-600 dark:text-slate-400 leading-relaxed max-w-4xl mb-8">
+                            Enhancing academic outcomes through holistic support systems, social-emotional learning integration, and evidence-based literacy frameworks across all grade levels.
+                        </p>
+<div class="pt-8 border-t border-slate-100 dark:border-slate-800">
+<div class="flex items-center justify-between">
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-3">Goal Health Summary</span>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2 text-xl tracking-widest">
+<span class="text-emerald-500">●</span>
+<span class="text-emerald-500">●</span>
+<span class="text-emerald-500">●</span>
+<span class="text-error">○</span>
+<span class="text-error">○</span>
+<span class="text-slate-300">◦</span>
+</div>
+<p class="text-sm font-medium text-slate-600 dark:text-slate-400">
+<span class="text-emerald-600 dark:text-emerald-400">3 on target</span> · 
+                                            <span class="text-error">2 off</span> · 
+                                            <span class="text-slate-400">1 awaiting</span>
+</p>
+</div>
+</div>
+<button class="px-6 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-opacity">
+                                    Export PDF
+                                </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Goal Cards Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<!-- Goal Card 1 -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl mixpanel-border transition-all hover:border-slate-300 dark:hover:border-slate-600">
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">1.1</span>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">Early Literacy Proficiency</h4>
+</div>
+<span class="px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 mixpanel-border">ON TARGET</span>
+</div>
+<div class="mb-8">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Current Score</span>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black tabular-nums text-slate-900 dark:text-slate-100 animate-count">72%</span>
+<span class="text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-1.5 py-0.5 rounded flex items-center">
+<span class="material-symbols-outlined text-[12px]" data-icon="arrow_upward">arrow_upward</span>
+                                7.0%
+                            </span>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">from baseline</span>
+</div>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<span>━━━━━━━━━━━━━░░░░</span>
+<span>Target: 85%</span>
+</div>
+<div class="relative h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-emerald-500 w-[72%]"></div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Trend 2020-2025</span>
+<div class="flex gap-1 h-6">
+<div class="flex-1 bg-emerald-100 dark:bg-emerald-900/20 rounded-sm"></div>
+<div class="flex-1 bg-emerald-200 dark:bg-emerald-800/30 rounded-sm"></div>
+<div class="flex-1 bg-emerald-300 dark:bg-emerald-700/40 rounded-sm"></div>
+<div class="flex-1 bg-emerald-400 dark:bg-emerald-600/50 rounded-sm"></div>
+<div class="flex-1 bg-emerald-500 dark:bg-emerald-500 rounded-sm"></div>
+<div class="flex-1 bg-emerald-600 dark:bg-emerald-400 rounded-sm"></div>
+</div>
+</div>
+</div>
+<!-- Goal Card 2 -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl mixpanel-border">
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">1.2</span>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">Secondary Math Readiness</h4>
+</div>
+<span class="px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 mixpanel-border">IN PROGRESS</span>
+</div>
+<div class="mb-8">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Current Score</span>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black tabular-nums text-slate-900 dark:text-slate-100 animate-count">58%</span>
+<span class="text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-1.5 py-0.5 rounded flex items-center">
+<span class="material-symbols-outlined text-[12px]" data-icon="arrow_upward">arrow_upward</span>
+                                2.4%
+                            </span>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">from baseline</span>
+</div>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<span>━━━━━━━━━░░░░░░░░</span>
+<span>Target: 70%</span>
+</div>
+<div class="relative h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-amber-400 w-[58%]"></div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Trend 2020-2025</span>
+<div class="flex gap-1 h-6">
+<div class="flex-1 bg-amber-50 dark:bg-amber-900/10 rounded-sm"></div>
+<div class="flex-1 bg-amber-100 dark:bg-amber-900/20 rounded-sm"></div>
+<div class="flex-1 bg-amber-200 dark:bg-amber-800/30 rounded-sm"></div>
+<div class="flex-1 bg-amber-300 dark:bg-amber-700/40 rounded-sm"></div>
+<div class="flex-1 bg-amber-400 dark:bg-amber-600/50 rounded-sm"></div>
+<div class="flex-1 bg-amber-500 dark:bg-amber-500 rounded-sm"></div>
+</div>
+</div>
+</div>
+<!-- Goal Card 3 -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl mixpanel-border">
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">1.3</span>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">SEL Core Integration</h4>
+</div>
+<span class="px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter bg-red-50 text-error dark:bg-red-900/20 mixpanel-border">OFF TRACK</span>
+</div>
+<div class="mb-8">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Current Score</span>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black tabular-nums text-slate-900 dark:text-slate-100 animate-count">42%</span>
+<span class="text-[11px] font-bold bg-red-50 dark:bg-red-900/20 text-error px-1.5 py-0.5 rounded flex items-center">
+<span class="material-symbols-outlined text-[12px]" data-icon="arrow_downward">arrow_downward</span>
+                                1.5%
+                            </span>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">from baseline</span>
+</div>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<span>━━━━━━░░░░░░░░░░░</span>
+<span>Target: 65%</span>
+</div>
+<div class="relative h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-error w-[42%]"></div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Trend 2020-2025</span>
+<div class="flex gap-1 h-6">
+<div class="flex-1 bg-red-300 dark:bg-red-700/40 rounded-sm"></div>
+<div class="flex-1 bg-red-200 dark:bg-red-800/30 rounded-sm"></div>
+<div class="flex-1 bg-red-100 dark:bg-red-900/20 rounded-sm"></div>
+<div class="flex-1 bg-red-100 dark:bg-red-900/20 rounded-sm"></div>
+<div class="flex-1 bg-red-200 dark:bg-red-800/30 rounded-sm"></div>
+<div class="flex-1 bg-red-300 dark:bg-red-700/40 rounded-sm"></div>
+</div>
+</div>
+</div>
+<!-- Goal Card 4 -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl mixpanel-border">
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">1.4</span>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">Chronic Absenteeism Redux</h4>
+</div>
+<span class="px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter bg-slate-100 text-slate-500 dark:bg-slate-800 mixpanel-border">NOT STARTED</span>
+</div>
+<div class="mb-8">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Current Score</span>
+<span class="text-[9px] font-bold text-violet-500 lowercase tracking-normal italic">(lower is better)</span>
+</div>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black tabular-nums text-slate-900 dark:text-slate-100 animate-count">18%</span>
+<span class="text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded flex items-center">
+<span class="material-symbols-outlined text-[12px]" data-icon="horizontal_rule">horizontal_rule</span>
+                                0.0%
+                            </span>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">from baseline</span>
+</div>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<span>━━░░░░░░░░░░░░░░░░</span>
+<span>Target: 12%</span>
+</div>
+<div class="relative h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-slate-400 w-[18%]"></div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Trend 2020-2025</span>
+<div class="flex gap-1 h-6 opacity-40">
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-sm"></div>
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-sm"></div>
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-sm"></div>
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-sm"></div>
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-sm"></div>
+<div class="flex-1 bg-slate-200 dark:bg-slate-700 rounded-sm"></div>
+</div>
+</div>
+</div>
+<!-- Goal Card 5 -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl mixpanel-border">
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">1.5</span>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">Post-Secondary Pathways</h4>
+</div>
+<span class="px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-400 mixpanel-border">ON TARGET</span>
+</div>
+<div class="mb-8">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Current Score</span>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black tabular-nums text-slate-900 dark:text-slate-100 animate-count">91%</span>
+<span class="text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-1.5 py-0.5 rounded flex items-center">
+<span class="material-symbols-outlined text-[12px]" data-icon="arrow_upward">arrow_upward</span>
+                                12.1%
+                            </span>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">from baseline</span>
+</div>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<span>━━━━━━━━━━━━━━━░</span>
+<span>Target: 90%</span>
+</div>
+<div class="relative h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-emerald-500 w-[91%]"></div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Trend 2020-2025</span>
+<div class="flex gap-1 h-6">
+<div class="flex-1 bg-emerald-100 dark:bg-emerald-900/20 rounded-sm"></div>
+<div class="flex-1 bg-emerald-200 dark:bg-emerald-800/30 rounded-sm"></div>
+<div class="flex-1 bg-emerald-400 dark:bg-emerald-600/50 rounded-sm"></div>
+<div class="flex-1 bg-emerald-500 dark:bg-emerald-500 rounded-sm"></div>
+<div class="flex-1 bg-emerald-600 dark:bg-emerald-400 rounded-sm"></div>
+<div class="flex-1 bg-emerald-700 dark:bg-emerald-300 rounded-sm"></div>
+</div>
+</div>
+</div>
+<!-- Goal Card 6 -->
+<div class="bg-white dark:bg-slate-900 p-8 rounded-xl mixpanel-border">
+<div class="flex justify-between items-start mb-8">
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold tabular-nums bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">1.6</span>
+<h4 class="text-sm font-bold text-slate-900 dark:text-slate-100">District Mental Health Index</h4>
+</div>
+<span class="px-2 py-1 rounded-sm text-[9px] font-bold uppercase tracking-tighter bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 mixpanel-border">IN PROGRESS</span>
+</div>
+<div class="mb-8">
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Current Score</span>
+<div class="flex items-baseline gap-3">
+<span class="text-5xl font-black tabular-nums text-slate-900 dark:text-slate-100 animate-count">64%</span>
+<span class="text-[11px] font-bold bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-1.5 py-0.5 rounded flex items-center">
+<span class="material-symbols-outlined text-[12px]" data-icon="arrow_upward">arrow_upward</span>
+                                4.2%
+                            </span>
+</div>
+<span class="text-[10px] text-slate-400 font-medium">from baseline</span>
+</div>
+<div class="space-y-3 mb-8">
+<div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<span>━━━━━━━━━━░░░░░░</span>
+<span>Target: 80%</span>
+</div>
+<div class="relative h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-amber-400 w-[64%]"></div>
+</div>
+</div>
+<div>
+<span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 block mb-2">Trend 2020-2025</span>
+<div class="flex gap-1 h-6">
+<div class="flex-1 bg-amber-50 dark:bg-amber-900/10 rounded-sm"></div>
+<div class="flex-1 bg-amber-100 dark:bg-amber-900/20 rounded-sm"></div>
+<div class="flex-1 bg-amber-200 dark:bg-amber-800/30 rounded-sm"></div>
+<div class="flex-1 bg-amber-300 dark:bg-amber-700/40 rounded-sm"></div>
+<div class="flex-1 bg-amber-400 dark:bg-amber-600/50 rounded-sm"></div>
+<div class="flex-1 bg-amber-500 dark:bg-amber-500 rounded-sm"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-white dark:bg-slate-950 w-full border-t border-slate-100 dark:border-slate-800 mt-20">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-10 w-full max-w-7xl mx-auto">
+<div class="mb-6 md:mb-0">
+<p class="font-bold text-slate-900 dark:text-slate-50 mb-1">StrataDash</p>
+<p class="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">© 2024 School District Strategic Planning</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6 text-[10px] font-bold uppercase tracking-widest text-slate-400">
+<a class="hover:text-violet-500 transition-colors" href="#">Accessibility</a>
+<a class="hover:text-violet-500 transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-violet-500 transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

@@ -15,6 +15,7 @@ const routeTitles: Record<string, string> = {
   '/dashboard/reports': 'Reports',
   '/dashboard/invite': 'Invite Teammates',
   '/dashboard/help': 'Help & Support',
+  '/dashboard/account': 'Account Settings',
 };
 
 export function DashboardHeader() {

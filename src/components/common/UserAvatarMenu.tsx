@@ -1,8 +1,9 @@
 'use client'
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { LogOut, Building2, Shield, Moon, Sun, Monitor, Check } from 'lucide-react';
+import { LogOut, Building2, Shield, Moon, Sun, Monitor, Check, User } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Avatar } from '../ui/Avatar';
@@ -74,8 +75,6 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
 
   // Get user role label
   const roleLabel = isSystemAdmin ? 'System Admin' : 'District Admin';
-
-  if (!user) return null;
 
   const handleLogout = async () => {
     try {
@@ -196,6 +195,20 @@ export function UserAvatarMenu({ className }: UserAvatarMenuProps) {
                 </DropdownMenu.ItemIndicator>
               </DropdownMenu.RadioItem>
             </DropdownMenu.RadioGroup>
+          </div>
+
+          {/* Account Settings */}
+          <DropdownMenu.Separator className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+          <div className="py-1">
+            <DropdownMenu.Item asChild>
+              <Link
+                href="/dashboard/account"
+                className="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 focus:bg-slate-50 dark:focus:bg-slate-800 outline-hidden cursor-pointer transition-colors"
+              >
+                <User className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                Account Settings
+              </Link>
+            </DropdownMenu.Item>
           </div>
 
           {/* Sign Out */}

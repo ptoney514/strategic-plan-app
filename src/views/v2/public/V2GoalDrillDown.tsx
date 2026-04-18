@@ -1,13 +1,13 @@
 'use client'
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import { useSubdomain, useDistrictLink } from '../../../contexts/SubdomainContext';
 import { useDistrict } from '../../../hooks/useDistricts';
 import { usePlansBySlug } from '../../../hooks/v2/usePlans';
 import { useGoalsByPlan } from '../../../hooks/v2/useGoals';
 import { useWidgetsByGoals } from '../../../hooks/v2/useWidgets';
-import { GoalCard, ExpandedGoalCard, ProgressRing, Breadcrumb } from '../../../components/v2/public';
+import { GoalCardCollapsed, GoalDetailCard, ProgressRing, Breadcrumb } from '../../../components/v2/public';
 import { WidgetGrid } from '../../../components/v2/widgets/WidgetGrid';
 import type { HierarchicalGoal } from '../../../lib/types';
 import type { Widget } from '../../../lib/types/v2';
@@ -30,21 +30,7 @@ export function V2GoalDrillDown() {
   const { data: plans } = usePlansBySlug(slug || '');
 
   const activePlan = plans?.find((p) => p.is_active && p.is_public);
-  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
-
-  const prevExpandedRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (expandedGoalId && expandedGoalId !== prevExpandedRef.current) {
-      const timer = setTimeout(() => {
-        const element = document.getElementById(`goal-card-${expandedGoalId}`);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-    prevExpandedRef.current = expandedGoalId;
-  }, [expandedGoalId]);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
 
   const { data: allGoals, isLoading: goalsLoading } = useGoalsByPlan(activePlan?.id || '');
 
@@ -59,6 +45,8 @@ export function V2GoalDrillDown() {
 
   const getWidgetsForGoal = (id: string): Widget[] =>
     goalWidgets?.filter((w) => w.goalId === id) || [];
+
+  const selectedGoal = selectedGoalId ? children.find((c) => c.id === selectedGoalId) : null;
 
   const isLoading = goalsLoading;
 
@@ -136,75 +124,72 @@ export function V2GoalDrillDown() {
         </div>
       )}
 
-      {/* Children section */}
-      <div className="space-y-3">
-        <h2
-          className="uppercase tracking-wider text-xs font-semibold"
-          style={{ color: 'var(--editorial-text-secondary)' }}
-        >
-          Goals ({children?.length || 0})
-        </h2>
+      {/* Content area: grid or detail */}
+      {children.length > 0 && !selectedGoal && (
+        <>
+          <div className="space-y-3">
+            <h2
+              className="uppercase tracking-wider text-xs font-semibold"
+              style={{ color: 'var(--editorial-text-secondary)' }}
+            >
+              Goals ({children.length})
+            </h2>
 
-        {!children?.length && getWidgetsForGoal(goalId || '').length === 0 ? (
-          <p className="text-sm py-6 text-center" style={{ color: 'var(--editorial-text-secondary)' }}>
-            No goals defined for this objective yet.
-          </p>
-        ) : children.length > 0 ? (
-          <LayoutGroup>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              <AnimatePresence mode="popLayout">
-                {children.map((child) => {
-                  const isExpanded = expandedGoalId === child.id;
-                  const childWidgets = getWidgetsForGoal(child.id);
-                  const subGoalWidgetMap: Record<string, Widget[]> = {};
-                  (child.children || []).forEach((gc) => {
-                    const gcWidgets = getWidgetsForGoal(gc.id);
-                    if (gcWidgets.length > 0) subGoalWidgetMap[gc.id] = gcWidgets;
-                  });
-                  return (
-                    <motion.div
-                      key={child.id}
-                      id={`goal-card-${child.id}`}
-                      layout
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{
-                        layout: { duration: 0.3, ease: 'easeInOut' },
-                        opacity: { duration: 0.2 },
-                      }}
-                      className={isExpanded ? 'md:col-span-2' : ''}
-                    >
-                      {isExpanded ? (
-                        <ExpandedGoalCard
-                          goal={child}
-                          widgets={childWidgets}
-                          subGoalWidgets={subGoalWidgetMap}
-                          onClose={() => setExpandedGoalId(null)}
-                          primaryColor={district?.primary_color}
-                          buildLink={districtLink}
-                        />
-                      ) : (
-                        <GoalCard
-                          goalNumber={child.goal_number}
-                          title={child.title}
-                          description={child.description}
-                          status={child.status}
-                          widgets={childWidgets}
-                          primaryColor={district?.primary_color}
-                          isExpanded={false}
-                          onClick={() => setExpandedGoalId(expandedGoalId === child.id ? null : child.id)}
-                          subGoalCount={child.children?.length}
-                        />
-                      )}
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {children.map((child) => {
+                const childWidgets = getWidgetsForGoal(child.id);
+                return (
+                  <GoalCardCollapsed
+                    key={child.id}
+                    goalNumber={child.goal_number}
+                    title={child.title}
+                    widgets={childWidgets}
+                    primaryColor={district?.primary_color}
+                    onClick={() => setSelectedGoalId(child.id)}
+                    subGoalCount={child.children?.length}
+                  />
+                );
+              })}
             </div>
-          </LayoutGroup>
-        ) : null}
-      </div>
+          </div>
+        </>
+      )}
+
+      {selectedGoal && (
+        <div className="space-y-4">
+          <button
+            onClick={() => setSelectedGoalId(null)}
+            className="inline-flex items-center gap-1.5 text-[13px] font-medium cursor-pointer bg-transparent border-none p-0"
+            style={{ color: 'var(--editorial-accent-link, #4a6fa5)' }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to goals
+          </button>
+
+          <GoalDetailCard
+            goal={selectedGoal}
+            widgets={getWidgetsForGoal(selectedGoal.id)}
+            subGoalWidgets={(() => {
+              const map: Record<string, Widget[]> = {};
+              (selectedGoal.children || []).forEach((gc) => {
+                const gcWidgets = getWidgetsForGoal(gc.id);
+                if (gcWidgets.length > 0) map[gc.id] = gcWidgets;
+              });
+              return map;
+            })()}
+            primaryColor={district?.primary_color}
+            onBack={() => setSelectedGoalId(null)}
+            buildLink={districtLink}
+          />
+        </div>
+      )}
+
+      {/* Empty state: no children and no widgets */}
+      {children.length === 0 && getWidgetsForGoal(goalId || '').length === 0 && (
+        <p className="text-sm py-6 text-center" style={{ color: 'var(--editorial-text-secondary)' }}>
+          No goals defined for this objective yet.
+        </p>
+      )}
     </div>
   );
 }

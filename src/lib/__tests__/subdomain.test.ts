@@ -6,6 +6,7 @@ import {
   getSubdomainUrl,
   buildSubdomainUrlWithPath,
   buildDistrictPath,
+  buildDistrictPathWithQueryParam,
 } from '../subdomain';
 
 /**
@@ -506,7 +507,7 @@ describe('buildDistrictPath', () => {
   });
 
   it('prepends slug when on root domain', () => {
-    expect(buildDistrictPath('/objective/123', 'westside', false)).toBe('/westside/objective/123');
+    expect(buildDistrictPath('/objective/123', 'westside', false)).toBe('/district/westside/objective/123');
   });
 
   it('handles path without leading slash for subdomain', () => {
@@ -518,6 +519,37 @@ describe('buildDistrictPath', () => {
   });
 
   it('handles root path for path-based routing', () => {
-    expect(buildDistrictPath('/', 'westside', false)).toBe('/westside/');
+    expect(buildDistrictPath('/', 'westside', false)).toBe('/district/westside/');
+  });
+});
+
+describe('buildDistrictPathWithQueryParam — root-domain branch', () => {
+  it('returns /district/<slug><basePath> when isSubdomain=false', () => {
+    expect(buildDistrictPathWithQueryParam('/goals', 'westside', false))
+      .toBe('/district/westside/goals');
+  });
+
+  it('returns /district/<slug><basePath> when isSubdomain=false and basePath has deep segments', () => {
+    expect(buildDistrictPathWithQueryParam('/goals/abc-123', 'westside', false))
+      .toBe('/district/westside/goals/abc-123');
+  });
+
+  it('returns query-param form on a subdomain in jsdom', () => {
+    // In jsdom, window.location.hostname is 'localhost' which is treated as
+    // a query-param subdomain host — so the query-param gets appended even
+    // when isSubdomain=true.
+    expect(buildDistrictPathWithQueryParam('/goals', 'westside', true))
+      .toBe('/goals?subdomain=westside');
+  });
+});
+
+describe('buildDistrictPath — root-domain branch', () => {
+  it('returns /district/<slug><basePath> when isSubdomain=false', () => {
+    expect(buildDistrictPath('/goals', 'westside', false))
+      .toBe('/district/westside/goals');
+  });
+
+  it('returns basePath unchanged when isSubdomain=true', () => {
+    expect(buildDistrictPath('/goals', 'westside', true)).toBe('/goals');
   });
 });

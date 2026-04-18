@@ -1,47 +1,76 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@/test/setup';
-import { V2Landing } from '../V2Landing';
+import { describe, it, expect } from "vitest";
+import { render, screen } from "@/test/setup";
+import { V2Landing } from "../V2Landing";
 
-describe('V2Landing', () => {
-  it('renders the hero heading', () => {
+describe("V2Landing", () => {
+  it("renders the hero heading", () => {
     render(<V2Landing />);
 
-    expect(screen.getByText(/share your strategic plan with the world/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", {
+        name: /make your strategic plan visible to your community/i,
+      }),
+    ).toBeInTheDocument();
   });
 
-  it('renders hero description', () => {
+  it("renders hero description", () => {
     render(<V2Landing />);
 
-    expect(screen.getByText(/beautiful, interactive dashboards/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /turns static strategic plans into a hosted district surface/i,
+      ),
+    ).toBeInTheDocument();
   });
 
-  it('renders Get Started Free CTA button', () => {
+  it("renders Request a demo CTA button", () => {
     render(<V2Landing />);
 
-    const ctaLink = screen.getByText('Get Started Free');
-    expect(ctaLink).toBeInTheDocument();
-    expect(ctaLink.closest('a')).toHaveAttribute('href', '/signup?redirect=/onboard');
+    const ctaLinks = screen
+      .getAllByText("Request a demo")
+      .map((node) => node.closest("a"))
+      .filter((link) => link?.getAttribute("href") === "/demo");
+
+    expect(ctaLinks.length).toBeGreaterThan(0);
+    expect(ctaLinks[0]).toBeInTheDocument();
   });
 
-  it('renders View Pricing link', () => {
+  it("renders example dashboard link", () => {
     render(<V2Landing />);
 
-    const pricingLink = screen.getByText('View Pricing');
-    expect(pricingLink).toBeInTheDocument();
-    expect(pricingLink.closest('a')).toHaveAttribute('href', '/pricing');
+    const exampleLink = screen.getByText("View example dashboard");
+    expect(exampleLink).toBeInTheDocument();
+    expect(exampleLink.closest("a")).toHaveAttribute(
+      "href",
+      "/district/westside",
+    );
   });
 
-  it('renders feature sections', () => {
+  it("renders core section headings", () => {
     render(<V2Landing />);
 
-    expect(screen.getByText('Hierarchical Goals')).toBeInTheDocument();
-    expect(screen.getByText('Your Brand')).toBeInTheDocument();
-    expect(screen.getByText('Import from Excel')).toBeInTheDocument();
+    expect(
+      screen.getByText("Built for clarity. Designed for results."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("High-fidelity metrics for every KPI"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Ready to visualize your district/i),
+    ).toBeInTheDocument();
   });
 
-  it('renders features section heading', () => {
+  it("renders social proof strip with district names", () => {
     render(<V2Landing />);
 
-    expect(screen.getByText('Everything you need to share your strategy')).toBeInTheDocument();
+    expect(screen.getByText("WESTSIDE USD")).toBeInTheDocument();
+    expect(screen.getByText("EASTSIDE ISD")).toBeInTheDocument();
+  });
+
+  it("renders leadership and community cards", () => {
+    render(<V2Landing />);
+
+    expect(screen.getByText("For Leadership")).toBeInTheDocument();
+    expect(screen.getByText("For Community")).toBeInTheDocument();
   });
 });

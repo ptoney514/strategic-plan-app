@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>About StrataDash | The Future of Civic Strategy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;700;800;900&amp;family=Manrope:wght@400;500;600&amp;family=Space+Grotesk:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2e3036",
+                        "on-surface-variant": "#42474f",
+                        "on-primary-container": "#b4d6ff",
+                        "on-primary-fixed": "#001d35",
+                        "on-primary": "#ffffff",
+                        "surface-variant": "#e1e2e9",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#2f5e8a",
+                        "tertiary-container": "#006760",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#33618e",
+                        "tertiary-fixed-dim": "#83d5cb",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f8f9ff",
+                        "inverse-primary": "#9ecafc",
+                        "tertiary": "#004d47",
+                        "outline": "#72777f",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e1e2e9",
+                        "on-secondary-container": "#65000b",
+                        "secondary-container": "#fd625f",
+                        "on-error": "#ffffff",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "surface-container": "#ecedf5",
+                        "on-secondary-fixed-variant": "#8f0d19",
+                        "primary": "#0f4671",
+                        "surface-container-low": "#f2f3fa",
+                        "on-tertiary-container": "#90e3d9",
+                        "surface": "#f8f9ff",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "surface-container-high": "#e6e8ef",
+                        "primary-fixed": "#d0e4ff",
+                        "secondary-fixed": "#ffdad7",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#191c21",
+                        "on-surface": "#191c21",
+                        "background": "#f8f9ff",
+                        "secondary": "#b12a2e",
+                        "tertiary-fixed": "#9ff1e7",
+                        "on-secondary-fixed": "#410005",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#c2c7d0",
+                        "inverse-on-surface": "#eff0f8",
+                        "on-tertiary-fixed": "#00201d",
+                        "surface-dim": "#d8dae1",
+                        "on-primary-fixed-variant": "#154974",
+                        "primary-fixed-dim": "#9ecafc"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Epilogue"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #F5F2EA; /* Canvas Base */
+            color: #171A1F; /* Ink */
+            font-family: 'Manrope', sans-serif;
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 40px rgba(25, 28, 33, 0.06);
+        }
+        .tactile-button {
+            background: linear-gradient(135deg, #0F4671 0%, #2F5E8A 100%);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="antialiased">
+<!-- TopNavBar (Shared Component) -->
+<header class="sticky top-0 w-full z-50 bg-[#F5F2EA] dark:bg-slate-950 backdrop-blur-md opacity-90 transition-all duration-200">
+<nav class="flex justify-between items-center px-12 py-6 max-w-[1440px] mx-auto">
+<div class="text-2xl font-black text-[#171A1F] dark:text-slate-100 font-headline tracking-tight">StrataDash</div>
+<div class="hidden md:flex items-center space-x-10">
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity font-headline font-bold tracking-tight text-sm" href="#">Product</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity font-headline font-bold tracking-tight text-sm" href="#">Pricing</a>
+<a class="text-[#2F5E8A] font-bold border-b-2 border-[#2F5E8A] pb-1 font-headline tracking-tight text-sm" href="#">About</a>
+<a class="text-[#171A1F] dark:text-slate-300 opacity-80 hover:opacity-100 transition-opacity font-headline font-bold tracking-tight text-sm" href="#">Sign in</a>
+</div>
+<button class="tactile-button text-on-primary px-8 py-3 rounded-full font-headline font-bold text-sm tracking-tight scale-95 active:scale-90 duration-200">
+                Book a demo
+            </button>
+</nav>
+</header>
+<main>
+<!-- Hero Section -->
+<section class="max-w-[1440px] mx-auto px-12 pt-24 pb-32 grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
+<div class="md:col-span-7">
+<h1 class="font-headline text-[3.5rem] font-black leading-[1.1] text-primary mb-8">
+                    Modernizing how districts communicate strategic progress.
+                </h1>
+<p class="font-body text-xl text-on-surface-variant leading-relaxed max-w-2xl mb-12">
+                    We believe public education thrives on trust, transparency, and a shared community understanding of where we are headed.
+                </p>
+<div class="flex flex-wrap gap-4">
+<button class="tactile-button text-on-primary px-10 py-4 rounded-full font-headline font-bold text-lg">
+                        Book a demo
+                    </button>
+<button class="border-2 border-primary/20 text-primary hover:bg-primary/5 px-10 py-4 rounded-full font-headline font-bold text-lg transition-colors">
+                        View a live example
+                    </button>
+</div>
+</div>
+<div class="md:col-span-5 relative">
+<div class="w-full aspect-[4/5] rounded-xl overflow-hidden editorial-shadow bg-surface-container-high" data-alt="Abstract architectural composition of stone and glass reflecting blue sky symbolizing strength and transparency">
+<img alt="Strategy meeting" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1gWqvimVO4hjavr7sL0mWrRzXXiseiTG8ZCa605Y0c-gNdamBaL0C4fc8f5VF_L7cx0l7D79b7BN7-5yV1o669OpfIEgfAf-T3AjqLE_0DuYIZLKpvtSRhC-vQ2EVeVWZ8fp-gNAKE5txhsd3ERTsYoWFvEwOurILjQFr9PoaKXI-obLvr4oZMdYPCqz5tFfJ6_-2zpF2WczvSlXT6vKUFMj4fNQXXJ_vj6Qu19JAFPduoMZ4Y5oIT8y6rHEf_wTllW__dCi-osE"/>
+</div>
+</div>
+</section>
+<!-- Origin/Problem Section -->
+<section class="bg-surface-container-low py-32">
+<div class="max-w-[1440px] mx-auto px-12">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-24 items-start">
+<div class="sticky top-32">
+<span class="font-label text-secondary font-bold tracking-widest uppercase text-sm mb-6 block">The Catalyst</span>
+<h2 class="font-headline text-5xl font-extrabold text-primary mb-8 leading-tight">Strategic plans deserve better than a binder.</h2>
+<p class="font-body text-lg text-on-surface-variant leading-relaxed">
+                            For decades, the most ambitious goals for students have been buried in 100-page PDFs or dusty binders on shelf. We saw a gap between the vision of school boards and the daily understanding of their communities. 
+                            <br/><br/>
+                            StrataDash was born to bridge that gap. Districts deserve accountability that is visible, actionable, and modern.
+                        </p>
+</div>
+<div class="space-y-12">
+<div class="p-12 bg-surface rounded-xl editorial-shadow">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">description</span>
+<h3 class="font-headline text-2xl font-bold mb-4">The PDF Problem</h3>
+<p class="font-body text-on-surface-variant">Static documents are where transparency goes to die. They are impossible to search, hard to update, and rarely read by the public.</p>
+</div>
+<div class="p-12 bg-surface rounded-xl editorial-shadow">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">history_edu</span>
+<h3 class="font-headline text-2xl font-bold mb-4">The Trust Gap</h3>
+<p class="font-body text-on-surface-variant">When progress isn't visible, skepticism grows. Community support is built on the foundation of seeing constant, measurable improvement.</p>
+</div>
+<div class="p-12 bg-surface rounded-xl editorial-shadow">
+<span class="material-symbols-outlined text-primary text-4xl mb-6">payments</span>
+<h3 class="font-headline text-2xl font-bold mb-4">The Budget Reality</h3>
+<p class="font-body text-on-surface-variant">Public funds should go to classrooms, not custom high-priced consulting software. Efficiency is a moral imperative.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Who it is for: Bento Grid -->
+<section class="py-32 bg-background">
+<div class="max-w-[1440px] mx-auto px-12">
+<div class="text-center mb-24">
+<h2 class="font-headline text-5xl font-black text-on-surface mb-6">Built for the Institutional Architect.</h2>
+<p class="font-body text-xl text-on-surface-variant max-w-2xl mx-auto">Providing clarity to the leaders managing our most vital public assets.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 h-auto md:h-[600px]">
+<div class="md:col-span-8 bg-primary rounded-xl p-12 text-on-primary relative overflow-hidden flex flex-col justify-end">
+<div class="absolute inset-0 opacity-20" data-alt="Subtle geometric blueprint overlay pattern with grid lines and soft circular elements"></div>
+<h3 class="font-headline text-4xl font-bold mb-4 relative z-10">K-12 School Districts</h3>
+<p class="font-body text-lg opacity-80 relative z-10 max-w-md">From small rural districts to large urban systems, we provide the platform to align Cabinet teams and School Boards under one source of truth.</p>
+</div>
+<div class="md:col-span-4 bg-surface-container-highest rounded-xl p-12 flex flex-col justify-between">
+<span class="material-symbols-outlined text-5xl text-primary">hub</span>
+<div>
+<h3 class="font-headline text-2xl font-bold mb-4">Charter Networks</h3>
+<p class="font-body text-on-surface-variant">Scale excellence by maintaining rigorous strategic focus across multiple campuses and regions.</p>
+</div>
+</div>
+<div class="md:col-span-4 bg-tertiary-fixed rounded-xl p-12 flex flex-col justify-between">
+<span class="material-symbols-outlined text-5xl text-tertiary">account_balance</span>
+<div>
+<h3 class="font-headline text-2xl font-bold text-on-tertiary-fixed-variant mb-4">Education Agencies</h3>
+<p class="font-body text-on-tertiary-fixed-variant opacity-80">Empowering state and regional agencies to visualize policy impact and resource allocation at scale.</p>
+</div>
+</div>
+<div class="md:col-span-8 bg-surface-container-low rounded-xl p-12 flex items-center justify-between gap-12">
+<div class="max-w-md">
+<h3 class="font-headline text-2xl font-bold mb-4">Public Transparency</h3>
+<p class="font-body text-on-surface-variant">Built-in public dashboards that make it easy for parents and taxpayers to understand district performance without needing a data degree.</p>
+</div>
+<div class="hidden lg:block w-48 h-32 bg-surface rounded-lg editorial-shadow flex items-center justify-center">
+<span class="font-label text-primary font-bold">98% ON TRACK</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Beliefs & Principles -->
+<section class="py-32 bg-surface-container-high">
+<div class="max-w-[1440px] mx-auto px-12">
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-16">
+<div>
+<h2 class="font-headline text-4xl font-extrabold text-primary mb-8">Our Core Beliefs</h2>
+<ul class="space-y-8">
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body font-bold">Usable transparency is a human right.</span>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body font-bold">Visible progress accelerates growth.</span>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body font-bold">Respect for public budgets is paramount.</span>
+</li>
+<li class="flex gap-4">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-body font-bold">No custom consulting should be needed.</span>
+</li>
+</ul>
+</div>
+<div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="p-8 border-l-4 border-primary bg-surface/50">
+<h4 class="font-label text-xs font-bold tracking-tighter text-primary/60 uppercase mb-4">Principle 01</h4>
+<h3 class="font-headline text-2xl font-bold mb-4">Clarity over complexity</h3>
+<p class="font-body text-sm text-on-surface-variant">We design for the busy Superintendent, not the data engineer. Information is presented in logical, digestible layers.</p>
+</div>
+<div class="p-8 border-l-4 border-primary bg-surface/50">
+<h4 class="font-label text-xs font-bold tracking-tighter text-primary/60 uppercase mb-4">Principle 02</h4>
+<h3 class="font-headline text-2xl font-bold mb-4">Usefulness over flash</h3>
+<p class="font-body text-sm text-on-surface-variant">Every pixel must serve a strategic purpose. We avoid "dashboard fatigue" by focusing on actionable insights.</p>
+</div>
+<div class="p-8 border-l-4 border-primary bg-surface/50">
+<h4 class="font-label text-xs font-bold tracking-tighter text-primary/60 uppercase mb-4">Principle 03</h4>
+<h3 class="font-headline text-2xl font-bold mb-4">Trust over hype</h3>
+<p class="font-body text-sm text-on-surface-variant">We are a partner to public institutions. Our brand voice is grounded in reality, not venture-backed hyperbole.</p>
+</div>
+<div class="p-8 border-l-4 border-primary bg-surface/50">
+<h4 class="font-label text-xs font-bold tracking-tighter text-primary/60 uppercase mb-4">Principle 04</h4>
+<h3 class="font-headline text-2xl font-bold mb-4">Universal Accessibility</h3>
+<p class="font-body text-sm text-on-surface-variant">Strategic progress must be accessible to all community members, regardless of ability or device.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-32 text-center bg-primary overflow-hidden relative">
+<div class="absolute inset-0 opacity-10 pointer-events-none" data-alt="Ethereal overlapping circles in deep blue tones creating a sense of depth and focus"></div>
+<div class="max-w-4xl mx-auto px-12 relative z-10">
+<h2 class="font-headline text-5xl font-black text-on-primary mb-8">Ready to bring your strategic plan to life?</h2>
+<div class="flex flex-col md:flex-row gap-6 justify-center">
+<button class="bg-surface text-primary px-12 py-5 rounded-full font-headline font-black text-xl hover:bg-surface-container-lowest transition-all">
+                        Book a demo
+                    </button>
+<button class="border-2 border-on-primary/30 text-on-primary px-12 py-5 rounded-full font-headline font-black text-xl hover:bg-on-primary/10 transition-all">
+                        View live example
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer (Shared Component) -->
+<footer class="w-full border-t border-[#171A1F]/5 bg-[#FFFFFF] dark:bg-slate-900">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12 px-12 py-24 max-w-[1440px] mx-auto">
+<div class="col-span-1">
+<div class="text-xl font-bold text-[#171A1F] dark:text-slate-100 font-headline mb-6">StrataDash</div>
+<p class="font-body leading-relaxed text-sm text-[#171A1F]/60 dark:text-slate-400">
+                    © 2024 StrataDash. Your strategic plan deserves better than a PDF.
+                </p>
+</div>
+<div>
+<h4 class="font-headline font-bold mb-6 text-primary">Product</h4>
+<ul class="space-y-4 font-body text-sm">
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Product</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Pricing</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Resources</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Strategic Planning</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold mb-6 text-primary">Company</h4>
+<ul class="space-y-4 font-body text-sm">
+<li><a class="text-[#2F5E8A] underline" href="#">About</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Careers</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Press</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-headline font-bold mb-6 text-primary">Legal</h4>
+<ul class="space-y-4 font-body text-sm">
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Privacy</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Terms</a></li>
+<li><a class="text-[#171A1F]/60 dark:text-slate-400 hover:text-[#2F5E8A] transition-all" href="#">Security</a></li>
+</ul>
+</div>
+</div>
+</footer>
+
+```</body></html>

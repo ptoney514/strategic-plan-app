@@ -190,6 +190,7 @@ export const verification = pgTable("verification", {
 	value: varchar({ length: 255 }).notNull(),
 	expiresAt: timestamp("expires_at", { mode: 'string' }).notNull(),
 	createdAt: timestamp("created_at", { mode: 'string' }).defaultNow(),
+	updatedAt: timestamp("updated_at", { mode: 'string' }).defaultNow(),
 });
 
 export const user = pgTable("user", {

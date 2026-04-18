@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StrataDash | Login</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800;900&amp;family=Manrope:wght@400;500;600&amp;family=Space+Grotesk:wght@500&amp;family=JetBrains+Mono&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#0f4671",
+                        "on-surface": "#191c21",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#ecedf5",
+                        "inverse-surface": "#2e3036",
+                        "surface-dim": "#d8dae1",
+                        "tertiary-fixed": "#9ff1e7",
+                        "on-tertiary-fixed-variant": "#00504a",
+                        "on-secondary-fixed": "#410005",
+                        "secondary": "#b12a2e",
+                        "on-tertiary-fixed": "#00201d",
+                        "background": "#f8f9ff",
+                        "on-surface-variant": "#42474f",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#83d5cb",
+                        "on-error-container": "#93000a",
+                        "outline": "#72777f",
+                        "secondary-fixed-dim": "#ffb3ae",
+                        "inverse-on-surface": "#eff0f8",
+                        "secondary-container": "#fd625f",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "inverse-primary": "#9ecafc",
+                        "on-secondary-fixed-variant": "#8f0d19",
+                        "tertiary-container": "#006760",
+                        "on-tertiary-container": "#90e3d9",
+                        "on-secondary-container": "#65000b",
+                        "on-primary-fixed": "#001d35",
+                        "on-primary-container": "#b4d6ff",
+                        "tertiary": "#004d47",
+                        "primary-fixed-dim": "#9ecafc",
+                        "outline-variant": "#c2c7d0",
+                        "surface-tint": "#33618e",
+                        "surface-container-highest": "#e1e2e9",
+                        "surface-bright": "#f8f9ff",
+                        "on-primary-fixed-variant": "#154974",
+                        "surface": "#f8f9ff",
+                        "primary-fixed": "#d0e4ff",
+                        "primary-container": "#2f5e8a",
+                        "surface-container-high": "#e6e8ef",
+                        "surface-container-low": "#f2f3fa",
+                        "surface-variant": "#e1e2e9",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed": "#ffdad7",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#191c21"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Epilogue"],
+                        "body": ["Manrope"],
+                        "label": ["Space Grotesk"],
+                        "mono": ["JetBrains Mono"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #F5F2EA;
+            font-family: 'Manrope', sans-serif;
+            color: #171A1F;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+        }
+        .editorial-shadow {
+            box-shadow: 0 20px 40px rgba(25, 28, 33, 0.06);
+        }
+        .tactile-btn {
+            background: linear-gradient(135deg, #0f4671 0%, #2f5e8a 100%);
+            border-top: 0.5px solid rgba(255, 255, 255, 0.2);
+        }
+        .tactile-btn:active {
+            transform: scale(0.98);
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body class="min-h-screen overflow-hidden">
+<main class="flex min-h-screen">
+<!-- Left Side: Login Form -->
+<section class="w-full lg:w-[45%] flex items-center justify-center p-8 lg:p-16 relative bg-[#F5F2EA]">
+<div class="absolute top-12 left-12">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-black font-headline tracking-tighter text-[#171A1F]">StrataDash</span>
+</div>
+</div>
+<div class="w-full max-w-md">
+<div class="bg-white rounded-xl p-10 editorial-shadow">
+<header class="mb-8">
+<h1 class="text-3xl font-bold font-headline mb-3 text-[#171A1F]">Sign in to StrataDash</h1>
+<p class="text-on-surface-variant font-body leading-relaxed">Enter your work email to receive a secure sign-in code.</p>
+</header>
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="block text-xs font-label uppercase tracking-widest text-on-surface-variant" for="email">Work Email</label>
+<input class="w-full px-5 py-4 bg-surface-container-high border-none rounded-lg focus:ring-2 focus:ring-primary-container font-body transition-all" id="email" name="email" placeholder="name@school-district.edu" type="email"/>
+</div>
+<button class="w-full py-4 px-6 rounded-full tactile-btn text-white font-headline font-bold text-lg transition-all flex items-center justify-center gap-2 group" type="submit">
+                            Send Code
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</form>
+<footer class="mt-12 pt-8 border-t border-[#171A1F]/5">
+<p class="text-sm font-body text-on-surface-variant">
+                            New to StrataDash? <a class="text-primary font-semibold hover:underline" href="#">Contact your administrator</a> to request access.
+                        </p>
+</footer>
+</div>
+<div class="mt-8 flex justify-center space-x-6">
+<span class="text-[10px] font-label text-on-surface-variant/50 uppercase tracking-widest">© 2024 StrataDash</span>
+<a class="text-[10px] font-label text-on-surface-variant/50 uppercase tracking-widest hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="text-[10px] font-label text-on-surface-variant/50 uppercase tracking-widest hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+</div>
+</section>
+<!-- Right Side: Brand Content -->
+<section class="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-primary-container">
+<!-- Background Decorative Elements -->
+<div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/graphy.png')] opacity-10"></div>
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary rounded-full blur-[120px] opacity-40"></div>
+<div class="absolute bottom-[-10%] left-[-10%] w-[80%] h-[80%] bg-[#0F4671] rounded-full blur-[150px] opacity-30"></div>
+<div class="relative z-10 w-full h-full flex flex-col justify-center px-20">
+<div class="max-w-2xl mb-12">
+<h2 class="text-6xl font-black font-headline text-white leading-[1.1] mb-6">
+                        Your strategic plan deserves better than a PDF.
+                    </h2>
+<p class="text-xl font-body text-on-primary-container leading-relaxed opacity-90">
+                        Empowering school districts with interactive transparency and real-time progress tracking.
+                    </p>
+</div>
+<!-- Product Preview Snippet (Bento-style Mockup) -->
+<div class="relative group">
+<div class="glass-panel rounded-xl p-8 editorial-shadow border border-white/10 transform rotate-[-1deg] group-hover:rotate-0 transition-transform duration-500">
+<div class="flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-fixed">school</span>
+</div>
+<div>
+<h3 class="text-on-surface font-headline font-bold">Westside Community Schools</h3>
+<p class="text-xs font-mono text-on-surface-variant">STRATEGIC PLAN 2024-2027</p>
+</div>
+</div>
+<div class="bg-tertiary-fixed px-3 py-1 rounded-full flex items-center gap-2">
+<div class="w-2 h-2 bg-on-tertiary-fixed-variant rounded-full animate-pulse"></div>
+<span class="text-[10px] font-label font-bold text-on-tertiary-fixed-variant">LIVE MONITORING</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-6">
+<div class="bg-surface-container-low p-6 rounded-lg">
+<p class="text-xs font-label uppercase tracking-wider text-on-surface-variant mb-2">Student Achievement</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-mono font-bold text-primary">87.4%</span>
+<span class="text-xs font-mono text-on-tertiary-fixed-variant">+2.1%</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-4">
+<div class="bg-primary w-[87.4%] h-full rounded-full"></div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-lg">
+<p class="text-xs font-label uppercase tracking-wider text-on-surface-variant mb-2">Operational Excellence</p>
+<div class="flex items-baseline gap-2">
+<span class="text-3xl font-mono font-bold text-primary">92/100</span>
+</div>
+<div class="w-full bg-surface-container-highest h-1.5 rounded-full mt-4">
+<div class="bg-primary w-[92%] h-full rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="mt-8 space-y-4">
+<div class="flex items-center justify-between p-4 bg-white/50 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">verified</span>
+<span class="text-sm font-body">Modernizing STEAM Labs (Phase 2)</span>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed-variant rounded">ON TARGET</span>
+</div>
+<div class="flex items-center justify-between p-4 bg-white/50 rounded-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-sm">schedule</span>
+<span class="text-sm font-body">Dual-Language Immersion Expansion</span>
+</div>
+<span class="text-[10px] font-label px-2 py-1 bg-secondary-fixed text-on-secondary-fixed-variant rounded">OFF TRACK</span>
+</div>
+</div>
+</div>
+<!-- Decorative Floating Badge -->
+<div class="absolute -bottom-6 -right-6 glass-panel p-4 rounded-xl editorial-shadow border border-white/20 transform rotate-3">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+</div>
+<div>
+<p class="text-[10px] font-label text-on-surface-variant uppercase">Transparency Score</p>
+<p class="text-sm font-mono font-bold text-on-surface">Tier 1 Exemplar</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

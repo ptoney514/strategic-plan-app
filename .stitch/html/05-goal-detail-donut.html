@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Professional Development Hours | StrataDash</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#b41340",
+                        "tertiary": "#994100",
+                        "secondary-container": "#6df5e1",
+                        "secondary-dim": "#005a50",
+                        "tertiary-fixed": "#ff955a",
+                        "on-primary-fixed": "#000000",
+                        "on-error": "#ffefef",
+                        "outline-variant": "#9eaec7",
+                        "on-surface-variant": "#4d5d73",
+                        "on-primary": "#f8f0ff",
+                        "on-secondary-fixed-variant": "#00655b",
+                        "on-tertiary-fixed-variant": "#632800",
+                        "primary-fixed-dim": "#a67aff",
+                        "inverse-on-surface": "#8e9eb7",
+                        "on-secondary-container": "#005b51",
+                        "on-primary-fixed-variant": "#390083",
+                        "background": "#f4f6ff",
+                        "surface-variant": "#c9deff",
+                        "surface-container-high": "#d2e4ff",
+                        "on-primary-container": "#2e006c",
+                        "inverse-primary": "#a476ff",
+                        "surface-tint": "#702ae1",
+                        "on-secondary": "#c0fff3",
+                        "error-dim": "#a70138",
+                        "primary-container": "#b28cff",
+                        "tertiary-fixed-dim": "#ff7f2f",
+                        "primary": "#702ae1",
+                        "primary-fixed": "#b28cff",
+                        "surface-dim": "#bdd6fc",
+                        "tertiary-container": "#ff955a",
+                        "surface": "#f4f6ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#510017",
+                        "error-container": "#f74b6d",
+                        "secondary-fixed-dim": "#5de7d3",
+                        "tertiary-dim": "#863800",
+                        "inverse-surface": "#000f21",
+                        "primary-dim": "#6411d5",
+                        "secondary": "#00675d",
+                        "surface-container-low": "#eaf1ff",
+                        "on-secondary-fixed": "#00463e",
+                        "surface-bright": "#f4f6ff",
+                        "secondary-fixed": "#6df5e1",
+                        "on-tertiary-container": "#552100",
+                        "surface-container-highest": "#c9deff",
+                        "on-surface": "#203044",
+                        "outline": "#68788f",
+                        "surface-container": "#dce9ff",
+                        "on-tertiary": "#fff0e9",
+                        "on-background": "#203044",
+                        "on-tertiary-fixed": "#2e0e00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .donut-shimmer {
+            animation: shimmer 2s infinite linear;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,149,90,0.1) 50%, transparent 100%);
+            background-size: 200% 100%;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="bg-white dark:bg-slate-950 text-violet-700 dark:text-violet-400 font-['Inter'] tabular-nums tracking-tight docked full-width top-0 border-b border-slate-200/60 dark:border-slate-800/60 flat no shadows flex justify-between items-center w-full px-6 py-3 h-16 sticky z-50">
+<div class="flex items-center gap-8">
+<span class="text-lg font-bold tracking-tighter text-slate-900 dark:text-slate-50">StrataDash</span>
+<div class="hidden md:flex gap-6">
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-200 scale-95 active:duration-100" href="#">Plan</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors duration-200 scale-95 active:duration-100" href="#">Objectives</a>
+<a class="text-violet-700 dark:text-violet-400 font-semibold border-b-2 border-violet-700 dark:border-violet-400 pb-1" href="#">Goals</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined p-2 rounded-full hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">dark_mode</button>
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-xs font-bold border border-outline-variant/20 overflow-hidden">
+<img alt="DS" data-alt="District Square Initials Avatar in a clean minimalist style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJpPii33orgsQorU-Mjm1DM7uNl8yL7mTrr41kAj01XS0wQS8zBqnftm7p6aDy-fza4t7iI8hDBflVoeW2nj02dc1zQgKe20SLS4BJS-wtZiHJYNTKxLaVlEJWfAFMylBqdz1_Buqsdy_Ylf3X9P0SSwIZBPeXqPtGLj8Qy6dMyQPuEAa7eVjfWtqnQ_J8nUNPaacfENhJ0yDYKihy0VH7A-WD5QdZ-XysYyyu27PHf-u6JtaH8UlV5slp_n7yQRMdluCW92-hHsqY"/>
+</div>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-6 py-8 min-h-[calc(100vh-128px)]">
+<!-- Breadcrumbs & Back Link -->
+<div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+<nav class="flex items-center space-x-2 text-xs font-label tracking-widest uppercase text-on-surface-variant">
+<a class="hover:text-primary transition-colors" href="#">Plan</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">Operational Excellence</a>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface">Professional Development</span>
+</nav>
+<a class="flex items-center text-sm font-medium text-primary hover:translate-x-[-4px] transition-transform duration-200" href="#">
+<span class="material-symbols-outlined mr-1 text-lg">arrow_back</span>
+                Back to goals
+            </a>
+</div>
+<!-- Goal Header Section -->
+<div class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/15 mb-6 relative overflow-hidden">
+<div class="flex flex-col md:flex-row md:items-start justify-between gap-6">
+<div class="flex gap-4">
+<div class="w-12 h-12 bg-primary text-on-primary rounded-lg flex items-center justify-center font-black text-xl flex-shrink-0">
+                        04
+                    </div>
+<div>
+<h1 class="text-3xl font-black tracking-tight text-on-surface mb-2">Professional Development Hours</h1>
+<p class="text-on-surface-variant max-w-2xl leading-relaxed">
+                            Ensuring all district academic staff exceed the state-mandated minimum continuing education credits through high-impact workshops and certification programs.
+                        </p>
+</div>
+</div>
+<div class="flex-shrink-0">
+<span class="inline-flex items-center px-4 py-1.5 rounded-full bg-secondary/10 text-secondary border border-secondary/20 text-xs font-bold tracking-widest uppercase">
+                        Exceeding Goals
+                    </span>
+</div>
+</div>
+</div>
+<!-- Main Split Layout: Stats & Chart -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+<!-- Left Panel: Status Cards -->
+<div class="lg:col-span-5 space-y-6">
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15 flex flex-col justify-between h-full">
+<div>
+<div class="flex items-center justify-between mb-8">
+<span class="text-xs font-label tracking-widest uppercase text-on-surface-variant">Completion</span>
+<span class="flex items-center gap-1.5 text-xs font-bold text-secondary bg-secondary/5 px-2 py-1 rounded">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                EXCEEDING
+                            </span>
+</div>
+<div class="mb-10">
+<div class="flex items-baseline gap-2">
+<span class="text-6xl font-black tabular-nums tracking-tighter text-on-surface">42</span>
+<span class="text-2xl font-bold text-on-surface-variant">of 50 hours</span>
+</div>
+<div class="mt-4 flex items-center gap-3">
+<span class="flex items-center text-sm font-bold text-secondary bg-secondary/10 px-2 py-0.5 rounded">
+<span class="material-symbols-outlined text-sm mr-1">trending_up</span>
+                                    ↑ 100% from baseline
+                                </span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4 pt-8 border-t border-outline-variant/10">
+<div>
+<span class="block text-[10px] font-label tracking-widest uppercase text-on-surface-variant mb-1">Target</span>
+<span class="text-xl font-bold tabular-nums text-on-surface">50.0</span>
+</div>
+<div>
+<span class="block text-[10px] font-label tracking-widest uppercase text-on-surface-variant mb-1">Baseline</span>
+<span class="text-xl font-bold tabular-nums text-on-surface">0.0</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Panel: Donut Chart -->
+<div class="lg:col-span-7">
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/15 flex flex-col items-center justify-center relative overflow-hidden group h-full">
+<div class="absolute inset-0 donut-shimmer opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<div class="relative w-72 h-72">
+<!-- SVG Donut Chart -->
+<svg class="w-full h-full -rotate-90" viewbox="0 0 100 100">
+<!-- Track -->
+<circle class="text-slate-100 dark:text-slate-800" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="12"></circle>
+<!-- Progress Segment (Gold Objective Accent) -->
+<circle class="transition-all duration-1000 ease-out" cx="50" cy="50" fill="transparent" r="40" stroke="#994100" stroke-dasharray="251.2" stroke-dashoffset="40.2" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<!-- Center Content -->
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-5xl font-black tracking-tighter text-on-surface tabular-nums">84%</span>
+<span class="text-[10px] font-label tracking-widest uppercase text-on-surface-variant mt-1">42 of 50 hours completed</span>
+</div>
+</div>
+<div class="mt-8 flex gap-6">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-sm bg-tertiary"></div>
+<span class="text-xs font-medium text-on-surface">Actual Completion</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-sm bg-slate-200 dark:bg-slate-700"></div>
+<span class="text-xs font-medium text-on-surface">Remaining Gap</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section: Sub-Goals Accordion -->
+<div class="space-y-4">
+<h3 class="text-lg font-bold tracking-tight text-on-surface flex items-center gap-2">
+                Sub-Goals <span class="px-2 py-0.5 rounded-full bg-surface-container text-xs">2</span>
+</h3>
+<div class="divide-y divide-outline-variant/10 border border-outline-variant/15 rounded-xl bg-surface-container-lowest overflow-hidden">
+<!-- Accordion Item 1 -->
+<div class="group">
+<button class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">school</span>
+<div>
+<span class="block font-bold text-on-surface">Q1 Curriculum Alignment Workshop</span>
+<span class="text-xs text-on-surface-variant">Target: 20 Hours • Current: 20 Hours</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-xs font-bold text-secondary uppercase tracking-widest">Completed</span>
+<span class="material-symbols-outlined transition-transform group-focus:rotate-180">expand_more</span>
+</div>
+</button>
+</div>
+<!-- Accordion Item 2 -->
+<div class="group">
+<button class="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<div>
+<span class="block font-bold text-on-surface">Advanced Digital Literacy Certification</span>
+<span class="text-xs text-on-surface-variant">Target: 30 Hours • Current: 22 Hours</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<span class="text-xs font-bold text-tertiary uppercase tracking-widest">In Progress</span>
+<span class="material-symbols-outlined transition-transform group-focus:rotate-180">expand_more</span>
+</div>
+</button>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 py-12 w-full max-w-7xl mx-auto">
+<div class="mb-6 md:mb-0">
+<span class="font-bold text-slate-900 dark:text-slate-50 text-xl tracking-tighter">StrataDash</span>
+<p class="text-xs font-medium uppercase tracking-widest text-slate-500 dark:text-slate-400 mt-2">© 2024 School District Strategic Planning</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity" href="#">Powered by StrataDash</a>
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity" href="#">Accessibility</a>
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity" href="#">Privacy Policy</a>
+<a class="text-xs font-medium uppercase tracking-widest text-slate-400 dark:text-slate-500 hover:text-violet-500 dark:hover:text-violet-300 transition-opacity" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</body></html>

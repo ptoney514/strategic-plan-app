@@ -5,6 +5,8 @@ import { contactSubmissions } from "@api/lib/schema/index";
 import { requireSystemAdmin } from "@api/lib/middleware/auth";
 import { jsonOk, jsonError, parsePagination } from "@api/lib/response";
 import { contactLimiter, checkRateLimit, getClientIp, rateLimitResponse } from "@api/lib/rateLimit";
+import { sendEmail } from "@api/lib/email";
+import { demoRequestNotificationHtml } from "@api/lib/email-templates";
 
 /** Map a Drizzle contact submission row to snake_case for the frontend */
 function contactToSnake(c: typeof contactSubmissions.$inferSelect) {
@@ -56,6 +58,24 @@ export async function POST(req: Request) {
         message: message.trim(),
       })
       .returning();
+
+    // Send notification email for demo requests
+    if (body.topic === "demo_request") {
+      const name = [body.first_name, body.last_name].filter(Boolean).join(" ") || "Unknown";
+      const roleMatch = message.match(/\nRole:\s*(.+)$/);
+      const role = roleMatch ? roleMatch[1].trim() : "Not specified";
+      sendEmail({
+        to: "sales@stratadash.org",
+        subject: `Demo Request from ${name} — ${body.organization || "Unknown org"}`,
+        html: demoRequestNotificationHtml({
+          name,
+          email: email.trim(),
+          organization: body.organization || "",
+          role,
+          message: message.trim(),
+        }),
+      }).catch((err) => console.error("[contact] Failed to send demo notification:", err));
+    }
 
     return jsonOk(contactToSnake(created), 201);
   } catch (error) {

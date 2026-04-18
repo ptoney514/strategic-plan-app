@@ -1,9 +1,10 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { emailOTP } from "better-auth/plugins";
 import { db } from "./db.js";
 import * as schema from "./schema/index.js";
 import { sendEmail } from "./email.js";
-import { passwordResetEmailHtml } from "./email-templates.js";
+import { loginOtpEmailHtml, passwordResetEmailHtml } from "./email-templates.js";
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined),
@@ -23,6 +24,22 @@ export const auth = betterAuth({
       });
     },
   },
+  plugins: [
+    emailOTP({
+      disableSignUp: true,
+      storeOTP: "hashed",
+      sendVerificationOTP: async ({ email, otp, type }) => {
+        await sendEmail({
+          to: email,
+          subject:
+            type === "sign-in"
+              ? "Your StrataDash sign-in code"
+              : "Your StrataDash verification code",
+          html: loginOtpEmailHtml(otp),
+        });
+      },
+    }),
+  ],
   session: {
     cookieCache: {
       enabled: true,

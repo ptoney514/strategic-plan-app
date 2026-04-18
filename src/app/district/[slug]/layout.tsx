@@ -1,7 +1,6 @@
 'use client'
 import { use } from 'react'
 import { SubdomainOverrideProvider } from '@/contexts/SubdomainContext'
-import { V2PublicLayout } from '@/components/v2/layout/V2PublicLayout'
 
 export default function DistrictLayout({
   children,
@@ -13,7 +12,12 @@ export default function DistrictLayout({
   const { slug } = use(params)
   return (
     <SubdomainOverrideProvider slug={slug}>
-      <V2PublicLayout>{children}</V2PublicLayout>
+      {/* Material Symbols Outlined font for public dashboard icons */}
+      <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet"
+      />
+      {children}
     </SubdomainOverrideProvider>
   )
 }

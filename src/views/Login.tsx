@@ -1,336 +1,472 @@
-'use client'
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
-import { useAuth } from '../contexts/AuthContext';
-import { useSubdomain } from '../contexts/SubdomainContext';
-import { getSubdomainUrl } from '../lib/subdomain';
-import { AlertCircle, Loader2 } from 'lucide-react';
+"use client";
 
-export function Login() {
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, CircleNotch } from "@phosphor-icons/react";
+import { useAuth } from "../contexts/AuthContext";
+import { useSubdomain } from "../contexts/SubdomainContext";
+import { authClient } from "../lib/auth-client";
+import { getSubdomainUrl } from "../lib/subdomain";
+import { mapBetterAuthUser, type AuthUser } from "../lib/types/auth";
+import { PublicAuthShell } from "@/components/public-site/PublicAuthShell";
+import {
+  AuthNotice,
+  authInputClass,
+  authLabelClass,
+} from "@/components/public-site/AuthFormPrimitives";
+
+type LoginMethod = "password" | "code";
+type CodeStep = "request" | "verify";
+
+function usePublicRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, isAuthenticated } = useAuth();
   const { type: subdomainType } = useSubdomain();
+  const redirectParam = searchParams.get("redirect");
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Redirect if already authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      const redirectParam = searchParams.get('redirect');
-
-      // On non-root subdomains, redirect to root domain dashboard
-      if (subdomainType !== 'root' && !redirectParam) {
-        window.location.href = getSubdomainUrl('root') + '/dashboard';
-        return;
-      }
-
-      const redirectUrl = redirectParam || '/dashboard';
-      router.replace(redirectUrl);
-    }
-  }, [isAuthenticated, searchParams, router, subdomainType]);
-
-  // Show nothing while redirecting
-  if (isAuthenticated) {
-    return null;
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    if (!email || !password) {
-      setError('Please enter both email and password');
-      setIsLoading(false);
-      return;
-    }
-
-    try {
-      const response = await login(email, password);
-      const user = response.data.user;
-
-      if (!user) {
-        setError('Login failed. Please try again.');
-        return;
-      }
-
-      // On admin subdomain, system admins stay, others go to root
-      if (subdomainType === 'admin') {
-        if (user.isSystemAdmin) {
-          router.replace('/');
+  return useCallback(
+    (authenticatedUser: AuthUser) => {
+      if (subdomainType === "admin") {
+        if (authenticatedUser.isSystemAdmin) {
+          router.replace("/");
         } else {
-          window.location.href = getSubdomainUrl('root');
+          window.location.href = getSubdomainUrl("root");
         }
         return;
       }
 
-      // Redirect to the intended destination or /dashboard
-      // Users can access admin pages from the avatar menu
-      const redirectParam = searchParams.get('redirect');
-
-      // On non-root subdomains (district), redirect to root domain dashboard
-      if (subdomainType !== 'root' && !redirectParam) {
-        window.location.href = getSubdomainUrl('root') + '/dashboard';
+      if (subdomainType !== "root" && !redirectParam) {
+        window.location.href = `${getSubdomainUrl("root")}/dashboard`;
         return;
       }
 
-      const redirectUrl = redirectParam || '/dashboard';
-      router.replace(redirectUrl);
+      router.replace(redirectParam || "/dashboard");
+    },
+    [redirectParam, router, subdomainType],
+  );
+}
+
+export function Login() {
+  const { isAuthenticated, login, user } = useAuth();
+  const redirectAfterAuth = usePublicRedirect();
+  const [method, setMethod] = useState<LoginMethod>("password");
+  const [codeStep, setCodeStep] = useState<CodeStep>("request");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    redirectAfterAuth(user);
+  }, [isAuthenticated, redirectAfterAuth, user]);
+
+  if (isAuthenticated) {
+    return null;
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  const canSubmitPassword = normalizedEmail.length > 0 && password.length > 0;
+  const canSubmitEmail = normalizedEmail.length > 0;
+  const canSubmitCode = otp.trim().length > 0;
+
+  const switchMethod = (nextMethod: LoginMethod) => {
+    if (nextMethod === method) return;
+
+    setMethod(nextMethod);
+    setCodeStep("request");
+    setPassword("");
+    setOtp("");
+    setError("");
+  };
+
+  const handlePasswordSignIn = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    if (!normalizedEmail || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await login(normalizedEmail, password);
+      const authenticatedUser = response.data.user;
+
+      if (!authenticatedUser) {
+        throw new Error("Login failed. Please try again.");
+      }
+
+      redirectAfterAuth(authenticatedUser);
     } catch (err) {
-      console.error('[Login] Error:', err);
-      setError(err instanceof Error ? err.message : 'Failed to sign in. Please check your credentials.');
+      console.error("[Login] password sign-in error:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to sign in. Please check your credentials.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleGoogleSignIn = () => {
-    // Google OAuth temporarily disabled during Better Auth migration.
-    // Will be re-enabled with socialProviders.google server config.
-    setError('Google sign-in is temporarily unavailable. Please use email/password.');
+  const handleSendCode = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    if (!canSubmitEmail) {
+      setError("Please enter your work email.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await authClient.emailOtp.sendVerificationOtp({
+        email: normalizedEmail,
+        type: "sign-in",
+      });
+
+      if (response.error) {
+        throw new Error(
+          response.error.message || "Failed to send sign-in code.",
+        );
+      }
+
+      setOtp("");
+      setCodeStep("verify");
+    } catch (err) {
+      console.error("[Login] send code error:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to send sign-in code.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleVerifyCode = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    if (!canSubmitCode) {
+      setError("Please enter the code we emailed you.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await authClient.signIn.emailOtp({
+        email: normalizedEmail,
+        otp: otp.trim(),
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to verify code.");
+      }
+
+      const rawUser = response.data?.user;
+      if (!rawUser) {
+        throw new Error("Login failed. Please try again.");
+      }
+
+      redirectAfterAuth(
+        mapBetterAuthUser(rawUser as Parameters<typeof mapBetterAuthUser>[0]),
+      );
+    } catch (err) {
+      console.error("[Login] verify code error:", err);
+      setError(err instanceof Error ? err.message : "Failed to verify code.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!canSubmitEmail || isLoading) return;
+
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const response = await authClient.emailOtp.sendVerificationOtp({
+        email: normalizedEmail,
+        type: "sign-in",
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to resend code.");
+      }
+
+      setOtp("");
+    } catch (err) {
+      console.error("[Login] resend code error:", err);
+      setError(err instanceof Error ? err.message : "Failed to resend code.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const isPasswordMode = method === "password";
+  const submitLabel = isPasswordMode
+    ? "Sign in"
+    : codeStep === "request"
+      ? "Send code"
+      : "Sign in";
+  const submitHandler = isPasswordMode
+    ? handlePasswordSignIn
+    : codeStep === "request"
+      ? handleSendCode
+      : handleVerifyCode;
+
+  const headerKicker = isPasswordMode
+    ? "Secure access"
+    : codeStep === "request"
+      ? "Sign-in code"
+      : "Verification";
+
+  const headerCopy = isPasswordMode
+    ? "Use your work email and password. Prefer a one-time code? Switch to sign-in code instead."
+    : codeStep === "request"
+      ? "Enter your work email to receive a secure sign-in code."
+      : `We sent a code to ${normalizedEmail}. Enter it below to finish signing in.`;
+
   return (
-    <div className="flex min-h-screen w-full bg-white text-slate-900 antialiased">
-      <style>{`
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; opacity: 0; }
-        @keyframes fadeIn { to { opacity: 1; } }
-      `}</style>
-
-      {/* Left Side: Login Form */}
-      <div className="flex flex-1 flex-col px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-white z-10 pt-12 pb-12 relative justify-center">
-        <div className="mx-auto w-full max-w-sm lg:w-96 fade-in">
-          {/* Logo */}
-          <div className="flex items-center gap-3 mb-10">
-            <div className="h-10 w-10 overflow-hidden rounded-lg shadow-xs">
-              <img
-                src="/assets/stratadash-logo.png"
-                alt="StrataDash"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <span className="text-xl font-semibold tracking-tight text-slate-900">StrataDash</span>
-          </div>
-
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-              Log in to StrataDash
-            </h2>
-            <p className="mt-2 text-sm text-slate-500">Welcome back! Please enter your details.</p>
-          </div>
-
-          <div className="mt-10">
-            {/* Error Alert */}
-            {error && (
-              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-red-600 font-medium">Authentication Error</p>
-                  <p className="text-sm text-red-500 mt-1">{error}</p>
-                </div>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Email Field */}
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium leading-6 text-slate-700">
-                  Email address
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={isLoading}
-                    className="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-xs ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50"
-                  />
-                </div>
-              </div>
-
-              {/* Password Field */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium leading-6 text-slate-700">
-                  Password
-                </label>
-                <div className="mt-2">
-                  <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={isLoading}
-                    className="block w-full rounded-lg border-0 py-2.5 px-3 text-slate-900 shadow-xs ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 transition-shadow disabled:opacity-50"
-                  />
-                </div>
-              </div>
-
-              {/* Remember Me + Forgot Password */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    disabled={isLoading}
-                    className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-slate-700">
-                    Remember me
-                  </label>
-                </div>
-                <div className="text-sm">
-                  <Link
-                    href="/forgot-password"
-                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
-                  >
-                    Forgot password?
-                  </Link>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div>
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="flex w-full justify-center items-center gap-2 rounded-lg bg-slate-900 px-3 py-2.5 text-sm font-semibold leading-6 text-white shadow-xs hover:bg-slate-800 focus-visible:outline-solid focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    'Sign in'
-                  )}
-                </button>
-              </div>
-            </form>
-
-            {/* Divider */}
-            <div className="relative mt-8">
-              <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-sm font-medium leading-6">
-                <span className="bg-white px-6 text-slate-400">Or continue with</span>
-              </div>
-            </div>
-
-            {/* Google OAuth Button */}
-            <div className="mt-8">
-              <button
-                type="button"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-                className="flex w-full items-center justify-center gap-3 rounded-lg bg-white px-3 py-2.5 text-sm font-semibold text-slate-700 shadow-xs ring-1 ring-inset ring-slate-200 hover:bg-slate-50 focus-visible:ring-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="h-5 w-5" aria-hidden="true" viewBox="0 0 24 24">
-                  <path
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    fill="#4285F4"
-                  />
-                  <path
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    fill="#34A853"
-                  />
-                  <path
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    fill="#FBBC05"
-                  />
-                  <path
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    fill="#EA4335"
-                  />
-                </svg>
-                Google
-              </button>
-            </div>
-
-            {/* Sign Up Link */}
-            <div className="mt-6 text-center">
-              <p className="text-sm text-slate-500">
-                Don't have an account?{' '}
-                <Link
-                  href="/signup"
-                  className="font-semibold text-indigo-600 hover:text-indigo-500 transition-colors"
-                >
-                  Sign up
-                </Link>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Footer */}
-        <div className="mt-16 lg:hidden text-center text-xs text-slate-400">
-          © {new Date().getFullYear()} StrataDash.
-        </div>
-      </div>
-
-      {/* Right Side: Branding */}
-      <div className="relative hidden w-0 flex-1 lg:block bg-slate-950 overflow-hidden">
-        {/* Grid Background with Vignette Mask */}
-        <div className="absolute inset-0 h-full w-full bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)]" />
-
-        {/* Subtle Purple/Indigo Glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-indigo-600/20 rounded-full blur-[100px] pointer-events-none" />
+    <PublicAuthShell
+      header={
+        <>
+          <p className="public-kicker text-primary">{headerKicker}</p>
+          <h1 className="mt-4 font-headline text-3xl font-semibold tracking-[-0.05em] text-on-surface">
+            Sign in to StrataDash
+          </h1>
+          <p className="mt-4 text-sm leading-7 text-on-surface-variant">
+            {headerCopy}
+          </p>
+        </>
+      }
+      footer={
+        <>
+          <span>© {new Date().getFullYear()} StrataDash</span>
+          <Link
+            href="/privacy"
+            className="transition-colors hover:text-primary"
+          >
+            Privacy
+          </Link>
+          <Link href="/terms" className="transition-colors hover:text-primary">
+            Terms
+          </Link>
+        </>
+      }
+      visualMode="auth"
+      visualEyebrow="Protected workspace"
+      visualTitle="Route leaders to the correct planning environment."
+      visualDescription="Use password sign-in by default, or fall back to a one-time email code, without changing the redirect and subdomain rules already in the product."
+      visualPoints={[
+        "Password sign-in with optional email code",
+        "Support-safe messaging around auth errors",
+        "Correct redirect behavior for root and admin workspaces",
+      ]}
+    >
+      <div className="space-y-5">
+        {error ? (
+          <AuthNotice tone="error" title="Authentication error">
+            {error}
+          </AuthNotice>
+        ) : null}
 
         <div
-          className="flex flex-col fade-in text-center h-full p-12 relative items-center justify-center z-10"
-          style={{ animationDelay: '0.1s' }}
+          className="grid grid-cols-2 gap-2 rounded-[24px] bg-surface-container-low p-1.5"
+          role="tablist"
+          aria-label="Sign-in methods"
         >
-          <div className="flex flex-col items-center gap-8 max-w-lg">
-            {/* Logo Container with Glow */}
-            <div className="relative group">
-              <div className="absolute -inset-1 bg-linear-to-r from-indigo-500 to-purple-500 rounded-2xl blur-sm opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
-              <div className="relative h-28 w-28 overflow-hidden rounded-2xl bg-indigo-950 ring-1 ring-white/10 shadow-2xl">
-                <img
-                  src="/assets/stratadash-logo.png"
-                  alt="StrataDash Logo"
-                  className="w-full h-full object-cover"
+          <button
+            id="password-tab"
+            type="button"
+            role="tab"
+            aria-selected={isPasswordMode}
+            aria-controls="password-panel"
+            onClick={() => switchMethod("password")}
+            className={`rounded-[18px] px-4 py-3 text-sm font-semibold transition-colors ${
+              isPasswordMode
+                ? "bg-white text-on-surface shadow-sm"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            Password
+          </button>
+          <button
+            id="code-tab"
+            type="button"
+            role="tab"
+            aria-selected={!isPasswordMode}
+            aria-controls="code-panel"
+            onClick={() => switchMethod("code")}
+            className={`rounded-[18px] px-4 py-3 text-sm font-semibold transition-colors ${
+              !isPasswordMode
+                ? "bg-white text-on-surface shadow-sm"
+                : "text-on-surface-variant hover:text-on-surface"
+            }`}
+          >
+            Sign-in code
+          </button>
+        </div>
+
+        <form onSubmit={submitHandler} className="space-y-5">
+          <div className="space-y-2">
+            <label htmlFor="email" className={authLabelClass}>
+              Work email
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              placeholder="name@school-district.edu"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              disabled={isLoading || (!isPasswordMode && codeStep === "verify")}
+              className={authInputClass}
+            />
+            <p className="text-xs leading-6 text-on-surface-variant">
+              Use the district or organization email connected to your
+              workspace.
+            </p>
+          </div>
+
+          {isPasswordMode ? (
+            <div id="password-panel" role="tabpanel" aria-labelledby="password-tab">
+              <div className="space-y-2">
+                <label htmlFor="password" className={authLabelClass}>
+                  Password
+                </label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  required
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  disabled={isLoading}
+                  className={authInputClass}
                 />
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <h1 className="text-5xl font-semibold tracking-tight text-white">StrataDash</h1>
-              <p className="text-lg text-slate-400 font-medium leading-relaxed">
-                The intelligent strategic planning platform designed for K-12 Districts.
-              </p>
+              <div className="mt-3 flex justify-end">
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-semibold text-primary transition-colors hover:text-on-surface"
+                >
+                  Forgot password?
+                </Link>
+              </div>
             </div>
+          ) : (
+            <div id="code-panel" role="tabpanel" aria-labelledby="code-tab">
+              {codeStep === "verify" ? (
+                <div className="space-y-2">
+                  <label htmlFor="otp" className={authLabelClass}>
+                    Verification code
+                  </label>
+                  <input
+                    id="otp"
+                    name="otp"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    required
+                    placeholder="123456"
+                    value={otp}
+                    onChange={(event) => setOtp(event.target.value)}
+                    disabled={isLoading}
+                    maxLength={6}
+                    className={authInputClass}
+                  />
+                  <p className="text-xs leading-6 text-on-surface-variant">
+                    The code is short-lived. Request another one if it has
+                    expired.
+                  </p>
+                </div>
+              ) : (
+                <div className="rounded-[24px] bg-surface-container-low px-4 py-4 text-sm leading-7 text-on-surface-variant">
+                  We&apos;ll send a one-time sign-in code to your work email.
+                </div>
+              )}
+            </div>
+          )}
 
-            {/* Decorative Dots */}
-            <div className="flex gap-2 mt-4">
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/50" />
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500/20" />
-            </div>
+          <button
+            type="submit"
+            disabled={
+              isLoading ||
+              (isPasswordMode
+                ? !canSubmitPassword
+                : codeStep === "request"
+                  ? !canSubmitEmail
+                  : !canSubmitCode)
+            }
+            className="public-button-primary inline-flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {isLoading ? (
+              <>
+                <CircleNotch size={18} className="animate-spin" />
+                {isPasswordMode
+                  ? "Signing in..."
+                  : codeStep === "request"
+                    ? "Sending code..."
+                    : "Signing in..."}
+              </>
+            ) : (
+              <>
+                {submitLabel}
+                <ArrowRight size={18} weight="bold" />
+              </>
+            )}
+          </button>
+        </form>
+
+        {!isPasswordMode && codeStep === "verify" ? (
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-2 text-sm">
+            <button
+              type="button"
+              onClick={() => {
+                setCodeStep("request");
+                setOtp("");
+                setError("");
+              }}
+              className="font-semibold text-on-surface-variant transition-colors hover:text-primary"
+            >
+              Use a different email
+            </button>
+            <button
+              type="button"
+              onClick={handleResendCode}
+              disabled={isLoading || !canSubmitEmail}
+              className="font-semibold text-primary transition-colors hover:text-on-surface disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              Resend code
+            </button>
           </div>
-        </div>
+        ) : null}
 
-        {/* Bottom Legal Text */}
-        <div className="absolute bottom-10 left-0 right-0 text-center">
-          <p className="text-xs text-slate-500 font-medium tracking-wide uppercase opacity-60">
-            Empowering Education Leadership
-          </p>
+        <div className="rounded-[24px] bg-surface-container-low px-4 py-4 text-sm leading-7 text-on-surface-variant">
+          New to StrataDash?{" "}
+          <a
+            href="mailto:support@stratadash.org?subject=StrataDash%20access%20request"
+            className="font-semibold text-primary transition-colors hover:text-on-surface"
+          >
+            Contact your administrator
+          </a>{" "}
+          to request access.
         </div>
       </div>
-    </div>
+    </PublicAuthShell>
   );
 }

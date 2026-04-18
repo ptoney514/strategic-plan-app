@@ -1,0 +1,128 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - link "StrataDASH StrataDASH" [ref=e5] [cursor=pointer]:
+        - /url: /dashboard
+        - img "StrataDASH" [ref=e6]
+        - generic [ref=e7]: StrataDASH
+      - navigation [ref=e8]:
+        - generic [ref=e9]: Menu
+        - list [ref=e10]:
+          - listitem [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /dashboard
+              - img [ref=e14]
+              - generic [ref=e17]: Home
+          - listitem [ref=e18]:
+            - link "Districts" [ref=e19] [cursor=pointer]:
+              - /url: /dashboard/districts
+              - img [ref=e21]
+              - generic [ref=e25]: Districts
+          - listitem [ref=e26]:
+            - link "Strategic plans" [ref=e27] [cursor=pointer]:
+              - /url: /dashboard/plans
+              - img [ref=e29]
+              - generic [ref=e32]: Strategic plans
+          - listitem [ref=e33]:
+            - link "Objectives & goals" [ref=e34] [cursor=pointer]:
+              - /url: /dashboard/objectives
+              - img [ref=e36]
+              - generic [ref=e40]: Objectives & goals
+          - listitem [ref=e41]:
+            - link "Metrics" [ref=e42] [cursor=pointer]:
+              - /url: /dashboard/metrics
+              - img [ref=e44]
+              - generic [ref=e46]: Metrics
+          - listitem [ref=e47]:
+            - link "Dashboards" [ref=e48] [cursor=pointer]:
+              - /url: /dashboard/dashboards
+              - img [ref=e50]
+              - generic [ref=e55]: Dashboards
+          - listitem [ref=e56]:
+            - link "Reports" [ref=e57] [cursor=pointer]:
+              - /url: /dashboard/reports
+              - img [ref=e59]
+              - generic [ref=e62]: Reports
+          - listitem [ref=e63]:
+            - link "Appearance" [ref=e64] [cursor=pointer]:
+              - /url: /dashboard/appearance
+              - img [ref=e66]
+              - generic [ref=e72]: Appearance
+          - listitem [ref=e73]:
+            - link "Visual Library" [ref=e74] [cursor=pointer]:
+              - /url: /dashboard/visuals
+              - img [ref=e76]
+              - generic [ref=e80]: Visual Library
+      - list [ref=e82]:
+        - listitem [ref=e83]:
+          - link "Invite teammates" [ref=e84] [cursor=pointer]:
+            - /url: /dashboard/invite
+            - img [ref=e86]
+            - generic [ref=e91]: Invite teammates
+        - listitem [ref=e92]:
+          - link "Help & Support" [ref=e93] [cursor=pointer]:
+            - /url: /dashboard/help
+            - img [ref=e95]
+            - generic [ref=e98]: Help & Support
+    - generic [ref=e99]:
+      - banner [ref=e100]:
+        - generic [ref=e101]:
+          - img [ref=e103]
+          - generic [ref=e106]: /
+          - heading "Home" [level=1] [ref=e107]
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - img [ref=e110]
+            - textbox "Search..." [ref=e113]
+          - button [ref=e115]:
+            - img [ref=e116]
+      - main [ref=e120]:
+        - generic [ref=e131]:
+          - generic [ref=e132]:
+            - generic [ref=e133]:
+              - heading "Dashboard" [level=1] [ref=e134]
+              - paragraph [ref=e135]: Good morning, User
+            - generic [ref=e136]: April 2026
+          - generic [ref=e137]:
+            - generic [ref=e138]:
+              - img [ref=e140]
+              - generic [ref=e144]:
+                - generic [ref=e145]: "0"
+                - generic [ref=e146]: Districts
+            - generic [ref=e147]:
+              - img [ref=e149]
+              - generic [ref=e152]:
+                - generic [ref=e153]: "0"
+                - generic [ref=e154]: Plans
+            - generic [ref=e155]:
+              - img [ref=e157]
+              - generic [ref=e161]:
+                - generic [ref=e162]: "0"
+                - generic [ref=e163]: Objectives
+          - generic [ref=e164]:
+            - heading "Your Districts" [level=2] [ref=e166]
+            - generic [ref=e167]:
+              - img [ref=e169]
+              - heading "No districts yet" [level=3] [ref=e173]
+              - paragraph [ref=e174]: You don't have access to any districts yet.
+          - generic [ref=e175]:
+            - generic [ref=e176]:
+              - heading "Strategic Plans" [level=2] [ref=e177]
+              - generic [ref=e178]:
+                - link "View all plans" [ref=e179] [cursor=pointer]:
+                  - /url: /dashboard/plans
+                  - text: View all plans
+                  - img [ref=e180]
+                - button "New Plan" [ref=e182]:
+                  - img [ref=e183]
+                  - text: New Plan
+            - generic [ref=e184]:
+              - img [ref=e186]
+              - heading "No plans yet" [level=3] [ref=e189]
+              - paragraph [ref=e190]: Create your first strategic plan to organize your objectives.
+              - button "Create Plan" [ref=e191]:
+                - img [ref=e192]
+                - text: Create Plan
+  - button "Open Next.js Dev Tools" [ref=e127] [cursor=pointer]:
+    - img [ref=e128]
+  - alert [ref=e193]

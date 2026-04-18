@@ -1,8 +1,5 @@
-'use client'
-import dynamic from 'next/dynamic'
-
-const AccountSettings = dynamic(() => import('@/views/AccountSettings').then((m) => ({ default: m.AccountSettings })), { ssr: false })
+import { redirect } from 'next/navigation'
 
 export default function Page() {
-  return <AccountSettings />
+  redirect('/dashboard/account')
 }

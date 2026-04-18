@@ -48,6 +48,24 @@ function footer(text: string): string {
   return `<p style="margin:24px 0 0;font-size:13px;color:#6b7280;line-height:1.5;">${text}</p>`;
 }
 
+export function loginOtpEmailHtml(otp: string): string {
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:20px;color:#111827;font-weight:600;">Your StrataDash sign-in code</h2>
+    <p style="margin:0 0 16px;font-size:16px;color:#374151;line-height:1.6;">
+      Use this code to finish signing in to StrataDash. It expires in 5 minutes.
+    </p>
+    <div style="margin:24px 0;padding:18px 24px;border-radius:12px;background:#f8fafc;border:1px solid #e5e7eb;text-align:center;">
+      <span style="display:block;font-size:30px;line-height:1;font-weight:700;letter-spacing:0.32em;color:#111827;">${otp}</span>
+    </div>
+    <p style="margin:0;font-size:14px;color:#6b7280;line-height:1.5;">
+      If you did not request this code, you can safely ignore this email.
+    </p>
+    ${footer("Need help? Contact your district administrator or the StrataDash team.")}
+  `;
+
+  return layout(content);
+}
+
 export function invitationEmailHtml(
   orgName: string,
   inviterName: string,
@@ -79,6 +97,42 @@ export function passwordResetEmailHtml(resetUrl: string): string {
     </p>
     ${ctaButton(resetUrl, "Reset Password")}
     ${footer("If you didn't request this, you can safely ignore this email. Your password will not be changed.")}
+  `;
+  return layout(content);
+}
+
+export function demoRequestNotificationHtml(fields: {
+  name: string;
+  email: string;
+  organization: string;
+  role: string;
+  message: string;
+}): string {
+  const content = `
+    <h2 style="margin:0 0 16px;font-size:20px;color:#111827;font-weight:600;">New Demo Request</h2>
+    <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;margin-bottom:16px;">
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;width:120px;">Name</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;">${fields.name}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;">Email</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;"><a href="mailto:${fields.email}">${fields.email}</a></td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;">Organization</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;">${fields.organization || "Not provided"}</td>
+      </tr>
+      <tr>
+        <td style="padding:8px 0;font-size:14px;color:#6b7280;font-weight:600;">Role</td>
+        <td style="padding:8px 0;font-size:14px;color:#374151;">${fields.role}</td>
+      </tr>
+    </table>
+    <div style="padding:16px;background:#f9fafb;border-radius:8px;margin-bottom:16px;">
+      <p style="margin:0 0 8px;font-size:13px;color:#6b7280;font-weight:600;">Message</p>
+      <p style="margin:0;font-size:14px;color:#374151;line-height:1.6;white-space:pre-wrap;">${fields.message}</p>
+    </div>
+    ${footer("Reply directly to this email to respond to the prospect.")}
   `;
   return layout(content);
 }

@@ -1,14 +1,7 @@
 import { useState } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 import type { Widget } from '../../../lib/types/v2';
-import {
-  DonutWidget,
-  BigNumberWidget,
-  BarChartWidget,
-  AreaLineWidget,
-  ProgressBarWidget,
-  PieBreakdownWidget,
-} from './renderers';
+import { WidgetRenderer } from './WidgetRenderer';
 
 interface WidgetCardProps {
   widget: Widget;
@@ -25,32 +18,12 @@ const TYPE_LABELS: Record<string, string> = {
   'pie-breakdown': 'Pie Breakdown',
 };
 
-function WidgetRenderer({ widget }: { widget: Widget }) {
-  const props = { config: widget.config, title: widget.title, subtitle: widget.subtitle };
-
-  switch (widget.type) {
-    case 'donut':
-      return <DonutWidget {...props} />;
-    case 'big-number':
-      return <BigNumberWidget {...props} />;
-    case 'bar-chart':
-      return <BarChartWidget {...props} />;
-    case 'area-line':
-      return <AreaLineWidget {...props} />;
-    case 'progress-bar':
-      return <ProgressBarWidget {...props} />;
-    case 'pie-breakdown':
-      return <PieBreakdownWidget {...props} />;
-    default:
-      return <div className="text-sm text-gray-400">Unknown widget type</div>;
-  }
-}
-
 export function WidgetCard({ widget, onEdit, onDelete }: WidgetCardProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
+      data-testid={`widget-card-${widget.id}`}
       className="rounded-xl p-5 relative group"
       style={{
         backgroundColor: 'var(--editorial-surface)',

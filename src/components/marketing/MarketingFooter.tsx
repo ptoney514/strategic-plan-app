@@ -1,128 +1,89 @@
-import Link from 'next/link';
-import { Icon } from '@iconify/react';
+import Link from "next/link";
+
+const productLinks = [
+  { label: "Features", href: "/" },
+  { label: "Pricing", href: "/pricing" },
+  { label: "Request a Demo", href: "/demo" },
+  { label: "Sign in", href: "/login" },
+] as const;
+
+const companyLinks = [
+  { label: "About", href: "/about" },
+  { label: "District example", href: "/district/westside" },
+  {
+    label: "Contact sales",
+    href: "mailto:sales@stratadash.org?subject=StrataDash%20inquiry",
+  },
+] as const;
+
+const legalLinks = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+] as const;
+
+function FooterLink({ href, label }: { href: string; label: string }) {
+  const isExternal = href.startsWith("mailto:") || href.startsWith("http");
+  const className =
+    "text-sm text-on-surface-variant hover:text-primary transition-colors";
+  if (isExternal) {
+    return (
+      <a href={href} className={className}>
+        {label}
+      </a>
+    );
+  }
+  return (
+    <Link href={href} className={className}>
+      {label}
+    </Link>
+  );
+}
 
 export function MarketingFooter() {
   return (
-    <footer className="bg-white border-t border-indigo-200 pt-16 pb-8">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
-          {/* Logo & Tagline */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <img
-                src="/assets/stratadash-logo.png"
-                alt="StrataDash"
-                className="w-7 h-7 rounded-lg shadow-xs"
-              />
-              <span className="font-bold text-indigo-900">StrataDash</span>
-            </div>
-            <p className="text-xs text-indigo-500 leading-relaxed mb-4">
-              Our commitment to student success and community prosperity.
-            </p>
-          </div>
-
-          {/* Our Plan */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Our Plan</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <a href="/#goals" className="hover:text-blue-600 transition-colors">
-                  Plan Overview
-                </a>
-              </li>
-              <li>
-                <a href="/#initiatives" className="hover:text-blue-600 transition-colors">
-                  Our Initiatives
-                </a>
-              </li>
-              <li>
-                <a href="/#goals" className="hover:text-blue-600 transition-colors">
-                  Strategic Goals
-                </a>
-              </li>
-              <li>
-                <a href="/#progress" className="hover:text-blue-600 transition-colors">
-                  Metrics
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Stakeholders */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Stakeholders</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <span className="cursor-default">Enterprise</span>
-              </li>
-              <li>
-                <span className="cursor-default">Educators</span>
-              </li>
-              <li>
-                <span className="cursor-default">Community</span>
-              </li>
-              <li>
-                <span className="cursor-default">Parents</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Resources */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Resources</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <span className="cursor-default">Strategy Factory</span>
-              </li>
-              <li>
-                <span className="cursor-default">Templates</span>
-              </li>
-              <li>
-                <span className="cursor-default">Blog</span>
-              </li>
-              <li>
-                <span className="cursor-default">Events</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Company */}
-          <div>
-            <h4 className="font-semibold text-indigo-900 mb-4 text-sm">Company</h4>
-            <ul className="space-y-2 text-sm text-indigo-500">
-              <li>
-                <Link href="/about" className="hover:text-blue-600 transition-colors">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <span className="cursor-default">Careers</span>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:text-blue-600 transition-colors">
-                  Legal
-                </Link>
-              </li>
-              <li>
-                <span className="cursor-default">Contact</span>
-              </li>
-            </ul>
-          </div>
+    <footer className="mt-auto border-t border-outline-variant/30 bg-surface-container-low">
+      <div className="mx-auto grid max-w-7xl gap-10 px-8 py-14 md:grid-cols-4">
+        <div className="md:col-span-1">
+          <span className="font-headline text-xl font-extrabold tracking-tighter text-[#1e1b4b]">
+            StrataDASH
+          </span>
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-on-surface-variant">
+            Empowering school districts with transparency and data-driven
+            strategic planning.
+          </p>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-indigo-400">
-            &copy; {new Date().getFullYear()} StrataDash. All rights reserved.
-          </p>
-          <div className="flex gap-4 text-indigo-400">
-            <span className="cursor-default hover:text-indigo-900 transition-colors">
-              <Icon icon="solar:camera-linear" width="18" />
-            </span>
-            <span className="cursor-default hover:text-indigo-900 transition-colors">
-              <Icon icon="solar:plain-linear" width="18" />
-            </span>
-          </div>
+        <div className="flex flex-col gap-3">
+          <h4 className="font-headline text-sm font-bold text-on-surface">
+            Product
+          </h4>
+          {productLinks.map((item) => (
+            <FooterLink key={item.label} {...item} />
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h4 className="font-headline text-sm font-bold text-on-surface">
+            Company
+          </h4>
+          {companyLinks.map((item) => (
+            <FooterLink key={item.label} {...item} />
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h4 className="font-headline text-sm font-bold text-on-surface">
+            Legal
+          </h4>
+          {legalLinks.map((item) => (
+            <FooterLink key={item.label} {...item} />
+          ))}
+        </div>
+      </div>
+
+      <div className="border-t border-outline-variant/30 px-8 py-6">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm text-on-surface-variant md:flex-row md:items-center md:justify-between">
+          <span>&copy; {new Date().getFullYear()} StrataDASH Inc. All rights reserved.</span>
         </div>
       </div>
     </footer>

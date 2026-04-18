@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Strategic Objectives | Westside Community Schools</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "on-primary-fixed-variant": "#5a00c6",
+                "on-surface": "#191c1d",
+                "on-secondary": "#ffffff",
+                "tertiary-fixed": "#71f8e4",
+                "on-secondary-fixed-variant": "#822800",
+                "secondary": "#a43c12",
+                "on-primary": "#ffffff",
+                "on-tertiary-container": "#75fce8",
+                "outline": "#7b7487",
+                "surface-dim": "#d9dadb",
+                "error": "#ba1a1a",
+                "on-error-container": "#93000a",
+                "surface-container-highest": "#e1e3e4",
+                "on-secondary-container": "#6b1f00",
+                "secondary-fixed": "#ffdbcf",
+                "on-error": "#ffffff",
+                "surface-tint": "#732ee4",
+                "surface-variant": "#e1e3e4",
+                "tertiary-fixed-dim": "#4fdbc8",
+                "on-secondary-fixed": "#380c00",
+                "surface-container-low": "#f3f4f5",
+                "primary-fixed-dim": "#d2bbff",
+                "error-container": "#ffdad6",
+                "surface": "#f8f9fa",
+                "tertiary-container": "#007468",
+                "primary": "#630ed4",
+                "surface-bright": "#f8f9fa",
+                "on-primary-container": "#ede0ff",
+                "surface-container": "#edeeef",
+                "secondary-fixed-dim": "#ffb59c",
+                "inverse-primary": "#d2bbff",
+                "tertiary": "#005950",
+                "on-tertiary-fixed-variant": "#005048",
+                "surface-container-high": "#e7e8e9",
+                "inverse-on-surface": "#f0f1f2",
+                "on-surface-variant": "#4a4455",
+                "outline-variant": "#ccc3d8",
+                "secondary-container": "#fe7e4f",
+                "on-tertiary-fixed": "#00201c",
+                "background": "#f8f9fa",
+                "inverse-surface": "#2e3132",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed": "#25005a",
+                "primary-container": "#7c3aed",
+                "primary-fixed": "#eaddff",
+                "on-background": "#191c1d"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "1rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "fontFamily": {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+        /* Editorial Ghost Border */
+        .ghost-border {
+            border: 1px solid rgba(204, 195, 216, 0.2);
+        }
+        .ghost-border:hover {
+            border-color: rgba(204, 195, 216, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased">
+<!-- TopNavBar (Shared Component) - Mobile Only via JSON layout rules -->
+<header class="flex md:hidden justify-between items-center w-full px-6 py-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+<div class="text-xl font-bold text-slate-900 dark:text-white">StrataDash</div>
+<div class="flex gap-4 items-center">
+<span class="material-symbols-outlined text-slate-500">dark_mode</span>
+<span class="material-symbols-outlined text-slate-500">info</span>
+<div class="w-8 h-8 rounded-full bg-slate-200 overflow-hidden">
+<img alt="District Avatar" data-alt="circular minimalist logo representing a community school district with abstract geometric shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClF8hqlt_77Cpp4uZnMB2WRKiaV5f7tHJ01BZZefKpreWRuijC4riJCdc3RK8Ku6Sbph0Drtts4JimjovvcsYFQR_lopE09Mh7znmnGeyAFGJwrR4o04SIfnf7Xbzn30eDCAXdWNMqXnQGA3toKwfK9Ahh_KMHVhM5JYOKVA_1BtGvg7HZjGGU28WAU_sWGeNuacvVE0y61JZBdwG_ueAj0ATBqxI5S29XK8tV2yWr6z5DNuChuCV7hDtDnhOlo17s4Jt9QDWdTiUo"/>
+</div>
+</div>
+</header>
+<!-- SideNavBar (Shared Component) -->
+<aside class="h-screen w-80 fixed left-0 top-0 hidden md:flex flex-col bg-slate-50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 py-6 px-4">
+<div class="mb-8 px-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+</div>
+<div>
+<h1 class="text-lg font-bold text-slate-900 dark:text-slate-100">District Plan Explorer</h1>
+<p class="text-[10px] font-medium uppercase tracking-wider text-slate-500">2023-2025 Strategic Cycle</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="domain">domain</span>
+<span class="font-medium">District Identity</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-medium">Plan Health</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-violet-700 dark:text-violet-400 font-semibold border-r-2 border-violet-700 bg-slate-100/50 dark:bg-slate-800/50" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span class="font-medium">Objectives Tree</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="pt-6 border-t border-slate-200 dark:border-slate-800 space-y-1">
+<a class="flex items-center gap-3 px-3 py-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+<span class="font-medium">Dark Mode</span>
+</a>
+<div class="flex items-center gap-3 px-3 py-2 text-slate-400">
+<span class="material-symbols-outlined text-violet-500" data-icon="bolt">bolt</span>
+<span class="text-xs font-medium uppercase tracking-widest">Powered by StrataDash</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-80 min-h-screen p-8 lg:p-12">
+<!-- Header Section -->
+<header class="mb-12 max-w-7xl mx-auto">
+<!-- Breadcrumbs -->
+<nav class="flex items-center gap-2 mb-6">
+<span class="text-[12px] font-medium uppercase tracking-wider text-outline">Plan</span>
+<span class="material-symbols-outlined text-sm text-outline">chevron_right</span>
+<span class="text-[12px] font-medium uppercase tracking-wider text-primary">All Objectives</span>
+</nav>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<h2 class="text-4xl lg:text-5xl font-bold tracking-tight text-on-surface mb-2">Strategic Objectives</h2>
+<div class="flex items-center gap-3">
+<span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-sm font-medium">4 Objectives</span>
+<span class="text-outline text-sm">Updated 2 days ago</span>
+</div>
+</div>
+<!-- Filter Popover Trigger (Radix-like) -->
+<button class="flex items-center gap-2 px-4 py-2.5 bg-surface-container-lowest ghost-border rounded-lg text-sm font-semibold text-on-surface hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined text-xl" data-icon="filter_list">filter_list</span>
+                    Filter by Status
+                    <span class="material-symbols-outlined text-sm" data-icon="expand_more">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Objectives Bento/Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-2 gap-8 max-w-7xl mx-auto">
+<!-- Objective 01: Purple -->
+<div class="group relative flex flex-col bg-surface-container-lowest ghost-border rounded-lg transition-all overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="p-8 lg:p-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="text-6xl font-black text-primary/5 select-none tabular-nums">01</span>
+<span class="material-symbols-outlined text-primary/40 group-hover:text-primary transition-colors" data-icon="north_east">north_east</span>
+</div>
+<h3 class="text-2xl font-bold text-on-surface mb-3 leading-tight">Elevating Academic Excellence</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 flex-1">Ensure every student receives high-quality instruction and rigorous curriculum that prepares them for post-secondary success through personalized learning paths.</p>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Current Status</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-error"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+</div>
+<div class="text-sm font-medium">
+<span class="text-on-surface">3 on target</span>
+<span class="text-outline mx-1.5">·</span>
+<span class="text-on-surface">1 off track</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Total Goals</span>
+<span class="text-2xl font-bold tabular-nums text-primary">12</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Objective 02: Coral -->
+<div class="group relative flex flex-col bg-surface-container-lowest ghost-border rounded-lg transition-all overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-secondary"></div>
+<div class="p-8 lg:p-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="text-6xl font-black text-secondary/5 select-none tabular-nums">02</span>
+<span class="material-symbols-outlined text-secondary/40 group-hover:text-secondary transition-colors" data-icon="north_east">north_east</span>
+</div>
+<h3 class="text-2xl font-bold text-on-surface mb-3 leading-tight">Human-Centered Workforce</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 flex-1">Foster a professional environment that attracts, develops, and retains world-class educators by prioritizing wellness, diversity, and competitive compensation.</p>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Current Status</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+</div>
+<div class="text-sm font-medium">
+<span class="text-on-surface">5 on target</span>
+<span class="text-outline mx-1.5">·</span>
+<span class="text-on-surface">0 off track</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Total Goals</span>
+<span class="text-2xl font-bold tabular-nums text-secondary">8</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Objective 03: Teal -->
+<div class="group relative flex flex-col bg-surface-container-lowest ghost-border rounded-lg transition-all overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-tertiary"></div>
+<div class="p-8 lg:p-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="text-6xl font-black text-tertiary/5 select-none tabular-nums">03</span>
+<span class="material-symbols-outlined text-tertiary/40 group-hover:text-tertiary transition-colors" data-icon="north_east">north_east</span>
+</div>
+<h3 class="text-2xl font-bold text-on-surface mb-3 leading-tight">Strategic Growth &amp; Stability</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 flex-1">Maintain fiscal responsibility while expanding modern facility infrastructure to support increasing student population and specialized program needs.</p>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Current Status</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-error"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-error"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+</div>
+<div class="text-sm font-medium">
+<span class="text-on-surface">1 on target</span>
+<span class="text-outline mx-1.5">·</span>
+<span class="text-on-surface">2 off track</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Total Goals</span>
+<span class="text-2xl font-bold tabular-nums text-tertiary">15</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Objective 04: Gold -->
+<div class="group relative flex flex-col bg-surface-container-lowest ghost-border rounded-lg transition-all overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#D97706]"></div>
+<div class="p-8 lg:p-10 flex flex-col h-full">
+<div class="flex justify-between items-start mb-6">
+<span class="text-6xl font-black text-[#D97706]/5 select-none tabular-nums">04</span>
+<span class="material-symbols-outlined text-[#D97706]/40 group-hover:text-[#D97706] transition-colors" data-icon="north_east">north_east</span>
+</div>
+<h3 class="text-2xl font-bold text-on-surface mb-3 leading-tight">Achievement &amp; Community Equity</h3>
+<p class="text-on-surface-variant leading-relaxed mb-8 flex-1">Bridging the gap between school and community by ensuring equitable access to technology, nutrition, and mental health support for all families.</p>
+<div class="space-y-6">
+<div class="flex items-center gap-4">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Current Status</span>
+<div class="flex-1 h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex items-center gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-slate-200"></div>
+</div>
+<div class="text-sm font-medium">
+<span class="text-on-surface">4 on target</span>
+<span class="text-outline mx-1.5">·</span>
+<span class="text-on-surface">0 off track</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<span class="text-[12px] font-bold uppercase tracking-widest text-outline">Total Goals</span>
+<span class="text-2xl font-bold tabular-nums text-[#D97706]">9</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Metric Highlight Footer (Editorial Detail) -->
+<footer class="mt-16 pt-12 border-t border-surface-container-high max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-12">
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Portfolio Completion</p>
+<p class="text-4xl font-bold tabular-nums text-on-surface">74<span class="text-xl text-outline font-medium">%</span></p>
+</div>
+<div>
+<p class="text-[10px] font-bold uppercase tracking-widest text-outline mb-1">Active Milestones</p>
+<p class="text-4xl font-bold tabular-nums text-on-surface">142</p>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-primary text-white font-bold text-sm px-6 py-3 rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2">
+<span class="material-symbols-outlined text-lg" data-icon="download">download</span>
+                    Export Strategic Report
+                </button>
+</div>
+</footer>
+</main>
+</body></html>

@@ -7,6 +7,7 @@ interface WidgetGridProps {
   isLoading?: boolean;
   onEdit?: (widget: Widget) => void;
   onDelete?: (widget: Widget) => void;
+  variant?: 'default' | 'public-detail';
 }
 
 function SkeletonCard() {
@@ -25,10 +26,20 @@ function SkeletonCard() {
   );
 }
 
-export function WidgetGrid({ widgets, isLoading, onEdit, onDelete }: WidgetGridProps) {
+export function WidgetGrid({
+  widgets,
+  isLoading,
+  onEdit,
+  onDelete,
+  variant = 'default',
+}: WidgetGridProps) {
+  const gridClasses = variant === 'public-detail'
+    ? 'grid grid-cols-1 gap-6 xl:grid-cols-2'
+    : 'grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3';
+
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className={gridClasses} data-widget-grid-variant={variant}>
         <SkeletonCard />
         <SkeletonCard />
         <SkeletonCard />
@@ -60,7 +71,7 @@ export function WidgetGrid({ widgets, isLoading, onEdit, onDelete }: WidgetGridP
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className={gridClasses} data-widget-grid-variant={variant}>
       {widgets.map((widget) => (
         <WidgetCard
           key={widget.id}

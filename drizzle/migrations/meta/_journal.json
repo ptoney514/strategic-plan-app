@@ -57,6 +57,13 @@
       "when": 1772798400000,
       "tag": "0007_v2_cutover_drop_v1_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1775425701000,
+      "tag": "0008_verification_updated_at",
+      "breakpoints": true
     }
   ]
 }

@@ -4,18 +4,7 @@ import { render, screen } from '@/test/setup';
 import userEvent from '@testing-library/user-event';
 import { V2GoalDrillDown } from '../V2GoalDrillDown';
 
-// Mock framer-motion
-vi.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, className, id, ...props }: React.PropsWithChildren<{ className?: string; id?: string }>) => (
-      <div className={className} id={id} {...props}>{children}</div>
-    ),
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-  LayoutGroup: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
-
-// Mock Recharts (used by ExpandedGoalCard renderers)
+// Mock Recharts
 vi.mock('recharts', () => ({
   ResponsiveContainer: ({ children }: React.PropsWithChildren) => <div data-testid="responsive-container">{children}</div>,
   BarChart: ({ children }: React.PropsWithChildren) => <div data-testid="bar-chart">{children}</div>,
@@ -25,15 +14,13 @@ vi.mock('recharts', () => ({
   CartesianGrid: () => <div />,
   Tooltip: () => <div />,
   Legend: () => <div />,
+  ReferenceLine: () => <div />,
   PieChart: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
   Pie: () => <div />,
   Cell: () => <div />,
   AreaChart: ({ children }: React.PropsWithChildren) => <div>{children}</div>,
   Area: () => <div />,
 }));
-
-// Mock scrollIntoView
-Element.prototype.scrollIntoView = vi.fn();
 
 // Mock next/navigation
 vi.mock('next/navigation', () => ({
@@ -99,14 +86,15 @@ const mockHierarchicalGoals = [
         goal_number: '1.1',
         title: 'Reading Proficiency',
         description: 'Increase reading scores',
-        status_detail: 'in_progress',
+        status: 'in_progress',
+        level: 1,
         overall_progress: 65,
         children: [
           {
             id: 'gc-1',
             goal_number: '1.1.1',
             title: 'Phonics Program',
-            status_detail: 'in_progress',
+            status: 'in_progress',
             level: 2,
             children: [],
           },
@@ -116,7 +104,8 @@ const mockHierarchicalGoals = [
         id: 'c-2',
         goal_number: '1.2',
         title: 'Math Achievement',
-        status_detail: 'not_started',
+        status: 'not_started',
+        level: 1,
         overall_progress: 30,
         children: [],
       },
@@ -188,45 +177,26 @@ describe('V2GoalDrillDown', () => {
     expect(screen.getByText('Goals (2)')).toBeInTheDocument();
   });
 
-  it('renders GoalCard for each child with goal numbers visible', () => {
+  it('renders collapsed cards for each child', () => {
     render(<V2GoalDrillDown />);
     expect(screen.getByText('1.1')).toBeInTheDocument();
     expect(screen.getByText('1.2')).toBeInTheDocument();
   });
 
-  it('renders children as buttons with aria-expanded', () => {
+  it('shows widget data on collapsed card', () => {
     render(<V2GoalDrillDown />);
-    const buttons = screen.getAllByRole('button');
-    // Each child GoalCard is a button
-    const goalButtons = buttons.filter((b) => b.hasAttribute('aria-expanded'));
-    expect(goalButtons).toHaveLength(2);
-    goalButtons.forEach((btn) => {
-      expect(btn).toHaveAttribute('aria-expanded', 'false');
-    });
-  });
-
-  it('shows child title "Reading Proficiency"', () => {
-    render(<V2GoalDrillDown />);
-    expect(screen.getByText('Reading Proficiency')).toBeInTheDocument();
-  });
-
-  it('shows widget data on child card with widgets', () => {
-    render(<V2GoalDrillDown />);
-    // c-1 has a widget with indicator badge "Off Track" and type label
     expect(screen.getByText('Off Track')).toBeInTheDocument();
     expect(screen.getByText('CURRENT SCORE')).toBeInTheDocument();
   });
 
   it('shows "No metrics defined" for child without widgets', () => {
     render(<V2GoalDrillDown />);
-    // c-2 has no widgets
     expect(screen.getByText('No metrics defined')).toBeInTheDocument();
   });
 
   it('shows loading spinner when loading', () => {
     mockUseGoalsByPlan.mockReturnValue({ data: undefined, isLoading: true });
     const { container } = render(<V2GoalDrillDown />);
-
     const spinner = container.querySelector('.animate-spin');
     expect(spinner).toBeInTheDocument();
   });
@@ -234,57 +204,48 @@ describe('V2GoalDrillDown', () => {
   it('shows "Goal not found" when goal is not in hierarchy', () => {
     mockUseGoalsByPlan.mockReturnValue({ data: [], isLoading: false });
     render(<V2GoalDrillDown />);
-
     expect(screen.getByText('Goal not found')).toBeInTheDocument();
   });
 
-  it('shows empty children message when no children', () => {
+  it('shows empty children message when no children and no widgets', () => {
     mockUseGoalsByPlan.mockReturnValue({
-      data: [
-        {
-          id: 'goal-1',
-          goal_number: '1',
-          title: 'Academic Excellence',
-          description: 'Improve student outcomes',
-          status_detail: 'in_progress',
-          level: 0,
-          overall_progress: 72,
-          children: [],
-        },
-      ],
+      data: [{
+        id: 'goal-1', goal_number: '1', title: 'Academic Excellence',
+        description: 'Improve student outcomes', level: 0, overall_progress: 72, children: [],
+      }],
       isLoading: false,
     });
+    mockUseWidgetsByGoals.mockReturnValue({ data: [], isLoading: false });
     render(<V2GoalDrillDown />);
-
     expect(screen.getByText('No goals defined for this objective yet.')).toBeInTheDocument();
   });
 
-  it('expands a child card when clicked, showing ExpandedGoalCard with close button', async () => {
+  it('clicking a card shows full-width detail view with back button', async () => {
     const user = userEvent.setup();
     render(<V2GoalDrillDown />);
 
-    // Click the first GoalCard (Reading Proficiency)
-    const goalButtons = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-expanded'));
-    await user.click(goalButtons[0]);
+    const cards = screen.getAllByRole('button').filter((b) =>
+      b.getAttribute('aria-label')?.includes('Click to view details')
+    );
+    await user.click(cards[0]);
 
-    // ExpandedGoalCard should now show a close button
-    expect(screen.getByLabelText('Collapse goal details')).toBeInTheDocument();
+    expect(screen.getByText('Back to goals')).toBeInTheDocument();
+    expect(screen.queryByText('Goals (2)')).not.toBeInTheDocument();
   });
 
-  it('collapses expanded card when close button is clicked', async () => {
+  it('clicking back button returns to grid', async () => {
     const user = userEvent.setup();
     render(<V2GoalDrillDown />);
 
-    // Expand first child
-    const goalButtons = screen.getAllByRole('button').filter((b) => b.hasAttribute('aria-expanded'));
-    await user.click(goalButtons[0]);
+    const cards = screen.getAllByRole('button').filter((b) =>
+      b.getAttribute('aria-label')?.includes('Click to view details')
+    );
+    await user.click(cards[0]);
 
-    // Click close button
-    const closeBtn = screen.getByLabelText('Collapse goal details');
-    await user.click(closeBtn);
+    await user.click(screen.getByText('Back to goals'));
 
-    // Close button should no longer be present
-    expect(screen.queryByLabelText('Collapse goal details')).not.toBeInTheDocument();
+    expect(screen.getByText('Goals (2)')).toBeInTheDocument();
+    expect(screen.queryByText('Back to goals')).not.toBeInTheDocument();
   });
 
   it('shows ProgressRing in header when goal has overall_progress', () => {
@@ -306,64 +267,21 @@ describe('V2GoalDrillDown', () => {
 
   it('shows parent widgets in Metrics section when goal has no children', () => {
     mockUseGoalsByPlan.mockReturnValue({
-      data: [
-        {
-          id: 'goal-1',
-          goal_number: '1',
-          title: 'Academic Excellence',
-          description: 'Improve student outcomes',
-          status_detail: 'in_progress',
-          level: 0,
-          overall_progress: 72,
-          children: [],
-        },
-      ],
+      data: [{
+        id: 'goal-1', goal_number: '1', title: 'Academic Excellence',
+        description: 'Improve student outcomes', level: 0, overall_progress: 72, children: [],
+      }],
       isLoading: false,
     });
     mockUseWidgetsByGoals.mockReturnValue({
-      data: [
-        {
-          id: 'w-parent',
-          organizationId: 'org-1',
-          planId: 'plan-1',
-          goalId: 'goal-1',
-          type: 'big-number',
-          title: 'Graduation Rate',
-          config: { value: 95, unit: '%' },
-          position: 0,
-          isActive: true,
-          createdAt: '2025-01-01T00:00:00Z',
-          updatedAt: '2025-01-01T00:00:00Z',
-        },
-      ],
+      data: [{
+        id: 'w-parent', organizationId: 'org-1', planId: 'plan-1', goalId: 'goal-1',
+        type: 'big-number', title: 'Graduation Rate', config: { value: 95, unit: '%' },
+        position: 0, isActive: true, createdAt: '2025-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z',
+      }],
       isLoading: false,
     });
     render(<V2GoalDrillDown />);
-
     expect(screen.getByText('Metrics (1)')).toBeInTheDocument();
-    expect(screen.queryByText('No goals defined for this objective yet.')).not.toBeInTheDocument();
-  });
-
-  it('shows empty state when goal has no children and no widgets', () => {
-    mockUseGoalsByPlan.mockReturnValue({
-      data: [
-        {
-          id: 'goal-1',
-          goal_number: '1',
-          title: 'Academic Excellence',
-          description: 'Improve student outcomes',
-          status_detail: 'in_progress',
-          level: 0,
-          overall_progress: 72,
-          children: [],
-        },
-      ],
-      isLoading: false,
-    });
-    mockUseWidgetsByGoals.mockReturnValue({ data: [], isLoading: false });
-    render(<V2GoalDrillDown />);
-
-    expect(screen.getByText('No goals defined for this objective yet.')).toBeInTheDocument();
-    expect(screen.queryByText(/^Metrics/)).not.toBeInTheDocument();
   });
 });

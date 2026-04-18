@@ -38,9 +38,9 @@ describe('Breadcrumb', () => {
   it('renders separators between items', () => {
     const { container } = render(<Breadcrumb items={items} />);
 
-    // ChevronRight renders as SVG icons between items (2 separators for 3 items)
-    const svgs = container.querySelectorAll('svg');
-    expect(svgs).toHaveLength(2);
+    // Material Symbols renders as <span> with chevron_right text (2 separators for 3 items)
+    const separators = container.querySelectorAll('.material-symbols-outlined');
+    expect(separators).toHaveLength(2);
   });
 
   it('applies aria-current="page" to last item', () => {
@@ -55,5 +55,18 @@ describe('Breadcrumb', () => {
 
     const nav = screen.getByRole('navigation');
     expect(nav).toHaveAttribute('aria-label', 'Breadcrumb');
+    expect(nav).toHaveClass('overflow-x-auto');
+  });
+
+  it('marks older breadcrumb items to hide on mobile when more than two items exist', () => {
+    render(<Breadcrumb items={items} />);
+
+    const firstItem = screen.getByText('Strategic Plan 2025').closest('[data-breadcrumb-item]');
+    const middleItem = screen.getByText('Academic Excellence').closest('[data-breadcrumb-item]');
+    const lastItem = screen.getByText('Reading Proficiency').closest('[data-breadcrumb-item]');
+
+    expect(firstItem).toHaveAttribute('data-hide-on-mobile', 'true');
+    expect(middleItem).toHaveAttribute('data-hide-on-mobile', 'false');
+    expect(lastItem).toHaveAttribute('data-hide-on-mobile', 'false');
   });
 });

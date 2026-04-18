@@ -1,198 +1,216 @@
-import Link from 'next/link';
-import { Icon } from '@iconify/react';
-import { MarketingNav } from '../../components/marketing/MarketingNav';
-import { MarketingFooter } from '../../components/marketing/MarketingFooter';
+import Link from "next/link";
+import {
+  ArrowRight,
+  Buildings,
+  CheckCircle,
+  GlobeHemisphereWest,
+  TrendUp,
+} from "@phosphor-icons/react/dist/ssr";
+import { MarketingFooter } from "../../components/marketing/MarketingFooter";
+import { MarketingNav } from "../../components/marketing/MarketingNav";
+import {
+  ProductCanvas,
+  ProductVideoFrame,
+} from "@/components/public-site/ProductCanvas";
+import { PublicSectionHeading } from "@/components/public-site/PublicSectionHeading";
 
-/**
- * About page for stratadash.org
- * Explains what StrataDash is and who it serves
- */
+const operatingBeliefs = [
+  {
+    title: "Clarity over consulting language",
+    description:
+      "District leaders need to explain progress quickly. The product should reduce interpretation work, not increase it.",
+  },
+  {
+    title: "Readable hierarchy over visual clutter",
+    description:
+      "Plans, objectives, owners, and KPIs should align cleanly so the public surface tells one coherent story.",
+  },
+  {
+    title: "Update rhythm over presentation churn",
+    description:
+      "The weekly cadence of leadership work matters more than a quarterly deck rebuild. We optimize for the operational rhythm.",
+  },
+  {
+    title: "Institutional trust over marketing noise",
+    description:
+      "A district planning surface should feel current and credible, not overloaded with startup theatrics.",
+  },
+] as const;
+
+const audienceItems = [
+  "K-12 school districts that need a public-facing strategic hub",
+  "Leadership teams managing cabinet, campus, and board communication",
+  "Organizations that want strategic reporting without custom software overhead",
+] as const;
+
 export function AboutPage() {
-  const handleDemoClick = () => {
-    window.location.href = '/westside';
-  };
-
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <MarketingNav onDemoClick={handleDemoClick} />
+    <div className="min-h-screen bg-background text-foreground">
+      <MarketingNav />
 
-      {/* Hero Section */}
-      <section className="pt-32 pb-16 relative">
-        {/* Background Decoration */}
-        <div className="absolute inset-0 -z-10 pointer-events-none overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808008_1px,transparent_1px),linear-gradient(to_bottom,#80808008_1px,transparent_1px)] bg-size-[24px_24px]" />
-          <div className="absolute left-1/2 -translate-x-1/2 top-0 h-[40vh] w-[50vw] rounded-full bg-indigo-500/10 blur-[120px]" />
-        </div>
+      <main className="overflow-hidden">
+        <section className="mx-auto max-w-[1400px] px-6 pb-18 pt-14 md:px-10 md:pb-24 md:pt-18">
+          <div className="grid gap-16 lg:grid-cols-[minmax(0,0.88fr)_minmax(520px,1.12fr)] lg:items-center">
+            <div className="max-w-2xl">
+              <p className="public-kicker text-primary">About StrataDash</p>
+              <h1 className="mt-5 font-headline text-5xl font-semibold tracking-[-0.06em] text-on-surface md:text-7xl">
+                Modernizing how districts communicate strategic progress.
+              </h1>
+              <p className="mt-6 max-w-[64ch] text-lg leading-8 text-on-surface-variant md:text-xl">
+                We built StrataDash for leadership teams that are tired of
+                treating their most important public strategy like a file
+                attachment.
+              </p>
+              <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+                <a
+                  href="mailto:sales@stratadash.org?subject=StrataDash%20demo"
+                  className="public-button-primary inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-semibold text-white transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
+                >
+                  Book a demo
+                  <ArrowRight size={18} weight="bold" />
+                </a>
+                <Link
+                  href="/district/westside"
+                  className="public-button-secondary inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-semibold text-on-surface transition-colors hover:text-primary"
+                >
+                  View a live district example
+                  <ArrowRight size={18} weight="bold" />
+                </Link>
+              </div>
+            </div>
 
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-indigo-100 bg-indigo-50/80 text-indigo-700 text-xs font-semibold tracking-wide uppercase shadow-xs mb-6">
-            Our Story
+            <ProductCanvas mode="analytics" />
           </div>
+        </section>
 
-          <h1 className="text-4xl md:text-5xl font-bold text-indigo-900 mb-6 leading-tight tracking-tight">
-            About{' '}
-            <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-600 to-indigo-600">
-              StrataDash
-            </span>
-          </h1>
-          <p className="text-lg text-indigo-500 max-w-2xl mx-auto leading-relaxed">
-            Transforming how K-12 districts communicate strategic progress to their communities.
-          </p>
-        </div>
-      </section>
-
-      {/* Content */}
-      <main className="max-w-4xl mx-auto px-6 pb-20">
-        <div className="space-y-16">
-          {/* Section 1 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center">
-                <Icon icon="solar:document-text-linear" className="w-5 h-5 text-indigo-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-indigo-900">
-                Strategic Plans Shouldn't Live in Spreadsheets
-              </h2>
-            </div>
-            <div className="space-y-4 text-indigo-600 leading-relaxed">
-              <p>
-                Every school district has a strategic plan. Most of them sit in a shared drive somewhere, updated once a year for board presentations, disconnected from the daily work that's supposed to bring them to life.
-              </p>
-              <p className="font-semibold text-indigo-900">
-                StrataDash changes that.
-              </p>
-              <p>
-                We built StrataDash because we saw the same problem over and over: districts investing months in strategic planning, only to struggle communicating progress to the people who matter most—parents, community members, and board leadership. Complex goals written in administrative language. Progress buried in spreadsheets. Stakeholders left wondering what any of it means for their kids.
-              </p>
-            </div>
-          </section>
-
-          {/* Section 2 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                <Icon icon="solar:chart-2-linear" className="w-5 h-5 text-blue-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-indigo-900">
-                What StrataDash Does
-              </h2>
-            </div>
-            <div className="space-y-6 text-indigo-600 leading-relaxed">
-              <p>
-                StrataDash is a strategic plan dashboard built specifically for K-12 schools and educational nonprofits. It transforms your strategic plan from a static document into a living, community-facing transparency tool.
-              </p>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-indigo-50/50 rounded-xl p-5 border border-indigo-100">
-                  <h3 className="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
-                    <Icon icon="solar:users-group-rounded-linear" className="w-4 h-4" />
-                    Role-based Views
-                  </h3>
-                  <p className="text-sm">
-                    Show the right information to the right audience. Administrators see detailed analytics, parents see simple progress updates, board members get high-level overviews.
-                  </p>
-                </div>
-                <div className="bg-indigo-50/50 rounded-xl p-5 border border-indigo-100">
-                  <h3 className="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
-                    <Icon icon="solar:graph-up-linear" className="w-4 h-4" />
-                    Real-time Tracking
-                  </h3>
-                  <p className="text-sm">
-                    Replace manual spreadsheet updates. Your team updates progress as work happens, and stakeholders see it immediately.
-                  </p>
-                </div>
-                <div className="bg-indigo-50/50 rounded-xl p-5 border border-indigo-100">
-                  <h3 className="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
-                    <Icon icon="solar:chat-round-dots-linear" className="w-4 h-4" />
-                    Community Engagement
-                  </h3>
-                  <p className="text-sm">
-                    Tell the story behind the numbers. Success stories, plain-language explanations, and two-way communication.
-                  </p>
-                </div>
-                <div className="bg-indigo-50/50 rounded-xl p-5 border border-indigo-100">
-                  <h3 className="font-semibold text-indigo-900 mb-2 flex items-center gap-2">
-                    <Icon icon="solar:smartphone-linear" className="w-4 h-4" />
-                    Mobile-first Design
-                  </h3>
-                  <p className="text-sm">
-                    Every parent can engage, regardless of how they access the internet.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Section 3 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center">
-                <Icon icon="solar:graduation-cap-linear" className="w-5 h-5 text-emerald-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-indigo-900">
-                Who We Serve
-              </h2>
-            </div>
-            <div className="space-y-4 text-indigo-600 leading-relaxed">
-              <p>
-                StrataDash is purpose-built for education. We serve K-12 school districts, charter schools, educational nonprofits, and universities who want to communicate strategic progress transparently and build genuine community engagement around their goals.
-              </p>
-              <p>
-                We're not a corporate strategy tool repurposed for schools. Every feature exists because educators told us they needed it.
-              </p>
-            </div>
-          </section>
-
-          {/* Section 4 */}
-          <section className="bg-white rounded-2xl border border-indigo-100 p-8 md:p-10 shadow-xs">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center">
-                <Icon icon="solar:wallet-linear" className="w-5 h-5 text-amber-600" />
-              </div>
-              <h2 className="text-2xl font-bold text-indigo-900">
-                Pricing That Respects Public Budgets
-              </h2>
-            </div>
-            <div className="space-y-4 text-indigo-600 leading-relaxed">
-              <p>
-                We believe every school should be able to communicate their strategic plan effectively, regardless of budget. That's why StrataDash offers a free tier for small organizations piloting the platform, with paid tiers that scale based on your needs—topping out at $200/month for unlimited use.
-              </p>
-              <p>
-                No lengthy procurement cycles. No enterprise-only pricing. Just straightforward plans that let you start small and grow as needed.
-              </p>
-            </div>
-          </section>
-
-          {/* CTA Section */}
-          <section className="bg-linear-to-br from-indigo-900 to-indigo-800 rounded-2xl p-8 md:p-10 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-              Get Started
-            </h2>
-            <p className="text-indigo-200 mb-8 max-w-xl mx-auto">
-              Ready to transform how your community engages with your strategic plan? Contact us to learn more or start your free account today.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link
-                href="/login"
-                className="group flex items-center gap-2 bg-white hover:bg-indigo-50 text-indigo-900 h-12 px-6 rounded-full shadow-lg transition-all hover:scale-[1.02]"
+        <section className="border-y border-outline-variant/70 bg-white/74">
+          <div className="mx-auto grid max-w-[1400px] gap-6 px-6 py-8 md:px-10 lg:grid-cols-[1fr_1fr_1fr]">
+            {[
+              { label: "Built for district leadership teams", icon: Buildings },
+              {
+                label: "Public surfaces that stay current",
+                icon: GlobeHemisphereWest,
+              },
+              { label: "Board updates without deck churn", icon: TrendUp },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-4 rounded-[24px] px-2 py-2"
               >
-                <span className="font-medium">Get Started Free</span>
-                <Icon
-                  icon="solar:arrow-right-linear"
-                  className="w-5 h-5 group-hover:translate-x-0.5 transition-transform"
-                />
-              </Link>
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <item.icon size={20} weight="bold" />
+                </span>
+                <p className="text-sm font-semibold tracking-[-0.02em] text-on-surface">
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 md:py-30">
+          <div className="grid gap-16 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
+            <PublicSectionHeading
+              eyebrow="Why it exists"
+              title="District plans deserve better than a binder."
+              description="The catalyst was simple: districts invest too much effort in strategy for the result to disappear into a PDF, a board packet, or a hard-to-find attachment on the website."
+            />
+            <ProductVideoFrame
+              label="Product-led story"
+              title="The interface is the explanation"
+              description="Current product reel"
+            />
+          </div>
+        </section>
+
+        <section className="bg-surface-container-low py-24">
+          <div className="mx-auto grid max-w-[1400px] gap-16 px-6 md:px-10 lg:grid-cols-[0.74fr_1.26fr]">
+            <PublicSectionHeading
+              eyebrow="Operating beliefs"
+              title="The design principle is institutional clarity."
+              description="We build around the communication burden that district leaders already carry. Every surface should make that burden lighter."
+            />
+            <div className="space-y-5">
+              {operatingBeliefs.map((belief) => (
+                <article
+                  key={belief.title}
+                  className="rounded-[28px] border border-outline-variant/70 bg-white/86 px-6 py-6 backdrop-blur-sm"
+                >
+                  <h2 className="text-xl font-semibold tracking-[-0.03em] text-on-surface">
+                    {belief.title}
+                  </h2>
+                  <p className="mt-3 text-sm leading-7 text-on-surface-variant">
+                    {belief.description}
+                  </p>
+                </article>
+              ))}
             </div>
-            <p className="text-indigo-300 text-sm mt-8 italic">
-              StrataDash is built and operated in the United States.
-            </p>
-          </section>
-        </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1400px] px-6 py-24 md:px-10 md:py-30">
+          <div className="grid gap-14 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+            <div className="public-gradient public-shadow-strong rounded-[34px] px-8 py-10 text-white md:px-10 md:py-12">
+              <p className="public-kicker text-white/70">Who it serves</p>
+              <h2 className="mt-4 text-4xl font-semibold tracking-[-0.05em] md:text-5xl">
+                Built for the people managing public systems.
+              </h2>
+              <div className="mt-8 space-y-4">
+                {audienceItems.map((item) => (
+                  <div
+                    key={item}
+                    className="flex items-start gap-3 rounded-[24px] border border-white/14 bg-white/8 px-4 py-4"
+                  >
+                    <CheckCircle
+                      size={16}
+                      weight="fill"
+                      className="mt-1 text-white"
+                    />
+                    <span className="text-sm leading-7 text-white">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <ProductCanvas mode="editor" />
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1400px] px-6 pb-24 md:px-10">
+          <div className="public-gradient public-shadow-strong overflow-hidden rounded-[36px] px-8 py-10 text-white md:px-12 md:py-14">
+            <div className="grid gap-8 lg:grid-cols-[0.88fr_0.72fr] lg:items-end">
+              <div>
+                <p className="public-kicker text-white/70">Next step</p>
+                <h2 className="mt-4 max-w-3xl font-headline text-4xl font-semibold tracking-[-0.05em] md:text-6xl">
+                  Ready to bring your strategic plan to life?
+                </h2>
+              </div>
+              <div className="lg:justify-self-end">
+                <p className="max-w-xl text-base leading-8 text-white/78">
+                  Transparency, trust, and readable progress should be the
+                  default surface for a district strategy.
+                </p>
+                <div className="mt-8 flex flex-col gap-4 sm:flex-row">
+                  <a
+                    href="mailto:sales@stratadash.org?subject=StrataDash%20demo"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 text-base font-semibold text-primary transition-transform hover:-translate-y-0.5 active:scale-[0.98]"
+                  >
+                    Book a demo
+                    <ArrowRight size={18} weight="bold" />
+                  </a>
+                  <Link
+                    href="/district/westside"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border border-white/25 px-7 py-4 text-base font-semibold text-white transition-colors hover:bg-white/10"
+                  >
+                    View live example
+                    <ArrowRight size={18} weight="bold" />
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
       <MarketingFooter />
     </div>
   );

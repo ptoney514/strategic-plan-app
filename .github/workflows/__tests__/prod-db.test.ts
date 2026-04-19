@@ -9,8 +9,11 @@ describe('prod-db.yml workflow (Issue #166 — gate prod deploys on Neon migrati
     expect(existsSync(WORKFLOW_PATH)).toBe(true);
   });
 
-  describe('contents', () => {
-    const yaml = existsSync(WORKFLOW_PATH) ? readFileSync(WORKFLOW_PATH, 'utf-8') : '';
+  // Short-circuit the content checks when the file is missing — the existence
+  // test above already reports that cleanly, and 8 more assertions against
+  // an empty string just adds noise.
+  describe.skipIf(!existsSync(WORKFLOW_PATH))('contents', () => {
+    const yaml = readFileSync(WORKFLOW_PATH, 'utf-8');
 
     it('triggers on push to main', () => {
       expect(yaml).toMatch(/on:\s*[\s\S]*push:\s*[\s\S]*branches:\s*\[\s*main\s*\]/);

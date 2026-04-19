@@ -26,6 +26,9 @@ export const plans = pgTable(
     coverImageUrl: varchar("cover_image_url", { length: 500 }),
     isPublic: boolean("is_public").default(false),
     isActive: boolean("is_active").default(true),
+    publicTemplate: varchar("public_template", { length: 64 })
+      .notNull()
+      .default("sidebar-tree"),
     startDate: date("start_date"),
     endDate: date("end_date"),
     orderPosition: integer("order_position").default(0),

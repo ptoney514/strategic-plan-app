@@ -24,6 +24,7 @@ describe("plans schema", () => {
       "start_date",
       "end_date",
       "order_position",
+      "public_template",
       "created_at",
       "updated_at",
     ];
@@ -87,5 +88,14 @@ describe("plans schema", () => {
 
     const typeLabel = config.columns.find((c) => c.name === "type_label")!;
     expect(typeLabel.hasDefault).toBe(true);
+  });
+
+  it("has public_template column that is notNull with default", () => {
+    const publicTemplate = config.columns.find(
+      (c) => c.name === "public_template",
+    )!;
+    expect(publicTemplate).toBeDefined();
+    expect(publicTemplate.notNull).toBe(true);
+    expect(publicTemplate.hasDefault).toBe(true);
   });
 });

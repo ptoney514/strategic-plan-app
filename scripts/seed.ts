@@ -263,6 +263,7 @@ async function seed() {
         "Westside Community Schools Strategic Plan for 2025-2027",
       isPublic: true,
       isActive: true,
+      publicTemplate: "editorial-onepager",
     },
     {
       id: PLAN_EASTSIDE_DRAFT,

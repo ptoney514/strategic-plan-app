@@ -23,6 +23,7 @@ function planToSnake(p: typeof plans.$inferSelect) {
     start_date: p.startDate,
     end_date: p.endDate,
     order_position: p.orderPosition,
+    public_template: p.publicTemplate,
     created_at: p.createdAt,
     updated_at: p.updatedAt,
   };

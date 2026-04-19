@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+@import "tailwindcss";
 
 @source "../../src";
 
@@ -179,6 +179,45 @@
   --editorial-sidebar-text: #e8e6e1;
   --editorial-sidebar-text-muted: #8a8a8a;
   --editorial-sidebar-active: #b85c38;
+
+  /* v4 Public Dashboard Tokens — from design.md §2.
+     Intentionally raw CSS vars (not @theme utilities) — consumed by
+     component CSS in this file and by inline styles in v4 components. */
+
+  /* Base surfaces & text */
+  --bg: #faf7f2;
+  --bg-elev: #ffffff;
+  --ink: #0b0a1a;
+  --ink-2: #4a4763;
+  --ink-3: #6b6884;
+  --line: rgba(11, 10, 26, 0.08);
+
+  /* Brand */
+  --purple: #6b4fe6;
+  --purple-soft: rgba(107, 79, 230, 0.08);
+  --purple-mid: rgba(107, 79, 230, 0.35);
+  --purple-deep: #4f35bd;
+
+  /* Status */
+  --on-track: #1f8a4e;
+  --in-progress: #c58a1b;
+  --off-track: #c04a2a;
+  --not-started: #8e8b9f;
+
+  /* Per-objective accents */
+  --o1: #2e5bd9;
+  --o2: #b5891e;
+  --o3: #1f8a4e;
+  --o4: #b05533;
+
+  /* Editorial accents */
+  --green-emphasis: #5c7a5a;
+  --green-soft: rgba(92, 122, 90, 0.12);
+  --green-line: rgba(92, 122, 90, 0.22);
+
+  /* Pattern A accordion accents — defaults; overridable per objective */
+  --accent-mid: rgba(107, 79, 230, 0.35);
+  --accent-strong: rgba(107, 79, 230, 0.45);
 }
 
 .dark {
@@ -525,4 +564,264 @@ p {
   box-shadow:
     0 4px 6px -1px rgba(17, 0, 172, 0.04),
     0 20px 40px -10px rgba(26, 27, 31, 0.08);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   v4 Public Dashboard Components — design.md §5.3, §5.6 – §5.11
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* §5.3 — Status chip */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.chip-on-track {
+  background: rgba(31, 138, 78, 0.1);
+  color: var(--on-track);
+}
+.chip-in-progress {
+  background: rgba(197, 138, 27, 0.1);
+  color: var(--in-progress);
+}
+.chip-off-track {
+  background: rgba(192, 74, 42, 0.1);
+  color: var(--off-track);
+}
+.chip-not-started {
+  background: rgba(142, 139, 159, 0.1);
+  color: var(--not-started);
+}
+.chip-completed {
+  background: rgba(31, 138, 78, 0.18);
+  color: var(--on-track);
+}
+.chip .status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  display: inline-block;
+  background: currentColor;
+}
+
+/* §5.7 — Signature metric card */
+.sig-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 28px 32px;
+}
+.sig-number {
+  font-family: "Geist", sans-serif;
+  font-size: 80px;
+  font-weight: 600;
+  line-height: 0.88;
+  letter-spacing: -0.03em;
+}
+
+/* §5.8 — Pattern A inline accordion */
+.subgoal-row {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+  user-select: none;
+}
+.subgoal-row:hover {
+  border-color: var(--accent-mid);
+}
+.subgoal-row.open {
+  border-color: var(--accent-strong);
+  box-shadow: 0 4px 16px -10px rgba(11, 10, 26, 0.14);
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: transparent;
+}
+.num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-weight: 600;
+  font-size: 13px;
+}
+.num-badge-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: var(--purple-soft);
+  color: var(--purple);
+  font-weight: 600;
+  font-size: 12px;
+}
+.num-badge-xs {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 22px;
+  border-radius: 6px;
+  background: rgba(92, 122, 90, 0.1);
+  color: var(--green-emphasis);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+}
+.subgoal-expanded {
+  background: var(--bg-elev);
+  border: 1px solid var(--accent-strong);
+  border-top: none;
+  border-radius: 0 0 14px 14px;
+  padding: 20px 22px 22px;
+  margin-top: -1px;
+  box-shadow: 0 4px 16px -10px rgba(11, 10, 26, 0.14);
+  overflow: hidden;
+  transform-origin: top;
+  animation: expandIn 280ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.subgoal-expanded > * {
+  animation: contentFade 420ms ease 120ms both;
+}
+@keyframes expandIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.985);
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    max-height: 1400px;
+    padding-top: 20px;
+    padding-bottom: 22px;
+  }
+}
+@keyframes contentFade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.subgoal-row svg.caret {
+  transition: transform 250ms ease;
+}
+.subgoal-row.open svg.caret {
+  transform: rotate(180deg);
+}
+
+/* §5.9 — Nested sub-sub-goal */
+.subgoal-nested {
+  background: rgba(92, 122, 90, 0.04);
+  border: 1px dashed rgba(92, 122, 90, 0.35);
+  border-radius: 10px;
+  padding: 10px 14px 10px 16px;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+  cursor: pointer;
+}
+.subgoal-nested:hover {
+  background: rgba(92, 122, 90, 0.08);
+  border-color: rgba(92, 122, 90, 0.55);
+}
+.nested-rail {
+  width: 18px;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+.nested-rail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 9px;
+  width: 1px;
+  background: rgba(92, 122, 90, 0.35);
+}
+.nested-rail::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 9px;
+  right: -6px;
+  height: 1px;
+  background: rgba(92, 122, 90, 0.35);
+}
+
+/* §5.10 — Stat tile */
+.stat-tile {
+  background: #f6f3ed;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.stat-tile .label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ink-3);
+  font-weight: 600;
+}
+.stat-tile .value {
+  font-family: "Geist", sans-serif;
+  font-size: 34px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1;
+  margin-top: 6px;
+}
+
+/* §5.11 — Trend chip */
+.trend-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.trend-up {
+  color: var(--on-track);
+  background: rgba(31, 138, 78, 0.12);
+}
+.trend-down {
+  color: var(--off-track);
+  background: rgba(192, 74, 42, 0.12);
+}
+.trend-flat {
+  color: var(--ink-3);
+  background: rgba(11, 10, 26, 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subgoal-expanded,
+  .subgoal-expanded > *,
+  .subgoal-row svg.caret {
+    animation: none;
+    transition: none;
+  }
 }

@@ -33,5 +33,12 @@
     /* Next.js plugin */
     "plugins": [{ "name": "next" }]
   },
-  "include": ["src", "next.config.ts"]
+  "include": ["src", "next.config.ts"],
+  "exclude": [
+    "src/App.tsx",
+    "src/main.tsx",
+    "src/routers/AdminRouter.tsx",
+    "src/routers/DistrictRouter.tsx",
+    "src/routers/RootRouter.tsx"
+  ]
 }

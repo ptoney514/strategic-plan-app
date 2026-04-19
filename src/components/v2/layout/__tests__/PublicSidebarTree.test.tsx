@@ -3,13 +3,26 @@ import { render, screen } from '@/test/setup';
 import { SubdomainOverrideProvider } from '@/contexts/SubdomainContext';
 import { PublicSidebarProvider } from '../PublicSidebarContext';
 import { PublicSidebarTree } from '../PublicSidebarTree';
+import type { HierarchicalGoal } from '@/lib/types';
 
 vi.mock('next/navigation', () => ({
   usePathname: () => '/',
 }));
 
-const objectives = [
+const BASE: Pick<
+  HierarchicalGoal,
+  'district_id' | 'parent_id' | 'order_position' | 'created_at' | 'updated_at'
+> = {
+  district_id: 'd-1',
+  parent_id: null,
+  order_position: 0,
+  created_at: '2026-01-01T00:00:00Z',
+  updated_at: '2026-01-01T00:00:00Z',
+};
+
+const objectives: HierarchicalGoal[] = [
   {
+    ...BASE,
     id: 'obj-1',
     goal_number: '1',
     title: 'Student Achievement & Well-being',
@@ -18,7 +31,9 @@ const objectives = [
     overall_progress: 72,
     children: [
       {
+        ...BASE,
         id: 'g-1a',
+        parent_id: 'obj-1',
         goal_number: '1.1',
         title: 'Sense of belonging',
         level: 1,

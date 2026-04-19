@@ -1,7 +1,6 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/setup';
-import userEvent from '@testing-library/user-event';
 import { GoalDetailCard } from '../GoalDetailCard';
 import type { Goal } from '../../../../lib/types';
 import type { Widget } from '../../../../lib/types/v2';

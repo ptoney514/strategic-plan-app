@@ -75,7 +75,7 @@ export function GoalDetailCard({
   widgets = [],
   subGoalWidgets = {},
   primaryColor = '#1e293b',
-  onBack,
+  onBack: _onBack,
   buildLink = (p) => p,
 }: GoalDetailCardProps) {
   const children = goal.children ?? [];

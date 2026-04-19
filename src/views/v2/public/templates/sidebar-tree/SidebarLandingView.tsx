@@ -4,6 +4,7 @@ import { useSubdomain, useDistrictLink } from '@/contexts/SubdomainContext';
 import { useDistrict } from '@/hooks/useDistricts';
 import { usePlansBySlug } from '@/hooks/v2/usePlans';
 import { useGoalsByPlan } from '@/hooks/v2/useGoals';
+import { PublicSidebarLayout } from '@/components/v2/layout/PublicSidebarLayout';
 import { MaterialIcon } from '@/components/v2/public/MaterialIcon';
 import { KpiStatCard } from '@/components/v2/public/KpiStatCard';
 import { PlanHealthBar } from '@/components/v2/public/PlanHealthBar';
@@ -36,7 +37,10 @@ function statusBadgeForObjective(children: HierarchicalGoal[]): { label: string;
   return { label: 'On Track', classes: 'bg-emerald-50 text-emerald-700' };
 }
 
-export function SidebarLandingView() {
+// Exported so tests can render the inner content without pulling in the
+// full PublicSidebarLayout chrome. Route code should use the default export
+// (SidebarLandingView) which wraps this in the sidebar layout.
+export function SidebarLandingContent() {
   const router = useRouter();
   const { slug } = useSubdomain();
   const { data: district } = useDistrict(slug || '');
@@ -167,6 +171,14 @@ export function SidebarLandingView() {
         </div>
       </section>
     </div>
+  );
+}
+
+export function SidebarLandingView() {
+  return (
+    <PublicSidebarLayout>
+      <SidebarLandingContent />
+    </PublicSidebarLayout>
   );
 }
 

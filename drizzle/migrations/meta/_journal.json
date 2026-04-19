@@ -71,6 +71,13 @@
       "when": 1776672000000,
       "tag": "0009_v4_dashboard_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1777420800000,
+      "tag": "0010_plans_public_template",
+      "breakpoints": true
     }
   ]
 }

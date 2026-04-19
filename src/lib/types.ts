@@ -58,9 +58,15 @@ export interface Plan {
   end_date?: string;
   order_position: number;
   cover_image_url?: string;
+  public_template: PublicTemplateId;
   created_at: string;
   updated_at: string;
 }
+
+// Public surface template a plan renders at /district/[slug].
+// Keep in sync with drizzle/migrations/0010_plans_public_template.sql CHECK constraint
+// and src/lib/public-templates/registry.ts (added in Phase 4 Stage 2).
+export type PublicTemplateId = "sidebar-tree" | "editorial-onepager";
 
 export interface PlanWithSummary extends Plan {
   objectiveCount?: number;

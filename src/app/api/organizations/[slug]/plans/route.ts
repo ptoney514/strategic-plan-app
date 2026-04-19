@@ -20,6 +20,7 @@ function planToSnakeCase(plan: typeof plans.$inferSelect) {
     start_date: plan.startDate,
     end_date: plan.endDate,
     order_position: plan.orderPosition,
+    public_template: plan.publicTemplate,
     created_at: plan.createdAt?.toISOString() ?? null,
     updated_at: plan.updatedAt?.toISOString() ?? null,
   };

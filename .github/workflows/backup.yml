@@ -9,6 +9,10 @@ on:
 jobs:
   backup:
     runs-on: ubuntu-latest
+    # Intentionally NOT scoped to the Production environment — that environment
+    # now requires manual reviewer approval for prod-db.yml. Backups run on a
+    # weekly cron and shouldn't need a human in the loop. Uses BACKUP_DATABASE_URL
+    # (repo-level secret) which points at the same prod Neon connection string.
     steps:
       - name: Install PostgreSQL client
         run: |
@@ -17,7 +21,7 @@ jobs:
 
       - name: Run pg_dump
         env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
         run: |
           pg_dump "$DATABASE_URL" \
             --format=custom \

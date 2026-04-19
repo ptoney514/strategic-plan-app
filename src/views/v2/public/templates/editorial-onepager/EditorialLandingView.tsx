@@ -8,6 +8,9 @@ import { EditorialNav } from './EditorialNav'
 import { EditorialHero } from './EditorialHero'
 import { FourCommitmentsOverview } from './FourCommitmentsOverview'
 import { ObjectiveSection } from './ObjectiveSection'
+import { PullQuoteBand } from './PullQuoteBand'
+import { QuarterlyCTABand } from './QuarterlyCTABand'
+import { EditorialFooter } from './EditorialFooter'
 import { getEditorialContent } from './fixtures/editorial-fixtures'
 import type { HierarchicalGoal } from '@/lib/types'
 
@@ -64,6 +67,7 @@ export function EditorialLandingView() {
         objectives={objectives}
         heading={content.fourCommitments}
       />
+      <PullQuoteBand content={content.pullQuote} />
       {objectives.map((objective, idx) => (
         <ObjectiveSection
           key={objective.id}
@@ -72,7 +76,8 @@ export function EditorialLandingView() {
           widgets={widgets ?? []}
         />
       ))}
-      {/* Stage 7 — PullQuoteBand + QuarterlyCTABand + EditorialFooter */}
+      <QuarterlyCTABand content={content.cta} />
+      <EditorialFooter content={content.footer} />
     </div>
   )
 }

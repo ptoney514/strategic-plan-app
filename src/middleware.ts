@@ -32,6 +32,28 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // --- Maintenance gate ---
+  // When MAINTENANCE_MODE=true, rewrite every page request to /maintenance
+  // unless the request carries a valid bypass cookie or targets the bypass route.
+  if (process.env.MAINTENANCE_MODE === 'true') {
+    const bypassKey = process.env.MAINTENANCE_BYPASS_KEY
+    const bypassCookie = request.cookies.get('maintenance_bypass')?.value
+    const hasBypass = Boolean(bypassKey) && bypassCookie === bypassKey
+
+    const isMaintenanceRoute =
+      pathname === '/maintenance' || pathname === '/maintenance-bypass'
+
+    if (!hasBypass && !isMaintenanceRoute) {
+      url.pathname = '/maintenance'
+      return NextResponse.rewrite(url, { status: 503 })
+    }
+
+    if (hasBypass && pathname === '/maintenance') {
+      url.pathname = '/'
+      return NextResponse.redirect(url)
+    }
+  }
+
   // --- Determine subdomain type ---
   let subdomainType: 'root' | 'admin' | 'district' = 'root'
   let districtSlug: string | null = null

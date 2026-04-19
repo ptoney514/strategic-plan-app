@@ -107,4 +107,26 @@ describe('getCookieDomain', () => {
       expect(getCookieDomain()).toBeUndefined();
     });
   });
+
+  describe('explicit hostname (server-side callers)', () => {
+    it('resolves production hosts', () => {
+      expect(getCookieDomain('westside.stratadash.org')).toBe('.stratadash.org');
+      expect(getCookieDomain('www.stratadash.org')).toBe('.stratadash.org');
+    });
+
+    it('resolves lvh.me hosts', () => {
+      expect(getCookieDomain('admin.lvh.me')).toBe('.lvh.me');
+    });
+
+    it('strips a port from the host header before matching', () => {
+      expect(getCookieDomain('westside.stratadash.org:443')).toBe('.stratadash.org');
+      expect(getCookieDomain('lvh.me:5174')).toBe('.lvh.me');
+    });
+
+    it('returns undefined for localhost and vercel preview hosts', () => {
+      expect(getCookieDomain('localhost')).toBeUndefined();
+      expect(getCookieDomain('localhost:5174')).toBeUndefined();
+      expect(getCookieDomain('my-app.vercel.app')).toBeUndefined();
+    });
+  });
 });

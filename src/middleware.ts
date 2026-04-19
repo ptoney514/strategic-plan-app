@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { MAINTENANCE_COOKIE_NAME } from '@/lib/maintenance'
 
 const ROOT_DOMAINS = [
   'stratadash.org',
@@ -32,12 +33,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // --- Maintenance gate ---
-  // When MAINTENANCE_MODE=true, rewrite every page request to /maintenance
-  // unless the request carries a valid bypass cookie or targets the bypass route.
+  // Maintenance gate runs before subdomain routing so one flag covers every host.
+  // rewrite (not redirect) preserves the URL so 503 Service Unavailable accurately
+  // describes the response to bots, monitors, and CDN caches.
   if (process.env.MAINTENANCE_MODE === 'true') {
     const bypassKey = process.env.MAINTENANCE_BYPASS_KEY
-    const bypassCookie = request.cookies.get('maintenance_bypass')?.value
+    const bypassCookie = request.cookies.get(MAINTENANCE_COOKIE_NAME)?.value
     const hasBypass = Boolean(bypassKey) && bypassCookie === bypassKey
 
     const isMaintenanceRoute =

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@/test/setup';
 import { SubdomainOverrideProvider } from '@/contexts/SubdomainContext';
-import { PlanLandingView } from '../PlanLandingView';
+import { SidebarLandingView } from '../SidebarLandingView';
 
 const mockPush = vi.fn();
 vi.mock('next/navigation', () => ({
@@ -54,7 +54,7 @@ const mockObjectives = [
   },
 ];
 
-describe('PlanLandingView — link construction', () => {
+describe('SidebarLandingView — link construction', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUsePlansBySlug.mockReturnValue({
@@ -76,7 +76,7 @@ describe('PlanLandingView — link construction', () => {
   it('does not render any anchor href prefixed with /district/', () => {
     render(
       <SubdomainOverrideProvider slug="westside">
-        <PlanLandingView />
+        <SidebarLandingView />
       </SubdomainOverrideProvider>,
     );
 
@@ -91,7 +91,7 @@ describe('PlanLandingView — link construction', () => {
   it('card click routes via router.push with a bare path', () => {
     render(
       <SubdomainOverrideProvider slug="westside">
-        <PlanLandingView />
+        <SidebarLandingView />
       </SubdomainOverrideProvider>,
     );
 

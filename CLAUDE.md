@@ -241,6 +241,12 @@ Test users are created via the seed script (`scripts/seed.ts`) using Better Auth
 - [ ] All tests passing
 - [ ] No destructive operations without backup plan
 
+### Journal Drift (known issue, 2026-04)
+
+Prod Neon `main`'s Drizzle journal records all 10 migrations as applied, but `0009_v4_dashboard_schema.sql` was applied out-of-band via `psql` (Issue #166 incident) without updating the journal-writer's state. **Future `drizzle-kit migrate` runs against prod will skip `0009` because the journal says it's done.** This is safe today because every migration uses `IF NOT EXISTS` / `DROP CONSTRAINT IF EXISTS` — replay is a no-op.
+
+**When this becomes unsafe:** the first migration that uses a non-idempotent statement (e.g. `INSERT` of seed data, `UPDATE` of existing rows). Before merging such a migration, reconcile via `drizzle-kit introspect` against prod and produce a baseline migration.
+
 ## CI Pipeline
 
 Pull requests are validated via GitHub Actions.
@@ -258,6 +264,16 @@ lint-typecheck
 1. **Linting & Type checking** - ESLint + TypeScript compiler
 2. **Unit tests** - Vitest test suite
 3. **Build** - Production build completes successfully
+
+### CI Invariant
+
+**If `main` CI is green, prod Neon is at HEAD's migration state.**
+
+The `prod-db.yml` workflow runs on every push to `main` that touches `drizzle/migrations/`, `drizzle/custom/`, `_api/lib/schema/`, or the workflow itself. It applies pending migrations to prod Neon via `drizzle-kit migrate` before signaling success. If migrations fail, the workflow opens a `prod-incident` labeled issue and the commit shows a red X — the operator must reconcile prod Neon before users hit the broken Vercel deploy.
+
+**This invariant only holds for paths the workflow watches.** Out-of-band schema changes (manual `psql` against prod, schema edits not accompanied by a generated migration) bypass the gate. Always run `npx drizzle-kit generate` after editing files in `_api/lib/schema/`.
+
+This invariant exists because of [Issue #166](https://github.com/ptoney514/strategic-plan-app/issues/166): PR #162 shipped code referencing columns that didn't exist in prod, taking every public district page dark for ~a week.
 
 ## Preview/Staging Workflow
 

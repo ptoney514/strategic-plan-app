@@ -38,6 +38,11 @@ describe('prod-db.yml workflow (Issue #166 — gate prod deploys on Neon migrati
       expect(yaml).toMatch(/environment:\s*Production/);
     });
 
+    it('grants issues:write so the failure handler can open a prod-incident issue', () => {
+      expect(yaml).toMatch(/permissions:\s*[\s\S]*issues:\s*write/);
+      expect(yaml).toMatch(/permissions:\s*[\s\S]*contents:\s*read/);
+    });
+
     it('runs drizzle-kit migrate against secrets.DATABASE_URL', () => {
       expect(yaml).toContain('npx drizzle-kit migrate');
       expect(yaml).toContain('${{ secrets.DATABASE_URL }}');

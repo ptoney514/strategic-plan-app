@@ -29,6 +29,11 @@ jobs:
     name: Apply Migrations to Production Neon
     runs-on: ubuntu-latest
     environment: Production
+    # Need issues:write so the failure handler can open a prod-incident issue.
+    # Default GITHUB_TOKEN is read-only on push events.
+    permissions:
+      contents: read
+      issues: write
     steps:
       - uses: actions/checkout@v4
 

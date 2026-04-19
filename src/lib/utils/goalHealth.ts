@@ -19,8 +19,10 @@ export interface HealthSegment {
 function normalizeStatus(status?: string): 'on_target' | 'at_risk' | 'critical' | 'no_data' {
   switch (status?.toLowerCase().replace(/\s+/g, '_')) {
     case 'on_target':
+    case 'on_track':
     case 'exceeding':
     case 'completed':
+    case 'complete':
       return 'on_target';
     case 'at_risk':
     case 'in_progress':

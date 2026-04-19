@@ -211,11 +211,11 @@ describe('V2GoalDetail', () => {
     render(<V2GoalDetail />);
 
     const statusSelect = screen.getByDisplayValue('In Progress');
-    await user.selectOptions(statusSelect, 'completed');
+    await user.selectOptions(statusSelect, 'complete');
 
     expect(mockUpdateGoalMutate).toHaveBeenCalledWith({
       id: 'goal-1',
-      updates: { status: 'completed' },
+      updates: { status: 'complete' },
     });
   });
 

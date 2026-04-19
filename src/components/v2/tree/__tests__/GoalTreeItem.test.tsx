@@ -94,8 +94,9 @@ describe('GoalTreeItem', () => {
     const statusSelect = screen.getByDisplayValue('In Progress');
     expect(statusSelect).toBeInTheDocument();
     expect(screen.getByText('Not Started')).toBeInTheDocument();
-    expect(screen.getByText('Completed')).toBeInTheDocument();
-    expect(screen.getByText('On Hold')).toBeInTheDocument();
+    expect(screen.getByText('On Track')).toBeInTheDocument();
+    expect(screen.getByText('Off Track')).toBeInTheDocument();
+    expect(screen.getByText('Complete')).toBeInTheDocument();
   });
 
   it('enters edit mode when title is clicked', async () => {

@@ -14,7 +14,7 @@ const ACCENT_COLORS = ['#702ae1', '#00675d', '#005950', '#D97706'];
 function statusDotsForGoals(children: HierarchicalGoal[]): { color: string }[] {
   return children.map((c) => {
     const s = c.status?.toLowerCase().replace(/\s+/g, '_');
-    if (s === 'on_target' || s === 'exceeding' || s === 'completed') return { color: 'bg-emerald-500' };
+    if (s === 'on_target' || s === 'on_track' || s === 'exceeding' || s === 'completed' || s === 'complete') return { color: 'bg-emerald-500' };
     if (s === 'at_risk' || s === 'in_progress') return { color: 'bg-amber-500' };
     if (s === 'critical' || s === 'off_track') return { color: 'bg-red-500' };
     return { color: 'bg-slate-200' };

@@ -31,8 +31,11 @@ function progressBarColor(status?: string): string {
   switch (status?.toLowerCase().replace(/\s+/g, '_')) {
     case 'on_target':
     case 'on target':
+    case 'on_track':
+    case 'on track':
     case 'exceeding':
     case 'completed':
+    case 'complete':
       return 'bg-emerald-500';
     case 'at_risk':
     case 'at risk':

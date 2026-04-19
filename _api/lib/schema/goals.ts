@@ -6,6 +6,7 @@ import {
   text,
   integer,
   decimal,
+  jsonb,
   index,
   foreignKey,
 } from "drizzle-orm/pg-core";
@@ -39,6 +40,18 @@ export const goals = pgTable(
     // Metadata fields
     ownerName: varchar("owner_name", { length: 255 }),
     priority: varchar("priority", { length: 20 }),
+
+    // v4 public dashboard fields (design.md §6.2, §5.13)
+    // narrative: expanded-row callout paragraph (any level)
+    // pullQuoteText/Attribution: per-objective pull quote (level 0)
+    // highlightStats: 3-up stat callouts under the left narrative column (level 0)
+    //   shape: [{ label: string, value: string | number, unit?: string }, ...]
+    // signatureWidgetId: FK to the widget to render as the §5.7 signature metric card (level 0)
+    narrative: text("narrative"),
+    pullQuoteText: text("pull_quote_text"),
+    pullQuoteAttribution: varchar("pull_quote_attribution", { length: 255 }),
+    highlightStats: jsonb("highlight_stats"),
+    signatureWidgetId: uuid("signature_widget_id"),
 
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at")

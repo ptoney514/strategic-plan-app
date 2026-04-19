@@ -23,9 +23,11 @@ export interface SubGoalAccordionProps {
 function statusLabel(status?: string): { label: string; color: string } {
   switch (status?.toLowerCase().replace(/\s+/g, '_')) {
     case 'completed':
+    case 'complete':
     case 'on_target':
+    case 'on_track':
     case 'exceeding':
-      return { label: 'Completed', color: 'text-md3-secondary' };
+      return { label: 'Complete', color: 'text-md3-secondary' };
     case 'in_progress':
     case 'at_risk':
       return { label: 'In Progress', color: 'text-md3-tertiary' };

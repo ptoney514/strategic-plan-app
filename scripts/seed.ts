@@ -376,7 +376,7 @@ async function seed() {
       description: "Foster resilience and growth mindset in all students",
       level: 1,
       orderPosition: 4,
-      status: "completed",
+      status: "complete",
       overallProgress: "100.00",
     },
     {
@@ -390,7 +390,7 @@ async function seed() {
         "Increase student engagement and reduce chronic absenteeism",
       level: 1,
       orderPosition: 5,
-      status: "on_hold",
+      status: "in_progress",
       overallProgress: "35.00",
     },
     {
@@ -422,7 +422,7 @@ async function seed() {
         "Establish strong reading foundations in grades K-2 with 90% meeting benchmarks",
       level: 2,
       orderPosition: 1,
-      status: "completed",
+      status: "complete",
       overallProgress: "95.00",
     },
     {
@@ -529,7 +529,7 @@ async function seed() {
         "Effectively integrate technology to enhance learning outcomes",
       level: 1,
       orderPosition: 2,
-      status: "completed",
+      status: "complete",
       overallProgress: "100.00",
     },
     {
@@ -653,7 +653,7 @@ async function seed() {
         "Upgrade and maintain district facilities to support modern learning",
       level: 1,
       orderPosition: 2,
-      status: "on_hold",
+      status: "in_progress",
       overallProgress: "20.00",
     },
   ]);
@@ -783,7 +783,7 @@ async function seed() {
         "Implement cross-curricular literacy strategies in all subjects",
       level: 1,
       orderPosition: 2,
-      status: "completed",
+      status: "complete",
       overallProgress: "92.00",
     },
   ]);
@@ -879,7 +879,7 @@ async function seed() {
       "Ensure equitable access to high-quality education for every student regardless of background",
     level: 0,
     orderPosition: 4,
-    status: "on_hold",
+    status: "in_progress",
     overallProgress: "30.00",
     overallProgressDisplayMode: "hidden",
   });
@@ -897,7 +897,7 @@ async function seed() {
         "Provide 1:1 devices and reliable internet access for all students",
       level: 1,
       orderPosition: 1,
-      status: "on_hold",
+      status: "in_progress",
       overallProgress: "25.00",
     },
     {
@@ -1059,7 +1059,7 @@ async function seed() {
         "Implement competitive challenge programs that build career-ready skills",
       level: 1,
       orderPosition: 2,
-      status: "completed",
+      status: "complete",
       overallProgress: "82.00",
     },
   ]);

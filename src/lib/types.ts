@@ -76,7 +76,7 @@ export interface Goal {
   goal_number: string;
   title: string;
   description?: string;
-  level: 0 | 1 | 2;
+  level: 0 | 1 | 2 | 3;
   order_position: number;
   created_at: string;
   updated_at: string;
@@ -143,7 +143,7 @@ export function buildGoalHierarchy(goals: Goal[]): HierarchicalGoal[] {
 export function getNextGoalNumber(
   goals: Goal[],
   parentId: string | null,
-  level: 0 | 1 | 2
+  level: 0 | 1 | 2 | 3
 ): string {
   const siblingGoals = goals.filter(
     g => g.parent_id === parentId && g.level === level

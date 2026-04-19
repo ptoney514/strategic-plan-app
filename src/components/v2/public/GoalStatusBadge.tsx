@@ -4,6 +4,11 @@ export interface GoalStatusBadgeProps {
 }
 
 const STATUS_MAP: Record<string, { label: string; bgColor: string; textColor: string }> = {
+  // design.md §5.3 values
+  on_track: { label: 'On Track', bgColor: '#dcfce7', textColor: '#166534' },
+  off_track: { label: 'Off Track', bgColor: '#fee2e2', textColor: '#991b1b' },
+  complete: { label: 'Complete', bgColor: '#dcfce7', textColor: '#166534' },
+  // legacy values still emitted by some pre-v4 code paths
   completed: { label: 'Completed', bgColor: '#dcfce7', textColor: '#166534' },
   'on-target': { label: 'On Target', bgColor: '#dcfce7', textColor: '#166534' },
   in_progress: { label: 'In Progress', bgColor: '#fef3c7', textColor: '#92400e' },

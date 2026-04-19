@@ -26,8 +26,9 @@ function findGoalInHierarchy(goals: HierarchicalGoal[], id: string): Hierarchica
 const STATUS_OPTIONS = [
   { value: 'not_started', label: 'Not Started' },
   { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On Hold' },
+  { value: 'on_track', label: 'On Track' },
+  { value: 'off_track', label: 'Off Track' },
+  { value: 'complete', label: 'Complete' },
 ] as const;
 
 const PRIORITY_OPTIONS = [

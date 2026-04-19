@@ -64,6 +64,13 @@
       "when": 1775425701000,
       "tag": "0008_verification_updated_at",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1776672000000,
+      "tag": "0009_v4_dashboard_schema",
+      "breakpoints": true
     }
   ]
 }

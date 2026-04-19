@@ -1,11 +1,28 @@
-// Phase 4 Stage 2 placeholder. Replaced in Stage 5 with the real editorial
-// one-pager scaffold (nav + hero + four commitments + objective sections +
-// pull quote + CTA + footer). Exists now so the template registry's lazy
-// import resolves before the full implementation lands.
-export default function EditorialLandingView() {
+'use client'
+import { useSubdomain } from '@/contexts/SubdomainContext'
+import { EditorialNav } from './EditorialNav'
+import { EditorialHero } from './EditorialHero'
+import { getEditorialContent } from './fixtures/editorial-fixtures'
+
+export function EditorialLandingView() {
+  const { slug } = useSubdomain()
+  const content = getEditorialContent(slug)
+
   return (
-    <div style={{ padding: "2rem" }}>
-      <p>Editorial one-pager template — coming in Phase 4 Stage 5.</p>
+    <div
+      style={{
+        background: 'var(--bg)',
+        color: 'var(--ink)',
+        fontFamily: 'Geist, -apple-system, system-ui, sans-serif',
+        scrollBehavior: 'smooth',
+      }}
+    >
+      <EditorialNav content={content.nav} />
+      <EditorialHero content={content.hero} />
+      {/* Stage 6 — FourCommitmentsOverview + per-objective ObjectiveSection x4 */}
+      {/* Stage 7 — PullQuoteBand + QuarterlyCTABand + EditorialFooter */}
     </div>
-  );
+  )
 }
+
+export default EditorialLandingView

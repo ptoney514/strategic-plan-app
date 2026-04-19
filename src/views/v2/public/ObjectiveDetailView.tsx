@@ -12,7 +12,7 @@ import type { Widget } from '@/lib/types/v2';
 
 function statusDotChar(status?: string): string {
   const s = status?.toLowerCase().replace(/\s+/g, '_');
-  if (s === 'on_target' || s === 'exceeding' || s === 'completed') return 'text-emerald-500';
+  if (s === 'on_target' || s === 'on_track' || s === 'exceeding' || s === 'completed' || s === 'complete') return 'text-emerald-500';
   if (s === 'at_risk' || s === 'in_progress') return 'text-amber-500';
   if (s === 'critical' || s === 'off_track') return 'text-red-500';
   return 'text-slate-300';

@@ -7,35 +7,21 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname),
     resolveAlias: {
       '@api': path.resolve(__dirname, '_api'),
-      // Map .js imports within api/lib/ to their .ts counterparts
-      // (Turbopack doesn't support extensionAlias, so we map explicitly)
-      [path.resolve(__dirname, 'api/lib/auth.js')]: path.resolve(__dirname, 'api/lib/auth.ts'),
-      [path.resolve(__dirname, 'api/lib/db.js')]: path.resolve(__dirname, 'api/lib/db.ts'),
-      [path.resolve(__dirname, 'api/lib/response.js')]: path.resolve(__dirname, 'api/lib/response.ts'),
-      [path.resolve(__dirname, 'api/lib/rateLimit.js')]: path.resolve(__dirname, 'api/lib/rateLimit.ts'),
-      [path.resolve(__dirname, 'api/lib/sentry.js')]: path.resolve(__dirname, 'api/lib/sentry.ts'),
-      [path.resolve(__dirname, 'api/lib/url.js')]: path.resolve(__dirname, 'api/lib/url.ts'),
-      [path.resolve(__dirname, 'api/lib/email.js')]: path.resolve(__dirname, 'api/lib/email.ts'),
-      [path.resolve(__dirname, 'api/lib/email-templates.js')]: path.resolve(__dirname, 'api/lib/email-templates.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/index.js')]: path.resolve(__dirname, 'api/lib/schema/index.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/auth.js')]: path.resolve(__dirname, 'api/lib/schema/auth.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/contact.js')]: path.resolve(__dirname, 'api/lib/schema/contact.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/goals.js')]: path.resolve(__dirname, 'api/lib/schema/goals.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/imports.js')]: path.resolve(__dirname, 'api/lib/schema/imports.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/organizations.js')]: path.resolve(__dirname, 'api/lib/schema/organizations.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/plans.js')]: path.resolve(__dirname, 'api/lib/schema/plans.ts'),
-      [path.resolve(__dirname, 'api/lib/schema/widgets.js')]: path.resolve(__dirname, 'api/lib/schema/widgets.ts'),
-      [path.resolve(__dirname, 'api/lib/middleware/auth.js')]: path.resolve(__dirname, 'api/lib/middleware/auth.ts'),
-      [path.resolve(__dirname, 'api/lib/middleware/index.js')]: path.resolve(__dirname, 'api/lib/middleware/index.ts'),
-      [path.resolve(__dirname, 'api/lib/middleware/roles.js')]: path.resolve(__dirname, 'api/lib/middleware/roles.ts'),
-      [path.resolve(__dirname, 'api/lib/helpers/org-lookup.js')]: path.resolve(__dirname, 'api/lib/helpers/org-lookup.ts'),
-      [path.resolve(__dirname, 'api/lib/helpers/number.js')]: path.resolve(__dirname, 'api/lib/helpers/number.ts'),
     },
+    resolveExtensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
   },
-  experimental: {
-    extensionAlias: {
+  // Webpack parity: let ESM-style `.js` imports in _api/ resolve to their `.ts`
+  // sources. Required by Better Auth (ESM-only) + Drizzle schema files that
+  // import each other via `./goals.js` etc. Turbopack handles this via
+  // `turbopack.resolveExtensions` above; webpack needs `extensionAlias`.
+  webpack(config) {
+    config.resolve = config.resolve || {}
+    config.resolve.extensionAlias = {
+      ...(config.resolve.extensionAlias || {}),
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
-    },
+      '.mjs': ['.mts', '.mjs'],
+    }
+    return config
   },
   // Security headers (from current vercel.json)
   async headers() {

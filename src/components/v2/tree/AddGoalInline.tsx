@@ -5,7 +5,7 @@ interface AddGoalInlineProps {
   planId: string;
   districtId: string;
   parentId: string | null;
-  level: 0 | 1 | 2;
+  level: 0 | 1 | 2 | 3;
   onCancel: () => void;
 }
 

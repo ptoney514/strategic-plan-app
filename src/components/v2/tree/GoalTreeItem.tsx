@@ -15,8 +15,9 @@ interface GoalTreeItemProps {
 const STATUS_OPTIONS = [
   { value: 'not_started', label: 'Not Started' },
   { value: 'in_progress', label: 'In Progress' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'on_hold', label: 'On Hold' },
+  { value: 'on_track', label: 'On Track' },
+  { value: 'off_track', label: 'Off Track' },
+  { value: 'complete', label: 'Complete' },
 ] as const;
 
 const LEVEL_BADGE_STYLES: Record<number, { bg: string; text: string; label: string }> = {
@@ -154,8 +155,8 @@ export function GoalTreeItem({ goal, planId, districtId }: GoalTreeItemProps) {
           <ExternalLink className="h-4 w-4" />
         </button>
 
-        {/* Add sub-goal button (only for L0 and L1) */}
-        {goal.level < 2 && (
+        {/* Add sub-goal button (only for L0–L2; design.md §5.8 caps nesting at level 3) */}
+        {goal.level < 3 && (
           <button
             onClick={() => setShowAddChild(!showAddChild)}
             className="opacity-0 group-hover:opacity-100 p-1 rounded transition-opacity"

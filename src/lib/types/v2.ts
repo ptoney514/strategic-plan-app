@@ -77,9 +77,10 @@ export interface V2Goal {
   goalNumber: string;
   title: string;
   description?: string;
-  level: 0 | 1 | 2;
+  level: 0 | 1 | 2 | 3;
   orderPosition: number;
-  status: 'not_started' | 'in_progress' | 'completed' | 'on_hold';
+  // Matches the DB CHECK constraint (design.md §5.3 — locked to this set).
+  status: 'not_started' | 'in_progress' | 'on_track' | 'off_track' | 'complete';
   progress: number;
   ownerId?: string;
   ownerName?: string;

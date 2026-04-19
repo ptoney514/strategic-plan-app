@@ -17,7 +17,7 @@ function countGoals(goals: HierarchicalGoal[]): { total: number; completed: numb
   function walk(nodes: HierarchicalGoal[]) {
     for (const g of nodes) {
       total++;
-      if (g.status === 'completed') completed++;
+      if (g.status === 'complete') completed++;
       if (g.children) walk(g.children);
     }
   }

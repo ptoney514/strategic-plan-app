@@ -96,7 +96,7 @@ export interface ParsedGoal {
   goal_number: string; // "1.1.1"
   title: string;
   description?: string;
-  level: 0 | 1 | 2;
+  level: 0 | 1 | 2 | 3;
   owner_name?: string;
   metrics: ParsedMetric[];
 }

@@ -526,8 +526,9 @@ function PlanRow({ plan, districtName, districtColor, isSelected, onClick, onNav
 function getStatusColor(status?: string): string {
   switch (status) {
     case 'in_progress': return '#3b82f6';
-    case 'completed': return '#22c55e';
-    case 'on_hold': return '#f59e0b';
+    case 'on_track':
+    case 'complete': return '#22c55e';
+    case 'off_track': return '#f59e0b';
     case 'not_started': return '#9ca3af';
     default: return '#9ca3af';
   }
